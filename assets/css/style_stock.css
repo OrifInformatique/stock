@@ -1,0 +1,169 @@
+
+html, body {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%; 
+
+	
+    font-family: "Helvetica";
+    font-size: 0.9em;
+
+
+}
+
+.form_content{
+    font-family: "Helvetica";
+    font-size: 1.0em;
+
+}
+
+a {
+    color: #0000FF;
+}
+
+a:visited {
+    color: #0000FF;
+}
+
+a:hover {
+    color: #AA22FF;
+}
+
+.grey_round_border  {
+	background-color:#AAA;
+	border-radius:10px;
+	width:auto;
+	padding:2px;
+	text-align: center;
+}
+
+.divitem {
+	background-color: #CCCCCC;
+	margin:4px;
+	padding:5px;
+	border-radius: 8px;
+
+	box-shadow:         3px 3px 4px 2px #666;
+}
+
+.divitemheader {
+	font-size: 1.5em;
+	background-color: #5566FF; 
+
+	color: #FFFFFF;
+	margin:2px;
+	padding:5px;
+	border-radius: 8px;
+	
+	text-shadow: 2px 2px #000;
+	box-shadow:         3px 3px 4px 2px #999;
+}
+
+.tbitem  table{
+	/*  border:1px solid #FEFEFE;  */
+	width: 100%;
+	   table-layout:fixed;
+      border-collapse: collapse; 
+	  
+        /* border-spacing: 0; */
+
+	/* margin:0px;padding:0px; */
+	
+
+}
+
+.tbitem tr{
+	/*vertical-align:middle;*/
+	margin:5px;
+	padding:5px;
+
+
+}
+
+.tbitem td{
+	/*vertical-align:middle;*/
+
+      border-width:3px; 
+      /* background-color:#EEEEEE; */
+      padding:2px;
+	  vertical-align: top;
+}
+
+#form input {
+	width:100px;
+}
+
+
+
+.content {
+	min-height: 100%;
+	position: relative;
+	overflow: auto;
+	z-index: 0; 
+}
+
+/*
+.background {
+	position: absolute;
+	z-index: -1;
+	top: 0;
+	bottom: 0;
+	margin: 0;
+	padding: 0;
+}*/
+
+.top_block {
+	width: 100%;
+	display: block; 
+}
+
+.bottom_block {
+
+}
+
+.left_block {
+
+}
+
+.right_block {
+
+}
+
+.center_block {
+
+}
+
+.clstitle {
+
+	font-size: 1.8em;
+	text-align: center;
+	vertical-align: middle;
+	height: 50px;
+	line-height: 50px;
+	/* background-color: #9999ff; */
+	background-color: #AACCff; 
+	color: #FFF;
+	text-shadow: 1px 1px #444;
+	padding:5px;
+}
+
+.clsfilter {
+
+	
+	background-color: #999999;
+	padding:10px;
+}
+
+.background.clsview {
+
+}
+
+.clsview {
+	width: auto;
+	height: auto;
+	padding-bottom: 0px;
+	background-color: #EDEDED;
+	padding:5px;
+}
+
