@@ -143,45 +143,16 @@ class CI_URI {
 	// --------------------------------------------------------------------
 
 	/**
-	 * Set URI String
+	 * Parse CLI arguments
 	 *
-	 * @param 	string	$str
-	 * @return	void
+	 * Take each command line argument and assume it is a URI segment.
+	 *
+	 * @return    string
 	 */
-	protected function _set_uri_string($str)
+	protected function _parse_argv()
 	{
-		// Filter out control characters and trim slashes
-		$this->uri_string = trim(remove_invisible_characters($str, FALSE), '/');
-
-		if ($this->uri_string !== '')
-		{
-			// Remove the URL suffix, if present
-			if (($suffix = (string) $this->config->item('url_suffix')) !== '')
-			{
-				$slen = strlen($suffix);
-
-				if (substr($this->uri_string, -$slen) === $suffix)
-				{
-					$this->uri_string = substr($this->uri_string, 0, -$slen);
-				}
-			}
-
-			$this->segments[0] = NULL;
-			// Populate the segments array
-			foreach (explode('/', trim($this->uri_string, '/')) as $val)
-			{
-				$val = trim($val);
-				// Filter segments for security
-				$this->filter_uri($val);
-
-				if ($val !== '')
-				{
-					$this->segments[] = $val;
-				}
-			}
-
-			unset($this->segments[0]);
-		}
+		$args = array_slice($_SERVER['argv'], 1);
+		return $args ? implode('/', $args) : '';
 	}
 
 	// --------------------------------------------------------------------
@@ -201,7 +172,9 @@ class CI_URI {
 			return '';
 		}
 
-		$uri = parse_url($_SERVER['REQUEST_URI']);
+		// parse_url() returns false if no host is present, but the path or query string
+		// contains a colon followed by a number
+		$uri = parse_url('http://dummy' . $_SERVER['REQUEST_URI']);
 		$query = isset($uri['query']) ? $uri['query'] : '';
 		$uri = isset($uri['path']) ? $uri['path'] : '';
 
@@ -244,6 +217,30 @@ class CI_URI {
 	// --------------------------------------------------------------------
 
 	/**
+	 * Remove relative directory (../) and multi slashes (///)
+	 *
+	 * Do some final cleaning of the URI and return it, currently only used in self::_parse_request_uri()
+	 *
+	 * @param    string $url
+	 * @return    string
+	 */
+	protected function _remove_relative_directory($uri)
+	{
+		$uris = array();
+		$tok = strtok($uri, '/');
+		while ($tok !== FALSE) {
+			if ((!empty($tok) OR $tok === '0') && $tok !== '..') {
+				$uris[] = $tok;
+			}
+			$tok = strtok('/');
+		}
+
+		return implode('/', $uris);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
 	 * Parse QUERY_STRING
 	 *
 	 * Will parse QUERY_STRING and automatically detect the URI from it.
@@ -273,42 +270,42 @@ class CI_URI {
 	// --------------------------------------------------------------------
 
 	/**
-	 * Parse CLI arguments
+	 * Set URI String
 	 *
-	 * Take each command line argument and assume it is a URI segment.
-	 *
-	 * @return	string
+	 * @param    string $str
+	 * @return    void
 	 */
-	protected function _parse_argv()
+	protected function _set_uri_string($str)
 	{
-		$args = array_slice($_SERVER['argv'], 1);
-		return $args ? implode('/', $args) : '';
-	}
+		// Filter out control characters and trim slashes
+		$this->uri_string = trim(remove_invisible_characters($str, FALSE), '/');
 
-	// --------------------------------------------------------------------
-
-	/**
-	 * Remove relative directory (../) and multi slashes (///)
-	 *
-	 * Do some final cleaning of the URI and return it, currently only used in self::_parse_request_uri()
-	 *
-	 * @param	string	$url
-	 * @return	string
-	 */
-	protected function _remove_relative_directory($uri)
-	{
-		$uris = array();
-		$tok = strtok($uri, '/');
-		while ($tok !== FALSE)
+		if ($this->uri_string !== '')
 		{
-			if (( ! empty($tok) OR $tok === '0') && $tok !== '..')
+			// Remove the URL suffix, if present
+			if (($suffix = (string)$this->config->item('url_suffix')) !== '')
 			{
-				$uris[] = $tok;
-			}
-			$tok = strtok('/');
-		}
+				$slen = strlen($suffix);
 
-		return implode('/', $uris);
+				if (substr($this->uri_string, -$slen) === $suffix) {
+					$this->uri_string = substr($this->uri_string, 0, -$slen);
+				}
+			}
+
+			$this->segments[0] = NULL;
+			// Populate the segments array
+			foreach (explode('/', trim($this->uri_string, '/')) as $val) {
+				$val = trim($val);
+				// Filter segments for security
+				$this->filter_uri($val);
+
+				if ($val !== '') {
+					$this->segments[] = $val;
+				}
+			}
+
+			unset($this->segments[0]);
+		}
 	}
 
 	// --------------------------------------------------------------------
@@ -394,24 +391,6 @@ class CI_URI {
 	// --------------------------------------------------------------------
 
 	/**
-	 * Routed URI to assoc
-	 *
-	 * Identical to CI_URI::uri_to_assoc(), only it uses the re-routed
-	 * segment array.
-	 *
-	 * @see		CI_URI::uri_to_assoc()
-	 * @param 	int	$n		Index (default: 3)
-	 * @param 	array	$default	Default values
-	 * @return 	array
-	 */
-	public function ruri_to_assoc($n = 3, $default = array())
-	{
-		return $this->_uri_to_assoc($n, $default, 'rsegment');
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
 	 * Internal URI-to-assoc
 	 *
 	 * Generates a key/value pair from the URI string or re-routed URI string.
@@ -484,6 +463,24 @@ class CI_URI {
 	// --------------------------------------------------------------------
 
 	/**
+	 * Routed URI to assoc
+	 *
+	 * Identical to CI_URI::uri_to_assoc(), only it uses the re-routed
+	 * segment array.
+	 *
+	 * @see        CI_URI::uri_to_assoc()
+	 * @param    int $n Index (default: 3)
+	 * @param    array $default Default values
+	 * @return    array
+	 */
+	public function ruri_to_assoc($n = 3, $default = array())
+	{
+		return $this->_uri_to_assoc($n, $default, 'rsegment');
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
 	 * Assoc to URI
 	 *
 	 * Generates a URI string from an associative array.
@@ -522,22 +519,6 @@ class CI_URI {
 	// --------------------------------------------------------------------
 
 	/**
-	 * Slash routed segment
-	 *
-	 * Fetches an URI routed segment with a slash.
-	 *
-	 * @param	int	$n	Index
-	 * @param	string	$where	Where to add the slash ('trailing' or 'leading')
-	 * @return	string
-	 */
-	public function slash_rsegment($n, $where = 'trailing')
-	{
-		return $this->_slash_segment($n, $where, 'rsegment');
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
 	 * Internal Slash segment
 	 *
 	 * Fetches an URI Segment and adds a slash to it.
@@ -564,6 +545,22 @@ class CI_URI {
 		}
 
 		return $leading.$this->$which($n).$trailing;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Slash routed segment
+	 *
+	 * Fetches an URI routed segment with a slash.
+	 *
+	 * @param    int $n Index
+	 * @param    string $where Where to add the slash ('trailing' or 'leading')
+	 * @return    string
+	 */
+	public function slash_rsegment($n, $where = 'trailing')
+	{
+		return $this->_slash_segment($n, $where, 'rsegment');
 	}
 
 	// --------------------------------------------------------------------

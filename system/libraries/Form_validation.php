@@ -49,74 +49,65 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class CI_Form_validation {
 
 	/**
+	 * Custom data to validate
+	 *
+	 * @var array
+	 */
+	public $validation_data = array();
+	/**
 	 * Reference to the CodeIgniter instance
 	 *
 	 * @var object
 	 */
 	protected $CI;
-
 	/**
 	 * Validation data for the current form submission
 	 *
 	 * @var array
 	 */
 	protected $_field_data		= array();
-
 	/**
 	 * Validation rules for the current form
 	 *
 	 * @var array
 	 */
 	protected $_config_rules	= array();
-
 	/**
 	 * Array of validation errors
 	 *
 	 * @var array
 	 */
 	protected $_error_array		= array();
-
 	/**
 	 * Array of custom error messages
 	 *
 	 * @var array
 	 */
 	protected $_error_messages	= array();
-
 	/**
 	 * Start tag for error wrapping
 	 *
 	 * @var string
 	 */
 	protected $_error_prefix	= '<p>';
-
 	/**
 	 * End tag for error wrapping
 	 *
 	 * @var string
 	 */
 	protected $_error_suffix	= '</p>';
-
 	/**
 	 * Custom error message
 	 *
 	 * @var string
 	 */
 	protected $error_string		= '';
-
 	/**
 	 * Whether the form data has been validated as safe
 	 *
 	 * @var bool
 	 */
 	protected $_safe_form_data	= FALSE;
-
-	/**
-	 * Custom data to validate
-	 *
-	 * @var array
-	 */
-	public $validation_data	= array();
 
 	/**
 	 * Initialize Form_Validation class
@@ -147,108 +138,6 @@ class CI_Form_validation {
 		$this->CI->load->helper('form');
 
 		log_message('info', 'Form Validation Class Initialized');
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Set Rules
-	 *
-	 * This function takes an array of field names and validation
-	 * rules as input, any custom error messages, validates the info,
-	 * and stores it
-	 *
-	 * @param	mixed	$field
-	 * @param	string	$label
-	 * @param	mixed	$rules
-	 * @param	array	$errors
-	 * @return	CI_Form_validation
-	 */
-	public function set_rules($field, $label = '', $rules = array(), $errors = array())
-	{
-		// No reason to set rules if we have no POST data
-		// or a validation array has not been specified
-		if ($this->CI->input->method() !== 'post' && empty($this->validation_data))
-		{
-			return $this;
-		}
-
-		// If an array was passed via the first parameter instead of individual string
-		// values we cycle through it and recursively call this function.
-		if (is_array($field))
-		{
-			foreach ($field as $row)
-			{
-				// Houston, we have a problem...
-				if ( ! isset($row['field'], $row['rules']))
-				{
-					continue;
-				}
-
-				// If the field label wasn't passed we use the field name
-				$label = isset($row['label']) ? $row['label'] : $row['field'];
-
-				// Add the custom error message array
-				$errors = (isset($row['errors']) && is_array($row['errors'])) ? $row['errors'] : array();
-
-				// Here we go!
-				$this->set_rules($row['field'], $label, $row['rules'], $errors);
-			}
-
-			return $this;
-		}
-
-		// No fields? Nothing to do...
-		if ( ! is_string($field) OR $field === '')
-		{
-			return $this;
-		}
-		elseif ( ! is_array($rules))
-		{
-			// BC: Convert pipe-separated rules string to an array
-			if (is_string($rules))
-			{
-				$rules = explode('|', $rules);
-			}
-			else
-			{
-				return $this;
-			}
-		}
-
-		// If the field label wasn't passed we use the field name
-		$label = ($label === '') ? $field : $label;
-
-		$indexes = array();
-
-		// Is the field name an array? If it is an array, we break it apart
-		// into its components so that we can fetch the corresponding POST data later
-		if (($is_array = (bool) preg_match_all('/\[(.*?)\]/', $field, $matches)) === TRUE)
-		{
-			sscanf($field, '%[^[][', $indexes[0]);
-
-			for ($i = 0, $c = count($matches[0]); $i < $c; $i++)
-			{
-				if ($matches[1][$i] !== '')
-				{
-					$indexes[] = $matches[1][$i];
-				}
-			}
-		}
-
-		// Build our master array
-		$this->_field_data[$field] = array(
-			'field'		=> $field,
-			'label'		=> $label,
-			'rules'		=> $rules,
-			'errors'	=> $errors,
-			'is_array'	=> $is_array,
-			'keys'		=> $indexes,
-			'postdata'	=> NULL,
-			'error'		=> ''
-		);
-
-		return $this;
 	}
 
 	// --------------------------------------------------------------------
@@ -462,8 +351,7 @@ class CI_Form_validation {
 			if ($row['is_array'] === TRUE)
 			{
 				$this->_field_data[$field]['postdata'] = $this->_reduce_array($validation_array, $row['keys']);
-			}
-			elseif (isset($validation_array[$field]) && $validation_array[$field] !== '')
+			} elseif (isset($validation_array[$field]))
 			{
 				$this->_field_data[$field]['postdata'] = $validation_array[$field];
 			}
@@ -499,79 +387,114 @@ class CI_Form_validation {
 	// --------------------------------------------------------------------
 
 	/**
-	 * Traverse a multidimensional $_POST array index until the data is found
+	 * Set Rules
 	 *
-	 * @param	array
-	 * @param	array
-	 * @param	int
-	 * @return	mixed
+	 * This function takes an array of field names and validation
+	 * rules as input, any custom error messages, validates the info,
+	 * and stores it
+	 *
+	 * @param    mixed $field
+	 * @param    string $label
+	 * @param    mixed $rules
+	 * @param    array $errors
+	 * @return    CI_Form_validation
 	 */
-	protected function _reduce_array($array, $keys, $i = 0)
+	public function set_rules($field, $label = '', $rules = array(), $errors = array())
 	{
-		if (is_array($array) && isset($keys[$i]))
+		// No reason to set rules if we have no POST data
+		// or a validation array has not been specified
+		if ($this->CI->input->method() !== 'post' && empty($this->validation_data))
 		{
-			return isset($array[$keys[$i]]) ? $this->_reduce_array($array[$keys[$i]], $keys, ($i+1)) : NULL;
+			return $this;
 		}
 
-		// NULL must be returned for empty fields
-		return ($array === '') ? NULL : $array;
+		// If an array was passed via the first parameter instead of individual string
+		// values we cycle through it and recursively call this function.
+		if (is_array($field))
+		{
+			foreach ($field as $row)
+			{
+				// Houston, we have a problem...
+				if (!isset($row['field'], $row['rules']))
+				{
+					continue;
+				}
+
+				// If the field label wasn't passed we use the field name
+				$label = isset($row['label']) ? $row['label'] : $row['field'];
+
+				// Add the custom error message array
+				$errors = (isset($row['errors']) && is_array($row['errors'])) ? $row['errors'] : array();
+
+				// Here we go!
+				$this->set_rules($row['field'], $label, $row['rules'], $errors);
+			}
+
+			return $this;
+		}
+
+		// No fields or no rules? Nothing to do...
+		if (!is_string($field) OR $field === '' OR empty($rules)) {
+			return $this;
+		} elseif (!is_array($rules)) {
+			// BC: Convert pipe-separated rules string to an array
+			if (!is_string($rules)) {
+				return $this;
+			}
+
+			$rules = preg_split('/\|(?![^\[]*\])/', $rules);
+		}
+
+		// If the field label wasn't passed we use the field name
+		$label = ($label === '') ? $field : $label;
+
+		$indexes = array();
+
+		// Is the field name an array? If it is an array, we break it apart
+		// into its components so that we can fetch the corresponding POST data later
+		if (($is_array = (bool)preg_match_all('/\[(.*?)\]/', $field, $matches)) === TRUE) {
+			sscanf($field, '%[^[][', $indexes[0]);
+
+			for ($i = 0, $c = count($matches[0]); $i < $c; $i++) {
+				if ($matches[1][$i] !== '') {
+					$indexes[] = $matches[1][$i];
+				}
+			}
+		}
+
+		// Build our master array
+		$this->_field_data[$field] = array(
+			'field' => $field,
+			'label' => $label,
+			'rules' => $rules,
+			'errors' => $errors,
+			'is_array' => $is_array,
+			'keys' => $indexes,
+			'postdata' => NULL,
+			'error' => ''
+		);
+
+		return $this;
 	}
 
 	// --------------------------------------------------------------------
 
 	/**
-	 * Re-populate the _POST array with our finalized and processed data
+	 * Traverse a multidimensional $_POST array index until the data is found
 	 *
-	 * @return	void
+	 * @param    array
+	 * @param    array
+	 * @param    int
+	 * @return    mixed
 	 */
-	protected function _reset_post_array()
+	protected function _reduce_array($array, $keys, $i = 0)
 	{
-		foreach ($this->_field_data as $field => $row)
-		{
-			if ($row['postdata'] !== NULL)
-			{
-				if ($row['is_array'] === FALSE)
-				{
-					if (isset($_POST[$row['field']]))
-					{
-						$_POST[$row['field']] = $row['postdata'];
-					}
-				}
-				else
-				{
-					// start with a reference
-					$post_ref =& $_POST;
-
-					// before we assign values, make a reference to the right POST key
-					if (count($row['keys']) === 1)
-					{
-						$post_ref =& $post_ref[current($row['keys'])];
-					}
-					else
-					{
-						foreach ($row['keys'] as $val)
-						{
-							$post_ref =& $post_ref[$val];
-						}
-					}
-
-					if (is_array($row['postdata']))
-					{
-						$array = array();
-						foreach ($row['postdata'] as $k => $v)
-						{
-							$array[$k] = $v;
-						}
-
-						$post_ref = $array;
-					}
-					else
-					{
-						$post_ref = $row['postdata'];
-					}
-				}
-			}
+		if (is_array($array) && isset($keys[$i])) {
+			return isset($array[$keys[$i]]) ? $this->_reduce_array($array[$keys[$i]], $keys, ($i + 1)) : NULL;
 		}
+
+		// NULL must be returned for empty fields
+		return ($array === '') ? NULL : $array;
 	}
 
 	// --------------------------------------------------------------------
@@ -618,6 +541,10 @@ class CI_Form_validation {
 				{
 					$callback = TRUE;
 					$rules = array(1 => $rule);
+					break;
+				} elseif (is_array($rule) && isset($rule[0], $rule[1]) && is_callable($rule[1])) {
+					$callback = TRUE;
+					$rules = array(array($rule[0], $rule[1]));
 					break;
 				}
 			}
@@ -817,11 +744,10 @@ class CI_Form_validation {
 				// Callable rules might not have named error messages
 				if ( ! is_string($rule))
 				{
-					return;
+					$line = $this->CI->lang->line('form_validation_error_message_not_set') . '(Anonymous function)';
 				}
-
 				// Check if a custom message is defined
-				if (isset($this->_field_data[$row['field']]['errors'][$rule]))
+				elseif (isset($this->_field_data[$row['field']]['errors'][$rule]))
 				{
 					$line = $this->_field_data[$row['field']]['errors'][$rule];
 				}
@@ -865,6 +791,26 @@ class CI_Form_validation {
 	// --------------------------------------------------------------------
 
 	/**
+	 * Build an error message using the field and param.
+	 *
+	 * @param    string    The error message line
+	 * @param    string    A field's human name
+	 * @param    mixed    A rule's optional parameter
+	 * @return    string
+	 */
+	protected function _build_error_msg($line, $field = '', $param = '')
+	{
+		// Check for %s in the string for legacy support.
+		if (strpos($line, '%s') !== FALSE) {
+			return sprintf($line, $field, $param);
+		}
+
+		return str_replace(array('{field}', '{param}'), array($field, $param), $line);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
 	 * Translate a field name
 	 *
 	 * @param	string	the field name
@@ -872,17 +818,11 @@ class CI_Form_validation {
 	 */
 	protected function _translate_fieldname($fieldname)
 	{
-		// Do we need to translate the field name?
-		// We look for the prefix lang: to determine this
-		if (sscanf($fieldname, 'lang:%s', $line) === 1)
+		// Do we need to translate the field name? We look for the prefix 'lang:' to determine this
+		// If we find one, but there's no translation for the string - just return it
+		if (sscanf($fieldname, 'lang:%s', $line) === 1 && FALSE === ($fieldname = $this->CI->lang->line($line, FALSE)))
 		{
-			// Were we able to translate the field name?  If not we use $line
-			if (FALSE === ($fieldname = $this->CI->lang->line('form_validation_'.$line))
-				// DEPRECATED support for non-prefixed keys
-				&& FALSE === ($fieldname = $this->CI->lang->line($line, FALSE)))
-			{
-				return $line;
-			}
+			return $line;
 		}
 
 		return $fieldname;
@@ -891,22 +831,45 @@ class CI_Form_validation {
 	// --------------------------------------------------------------------
 
 	/**
-	 * Build an error message using the field and param.
+	 * Re-populate the _POST array with our finalized and processed data
 	 *
-	 * @param	string	The error message line
-	 * @param	string	A field's human name
-	 * @param	mixed	A rule's optional parameter
-	 * @return	string
+	 * @return    void
 	 */
-	protected function _build_error_msg($line, $field = '', $param = '')
+	protected function _reset_post_array()
 	{
-		// Check for %s in the string for legacy support.
-		if (strpos($line, '%s') !== FALSE)
+		foreach ($this->_field_data as $field => $row)
 		{
-			return sprintf($line, $field, $param);
-		}
+			if ($row['postdata'] !== NULL) {
+				if ($row['is_array'] === FALSE) {
+					if (isset($_POST[$row['field']])) {
+						$_POST[$row['field']] = $row['postdata'];
+					}
+				} else {
+					// start with a reference
+					$post_ref =& $_POST;
 
-		return str_replace(array('{field}', '{param}'), array($field, $param), $line);
+					// before we assign values, make a reference to the right POST key
+					if (count($row['keys']) === 1) {
+						$post_ref =& $post_ref[current($row['keys'])];
+					} else {
+						foreach ($row['keys'] as $val) {
+							$post_ref =& $post_ref[$val];
+						}
+					}
+
+					if (is_array($row['postdata'])) {
+						$array = array();
+						foreach ($row['postdata'] as $k => $v) {
+							$array[$k] = $v;
+						}
+
+						$post_ref = $array;
+					} else {
+						$post_ref = $row['postdata'];
+					}
+				}
+			}
+		}
 	}
 
 	// --------------------------------------------------------------------
@@ -999,6 +962,25 @@ class CI_Form_validation {
 	// --------------------------------------------------------------------
 
 	/**
+	 * Set Checkbox
+	 *
+	 * Enables checkboxes to be set to the value the user
+	 * selected in the event of an error
+	 *
+	 * @param    string
+	 * @param    string
+	 * @param    bool
+	 * @return    string
+	 */
+	public function set_checkbox($field = '', $value = '', $default = FALSE)
+	{
+		// Logic is exactly the same as for radio fields
+		return $this->set_radio($field, $value, $default);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
 	 * Set Radio
 	 *
 	 * Enables radio buttons to be set to the value the user
@@ -1037,25 +1019,6 @@ class CI_Form_validation {
 		}
 
 		return ' checked="checked"';
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Set Checkbox
-	 *
-	 * Enables checkboxes to be set to the value the user
-	 * selected in the event of an error
-	 *
-	 * @param	string
-	 * @param	string
-	 * @param	bool
-	 * @return	string
-	 */
-	public function set_checkbox($field = '', $value = '', $default = FALSE)
-	{
-		// Logic is exactly the same as for radio fields
-		return $this->set_radio($field, $value, $default);
 	}
 
 	// --------------------------------------------------------------------
@@ -1237,24 +1200,6 @@ class CI_Form_validation {
 	// --------------------------------------------------------------------
 
 	/**
-	 * Valid Email
-	 *
-	 * @param	string
-	 * @return	bool
-	 */
-	public function valid_email($str)
-	{
-		if (function_exists('idn_to_ascii') && $atpos = strpos($str, '@'))
-		{
-			$str = substr($str, 0, ++$atpos).idn_to_ascii(substr($str, $atpos));
-		}
-
-		return (bool) filter_var($str, FILTER_VALIDATE_EMAIL);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
 	 * Valid Emails
 	 *
 	 * @param	string
@@ -1276,6 +1221,23 @@ class CI_Form_validation {
 		}
 
 		return TRUE;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Valid Email
+	 *
+	 * @param    string
+	 * @return    bool
+	 */
+	public function valid_email($str)
+	{
+		if (function_exists('idn_to_ascii') && $atpos = strpos($str, '@')) {
+			$str = substr($str, 0, ++$atpos) . idn_to_ascii(substr($str, $atpos));
+		}
+
+		return (bool)filter_var($str, FILTER_VALIDATE_EMAIL);
 	}
 
 	// --------------------------------------------------------------------
@@ -1589,7 +1551,6 @@ class CI_Form_validation {
 	public function reset_validation()
 	{
 		$this->_field_data = array();
-		$this->_config_rules = array();
 		$this->_error_array = array();
 		$this->_error_messages = array();
 		$this->error_string = '';

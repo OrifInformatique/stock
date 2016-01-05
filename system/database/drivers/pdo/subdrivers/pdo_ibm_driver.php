@@ -128,6 +128,28 @@ class CI_DB_pdo_ibm_driver extends CI_DB_pdo_driver {
 	// --------------------------------------------------------------------
 
 	/**
+	 * Returns an object with field data
+	 *
+	 * @param    string $table
+	 * @return    array
+	 */
+	public function field_data($table)
+	{
+		$sql = 'SELECT "colname" AS "name", "typename" AS "type", "default" AS "default", "length" AS "max_length",
+				CASE "keyseq" WHEN NULL THEN 0 ELSE 1 END AS "primary_key"
+			FROM "syscat"."columns"
+			WHERE LOWER("tabschema") = ' . $this->escape(strtolower($this->database)) . '
+				AND LOWER("tabname") = ' . $this->escape(strtolower($table)) . '
+			ORDER BY "colno"';
+
+		return (($query = $this->query($sql)) !== FALSE)
+			? $query->result_object()
+			: FALSE;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
 	 * Show table query
 	 *
 	 * Generates a platform-specific query string so that the table names can be fetched
@@ -164,28 +186,6 @@ class CI_DB_pdo_ibm_driver extends CI_DB_pdo_driver {
 		return 'SELECT "colname" FROM "syscat"."columns"
 			WHERE LOWER("tabschema") = '.$this->escape(strtolower($this->database)).'
 				AND LOWER("tabname") = '.$this->escape(strtolower($table));
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Returns an object with field data
-	 *
-	 * @param	string	$table
-	 * @return	array
-	 */
-	public function field_data($table)
-	{
-		$sql = 'SELECT "colname" AS "name", "typename" AS "type", "default" AS "default", "length" AS "max_length",
-				CASE "keyseq" WHEN NULL THEN 0 ELSE 1 END AS "primary_key"
-			FROM "syscat"."columns"
-			WHERE LOWER("tabschema") = '.$this->escape(strtolower($this->database)).'
-				AND LOWER("tabname") = '.$this->escape(strtolower($table)).'
-			ORDER BY "colno"';
-
-		return (($query = $this->query($sql)) !== FALSE)
-			? $query->result_object()
-			: FALSE;
 	}
 
 	// --------------------------------------------------------------------

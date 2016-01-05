@@ -102,7 +102,6 @@ class CI_DB_mysqli_driver extends CI_DB {
 	 *
 	 * @param	bool	$persistent
 	 * @return	object
-	 * @todo	SSL support
 	 */
 	public function db_connect($persistent = FALSE)
 	{
@@ -132,8 +131,47 @@ class CI_DB_mysqli_driver extends CI_DB {
 			$mysqli->options(MYSQLI_INIT_COMMAND, 'SET SESSION sql_mode="STRICT_ALL_TABLES"');
 		}
 
-		return $mysqli->real_connect($hostname, $this->username, $this->password, $this->database, $port, $socket, $client_flags)
-			? $mysqli : FALSE;
+		if (is_array($this->encrypt)) {
+			$ssl = array();
+			empty($this->encrypt['ssl_key']) OR $ssl['key'] = $this->encrypt['ssl_key'];
+			empty($this->encrypt['ssl_cert']) OR $ssl['cert'] = $this->encrypt['ssl_cert'];
+			empty($this->encrypt['ssl_ca']) OR $ssl['ca'] = $this->encrypt['ssl_ca'];
+			empty($this->encrypt['ssl_capath']) OR $ssl['capath'] = $this->encrypt['ssl_capath'];
+			empty($this->encrypt['ssl_cipher']) OR $ssl['cipher'] = $this->encrypt['ssl_cipher'];
+
+			if (!empty($ssl)) {
+				if (!empty($this->encrypt['ssl_verify']) && defined('MYSQLI_OPT_SSL_VERIFY_SERVER_CERT')) {
+					$mysqli->options(MYSQLI_OPT_SSL_VERIFY_SERVER_CERT, TRUE);
+				}
+
+				$client_flags |= MYSQLI_CLIENT_SSL;
+				$mysqli->ssl_set(
+					isset($ssl['key']) ? $ssl['key'] : NULL,
+					isset($ssl['cert']) ? $ssl['cert'] : NULL,
+					isset($ssl['ca']) ? $ssl['ca'] : NULL,
+					isset($ssl['capath']) ? $ssl['capath'] : NULL,
+					isset($ssl['cipher']) ? $ssl['cipher'] : NULL
+				);
+			}
+		}
+
+		if ($mysqli->real_connect($hostname, $this->username, $this->password, $this->database, $port, $socket, $client_flags)) {
+			// Prior to version 5.7.3, MySQL silently downgrades to an unencrypted connection if SSL setup fails
+			if (
+				($client_flags & MYSQLI_CLIENT_SSL)
+				&& version_compare($mysqli->client_info, '5.7.3', '<=')
+				&& empty($mysqli->query("SHOW STATUS LIKE 'ssl_cipher'")->fetch_object()->Value)
+			) {
+				$mysqli->close();
+				$message = 'MySQLi was configured for an SSL connection, but got an unencrypted connection instead!';
+				log_message('error', $message);
+				return ($this->db->db_debug) ? $this->db->display_error($message, '', TRUE) : FALSE;
+			}
+
+			return $mysqli;
+		}
+
+		return FALSE;
 	}
 
 	// --------------------------------------------------------------------
@@ -181,31 +219,109 @@ class CI_DB_mysqli_driver extends CI_DB {
 	// --------------------------------------------------------------------
 
 	/**
-	 * Set client character set
+	 * Database version number
 	 *
-	 * @param	string	$charset
-	 * @return	bool
+	 * @return    string
 	 */
-	protected function _db_set_charset($charset)
+	public function version()
 	{
-		return $this->conn_id->set_charset($charset);
+		if (isset($this->data_cache['version'])) {
+			return $this->data_cache['version'];
+		}
+
+		return $this->data_cache['version'] = $this->conn_id->server_info;
 	}
 
 	// --------------------------------------------------------------------
 
 	/**
-	 * Database version number
+	 * Affected Rows
 	 *
-	 * @return	string
+	 * @return    int
 	 */
-	public function version()
+	public function affected_rows()
 	{
-		if (isset($this->data_cache['version']))
+		return $this->conn_id->affected_rows;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Insert ID
+	 *
+	 * @return    int
+	 */
+	public function insert_id()
+	{
+		return $this->conn_id->insert_id;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Returns an object with field data
+	 *
+	 * @param    string $table
+	 * @return    array
+	 */
+	public function field_data($table)
+	{
+		if (($query = $this->query('SHOW COLUMNS FROM ' . $this->protect_identifiers($table, TRUE, NULL, FALSE))) === FALSE)
 		{
-			return $this->data_cache['version'];
+			return FALSE;
+		}
+		$query = $query->result_object();
+
+		$retval = array();
+		for ($i = 0, $c = count($query); $i < $c; $i++) {
+			$retval[$i] = new stdClass();
+			$retval[$i]->name = $query[$i]->Field;
+
+			sscanf($query[$i]->Type, '%[a-z](%d)',
+				$retval[$i]->type,
+				$retval[$i]->max_length
+			);
+
+			$retval[$i]->default = $query[$i]->Default;
+			$retval[$i]->primary_key = (int)($query[$i]->Key === 'PRI');
 		}
 
-		return $this->data_cache['version'] = $this->conn_id->server_info;
+		return $retval;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Error
+	 *
+	 * Returns an array containing code and message of the last
+	 * database error that has occurred.
+	 *
+	 * @return    array
+	 */
+	public function error()
+	{
+		if (!empty($this->conn_id->connect_errno)) {
+			return array(
+				'code' => $this->conn_id->connect_errno,
+				'message' => is_php('5.2.9') ? $this->conn_id->connect_error : mysqli_connect_error()
+			);
+		}
+
+		return array('code' => $this->conn_id->errno, 'message' => $this->conn_id->error);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Set client character set
+	 *
+	 * @param    string $charset
+	 * @return    bool
+	 */
+	protected function _db_set_charset($charset)
+	{
+		return $this->conn_id->set_charset($charset);
 	}
 
 	// --------------------------------------------------------------------
@@ -248,22 +364,10 @@ class CI_DB_mysqli_driver extends CI_DB {
 	/**
 	 * Begin Transaction
 	 *
-	 * @param	bool	$test_mode
 	 * @return	bool
 	 */
-	public function trans_begin($test_mode = FALSE)
+	protected function _trans_begin()
 	{
-		// When transactions are nested we only begin/commit/rollback the outermost ones
-		if ( ! $this->trans_enabled OR $this->_trans_depth > 0)
-		{
-			return TRUE;
-		}
-
-		// Reset the transaction failure flag.
-		// If the $test_mode flag is set to TRUE transactions will be rolled back
-		// even if the queries produce a successful result.
-		$this->_trans_failure = ($test_mode === TRUE);
-
 		$this->conn_id->autocommit(FALSE);
 		return is_php('5.5')
 			? $this->conn_id->begin_transaction()
@@ -277,14 +381,8 @@ class CI_DB_mysqli_driver extends CI_DB {
 	 *
 	 * @return	bool
 	 */
-	public function trans_commit()
+	protected function _trans_commit()
 	{
-		// When transactions are nested we only begin/commit/rollback the outermost ones
-		if ( ! $this->trans_enabled OR $this->_trans_depth > 0)
-		{
-			return TRUE;
-		}
-
 		if ($this->conn_id->commit())
 		{
 			$this->conn_id->autocommit(TRUE);
@@ -301,14 +399,8 @@ class CI_DB_mysqli_driver extends CI_DB {
 	 *
 	 * @return	bool
 	 */
-	public function trans_rollback()
+	protected function _trans_rollback()
 	{
-		// When transactions are nested we only begin/commit/rollback the outermost ones
-		if ( ! $this->trans_enabled OR $this->_trans_depth > 0)
-		{
-			return TRUE;
-		}
-
 		if ($this->conn_id->rollback())
 		{
 			$this->conn_id->autocommit(TRUE);
@@ -329,30 +421,6 @@ class CI_DB_mysqli_driver extends CI_DB {
 	protected function _escape_str($str)
 	{
 		return $this->conn_id->real_escape_string($str);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Affected Rows
-	 *
-	 * @return	int
-	 */
-	public function affected_rows()
-	{
-		return $this->conn_id->affected_rows;
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Insert ID
-	 *
-	 * @return	int
-	 */
-	public function insert_id()
-	{
-		return $this->conn_id->insert_id;
 	}
 
 	// --------------------------------------------------------------------
@@ -390,63 +458,6 @@ class CI_DB_mysqli_driver extends CI_DB {
 	protected function _list_columns($table = '')
 	{
 		return 'SHOW COLUMNS FROM '.$this->protect_identifiers($table, TRUE, NULL, FALSE);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Returns an object with field data
-	 *
-	 * @param	string	$table
-	 * @return	array
-	 */
-	public function field_data($table)
-	{
-		if (($query = $this->query('SHOW COLUMNS FROM '.$this->protect_identifiers($table, TRUE, NULL, FALSE))) === FALSE)
-		{
-			return FALSE;
-		}
-		$query = $query->result_object();
-
-		$retval = array();
-		for ($i = 0, $c = count($query); $i < $c; $i++)
-		{
-			$retval[$i]			= new stdClass();
-			$retval[$i]->name		= $query[$i]->Field;
-
-			sscanf($query[$i]->Type, '%[a-z](%d)',
-				$retval[$i]->type,
-				$retval[$i]->max_length
-			);
-
-			$retval[$i]->default		= $query[$i]->Default;
-			$retval[$i]->primary_key	= (int) ($query[$i]->Key === 'PRI');
-		}
-
-		return $retval;
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Error
-	 *
-	 * Returns an array containing code and message of the last
-	 * database error that has occurred.
-	 *
-	 * @return	array
-	 */
-	public function error()
-	{
-		if ( ! empty($this->conn_id->connect_errno))
-		{
-			return array(
-				'code' => $this->conn_id->connect_errno,
-				'message' => is_php('5.2.9') ? $this->conn_id->connect_error : mysqli_connect_error()
-			);
-		}
-
-		return array('code' => $this->conn_id->errno, 'message' => $this->conn_id->error);
 	}
 
 	// --------------------------------------------------------------------

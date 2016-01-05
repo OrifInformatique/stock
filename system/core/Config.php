@@ -88,11 +88,9 @@ class CI_Config {
 		// Set the base_url automatically if none was provided
 		if (empty($this->config['base_url']))
 		{
-			// The regular expression is only a basic validation for a valid "Host" header.
-			// It's not exhaustive, only checks for valid characters.
-			if (isset($_SERVER['HTTP_HOST']) && preg_match('/^((\[[0-9a-f:]+\])|(\d{1,3}(\.\d{1,3}){3})|[a-z0-9\-\.]+)(:\d+)?$/i', $_SERVER['HTTP_HOST']))
+			if (isset($_SERVER['SERVER_ADDR']))
 			{
-				$base_url = (is_https() ? 'https' : 'http').'://'.$_SERVER['HTTP_HOST']
+				$base_url = (is_https() ? 'https' : 'http') . '://' . $_SERVER['SERVER_ADDR']
 					.substr($_SERVER['SCRIPT_NAME'], 0, strpos($_SERVER['SCRIPT_NAME'], basename($_SERVER['SCRIPT_FILENAME'])));
 			}
 			else
@@ -104,6 +102,20 @@ class CI_Config {
 		}
 
 		log_message('info', 'Config Class Initialized');
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Set a config file item
+	 *
+	 * @param    string $item Config item key
+	 * @param    string $value Config item value
+	 * @return    void
+	 */
+	public function set_item($item, $value)
+	{
+		$this->config[$item] = $value;
 	}
 
 	// --------------------------------------------------------------------
@@ -181,47 +193,6 @@ class CI_Config {
 	// --------------------------------------------------------------------
 
 	/**
-	 * Fetch a config file item
-	 *
-	 * @param	string	$item	Config item name
-	 * @param	string	$index	Index name
-	 * @return	string|null	The configuration item or NULL if the item doesn't exist
-	 */
-	public function item($item, $index = '')
-	{
-		if ($index == '')
-		{
-			return isset($this->config[$item]) ? $this->config[$item] : NULL;
-		}
-
-		return isset($this->config[$index], $this->config[$index][$item]) ? $this->config[$index][$item] : NULL;
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Fetch a config file item with slash appended (if not empty)
-	 *
-	 * @param	string		$item	Config item name
-	 * @return	string|null	The configuration item or NULL if the item doesn't exist
-	 */
-	public function slash_item($item)
-	{
-		if ( ! isset($this->config[$item]))
-		{
-			return NULL;
-		}
-		elseif (trim($this->config[$item]) === '')
-		{
-			return '';
-		}
-
-		return rtrim($this->config[$item], '/').'/';
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
 	 * Site URL
 	 *
 	 * Returns base_url . index_page [. uri_string]
@@ -238,7 +209,12 @@ class CI_Config {
 
 		if (isset($protocol))
 		{
-			$base_url = $protocol.substr($base_url, strpos($base_url, '://'));
+			// For protocol-relative links
+			if ($protocol === '') {
+				$base_url = substr($base_url, strpos($base_url, '//'));
+			} else {
+				$base_url = $protocol . substr($base_url, strpos($base_url, '://'));
+			}
 		}
 
 		if (empty($uri))
@@ -274,29 +250,42 @@ class CI_Config {
 		return $base_url.$this->item('index_page').$uri;
 	}
 
+	// --------------------------------------------------------------------
+
+	/**
+	 * Fetch a config file item with slash appended (if not empty)
+	 *
+	 * @param    string $item Config item name
+	 * @return    string|null    The configuration item or NULL if the item doesn't exist
+	 */
+	public function slash_item($item)
+	{
+		if (!isset($this->config[$item])) {
+			return NULL;
+		} elseif (trim($this->config[$item]) === '') {
+			return '';
+		}
+
+		return rtrim($this->config[$item], '/') . '/';
+	}
+
 	// -------------------------------------------------------------
 
 	/**
-	 * Base URL
+	 * Fetch a config file item
 	 *
-	 * Returns base_url [. uri_string]
-	 *
-	 * @uses	CI_Config::_uri_string()
-	 *
-	 * @param	string|string[]	$uri	URI string or an array of segments
-	 * @param	string	$protocol
-	 * @return	string
+	 * @param    string $item Config item name
+	 * @param    string $index Index name
+	 * @return    string|null    The configuration item or NULL if the item doesn't exist
 	 */
-	public function base_url($uri = '', $protocol = NULL)
+	public function item($item, $index = '')
 	{
-		$base_url = $this->slash_item('base_url');
-
-		if (isset($protocol))
+		if ($index == '')
 		{
-			$base_url = $protocol.substr($base_url, strpos($base_url, '://'));
+			return isset($this->config[$item]) ? $this->config[$item] : NULL;
 		}
 
-		return $base_url.ltrim($this->_uri_string($uri), '/');
+		return isset($this->config[$index], $this->config[$index][$item]) ? $this->config[$index][$item] : NULL;
 	}
 
 	// -------------------------------------------------------------
@@ -331,29 +320,44 @@ class CI_Config {
 	// --------------------------------------------------------------------
 
 	/**
-	 * System URL
+	 * Base URL
 	 *
-	 * @deprecated	3.0.0	Encourages insecure practices
+	 * Returns base_url [. uri_string]
+	 *
+	 * @uses    CI_Config::_uri_string()
+	 *
+	 * @param    string|string[] $uri URI string or an array of segments
+	 * @param    string $protocol
 	 * @return	string
 	 */
-	public function system_url()
+	public function base_url($uri = '', $protocol = NULL)
 	{
-		$x = explode('/', preg_replace('|/*(.+?)/*$|', '\\1', BASEPATH));
-		return $this->slash_item('base_url').end($x).'/';
+		$base_url = $this->slash_item('base_url');
+
+		if (isset($protocol)) {
+			// For protocol-relative links
+			if ($protocol === '') {
+				$base_url = substr($base_url, strpos($base_url, '//'));
+			} else {
+				$base_url = $protocol . substr($base_url, strpos($base_url, '://'));
+			}
+		}
+
+		return $base_url . ltrim($this->_uri_string($uri), '/');
 	}
 
 	// --------------------------------------------------------------------
 
 	/**
-	 * Set a config file item
+	 * System URL
 	 *
-	 * @param	string	$item	Config item key
-	 * @param	string	$value	Config item value
-	 * @return	void
+	 * @deprecated    3.0.0    Encourages insecure practices
+	 * @return    string
 	 */
-	public function set_item($item, $value)
+	public function system_url()
 	{
-		$this->config[$item] = $value;
+		$x = explode('/', preg_replace('|/*(.+?)/*$|', '\\1', BASEPATH));
+		return $this->slash_item('base_url') . end($x) . '/';
 	}
 
 }

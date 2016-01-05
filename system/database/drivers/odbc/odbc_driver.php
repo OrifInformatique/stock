@@ -128,6 +128,45 @@ class CI_DB_odbc_driver extends CI_DB {
 	// --------------------------------------------------------------------
 
 	/**
+	 * Affected Rows
+	 *
+	 * @return    int
+	 */
+	public function affected_rows()
+	{
+		return odbc_num_rows($this->result_id);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Insert ID
+	 *
+	 * @return    bool
+	 */
+	public function insert_id()
+	{
+		return ($this->db->db_debug) ? $this->db->display_error('db_unsupported_feature') : FALSE;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Error
+	 *
+	 * Returns an array containing code and message of the last
+	 * database error that has occured.
+	 *
+	 * @return    array
+	 */
+	public function error()
+	{
+		return array('code' => odbc_error($this->conn_id), 'message' => odbc_errormsg($this->conn_id));
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
 	 * Execute the query
 	 *
 	 * @param	string	$sql	an SQL query
@@ -143,22 +182,10 @@ class CI_DB_odbc_driver extends CI_DB {
 	/**
 	 * Begin Transaction
 	 *
-	 * @param	bool	$test_mode
 	 * @return	bool
 	 */
-	public function trans_begin($test_mode = FALSE)
+	protected function _trans_begin()
 	{
-		// When transactions are nested we only begin/commit/rollback the outermost ones
-		if ( ! $this->trans_enabled OR $this->_trans_depth > 0)
-		{
-			return TRUE;
-		}
-
-		// Reset the transaction failure flag.
-		// If the $test_mode flag is set to TRUE transactions will be rolled back
-		// even if the queries produce a successful result.
-		$this->_trans_failure = ($test_mode === TRUE);
-
 		return odbc_autocommit($this->conn_id, FALSE);
 	}
 
@@ -169,17 +196,15 @@ class CI_DB_odbc_driver extends CI_DB {
 	 *
 	 * @return	bool
 	 */
-	public function trans_commit()
+	protected function _trans_commit()
 	{
-		// When transactions are nested we only begin/commit/rollback the outermost ones
-		if ( ! $this->trans_enabled OR $this->_trans_depth > 0)
+		if (odbc_commit($this->conn_id))
 		{
+			odbc_autocommit($this->conn_id, TRUE);
 			return TRUE;
 		}
 
-		$ret = odbc_commit($this->conn_id);
-		odbc_autocommit($this->conn_id, TRUE);
-		return $ret;
+		return FALSE;
 	}
 
 	// --------------------------------------------------------------------
@@ -189,17 +214,15 @@ class CI_DB_odbc_driver extends CI_DB {
 	 *
 	 * @return	bool
 	 */
-	public function trans_rollback()
+	protected function _trans_rollback()
 	{
-		// When transactions are nested we only begin/commit/rollback the outermost ones
-		if ( ! $this->trans_enabled OR $this->_trans_depth > 0)
+		if (odbc_rollback($this->conn_id))
 		{
+			odbc_autocommit($this->conn_id, TRUE);
 			return TRUE;
 		}
 
-		$ret = odbc_rollback($this->conn_id);
-		odbc_autocommit($this->conn_id, TRUE);
-		return $ret;
+		return FALSE;
 	}
 
 	// --------------------------------------------------------------------
@@ -213,30 +236,6 @@ class CI_DB_odbc_driver extends CI_DB {
 	protected function _escape_str($str)
 	{
 		return remove_invisible_characters($str);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Affected Rows
-	 *
-	 * @return	int
-	 */
-	public function affected_rows()
-	{
-		return odbc_num_rows($this->result_id);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Insert ID
-	 *
-	 * @return	bool
-	 */
-	public function insert_id()
-	{
-		return ($this->db->db_debug) ? $this->db->display_error('db_unsupported_feature') : FALSE;
 	}
 
 	// --------------------------------------------------------------------
@@ -290,21 +289,6 @@ class CI_DB_odbc_driver extends CI_DB {
 	protected function _field_data($table)
 	{
 		return 'SELECT TOP 1 FROM '.$table;
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Error
-	 *
-	 * Returns an array containing code and message of the last
-	 * database error that has occured.
-	 *
-	 * @return	array
-	 */
-	public function error()
-	{
-		return array('code' => odbc_error($this->conn_id), 'message' => odbc_errormsg($this->conn_id));
 	}
 
 	// --------------------------------------------------------------------

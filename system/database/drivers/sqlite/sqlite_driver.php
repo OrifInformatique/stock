@@ -105,10 +105,84 @@ class CI_DB_sqlite_driver extends CI_DB {
 	// --------------------------------------------------------------------
 
 	/**
+	 * Affected Rows
+	 *
+	 * @return    int
+	 */
+	public function affected_rows()
+	{
+		return sqlite_changes($this->conn_id);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Insert ID
+	 *
+	 * @return    int
+	 */
+	public function insert_id()
+	{
+		return sqlite_last_insert_rowid($this->conn_id);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Returns an object with field data
+	 *
+	 * @param    string $table
+	 * @return    array
+	 */
+	public function field_data($table)
+	{
+		if (($query = $this->query('PRAGMA TABLE_INFO(' . $this->protect_identifiers($table, TRUE, NULL, FALSE) . ')')) === FALSE)
+		{
+			return FALSE;
+		}
+
+		$query = $query->result_array();
+		if (empty($query)) {
+			return FALSE;
+		}
+
+		$retval = array();
+		for ($i = 0, $c = count($query); $i < $c; $i++) {
+			$retval[$i] = new stdClass();
+			$retval[$i]->name = $query[$i]['name'];
+			$retval[$i]->type = $query[$i]['type'];
+			$retval[$i]->max_length = NULL;
+			$retval[$i]->default = $query[$i]['dflt_value'];
+			$retval[$i]->primary_key = isset($query[$i]['pk']) ? (int)$query[$i]['pk'] : 0;
+		}
+
+		return $retval;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Error
+	 *
+	 * Returns an array containing code and message of the last
+	 * database error that has occured.
+	 *
+	 * @return    array
+	 */
+	public function error()
+	{
+		$error = array('code' => sqlite_last_error($this->conn_id));
+		$error['message'] = sqlite_error_string($error['code']);
+		return $error;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
 	 * Execute the query
 	 *
-	 * @param	string	$sql	an SQL query
-	 * @return	resource
+	 * @param    string $sql an SQL query
+	 * @return    resource
 	 */
 	protected function _execute($sql)
 	{
@@ -122,24 +196,11 @@ class CI_DB_sqlite_driver extends CI_DB {
 	/**
 	 * Begin Transaction
 	 *
-	 * @param	bool	$test_mode
 	 * @return	bool
 	 */
-	public function trans_begin($test_mode = FALSE)
+	protected function _trans_begin()
 	{
-		// When transactions are nested we only begin/commit/rollback the outermost ones
-		if ( ! $this->trans_enabled OR $this->_trans_depth > 0)
-		{
-			return TRUE;
-		}
-
-		// Reset the transaction failure flag.
-		// If the $test_mode flag is set to TRUE transactions will be rolled back
-		// even if the queries produce a successful result.
-		$this->_trans_failure = ($test_mode === TRUE);
-
-		$this->simple_query('BEGIN TRANSACTION');
-		return TRUE;
+		return $this->simple_query('BEGIN TRANSACTION');
 	}
 
 	// --------------------------------------------------------------------
@@ -147,18 +208,11 @@ class CI_DB_sqlite_driver extends CI_DB {
 	/**
 	 * Commit Transaction
 	 *
-	 * @return	bool
+	 * @return    bool
 	 */
-	public function trans_commit()
+	protected function _trans_commit()
 	{
-		// When transactions are nested we only begin/commit/rollback the outermost ones
-		if ( ! $this->trans_enabled OR $this->_trans_depth > 0)
-		{
-			return TRUE;
-		}
-
-		$this->simple_query('COMMIT');
-		return TRUE;
+		return $this->simple_query('COMMIT');
 	}
 
 	// --------------------------------------------------------------------
@@ -166,18 +220,11 @@ class CI_DB_sqlite_driver extends CI_DB {
 	/**
 	 * Rollback Transaction
 	 *
-	 * @return	bool
+	 * @return    bool
 	 */
-	public function trans_rollback()
+	protected function _trans_rollback()
 	{
-		// When transactions are nested we only begin/commit/rollback the outermost ones
-		if ( ! $this->trans_enabled OR $this->_trans_depth > 0)
-		{
-			return TRUE;
-		}
-
-		$this->simple_query('ROLLBACK');
-		return TRUE;
+		return $this->simple_query('ROLLBACK');
 	}
 
 	// --------------------------------------------------------------------
@@ -185,36 +232,12 @@ class CI_DB_sqlite_driver extends CI_DB {
 	/**
 	 * Platform-dependant string escape
 	 *
-	 * @param	string
-	 * @return	string
+	 * @param    string
+	 * @return    string
 	 */
 	protected function _escape_str($str)
 	{
 		return sqlite_escape_string($str);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Affected Rows
-	 *
-	 * @return	int
-	 */
-	public function affected_rows()
-	{
-		return sqlite_changes($this->conn_id);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Insert ID
-	 *
-	 * @return	int
-	 */
-	public function insert_id()
-	{
-		return sqlite_last_insert_rowid($this->conn_id);
 	}
 
 	// --------------------------------------------------------------------
@@ -253,58 +276,6 @@ class CI_DB_sqlite_driver extends CI_DB {
 	{
 		// Not supported
 		return FALSE;
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Returns an object with field data
-	 *
-	 * @param	string	$table
-	 * @return	array
-	 */
-	public function field_data($table)
-	{
-		if (($query = $this->query('PRAGMA TABLE_INFO('.$this->protect_identifiers($table, TRUE, NULL, FALSE).')')) === FALSE)
-		{
-			return FALSE;
-		}
-
-		$query = $query->result_array();
-		if (empty($query))
-		{
-			return FALSE;
-		}
-
-		$retval = array();
-		for ($i = 0, $c = count($query); $i < $c; $i++)
-		{
-			$retval[$i]			= new stdClass();
-			$retval[$i]->name		= $query[$i]['name'];
-			$retval[$i]->type		= $query[$i]['type'];
-			$retval[$i]->max_length		= NULL;
-			$retval[$i]->default		= $query[$i]['dflt_value'];
-			$retval[$i]->primary_key	= isset($query[$i]['pk']) ? (int) $query[$i]['pk'] : 0;
-		}
-
-		return $retval;
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Error
-	 *
-	 * Returns an array containing code and message of the last
-	 * database error that has occured.
-	 *
-	 * @return	array
-	 */
-	public function error()
-	{
-		$error = array('code' => sqlite_last_error($this->conn_id));
-		$error['message'] = sqlite_error_string($error['code']);
-		return $error;
 	}
 
 	// --------------------------------------------------------------------

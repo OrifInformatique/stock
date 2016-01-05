@@ -107,6 +107,21 @@ class CI_Utf8 {
 	// --------------------------------------------------------------------
 
 	/**
+	 * Is ASCII?
+	 *
+	 * Tests if a string is standard 7-bit ASCII or not.
+	 *
+	 * @param    string $str String to check
+	 * @return    bool
+	 */
+	public function is_ascii($str)
+	{
+		return (preg_match('/[^\x00-\x7F]/S', $str) === 0);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
 	 * Remove ASCII control characters
 	 *
 	 * Removes all ASCII control characters except horizontal tabs,
@@ -144,21 +159,6 @@ class CI_Utf8 {
 		}
 
 		return FALSE;
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Is ASCII?
-	 *
-	 * Tests if a string is standard 7-bit ASCII or not.
-	 *
-	 * @param	string	$str	String to check
-	 * @return	bool
-	 */
-	public function is_ascii($str)
-	{
-		return (preg_match('/[^\x00-\x7F]/S', $str) === 0);
 	}
 
 }

@@ -177,6 +177,51 @@ class CI_Session_redis_driver extends CI_Session_driver implements SessionHandle
 	// ------------------------------------------------------------------------
 
 	/**
+	 * Get lock
+	 *
+	 * Acquires an (emulated) lock.
+	 *
+	 * @param    string $session_id Session ID
+	 * @return    bool
+	 */
+	protected function _get_lock($session_id)
+	{
+		if (isset($this->_lock_key)) {
+			return $this->_redis->setTimeout($this->_lock_key, 300);
+		}
+
+		// 30 attempts to obtain a lock, in case another request already has it
+		$lock_key = $this->_key_prefix . $session_id . ':lock';
+		$attempt = 0;
+		do {
+			if (($ttl = $this->_redis->ttl($lock_key)) > 0) {
+				sleep(1);
+				continue;
+			}
+
+			if (!$this->_redis->setex($lock_key, 300, time())) {
+				log_message('error', 'Session: Error while trying to obtain lock for ' . $this->_key_prefix . $session_id);
+				return FALSE;
+			}
+
+			$this->_lock_key = $lock_key;
+			break;
+		} while (++$attempt < 30);
+
+		if ($attempt === 30) {
+			log_message('error', 'Session: Unable to obtain lock for ' . $this->_key_prefix . $session_id . ' after 30 attempts, aborting.');
+			return FALSE;
+		} elseif ($ttl === -1) {
+			log_message('debug', 'Session: Lock for ' . $this->_key_prefix . $session_id . ' had no TTL, overriding.');
+		}
+
+		$this->_lock = TRUE;
+		return TRUE;
+	}
+
+	// ------------------------------------------------------------------------
+
+	/**
 	 * Write
 	 *
 	 * Writes (create / update) session data
@@ -221,6 +266,30 @@ class CI_Session_redis_driver extends CI_Session_driver implements SessionHandle
 		}
 
 		return FALSE;
+	}
+
+	// ------------------------------------------------------------------------
+
+	/**
+	 * Release lock
+	 *
+	 * Releases a previously acquired lock
+	 *
+	 * @return    bool
+	 */
+	protected function _release_lock()
+	{
+		if (isset($this->_redis, $this->_lock_key) && $this->_lock) {
+			if (!$this->_redis->delete($this->_lock_key)) {
+				log_message('error', 'Session: Error while trying to free lock for ' . $this->_lock_key);
+				return FALSE;
+			}
+
+			$this->_lock_key = NULL;
+			$this->_lock = FALSE;
+		}
+
+		return TRUE;
 	}
 
 	// ------------------------------------------------------------------------
@@ -296,85 +365,6 @@ class CI_Session_redis_driver extends CI_Session_driver implements SessionHandle
 	public function gc($maxlifetime)
 	{
 		// Not necessary, Redis takes care of that.
-		return TRUE;
-	}
-
-	// ------------------------------------------------------------------------
-
-	/**
-	 * Get lock
-	 *
-	 * Acquires an (emulated) lock.
-	 *
-	 * @param	string	$session_id	Session ID
-	 * @return	bool
-	 */
-	protected function _get_lock($session_id)
-	{
-		if (isset($this->_lock_key))
-		{
-			return $this->_redis->setTimeout($this->_lock_key, 300);
-		}
-
-		// 30 attempts to obtain a lock, in case another request already has it
-		$lock_key = $this->_key_prefix.$session_id.':lock';
-		$attempt = 0;
-		do
-		{
-			if (($ttl = $this->_redis->ttl($lock_key)) > 0)
-			{
-				sleep(1);
-				continue;
-			}
-
-			if ( ! $this->_redis->setex($lock_key, 300, time()))
-			{
-				log_message('error', 'Session: Error while trying to obtain lock for '.$this->_key_prefix.$session_id);
-				return FALSE;
-			}
-
-			$this->_lock_key = $lock_key;
-			break;
-		}
-		while ($attempt++ < 30);
-
-		if ($attempt === 30)
-		{
-			log_message('error', 'Session: Unable to obtain lock for '.$this->_key_prefix.$session_id.' after 30 attempts, aborting.');
-			return FALSE;
-		}
-		elseif ($ttl === -1)
-		{
-			log_message('debug', 'Session: Lock for '.$this->_key_prefix.$session_id.' had no TTL, overriding.');
-		}
-
-		$this->_lock = TRUE;
-		return TRUE;
-	}
-
-	// ------------------------------------------------------------------------
-
-	/**
-	 * Release lock
-	 *
-	 * Releases a previously acquired lock
-	 *
-	 * @return	bool
-	 */
-	protected function _release_lock()
-	{
-		if (isset($this->_redis, $this->_lock_key) && $this->_lock)
-		{
-			if ( ! $this->_redis->delete($this->_lock_key))
-			{
-				log_message('error', 'Session: Error while trying to free lock for '.$this->_lock_key);
-				return FALSE;
-			}
-
-			$this->_lock_key = NULL;
-			$this->_lock = FALSE;
-		}
-
 		return TRUE;
 	}
 

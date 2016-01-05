@@ -65,18 +65,6 @@ class CI_DB_mssql_result extends CI_DB_result {
 	// --------------------------------------------------------------------
 
 	/**
-	 * Number of fields in the result set
-	 *
-	 * @return	int
-	 */
-	public function num_fields()
-	{
-		return mssql_num_fields($this->result_id);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
 	 * Fetch Field Names
 	 *
 	 * Generates an array of column names
@@ -118,6 +106,18 @@ class CI_DB_mssql_result extends CI_DB_result {
 		}
 
 		return $retval;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Number of fields in the result set
+	 *
+	 * @return    int
+	 */
+	public function num_fields()
+	{
+		return mssql_num_fields($this->result_id);
 	}
 
 	// --------------------------------------------------------------------

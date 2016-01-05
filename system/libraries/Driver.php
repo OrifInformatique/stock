@@ -208,33 +208,30 @@ class CI_Driver_Library {
 class CI_Driver {
 
 	/**
+	 * Array of methods and properties for the parent class(es)
+	 *
+	 * @static
+	 * @var    array
+	 */
+	protected static $_reflections = array();
+	/**
 	 * Instance of the parent class
 	 *
 	 * @var object
 	 */
 	protected $_parent;
-
 	/**
 	 * List of methods in the parent class
 	 *
 	 * @var array
 	 */
 	protected $_methods = array();
-
 	/**
 	 * List of properties in the parent class
 	 *
 	 * @var array
 	 */
 	protected $_properties = array();
-
-	/**
-	 * Array of methods and properties for the parent class(es)
-	 *
-	 * @static
-	 * @var	array
-	 */
-	protected static $_reflections = array();
 
 	/**
 	 * Decorate

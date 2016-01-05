@@ -49,53 +49,47 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class CI_Jquery extends CI_Javascript {
 
 	/**
-	 * JavaScript directory location
-	 *
-	 * @var	string
-	 */
-	protected $_javascript_folder = 'js';
-
-	/**
 	 * JQuery code for load
 	 *
 	 * @var	array
 	 */
 	public $jquery_code_for_load = array();
-
 	/**
 	 * JQuery code for compile
 	 *
 	 * @var	array
 	 */
 	public $jquery_code_for_compile = array();
-
 	/**
 	 * JQuery corner active flag
 	 *
 	 * @var	bool
 	 */
 	public $jquery_corner_active = FALSE;
-
 	/**
 	 * JQuery table sorter active flag
 	 *
 	 * @var	bool
 	 */
 	public $jquery_table_sorter_active = FALSE;
-
 	/**
-	 * JQuery table sorder pager active
+	 * JQuery table sorter pager active
 	 *
 	 * @var	bool
 	 */
 	public $jquery_table_sorter_pager_active = FALSE;
-
 	/**
 	 * JQuery AJAX image
 	 *
 	 * @var	string
 	 */
 	public $jquery_ajax_img = '';
+	/**
+	 * JavaScript directory location
+	 *
+	 * @var    string
+	 */
+	protected $_javascript_folder = 'js';
 
 	// --------------------------------------------------------------------
 
@@ -123,6 +117,150 @@ class CI_Jquery extends CI_Javascript {
 	// --------------------------------------------------------------------
 
 	/**
+	 * Script Tag
+	 *
+	 * Outputs the script tag that loads the jquery.js file into an HTML document
+	 *
+	 * @param    string $library_src
+	 * @param    bool $relative
+	 * @return    string
+	 */
+	public function script($library_src = '', $relative = FALSE)
+	{
+		$library_src = $this->external($library_src, $relative);
+		$this->jquery_code_for_load[] = $library_src;
+		return $library_src;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Corner Plugin
+	 *
+	 * @link    http://www.malsup.com/jquery/corner/
+	 * @param    string $element
+	 * @param    string $corner_style
+	 * @return    string
+	 */
+	public function corner($element = '', $corner_style = '')
+	{
+		// may want to make this configurable down the road
+		$corner_location = '/plugins/jquery.corner.js';
+
+		if ($corner_style !== '') {
+			$corner_style = '"' . $corner_style . '"';
+		}
+
+		return '$(' . $this->_prep_element($element) . ').corner(' . $corner_style . ');';
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Modal window
+	 *
+	 * Load a thickbox modal window
+	 *
+	 * @param    string $src
+	 * @param    bool $relative
+	 * @return    void
+	 */
+	public function modal($src, $relative = FALSE)
+	{
+		$this->jquery_code_for_load[] = $this->external($src, $relative);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Effect
+	 *
+	 * Load an Effect library
+	 *
+	 * @param    string $src
+	 * @param    bool $relative
+	 * @return    void
+	 */
+	public function effect($src, $relative = FALSE)
+	{
+		$this->jquery_code_for_load[] = $this->external($src, $relative);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Plugin
+	 *
+	 * Load a plugin library
+	 *
+	 * @param    string $src
+	 * @param    bool $relative
+	 * @return    void
+	 */
+	public function plugin($src, $relative = FALSE)
+	{
+		$this->jquery_code_for_load[] = $this->external($src, $relative);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * UI
+	 *
+	 * Load a user interface library
+	 *
+	 * @param    string $src
+	 * @param    bool $relative
+	 * @return    void
+	 */
+	public function ui($src, $relative = FALSE)
+	{
+		$this->jquery_code_for_load[] = $this->external($src, $relative);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Sortable
+	 *
+	 * Creates a jQuery sortable
+	 *
+	 * @param    string $element
+	 * @param    array $options
+	 * @return    string
+	 */
+	public function sortable($element, $options = array())
+	{
+		if (count($options) > 0) {
+			$sort_options = array();
+			foreach ($options as $k => $v) {
+				$sort_options[] = "\n\t\t" . $k . ': ' . $v;
+			}
+			$sort_options = implode(',', $sort_options);
+		} else {
+			$sort_options = '';
+		}
+
+		return '$(' . $this->_prep_element($element) . ').sortable({' . $sort_options . "\n\t});";
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Table Sorter Plugin
+	 *
+	 * @param    string    table name
+	 * @param    string    plugin location
+	 * @return    string
+	 */
+	public function tablesorter($table = '', $options = '')
+	{
+		$this->jquery_code_for_compile[] = "\t$(" . $this->_prep_element($table) . ').tablesorter(' . $options . ");\n";
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
 	 * Blur
 	 *
 	 * Outputs a jQuery blur event
@@ -134,6 +272,50 @@ class CI_Jquery extends CI_Javascript {
 	protected function _blur($element = 'this', $js = '')
 	{
 		return $this->_add_event($element, $js, 'blur');
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Add Event
+	 *
+	 * Constructs the syntax for an event, and adds to into the array for compilation
+	 *
+	 * @param    string    The element to attach the event to
+	 * @param    string    The code to execute
+	 * @param    string    The event to pass
+	 * @return    string
+	 */
+	protected function _add_event($element, $js, $event)
+	{
+		if (is_array($js)) {
+			$js = implode("\n\t\t", $js);
+		}
+
+		$event = "\n\t$(" . $this->_prep_element($element) . ').' . $event . "(function(){\n\t\t{$js}\n\t});\n";
+		$this->jquery_code_for_compile[] = $event;
+		return $event;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Prep Element
+	 *
+	 * Puts HTML element in quotes for use in jQuery code
+	 * unless the supplied element is the Javascript 'this'
+	 * object, in which case no quotes are added
+	 *
+	 * @param    string
+	 * @return    string
+	 */
+	protected function _prep_element($element)
+	{
+		if ($element !== 'this') {
+			$element = '"' . $element . '"';
+		}
+
+		return $element;
 	}
 
 	// --------------------------------------------------------------------
@@ -261,6 +443,8 @@ class CI_Jquery extends CI_Javascript {
 		return $this->_add_event($element, $js, 'keydown');
 	}
 
+	// --------------------------------------------------------------------
+	// Effects
 	// --------------------------------------------------------------------
 
 	/**
@@ -429,8 +613,6 @@ class CI_Jquery extends CI_Javascript {
 	}
 
 	// --------------------------------------------------------------------
-	// Effects
-	// --------------------------------------------------------------------
 
 	/**
 	 * Add Class
@@ -490,6 +672,29 @@ class CI_Jquery extends CI_Javascript {
 	// --------------------------------------------------------------------
 
 	/**
+	 * Validate Speed
+	 *
+	 * Ensures the speed parameter is valid for jQuery
+	 *
+	 * @param    string
+	 * @return    string
+	 */
+	protected function _validate_speed($speed)
+	{
+		if (in_array($speed, array('slow', 'normal', 'fast'))) {
+			return '"' . $speed . '"';
+		} elseif (preg_match('/[^0-9]/', $speed)) {
+			return '';
+		}
+
+		return $speed;
+	}
+
+	// --------------------------------------------------------------------
+	// Pre-written handy stuff
+	// --------------------------------------------------------------------
+
+	/**
 	 * Fade In
 	 *
 	 * Outputs a jQuery hide event
@@ -512,6 +717,8 @@ class CI_Jquery extends CI_Javascript {
 		return "$({$element}).fadeIn({$speed}{$callback});";
 	}
 
+	// --------------------------------------------------------------------
+	// Plugins
 	// --------------------------------------------------------------------
 
 	/**
@@ -671,6 +878,8 @@ class CI_Jquery extends CI_Javascript {
 	}
 
 	// --------------------------------------------------------------------
+	// Class functions
+	// --------------------------------------------------------------------
 
 	/**
 	 * Toggle Class
@@ -756,8 +965,6 @@ class CI_Jquery extends CI_Javascript {
 	}
 
 	// --------------------------------------------------------------------
-	// Pre-written handy stuff
-	// --------------------------------------------------------------------
 
 	/**
 	 * Zebra tables
@@ -780,165 +987,6 @@ class CI_Jquery extends CI_Javascript {
 		}
 
 		return $zebra;
-	}
-
-	// --------------------------------------------------------------------
-	// Plugins
-	// --------------------------------------------------------------------
-
-	/**
-	 * Corner Plugin
-	 *
-	 * @link	http://www.malsup.com/jquery/corner/
-	 * @param	string	$element
-	 * @param	string	$corner_style
-	 * @return	string
-	 */
-	public function corner($element = '', $corner_style = '')
-	{
-		// may want to make this configurable down the road
-		$corner_location = '/plugins/jquery.corner.js';
-
-		if ($corner_style !== '')
-		{
-			$corner_style = '"'.$corner_style.'"';
-		}
-
-		return '$('.$this->_prep_element($element).').corner('.$corner_style.');';
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Modal window
-	 *
-	 * Load a thickbox modal window
-	 *
-	 * @param	string	$src
-	 * @param	bool	$relative
-	 * @return	void
-	 */
-	public function modal($src, $relative = FALSE)
-	{
-		$this->jquery_code_for_load[] = $this->external($src, $relative);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Effect
-	 *
-	 * Load an Effect library
-	 *
-	 * @param	string	$src
-	 * @param	bool	$relative
-	 * @return	void
-	 */
-	public function effect($src, $relative = FALSE)
-	{
-		$this->jquery_code_for_load[] = $this->external($src, $relative);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Plugin
-	 *
-	 * Load a plugin library
-	 *
-	 * @param	string	$src
-	 * @param	bool	$relative
-	 * @return	void
-	 */
-	public function plugin($src, $relative = FALSE)
-	{
-		$this->jquery_code_for_load[] = $this->external($src, $relative);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * UI
-	 *
-	 * Load a user interface library
-	 *
-	 * @param	string	$src
-	 * @param	bool	$relative
-	 * @return	void
-	 */
-	public function ui($src, $relative = FALSE)
-	{
-		$this->jquery_code_for_load[] = $this->external($src, $relative);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Sortable
-	 *
-	 * Creates a jQuery sortable
-	 *
-	 * @param	string	$element
-	 * @param	array	$options
-	 * @return	string
-	 */
-	public function sortable($element, $options = array())
-	{
-		if (count($options) > 0)
-		{
-			$sort_options = array();
-			foreach ($options as $k=>$v)
-			{
-				$sort_options[] = "\n\t\t".$k.': '.$v;
-			}
-			$sort_options = implode(',', $sort_options);
-		}
-		else
-		{
-			$sort_options = '';
-		}
-
-		return '$('.$this->_prep_element($element).').sortable({'.$sort_options."\n\t});";
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Table Sorter Plugin
-	 *
-	 * @param	string	table name
-	 * @param	string	plugin location
-	 * @return	string
-	 */
-	public function tablesorter($table = '', $options = '')
-	{
-		$this->jquery_code_for_compile[] = "\t$(".$this->_prep_element($table).').tablesorter('.$options.");\n";
-	}
-
-	// --------------------------------------------------------------------
-	// Class functions
-	// --------------------------------------------------------------------
-
-	/**
-	 * Add Event
-	 *
-	 * Constructs the syntax for an event, and adds to into the array for compilation
-	 *
-	 * @param	string	The element to attach the event to
-	 * @param	string	The code to execute
-	 * @param	string	The event to pass
-	 * @return	string
-	 */
-	protected function _add_event($element, $js, $event)
-	{
-		if (is_array($js))
-		{
-			$js = implode("\n\t\t", $js);
-		}
-
-		$event = "\n\t$(".$this->_prep_element($element).').'.$event."(function(){\n\t\t{$js}\n\t});\n";
-		$this->jquery_code_for_compile[] = $event;
-		return $event;
 	}
 
 	// --------------------------------------------------------------------
@@ -1007,70 +1055,6 @@ class CI_Jquery extends CI_Javascript {
 		{
 			$this->jquery_code_for_compile[] = $script;
 		}
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Script Tag
-	 *
-	 * Outputs the script tag that loads the jquery.js file into an HTML document
-	 *
-	 * @param	string	$library_src
-	 * @param	bool	$relative
-	 * @return	string
-	 */
-	public function script($library_src = '', $relative = FALSE)
-	{
-		$library_src = $this->external($library_src, $relative);
-		$this->jquery_code_for_load[] = $library_src;
-		return $library_src;
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Prep Element
-	 *
-	 * Puts HTML element in quotes for use in jQuery code
-	 * unless the supplied element is the Javascript 'this'
-	 * object, in which case no quotes are added
-	 *
-	 * @param	string
-	 * @return	string
-	 */
-	protected function _prep_element($element)
-	{
-		if ($element !== 'this')
-		{
-			$element = '"'.$element.'"';
-		}
-
-		return $element;
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Validate Speed
-	 *
-	 * Ensures the speed parameter is valid for jQuery
-	 *
-	 * @param	string
-	 * @return	string
-	 */
-	protected function _validate_speed($speed)
-	{
-		if (in_array($speed, array('slow', 'normal', 'fast')))
-		{
-			return '"'.$speed.'"';
-		}
-		elseif (preg_match('/[^0-9]/', $speed))
-		{
-			return '';
-		}
-
-		return $speed;
 	}
 
 }

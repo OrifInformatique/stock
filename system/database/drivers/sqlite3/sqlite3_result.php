@@ -49,18 +49,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class CI_DB_sqlite3_result extends CI_DB_result {
 
 	/**
-	 * Number of fields in the result set
-	 *
-	 * @return	int
-	 */
-	public function num_fields()
-	{
-		return $this->result_id->numColumns();
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
 	 * Fetch Field Names
 	 *
 	 * Generates an array of column names
@@ -76,6 +64,18 @@ class CI_DB_sqlite3_result extends CI_DB_result {
 		}
 
 		return $field_names;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Number of fields in the result set
+	 *
+	 * @return    int
+	 */
+	public function num_fields()
+	{
+		return $this->result_id->numColumns();
 	}
 
 	// --------------------------------------------------------------------
@@ -131,6 +131,24 @@ class CI_DB_sqlite3_result extends CI_DB_result {
 	// --------------------------------------------------------------------
 
 	/**
+	 * Data Seek
+	 *
+	 * Moves the internal pointer to the desired offset. We call
+	 * this internally before fetching results to make sure the
+	 * result set starts at zero.
+	 *
+	 * @param    int $n (ignored)
+	 * @return    array
+	 */
+	public function data_seek($n = 0)
+	{
+		// Only resetting to the start of the result set is supported
+		return ($n > 0) ? FALSE : $this->result_id->reset();
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
 	 * Result - associative array
 	 *
 	 * Returns the result set as an array
@@ -171,24 +189,6 @@ class CI_DB_sqlite3_result extends CI_DB_result {
 		}
 
 		return $class_name;
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Data Seek
-	 *
-	 * Moves the internal pointer to the desired offset. We call
-	 * this internally before fetching results to make sure the
-	 * result set starts at zero.
-	 *
-	 * @param	int	$n	(ignored)
-	 * @return	array
-	 */
-	public function data_seek($n = 0)
-	{
-		// Only resetting to the start of the result set is supported
-		return ($n > 0) ? FALSE : $this->result_id->reset();
 	}
 
 }

@@ -172,6 +172,77 @@ class CI_DB_cubrid_driver extends CI_DB {
 	// --------------------------------------------------------------------
 
 	/**
+	 * Affected Rows
+	 *
+	 * @return    int
+	 */
+	public function affected_rows()
+	{
+		return cubrid_affected_rows();
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Insert ID
+	 *
+	 * @return    int
+	 */
+	public function insert_id()
+	{
+		return cubrid_insert_id($this->conn_id);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Returns an object with field data
+	 *
+	 * @param    string $table
+	 * @return    array
+	 */
+	public function field_data($table)
+	{
+		if (($query = $this->query('SHOW COLUMNS FROM ' . $this->protect_identifiers($table, TRUE, NULL, FALSE))) === FALSE) {
+			return FALSE;
+		}
+		$query = $query->result_object();
+
+		$retval = array();
+		for ($i = 0, $c = count($query); $i < $c; $i++) {
+			$retval[$i] = new stdClass();
+			$retval[$i]->name = $query[$i]->Field;
+
+			sscanf($query[$i]->Type, '%[a-z](%d)',
+				$retval[$i]->type,
+				$retval[$i]->max_length
+			);
+
+			$retval[$i]->default = $query[$i]->Default;
+			$retval[$i]->primary_key = (int)($query[$i]->Key === 'PRI');
+		}
+
+		return $retval;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Error
+	 *
+	 * Returns an array containing code and message of the last
+	 * database error that has occured.
+	 *
+	 * @return    array
+	 */
+	public function error()
+	{
+		return array('code' => cubrid_errno($this->conn_id), 'message' => cubrid_error($this->conn_id));
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
 	 * Execute the query
 	 *
 	 * @param	string	$sql	an SQL query
@@ -187,25 +258,16 @@ class CI_DB_cubrid_driver extends CI_DB {
 	/**
 	 * Begin Transaction
 	 *
-	 * @param	bool	$test_mode
 	 * @return	bool
 	 */
-	public function trans_begin($test_mode = FALSE)
+	protected function _trans_begin()
 	{
-		// When transactions are nested we only begin/commit/rollback the outermost ones
-		if ( ! $this->trans_enabled OR $this->_trans_depth > 0)
+		if (($autocommit = cubrid_get_autocommit($this->conn_id)) === NULL)
 		{
-			return TRUE;
-		}
-
-		// Reset the transaction failure flag.
-		// If the $test_mode flag is set to TRUE transactions will be rolled back
-		// even if the queries produce a successful result.
-		$this->_trans_failure = ($test_mode === TRUE);
-
-		if (cubrid_get_autocommit($this->conn_id))
+			return FALSE;
+		} elseif ($autocommit === TRUE)
 		{
-			cubrid_set_autocommit($this->conn_id, CUBRID_AUTOCOMMIT_FALSE);
+			return cubrid_set_autocommit($this->conn_id, CUBRID_AUTOCOMMIT_FALSE);
 		}
 
 		return TRUE;
@@ -218,19 +280,16 @@ class CI_DB_cubrid_driver extends CI_DB {
 	 *
 	 * @return	bool
 	 */
-	public function trans_commit()
+	protected function _trans_commit()
 	{
-		// When transactions are nested we only begin/commit/rollback the outermost ones
-		if ( ! $this->trans_enabled OR $this->_trans_depth > 0)
+		if (!cubrid_commit($this->conn_id))
 		{
-			return TRUE;
+			return FALSE;
 		}
-
-		cubrid_commit($this->conn_id);
 
 		if ($this->auto_commit && ! cubrid_get_autocommit($this->conn_id))
 		{
-			cubrid_set_autocommit($this->conn_id, CUBRID_AUTOCOMMIT_TRUE);
+			return cubrid_set_autocommit($this->conn_id, CUBRID_AUTOCOMMIT_TRUE);
 		}
 
 		return TRUE;
@@ -243,15 +302,12 @@ class CI_DB_cubrid_driver extends CI_DB {
 	 *
 	 * @return	bool
 	 */
-	public function trans_rollback()
+	protected function _trans_rollback()
 	{
-		// When transactions are nested we only begin/commit/rollback the outermost ones
-		if ( ! $this->trans_enabled OR $this->_trans_depth > 0)
+		if (!cubrid_rollback($this->conn_id))
 		{
-			return TRUE;
+			return FALSE;
 		}
-
-		cubrid_rollback($this->conn_id);
 
 		if ($this->auto_commit && ! cubrid_get_autocommit($this->conn_id))
 		{
@@ -272,30 +328,6 @@ class CI_DB_cubrid_driver extends CI_DB {
 	protected function _escape_str($str)
 	{
 		return cubrid_real_escape_string($str, $this->conn_id);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Affected Rows
-	 *
-	 * @return	int
-	 */
-	public function affected_rows()
-	{
-		return cubrid_affected_rows();
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Insert ID
-	 *
-	 * @return	int
-	 */
-	public function insert_id()
-	{
-		return cubrid_insert_id($this->conn_id);
 	}
 
 	// --------------------------------------------------------------------
@@ -333,55 +365,6 @@ class CI_DB_cubrid_driver extends CI_DB {
 	protected function _list_columns($table = '')
 	{
 		return 'SHOW COLUMNS FROM '.$this->protect_identifiers($table, TRUE, NULL, FALSE);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Returns an object with field data
-	 *
-	 * @param	string	$table
-	 * @return	array
-	 */
-	public function field_data($table)
-	{
-		if (($query = $this->query('SHOW COLUMNS FROM '.$this->protect_identifiers($table, TRUE, NULL, FALSE))) === FALSE)
-		{
-			return FALSE;
-		}
-		$query = $query->result_object();
-
-		$retval = array();
-		for ($i = 0, $c = count($query); $i < $c; $i++)
-		{
-			$retval[$i]			= new stdClass();
-			$retval[$i]->name		= $query[$i]->Field;
-
-			sscanf($query[$i]->Type, '%[a-z](%d)',
-				$retval[$i]->type,
-				$retval[$i]->max_length
-			);
-
-			$retval[$i]->default		= $query[$i]->Default;
-			$retval[$i]->primary_key	= (int) ($query[$i]->Key === 'PRI');
-		}
-
-		return $retval;
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Error
-	 *
-	 * Returns an array containing code and message of the last
-	 * database error that has occured.
-	 *
-	 * @return	array
-	 */
-	public function error()
-	{
-		return array('code' => cubrid_errno($this->conn_id), 'message' => cubrid_error($this->conn_id));
 	}
 
 	// --------------------------------------------------------------------

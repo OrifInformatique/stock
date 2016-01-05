@@ -669,24 +669,6 @@ class CI_Javascript {
 	// --------------------------------------------------------------------
 
 	/**
-	 * Inline
-	 *
-	 * Outputs a <script> tag
-	 *
-	 * @param	string	The element to attach the event to
-	 * @param	bool	If a CDATA section should be added
-	 * @return	string
-	 */
-	public function inline($script, $cdata = TRUE)
-	{
-		return $this->_open_script()
-			. ($cdata ? "\n// <![CDATA[\n".$script."\n// ]]>\n" : "\n".$script."\n")
-			. $this->_close_script();
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
 	 * Open Script
 	 *
 	 * Outputs an opening <script>
@@ -713,6 +695,24 @@ class CI_Javascript {
 	protected function _close_script($extra = "\n")
 	{
 		return '</script>'.$extra;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Inline
+	 *
+	 * Outputs a <script> tag
+	 *
+	 * @param    string    The element to attach the event to
+	 * @param    bool    If a CDATA section should be added
+	 * @return    string
+	 */
+	public function inline($script, $cdata = TRUE)
+	{
+		return $this->_open_script()
+		. ($cdata ? "\n// <![CDATA[\n" . $script . "\n// ]]>\n" : "\n" . $script . "\n")
+		. $this->_close_script();
 	}
 
 	// --------------------------------------------------------------------
@@ -802,29 +802,6 @@ class CI_Javascript {
 	// --------------------------------------------------------------------
 
 	/**
-	 * Is associative array
-	 *
-	 * Checks for an associative array
-	 *
-	 * @param	array
-	 * @return	bool
-	 */
-	protected function _is_associative_array($arr)
-	{
-		foreach (array_keys($arr) as $key => $val)
-		{
-			if ($key !== $val)
-			{
-				return TRUE;
-			}
-		}
-
-		return FALSE;
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
 	 * Prep Args
 	 *
 	 * Ensures a standard json value and escapes values
@@ -851,6 +828,27 @@ class CI_Javascript {
 		{
 			return $result;
 		}
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Is associative array
+	 *
+	 * Checks for an associative array
+	 *
+	 * @param    array
+	 * @return    bool
+	 */
+	protected function _is_associative_array($arr)
+	{
+		foreach (array_keys($arr) as $key => $val) {
+			if ($key !== $val) {
+				return TRUE;
+			}
+		}
+
+		return FALSE;
 	}
 
 }

@@ -274,6 +274,44 @@ class CI_Cart {
 	// --------------------------------------------------------------------
 
 	/**
+	 * Save the cart array to the session DB
+	 *
+	 * @return    bool
+	 */
+	protected function _save_cart()
+	{
+		// Let's add up the individual prices and set the cart sub-total
+		$this->_cart_contents['total_items'] = $this->_cart_contents['cart_total'] = 0;
+		foreach ($this->_cart_contents as $key => $val) {
+			// We make sure the array contains the proper indexes
+			if (!is_array($val) OR !isset($val['price'], $val['qty'])) {
+				continue;
+			}
+
+			$this->_cart_contents['cart_total'] += ($val['price'] * $val['qty']);
+			$this->_cart_contents['total_items'] += $val['qty'];
+			$this->_cart_contents[$key]['subtotal'] = ($this->_cart_contents[$key]['price'] * $this->_cart_contents[$key]['qty']);
+		}
+
+		// Is our cart empty? If so we delete it from the session
+		if (count($this->_cart_contents) <= 2) {
+			$this->CI->session->unset_userdata('cart_contents');
+
+			// Nothing more to do... coffee time!
+			return FALSE;
+		}
+
+		// If we made it this far it means that our cart has data.
+		// Let's pass it to the Session class so it can be stored
+		$this->CI->session->set_userdata(array('cart_contents' => $this->_cart_contents));
+
+		// Woot!
+		return TRUE;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
 	 * Update the cart
 	 *
 	 * This function permits the quantity of a given item to be changed.
@@ -376,47 +414,6 @@ class CI_Cart {
 			$this->_cart_contents[$items['rowid']][$key] = $items[$key];
 		}
 
-		return TRUE;
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Save the cart array to the session DB
-	 *
-	 * @return	bool
-	 */
-	protected function _save_cart()
-	{
-		// Let's add up the individual prices and set the cart sub-total
-		$this->_cart_contents['total_items'] = $this->_cart_contents['cart_total'] = 0;
-		foreach ($this->_cart_contents as $key => $val)
-		{
-			// We make sure the array contains the proper indexes
-			if ( ! is_array($val) OR ! isset($val['price'], $val['qty']))
-			{
-				continue;
-			}
-
-			$this->_cart_contents['cart_total'] += ($val['price'] * $val['qty']);
-			$this->_cart_contents['total_items'] += $val['qty'];
-			$this->_cart_contents[$key]['subtotal'] = ($this->_cart_contents[$key]['price'] * $this->_cart_contents[$key]['qty']);
-		}
-
-		// Is our cart empty? If so we delete it from the session
-		if (count($this->_cart_contents) <= 2)
-		{
-			$this->CI->session->unset_userdata('cart_contents');
-
-			// Nothing more to do... coffee time!
-			return FALSE;
-		}
-
-		// If we made it this far it means that our cart has data.
-		// Let's pass it to the Session class so it can be stored
-		$this->CI->session->set_userdata(array('cart_contents' => $this->_cart_contents));
-
-		// Woot!
 		return TRUE;
 	}
 

@@ -342,73 +342,6 @@ class CI_Calendar {
 	// --------------------------------------------------------------------
 
 	/**
-	 * Get Month Name
-	 *
-	 * Generates a textual month name based on the numeric
-	 * month provided.
-	 *
-	 * @param	int	the month
-	 * @return	string
-	 */
-	public function get_month_name($month)
-	{
-		if ($this->month_type === 'short')
-		{
-			$month_names = array('01' => 'cal_jan', '02' => 'cal_feb', '03' => 'cal_mar', '04' => 'cal_apr', '05' => 'cal_may', '06' => 'cal_jun', '07' => 'cal_jul', '08' => 'cal_aug', '09' => 'cal_sep', '10' => 'cal_oct', '11' => 'cal_nov', '12' => 'cal_dec');
-		}
-		else
-		{
-			$month_names = array('01' => 'cal_january', '02' => 'cal_february', '03' => 'cal_march', '04' => 'cal_april', '05' => 'cal_mayl', '06' => 'cal_june', '07' => 'cal_july', '08' => 'cal_august', '09' => 'cal_september', '10' => 'cal_october', '11' => 'cal_november', '12' => 'cal_december');
-		}
-
-		return ($this->CI->lang->line($month_names[$month]) === FALSE)
-			? ucfirst(substr($month_names[$month], 4))
-			: $this->CI->lang->line($month_names[$month]);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Get Day Names
-	 *
-	 * Returns an array of day names (Sunday, Monday, etc.) based
-	 * on the type. Options: long, short, abr
-	 *
-	 * @param	string
-	 * @return	array
-	 */
-	public function get_day_names($day_type = '')
-	{
-		if ($day_type !== '')
-		{
-			$this->day_type = $day_type;
-		}
-
-		if ($this->day_type === 'long')
-		{
-			$day_names = array('sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday');
-		}
-		elseif ($this->day_type === 'short')
-		{
-			$day_names = array('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat');
-		}
-		else
-		{
-			$day_names = array('su', 'mo', 'tu', 'we', 'th', 'fr', 'sa');
-		}
-
-		$days = array();
-		for ($i = 0, $c = count($day_names); $i < $c; $i++)
-		{
-			$days[] = ($this->CI->lang->line('cal_'.$day_names[$i]) === FALSE) ? ucfirst($day_names[$i]) : $this->CI->lang->line('cal_'.$day_names[$i]);
-		}
-
-		return $days;
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
 	 * Adjust Date
 	 *
 	 * This function makes sure that we have a valid month/year.
@@ -464,6 +397,41 @@ class CI_Calendar {
 	// --------------------------------------------------------------------
 
 	/**
+	 * Parse Template
+	 *
+	 * Harvests the data within the template {pseudo-variables}
+	 * used to display the calendar
+	 *
+	 * @return    CI_Calendar
+	 */
+	public function parse_template()
+	{
+		$this->replacements = $this->default_template();
+
+		if (empty($this->template)) {
+			return $this;
+		}
+
+		if (is_string($this->template)) {
+			$today = array('cal_cell_start_today', 'cal_cell_content_today', 'cal_cell_no_content_today', 'cal_cell_end_today');
+
+			foreach (array('table_open', 'table_close', 'heading_row_start', 'heading_previous_cell', 'heading_title_cell', 'heading_next_cell', 'heading_row_end', 'week_row_start', 'week_day_cell', 'week_row_end', 'cal_row_start', 'cal_cell_start', 'cal_cell_content', 'cal_cell_no_content', 'cal_cell_blank', 'cal_cell_end', 'cal_row_end', 'cal_cell_start_today', 'cal_cell_content_today', 'cal_cell_no_content_today', 'cal_cell_end_today', 'cal_cell_start_other', 'cal_cell_other', 'cal_cell_end_other') as $val) {
+				if (preg_match('/\{' . $val . '\}(.*?)\{\/' . $val . '\}/si', $this->template, $match)) {
+					$this->replacements[$val] = $match[1];
+				} elseif (in_array($val, $today, TRUE)) {
+					$this->replacements[$val] = $this->replacements[substr($val, 0, -6)];
+				}
+			}
+		} elseif (is_array($this->template)) {
+			$this->replacements = array_merge($this->replacements, $this->template);
+		}
+
+		return $this;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
 	 * Set Default Template Data
 	 *
 	 * This is used in the event that the user has not created their own template
@@ -503,44 +471,61 @@ class CI_Calendar {
 	// --------------------------------------------------------------------
 
 	/**
-	 * Parse Template
+	 * Get Month Name
 	 *
-	 * Harvests the data within the template {pseudo-variables}
-	 * used to display the calendar
+	 * Generates a textual month name based on the numeric
+	 * month provided.
 	 *
-	 * @return	CI_Calendar
+	 * @param    int    the month
+	 * @return    string
 	 */
-	public function parse_template()
+	public function get_month_name($month)
 	{
-		$this->replacements = $this->default_template();
-
-		if (empty($this->template))
+		if ($this->month_type === 'short')
 		{
-			return $this;
+			$month_names = array('01' => 'cal_jan', '02' => 'cal_feb', '03' => 'cal_mar', '04' => 'cal_apr', '05' => 'cal_may', '06' => 'cal_jun', '07' => 'cal_jul', '08' => 'cal_aug', '09' => 'cal_sep', '10' => 'cal_oct', '11' => 'cal_nov', '12' => 'cal_dec');
+		} else {
+			$month_names = array('01' => 'cal_january', '02' => 'cal_february', '03' => 'cal_march', '04' => 'cal_april', '05' => 'cal_mayl', '06' => 'cal_june', '07' => 'cal_july', '08' => 'cal_august', '09' => 'cal_september', '10' => 'cal_october', '11' => 'cal_november', '12' => 'cal_december');
 		}
 
-		if (is_string($this->template))
-		{
-			$today = array('cal_cell_start_today', 'cal_cell_content_today', 'cal_cell_no_content_today', 'cal_cell_end_today');
+		return ($this->CI->lang->line($month_names[$month]) === FALSE)
+			? ucfirst(substr($month_names[$month], 4))
+			: $this->CI->lang->line($month_names[$month]);
+	}
 
-			foreach (array('table_open', 'table_close', 'heading_row_start', 'heading_previous_cell', 'heading_title_cell', 'heading_next_cell', 'heading_row_end', 'week_row_start', 'week_day_cell', 'week_row_end', 'cal_row_start', 'cal_cell_start', 'cal_cell_content', 'cal_cell_no_content', 'cal_cell_blank', 'cal_cell_end', 'cal_row_end', 'cal_cell_start_today', 'cal_cell_content_today', 'cal_cell_no_content_today', 'cal_cell_end_today', 'cal_cell_start_other', 'cal_cell_other', 'cal_cell_end_other') as $val)
-			{
-				if (preg_match('/\{'.$val.'\}(.*?)\{\/'.$val.'\}/si', $this->template, $match))
-				{
-					$this->replacements[$val] = $match[1];
-				}
-				elseif (in_array($val, $today, TRUE))
-				{
-					$this->replacements[$val] = $this->replacements[substr($val, 0, -6)];
-				}
-			}
-		}
-		elseif (is_array($this->template))
+	// --------------------------------------------------------------------
+
+	/**
+	 * Get Day Names
+	 *
+	 * Returns an array of day names (Sunday, Monday, etc.) based
+	 * on the type. Options: long, short, abr
+	 *
+	 * @param    string
+	 * @return    array
+	 */
+	public function get_day_names($day_type = '')
+	{
+		if ($day_type !== '')
 		{
-			$this->replacements = array_merge($this->replacements, $this->template);
+			$this->day_type = $day_type;
 		}
 
-		return $this;
+		if ($this->day_type === 'long') {
+			$day_names = array('sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday');
+		} elseif ($this->day_type === 'short')
+		{
+			$day_names = array('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat');
+		} else {
+			$day_names = array('su', 'mo', 'tu', 'we', 'th', 'fr', 'sa');
+		}
+
+		$days = array();
+		for ($i = 0, $c = count($day_names); $i < $c; $i++) {
+			$days[] = ($this->CI->lang->line('cal_' . $day_names[$i]) === FALSE) ? ucfirst($day_names[$i]) : $this->CI->lang->line('cal_' . $day_names[$i]);
+		}
+
+		return $days;
 	}
 
 }

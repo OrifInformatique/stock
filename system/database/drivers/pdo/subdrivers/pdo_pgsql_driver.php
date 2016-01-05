@@ -160,26 +160,6 @@ class CI_DB_pdo_pgsql_driver extends CI_DB_pdo_driver {
 	// --------------------------------------------------------------------
 
 	/**
-	 * "Smart" Escape String
-	 *
-	 * Escapes data based on type
-	 *
-	 * @param	string	$str
-	 * @return	mixed
-	 */
-	public function escape($str)
-	{
-		if (is_bool($str))
-		{
-			return ($str) ? 'TRUE' : 'FALSE';
-		}
-
-		return parent::escape($str);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
 	 * ORDER BY
 	 *
 	 * @param	string	$orderby
@@ -210,6 +190,37 @@ class CI_DB_pdo_pgsql_driver extends CI_DB_pdo_driver {
 		}
 
 		return parent::order_by($orderby, $direction, $escape);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Returns an object with field data
+	 *
+	 * @param    string $table
+	 * @return    array
+	 */
+	public function field_data($table)
+	{
+		$sql = 'SELECT "column_name", "data_type", "character_maximum_length", "numeric_precision", "column_default"
+			FROM "information_schema"."columns"
+			WHERE LOWER("table_name") = ' . $this->escape(strtolower($table));
+
+		if (($query = $this->query($sql)) === FALSE) {
+			return FALSE;
+		}
+		$query = $query->result_object();
+
+		$retval = array();
+		for ($i = 0, $c = count($query); $i < $c; $i++) {
+			$retval[$i] = new stdClass();
+			$retval[$i]->name = $query[$i]->column_name;
+			$retval[$i]->type = $query[$i]->data_type;
+			$retval[$i]->max_length = ($query[$i]->character_maximum_length > 0) ? $query[$i]->character_maximum_length : $query[$i]->numeric_precision;
+			$retval[$i]->default = $query[$i]->column_default;
+		}
+
+		return $retval;
 	}
 
 	// --------------------------------------------------------------------
@@ -256,34 +267,21 @@ class CI_DB_pdo_pgsql_driver extends CI_DB_pdo_driver {
 	// --------------------------------------------------------------------
 
 	/**
-	 * Returns an object with field data
+	 * "Smart" Escape String
 	 *
-	 * @param	string	$table
-	 * @return	array
+	 * Escapes data based on type
+	 *
+	 * @param    string $str
+	 * @return    mixed
 	 */
-	public function field_data($table)
+	public function escape($str)
 	{
-		$sql = 'SELECT "column_name", "data_type", "character_maximum_length", "numeric_precision", "column_default"
-			FROM "information_schema"."columns"
-			WHERE LOWER("table_name") = '.$this->escape(strtolower($table));
-
-		if (($query = $this->query($sql)) === FALSE)
+		if (is_bool($str))
 		{
-			return FALSE;
-		}
-		$query = $query->result_object();
-
-		$retval = array();
-		for ($i = 0, $c = count($query); $i < $c; $i++)
-		{
-			$retval[$i]			= new stdClass();
-			$retval[$i]->name		= $query[$i]->column_name;
-			$retval[$i]->type		= $query[$i]->data_type;
-			$retval[$i]->max_length		= ($query[$i]->character_maximum_length > 0) ? $query[$i]->character_maximum_length : $query[$i]->numeric_precision;
-			$retval[$i]->default		= $query[$i]->column_default;
+			return ($str) ? 'TRUE' : 'FALSE';
 		}
 
-		return $retval;
+		return parent::escape($str);
 	}
 
 	// --------------------------------------------------------------------

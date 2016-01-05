@@ -49,6 +49,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class CI_Cache extends CI_Driver_Library {
 
 	/**
+	 * Cache key prefix
+	 *
+	 * @var    string
+	 */
+	public $key_prefix = '';
+	/**
 	 * Valid cache drivers
 	 *
 	 * @var array
@@ -61,34 +67,24 @@ class CI_Cache extends CI_Driver_Library {
 		'redis',
 		'wincache'
 	);
-
 	/**
 	 * Path of cache files (if file-based cache)
 	 *
 	 * @var string
 	 */
 	protected $_cache_path = NULL;
-
 	/**
 	 * Reference to the driver
 	 *
 	 * @var mixed
 	 */
 	protected $_adapter = 'dummy';
-
 	/**
 	 * Fallback driver
 	 *
 	 * @var string
 	 */
 	protected $_backup_driver = 'dummy';
-
-	/**
-	 * Cache key prefix
-	 *
-	 * @var	string
-	 */
-	public $key_prefix = '';
 
 	/**
 	 * Constructor
@@ -100,27 +96,9 @@ class CI_Cache extends CI_Driver_Library {
 	 */
 	public function __construct($config = array())
 	{
-		$default_config = array(
-			'adapter',
-			'memcached'
-		);
-
-		foreach ($default_config as $key)
-		{
-			if (isset($config[$key]))
-			{
-				$param = '_'.$key;
-
-				$this->{$param} = $config[$key];
-			}
-		}
-
+		isset($config['adapter']) && $this->_adapter = $config['adapter'];
+		isset($config['backup']) && $this->_backup_driver = $config['backup'];
 		isset($config['key_prefix']) && $this->key_prefix = $config['key_prefix'];
-
-		if (isset($config['backup']) && in_array($config['backup'], $this->valid_drivers))
-		{
-			$this->_backup_driver = $config['backup'];
-		}
 
 		// If the specified adapter isn't available, check the backup.
 		if ( ! $this->is_supported($this->_adapter))
@@ -138,6 +116,25 @@ class CI_Cache extends CI_Driver_Library {
 				$this->_adapter = $this->_backup_driver;
 			}
 		}
+	}
+
+	// ------------------------------------------------------------------------
+
+	/**
+	 * Is the requested driver supported in this environment?
+	 *
+	 * @param    string $driver The driver to test
+	 * @return    array
+	 */
+	public function is_supported($driver)
+	{
+		static $support;
+
+		if (!isset($support, $support[$driver])) {
+			$support[$driver] = $this->{$driver}->is_supported();
+		}
+
+		return $support[$driver];
 	}
 
 	// ------------------------------------------------------------------------
@@ -196,7 +193,7 @@ class CI_Cache extends CI_Driver_Library {
 	 */
 	public function increment($id, $offset = 1)
 	{
-		return $this->{$this->_adapter}->increment($id, $offset);
+		return $this->{$this->_adapter}->increment($this->key_prefix . $id, $offset);
 	}
 
 	// ------------------------------------------------------------------------
@@ -210,7 +207,7 @@ class CI_Cache extends CI_Driver_Library {
 	 */
 	public function decrement($id, $offset = 1)
 	{
-		return $this->{$this->_adapter}->decrement($id, $offset);
+		return $this->{$this->_adapter}->decrement($this->key_prefix . $id, $offset);
 	}
 
 	// ------------------------------------------------------------------------
@@ -250,25 +247,4 @@ class CI_Cache extends CI_Driver_Library {
 	{
 		return $this->{$this->_adapter}->get_metadata($this->key_prefix.$id);
 	}
-
-	// ------------------------------------------------------------------------
-
-	/**
-	 * Is the requested driver supported in this environment?
-	 *
-	 * @param	string	$driver	The driver to test
-	 * @return	array
-	 */
-	public function is_supported($driver)
-	{
-		static $support = array();
-
-		if ( ! isset($support[$driver]))
-		{
-			$support[$driver] = $this->{$driver}->is_supported();
-		}
-
-		return $support[$driver];
-	}
-
 }

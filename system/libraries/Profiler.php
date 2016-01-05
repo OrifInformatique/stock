@@ -100,12 +100,6 @@ class CI_Profiler {
 		$this->CI =& get_instance();
 		$this->CI->load->language('profiler');
 
-		if (isset($config['query_toggle_count']))
-		{
-			$this->_query_toggle_count = (int) $config['query_toggle_count'];
-			unset($config['query_toggle_count']);
-		}
-
 		// default all sections to display
 		foreach ($this->_available_sections as $section)
 		{
@@ -144,6 +138,34 @@ class CI_Profiler {
 				$this->_compile_{$method} = ($enable !== FALSE);
 			}
 		}
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Run the Profiler
+	 *
+	 * @return    string
+	 */
+	public function run()
+	{
+		$output = '<div id="codeigniter_profiler" style="clear:both;background-color:#fff;padding:10px;">';
+		$fields_displayed = 0;
+
+		foreach ($this->_available_sections as $section) {
+			if ($this->_compile_{$section} !== FALSE) {
+				$func = '_compile_' . $section;
+				$output .= $this->{$func}();
+				$fields_displayed++;
+			}
+		}
+
+		if ($fields_displayed === 0) {
+			$output .= '<p style="border:1px solid #5a0099;padding:10px;margin:20px 0;background-color:#eee;">'
+				. $this->CI->lang->line('profiler_no_profiles') . '</p>';
+		}
+
+		return $output . '</div>';
 	}
 
 	// --------------------------------------------------------------------
@@ -540,37 +562,6 @@ class CI_Profiler {
 		}
 
 		return $output."</table>\n</fieldset>";
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Run the Profiler
-	 *
-	 * @return	string
-	 */
-	public function run()
-	{
-		$output = '<div id="codeigniter_profiler" style="clear:both;background-color:#fff;padding:10px;">';
-		$fields_displayed = 0;
-
-		foreach ($this->_available_sections as $section)
-		{
-			if ($this->_compile_{$section} !== FALSE)
-			{
-				$func = '_compile_'.$section;
-				$output .= $this->{$func}();
-				$fields_displayed++;
-			}
-		}
-
-		if ($fields_displayed === 0)
-		{
-			$output .= '<p style="border:1px solid #5a0099;padding:10px;margin:20px 0;background-color:#eee;">'
-				.$this->CI->lang->line('profiler_no_profiles').'</p>';
-		}
-
-		return $output.'</div>';
 	}
 
 }

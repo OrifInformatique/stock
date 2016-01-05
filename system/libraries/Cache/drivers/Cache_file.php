@@ -85,29 +85,28 @@ class CI_Cache_file extends CI_Driver {
 	// ------------------------------------------------------------------------
 
 	/**
-	 * Save into cache
+	 * Get all data
+	 *
+	 * Internal method to get all the relevant data about a cache item
 	 *
 	 * @param	string	$id	Cache ID
-	 * @param	mixed	$data	Data to store
-	 * @param	int	$ttl	Time to live in seconds
-	 * @param	bool	$raw	Whether to store the raw value (unused)
-	 * @return	bool	TRUE on success, FALSE on failure
+	 * @return    mixed    Data array on success or FALSE on failure
 	 */
-	public function save($id, $data, $ttl = 60, $raw = FALSE)
+	protected function _get($id)
 	{
-		$contents = array(
-			'time'		=> time(),
-			'ttl'		=> $ttl,
-			'data'		=> $data
-		);
-
-		if (write_file($this->_cache_path.$id, serialize($contents)))
-		{
-			chmod($this->_cache_path.$id, 0640);
-			return TRUE;
+		if (!is_file($this->_cache_path . $id)) {
+			return FALSE;
 		}
 
-		return FALSE;
+		$data = unserialize(file_get_contents($this->_cache_path . $id));
+
+		if ($data['ttl'] > 0 && time() > $data['time'] + $data['ttl'])
+		{
+			unlink($this->_cache_path . $id);
+			return FALSE;
+		}
+
+		return $data;
 	}
 
 	// ------------------------------------------------------------------------
@@ -149,6 +148,33 @@ class CI_Cache_file extends CI_Driver {
 		return $this->save($id, $new_value, $data['ttl'])
 			? $new_value
 			: FALSE;
+	}
+
+	// ------------------------------------------------------------------------
+
+	/**
+	 * Save into cache
+	 *
+	 * @param    string $id Cache ID
+	 * @param    mixed $data Data to store
+	 * @param    int $ttl Time to live in seconds
+	 * @param    bool $raw Whether to store the raw value (unused)
+	 * @return    bool    TRUE on success, FALSE on failure
+	 */
+	public function save($id, $data, $ttl = 60, $raw = FALSE)
+	{
+		$contents = array(
+			'time' => time(),
+			'ttl' => $ttl,
+			'data' => $data
+		);
+
+		if (write_file($this->_cache_path . $id, serialize($contents))) {
+			chmod($this->_cache_path . $id, 0640);
+			return TRUE;
+		}
+
+		return FALSE;
 	}
 
 	// ------------------------------------------------------------------------
@@ -253,34 +279,6 @@ class CI_Cache_file extends CI_Driver {
 	public function is_supported()
 	{
 		return is_really_writable($this->_cache_path);
-	}
-
-	// ------------------------------------------------------------------------
-
-	/**
-	 * Get all data
-	 *
-	 * Internal method to get all the relevant data about a cache item
-	 *
-	 * @param	string	$id	Cache ID
-	 * @return	mixed	Data array on success or FALSE on failure
-	 */
-	protected function _get($id)
-	{
-		if ( ! file_exists($this->_cache_path.$id))
-		{
-			return FALSE;
-		}
-
-		$data = unserialize(file_get_contents($this->_cache_path.$id));
-
-		if ($data['ttl'] > 0 && time() > $data['time'] + $data['ttl'])
-		{
-			unlink($this->_cache_path.$id);
-			return FALSE;
-		}
-
-		return $data;
 	}
 
 }

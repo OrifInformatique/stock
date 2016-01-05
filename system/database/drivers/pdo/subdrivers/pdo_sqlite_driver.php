@@ -98,40 +98,29 @@ class CI_DB_pdo_sqlite_driver extends CI_DB_pdo_driver {
 	// --------------------------------------------------------------------
 
 	/**
-	 * Show table query
+	 * Fetch Field Names
 	 *
-	 * Generates a platform-specific query string so that the table names can be fetched
-	 *
-	 * @param	bool	$prefix_limit
-	 * @return	string
+	 * @param    string $table Table name
+	 * @return    array
 	 */
-	protected function _list_tables($prefix_limit = FALSE)
+	public function list_fields($table)
 	{
-		$sql = 'SELECT "NAME" FROM "SQLITE_MASTER" WHERE "TYPE" = \'table\'';
-
-		if ($prefix_limit === TRUE && $this->dbprefix !== '')
-		{
-			return $sql.' AND "NAME" LIKE \''.$this->escape_like_str($this->dbprefix)."%' "
-				.sprintf($this->_like_escape_str, $this->_like_escape_chr);
+		// Is there a cached result?
+		if (isset($this->data_cache['field_names'][$table])) {
+			return $this->data_cache['field_names'][$table];
 		}
 
-		return $sql;
-	}
+		if (($result = $this->query('PRAGMA TABLE_INFO(' . $this->protect_identifiers($table, TRUE, NULL, FALSE) . ')')) === FALSE)
+		{
+			return FALSE;
+		}
 
-	// --------------------------------------------------------------------
+		$this->data_cache['field_names'][$table] = array();
+		foreach ($result->result_array() as $row) {
+			$this->data_cache['field_names'][$table][] = $row['name'];
+		}
 
-	/**
-	 * Show column query
-	 *
-	 * Generates a platform-specific query string so that the column names can be fetched
-	 *
-	 * @param	string	$table
-	 * @return	string
-	 */
-	protected function _list_columns($table = '')
-	{
-		// Not supported
-		return FALSE;
+		return $this->data_cache['field_names'][$table];
 	}
 
 	// --------------------------------------------------------------------
@@ -167,6 +156,28 @@ class CI_DB_pdo_sqlite_driver extends CI_DB_pdo_driver {
 		}
 
 		return $retval;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Show table query
+	 *
+	 * Generates a platform-specific query string so that the table names can be fetched
+	 *
+	 * @param    bool $prefix_limit
+	 * @return    string
+	 */
+	protected function _list_tables($prefix_limit = FALSE)
+	{
+		$sql = 'SELECT "NAME" FROM "SQLITE_MASTER" WHERE "TYPE" = \'table\'';
+
+		if ($prefix_limit === TRUE && $this->dbprefix !== '') {
+			return $sql . ' AND "NAME" LIKE \'' . $this->escape_like_str($this->dbprefix) . "%' "
+			. sprintf($this->_like_escape_str, $this->_like_escape_chr);
+		}
+
+		return $sql;
 	}
 
 	// --------------------------------------------------------------------

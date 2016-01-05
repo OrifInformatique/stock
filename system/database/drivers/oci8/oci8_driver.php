@@ -102,6 +102,14 @@ class CI_DB_oci8_driver extends CI_DB {
 	// --------------------------------------------------------------------
 
 	/**
+	 * Reset $stmt_id flag
+	 *
+	 * Used by stored_procedure() to prevent _execute() from
+	 * re-setting the statement ID.
+	 */
+	protected $_reset_stmt_id = TRUE;
+
+	/**
 	 * List of reserved identifiers
 	 *
 	 * Identifiers that must NOT be escaped.
@@ -255,41 +263,6 @@ class CI_DB_oci8_driver extends CI_DB {
 	// --------------------------------------------------------------------
 
 	/**
-	 * Execute the query
-	 *
-	 * @param	string	$sql	an SQL query
-	 * @return	resource
-	 */
-	protected function _execute($sql)
-	{
-		/* Oracle must parse the query before it is run. All of the actions with
-		 * the query are based on the statement id returned by oci_parse().
-		 */
-		$this->stmt_id = FALSE;
-		$this->_set_stmt_id($sql);
-		oci_set_prefetch($this->stmt_id, 1000);
-		return oci_execute($this->stmt_id, $this->commit_mode);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Generate a statement ID
-	 *
-	 * @param	string	$sql	an SQL query
-	 * @return	void
-	 */
-	protected function _set_stmt_id($sql)
-	{
-		if ( ! is_resource($this->stmt_id))
-		{
-			$this->stmt_id = oci_parse($this->conn_id, $sql);
-		}
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
 	 * Get cursor. Returns a cursor from the database
 	 *
 	 * @return	resource
@@ -311,22 +284,22 @@ class CI_DB_oci8_driver extends CI_DB {
 	 *
 	 * params array keys
 	 *
-	 * KEY	  OPTIONAL	NOTES
-	 * name		no	the name of the parameter should be in :<param_name> format
-	 * value	no	the value of the parameter.  If this is an OUT or IN OUT parameter,
-	 *				this should be a reference to a variable
-	 * type		yes	the type of the parameter
-	 * length	yes	the max size of the parameter
+	 * KEY      OPTIONAL  NOTES
+	 * name     no        the name of the parameter should be in :<param_name> format
+	 * value    no        the value of the parameter.  If this is an OUT or IN OUT parameter,
+	 *                    this should be a reference to a variable
+	 * type     yes       the type of the parameter
+	 * length   yes       the max size of the parameter
 	 */
-	public function stored_procedure($package, $procedure, $params)
+	public function stored_procedure($package, $procedure, array $params)
 	{
-		if ($package === '' OR $procedure === '' OR ! is_array($params))
+		if ($package === '' OR $procedure === '')
 		{
 			log_message('error', 'Invalid query: '.$package.'.'.$procedure);
 			return ($this->db_debug) ? $this->display_error('db_invalid_query') : FALSE;
 		}
 
-		// build the query string
+		// Build the query string
 		$sql = 'BEGIN '.$package.'.'.$procedure.'(';
 
 		$have_cursor = FALSE;
@@ -341,10 +314,12 @@ class CI_DB_oci8_driver extends CI_DB {
 		}
 		$sql = trim($sql, ',').'); END;';
 
-		$this->stmt_id = FALSE;
-		$this->_set_stmt_id($sql);
+		$this->_reset_stmt_id = FALSE;
+		$this->stmt_id = oci_parse($this->conn_id, $sql);
 		$this->_bind_params($params);
-		return $this->query($sql, FALSE, $have_cursor);
+		$result = $this->query($sql, FALSE, $have_cursor);
+		$this->_reset_stmt_id = TRUE;
+		return $result;
 	}
 
 	// --------------------------------------------------------------------
@@ -379,79 +354,6 @@ class CI_DB_oci8_driver extends CI_DB {
 	// --------------------------------------------------------------------
 
 	/**
-	 * Begin Transaction
-	 *
-	 * @param	bool	$test_mode
-	 * @return	bool
-	 */
-	public function trans_begin($test_mode = FALSE)
-	{
-		if ( ! $this->trans_enabled)
-		{
-			return TRUE;
-		}
-
-		// When transactions are nested we only begin/commit/rollback the outermost ones
-		if ($this->_trans_depth > 0)
-		{
-			return TRUE;
-		}
-
-		// Reset the transaction failure flag.
-		// If the $test_mode flag is set to TRUE transactions will be rolled back
-		// even if the queries produce a successful result.
-		$this->_trans_failure = ($test_mode === TRUE);
-
-		$this->commit_mode = is_php('5.3.2') ? OCI_NO_AUTO_COMMIT : OCI_DEFAULT;
-		return TRUE;
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Commit Transaction
-	 *
-	 * @return	bool
-	 */
-	public function trans_commit()
-	{
-		if ( ! $this->trans_enabled)
-		{
-			return TRUE;
-		}
-
-		// When transactions are nested we only begin/commit/rollback the outermost ones
-		if ($this->_trans_depth > 0)
-		{
-			return TRUE;
-		}
-
-		$this->commit_mode = OCI_COMMIT_ON_SUCCESS;
-		return oci_commit($this->conn_id);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Rollback Transaction
-	 *
-	 * @return	bool
-	 */
-	public function trans_rollback()
-	{
-		// When transactions are nested we only begin/commit/rollback the outermost ones
-		if ( ! $this->trans_enabled OR $this->_trans_depth > 0)
-		{
-			return TRUE;
-		}
-
-		$this->commit_mode = OCI_COMMIT_ON_SUCCESS;
-		return oci_rollback($this->conn_id);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
 	 * Affected Rows
 	 *
 	 * @return	int
@@ -472,55 +374,6 @@ class CI_DB_oci8_driver extends CI_DB {
 	{
 		// not supported in oracle
 		return $this->display_error('db_unsupported_function');
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Show table query
-	 *
-	 * Generates a platform-specific query string so that the table names can be fetched
-	 *
-	 * @param	bool	$prefix_limit
-	 * @return	string
-	 */
-	protected function _list_tables($prefix_limit = FALSE)
-	{
-		$sql = 'SELECT "TABLE_NAME" FROM "ALL_TABLES"';
-
-		if ($prefix_limit !== FALSE && $this->dbprefix !== '')
-		{
-			return $sql.' WHERE "TABLE_NAME" LIKE \''.$this->escape_like_str($this->dbprefix)."%' "
-				.sprintf($this->_like_escape_str, $this->_like_escape_chr);
-		}
-
-		return $sql;
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Show column query
-	 *
-	 * Generates a platform-specific query string so that the column names can be fetched
-	 *
-	 * @param	string	$table
-	 * @return	string
-	 */
-	protected function _list_columns($table = '')
-	{
-		if (strpos($table, '.') !== FALSE)
-		{
-			sscanf($table, '%[^.].%s', $owner, $table);
-		}
-		else
-		{
-			$owner = $this->username;
-		}
-
-		return 'SELECT COLUMN_NAME FROM ALL_TAB_COLUMNS
-			WHERE UPPER(OWNER) = '.$this->escape(strtoupper($owner)).'
-				AND UPPER(TABLE_NAME) = '.$this->escape(strtoupper($table));
 	}
 
 	// --------------------------------------------------------------------
@@ -573,7 +426,7 @@ class CI_DB_oci8_driver extends CI_DB {
 			{
 				$default = '';
 			}
-			$retval[$i]->default		= $query[$i]->COLUMN_DEFAULT;
+			$retval[$i]->default = $default;
 		}
 
 		return $retval;
@@ -608,6 +461,112 @@ class CI_DB_oci8_driver extends CI_DB {
 		}
 
 		return oci_error();
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Execute the query
+	 *
+	 * @param    string $sql an SQL query
+	 * @return    resource
+	 */
+	protected function _execute($sql)
+	{
+		/* Oracle must parse the query before it is run. All of the actions with
+		 * the query are based on the statement id returned by oci_parse().
+		 */
+		if ($this->_reset_stmt_id === TRUE) {
+			$this->stmt_id = oci_parse($this->conn_id, $sql);
+		}
+
+		oci_set_prefetch($this->stmt_id, 1000);
+		return oci_execute($this->stmt_id, $this->commit_mode);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Begin Transaction
+	 *
+	 * @return    bool
+	 */
+	protected function _trans_begin()
+	{
+		$this->commit_mode = is_php('5.3.2') ? OCI_NO_AUTO_COMMIT : OCI_DEFAULT;
+		return TRUE;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Commit Transaction
+	 *
+	 * @return    bool
+	 */
+	protected function _trans_commit()
+	{
+		$this->commit_mode = OCI_COMMIT_ON_SUCCESS;
+
+		return oci_commit($this->conn_id);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Rollback Transaction
+	 *
+	 * @return    bool
+	 */
+	protected function _trans_rollback()
+	{
+		$this->commit_mode = OCI_COMMIT_ON_SUCCESS;
+		return oci_rollback($this->conn_id);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Show table query
+	 *
+	 * Generates a platform-specific query string so that the table names can be fetched
+	 *
+	 * @param    bool $prefix_limit
+	 * @return    string
+	 */
+	protected function _list_tables($prefix_limit = FALSE)
+	{
+		$sql = 'SELECT "TABLE_NAME" FROM "ALL_TABLES"';
+
+		if ($prefix_limit !== FALSE && $this->dbprefix !== '') {
+			return $sql . ' WHERE "TABLE_NAME" LIKE \'' . $this->escape_like_str($this->dbprefix) . "%' "
+			. sprintf($this->_like_escape_str, $this->_like_escape_chr);
+		}
+
+		return $sql;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Show column query
+	 *
+	 * Generates a platform-specific query string so that the column names can be fetched
+	 *
+	 * @param    string $table
+	 * @return    string
+	 */
+	protected function _list_columns($table = '')
+	{
+		if (strpos($table, '.') !== FALSE) {
+			sscanf($table, '%[^.].%s', $owner, $table);
+		} else {
+			$owner = $this->username;
+		}
+
+		return 'SELECT COLUMN_NAME FROM ALL_TAB_COLUMNS
+			WHERE UPPER(OWNER) = ' . $this->escape(strtoupper($owner)) . '
+				AND UPPER(TABLE_NAME) = ' . $this->escape(strtoupper($table));
 	}
 
 	// --------------------------------------------------------------------

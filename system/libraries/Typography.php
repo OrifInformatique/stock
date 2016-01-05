@@ -281,6 +281,41 @@ class CI_Typography {
 	// --------------------------------------------------------------------
 
 	/**
+	 * Format Newlines
+	 *
+	 * Converts newline characters into either <p> tags or <br />
+	 *
+	 * @param    string
+	 * @return    string
+	 */
+	protected function _format_newlines($str)
+	{
+		if ($str === '' OR (strpos($str, "\n") === FALSE && !in_array($this->last_block_element, $this->inner_block_required))) {
+			return $str;
+		}
+
+		// Convert two consecutive newlines to paragraphs
+		$str = str_replace("\n\n", "</p>\n\n<p>", $str);
+
+		// Convert single spaces to <br /> tags
+		$str = preg_replace("/([^\n])(\n)([^\n])/", '\\1<br />\\2\\3', $str);
+
+		// Wrap the whole enchilada in enclosing paragraphs
+		if ($str !== "\n") {
+			// We trim off the right-side new line so that the closing </p> tag
+			// will be positioned immediately following the string, matching
+			// the behavior of the opening <p> tag
+			$str = '<p>' . rtrim($str) . '</p>';
+		}
+
+		// Remove empty paragraphs if they are on the first line, as this
+		// is a potential unintended consequence of the previous code
+		return preg_replace('/<p><\/p>(.*)/', '\\1', $str, 1);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
 	 * Format Characters
 	 *
 	 * This function mainly converts double and single quotes
@@ -343,44 +378,29 @@ class CI_Typography {
 		return preg_replace(array_keys($table), $table, $str);
 	}
 
-	// --------------------------------------------------------------------
+	// ------------------------------------------------------------------------
 
 	/**
-	 * Format Newlines
-	 *
-	 * Converts newline characters into either <p> tags or <br />
+	 * Convert newlines to HTML line breaks except within PRE tags
 	 *
 	 * @param	string
 	 * @return	string
 	 */
-	protected function _format_newlines($str)
+	public function nl2br_except_pre($str)
 	{
-		if ($str === '' OR (strpos($str, "\n") === FALSE && ! in_array($this->last_block_element, $this->inner_block_required)))
+		$newstr = '';
+		for ($ex = explode('pre>', $str), $ct = count($ex), $i = 0; $i < $ct; $i++)
 		{
-			return $str;
+			$newstr .= (($i % 2) === 0) ? nl2br($ex[$i]) : $ex[$i];
+			if ($ct - 1 !== $i) {
+				$newstr .= 'pre>';
+			}
 		}
 
-		// Convert two consecutive newlines to paragraphs
-		$str = str_replace("\n\n", "</p>\n\n<p>", $str);
-
-		// Convert single spaces to <br /> tags
-		$str = preg_replace("/([^\n])(\n)([^\n])/", '\\1<br />\\2\\3', $str);
-
-		// Wrap the whole enchilada in enclosing paragraphs
-		if ($str !== "\n")
-		{
-			// We trim off the right-side new line so that the closing </p> tag
-			// will be positioned immediately following the string, matching
-			// the behavior of the opening <p> tag
-			$str =  '<p>'.rtrim($str).'</p>';
-		}
-
-		// Remove empty paragraphs if they are on the first line, as this
-		// is a potential unintended consequence of the previous code
-		return preg_replace('/<p><\/p>(.*)/', '\\1', $str, 1);
+		return $newstr;
 	}
 
-	// ------------------------------------------------------------------------
+	// --------------------------------------------------------------------
 
 	/**
 	 * Protect Characters
@@ -396,29 +416,6 @@ class CI_Typography {
 	protected function _protect_characters($match)
 	{
 		return str_replace(array("'",'"','--','  '), array('{@SQ}', '{@DQ}', '{@DD}', '{@NBS}'), $match[0]);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Convert newlines to HTML line breaks except within PRE tags
-	 *
-	 * @param	string
-	 * @return	string
-	 */
-	public function nl2br_except_pre($str)
-	{
-		$newstr = '';
-		for ($ex = explode('pre>', $str), $ct = count($ex), $i = 0; $i < $ct; $i++)
-		{
-			$newstr .= (($i % 2) === 0) ? nl2br($ex[$i]) : $ex[$i];
-			if ($ct - 1 !== $i)
-			{
-				$newstr .= 'pre>';
-			}
-		}
-
-		return $newstr;
 	}
 
 }
