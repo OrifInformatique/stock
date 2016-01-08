@@ -300,90 +300,80 @@ class Item_model extends CI_Model {
     }
     
     /* *** Check date format *** */
-    
-    function _validateDate($date)
+
+	public function validate_post(&$item, &$error_message)
     {
-    	$d = DateTime::createFromFormat('Y-m-d', $date);
-    	return $d && $d->format('Y-m-d') == $date;
+
+		if ($item['created_by_user_id'] < 1) {
+			$error_message .= ('<br>"Crée par" est obligatoire');
+		}
+
+		if ($item['modified_by_user_id'] < 1) {
+			$item['modified_by_user_id'] = NULL;
+		}
+
+		if ($item['control_by_user_id'] < 1) {
+			$item['control_by_user_id'] = NULL;
+		}
+
+		if ($item['stocking_place_id'] < 1) {
+			$item['stocking_place_id'] = NULL;
+		}
+
+		if ($item['item_state_id'] < 1) {
+			$item['item_state_id'] = NULL;
+		}
+
+		if ($item['supplier_id'] < 1) {
+			$item['supplier_id'] = NULL;
+		}
+
+		if (empty($item['buying_date']))
+			$item['buying_date'] = NULL;
+
+		if ($item['buying_date'] != NULL)
+			if (!$this->_validateDate($item['buying_date'])) {
+				$error_message .= ('<br>La date d\'achat est incorrecte');
+
+			}
+
+		if (empty($item['created_date']))
+			$item['created_date'] = NULL;
+
+
+		if ($item['created_date'] != NULL)
+			if (!$this->_validateDate($item['created_date'])) {
+				$error_message .= ('<br>La date de création est incorrecte');
+
+			}
+
+		if (empty($item['modified_date']))
+			$item['modified_date'] = NULL;
+
+		if ($item['modified_date'] != NULL)
+			if (!$this->_validateDate($item['modified_date'])) {
+				$error_message .= ('<br>La date de modification est incorrecte');
+
+			}
+
+		if (empty($item['control_date']))
+			$item['control_date'] = NULL;
+
+		if ($item['control_date'] != NULL)
+			if (!$this->_validateDate($item['modified_date'])) {
+				$error_message .= ('<br>La date de contrôle est incorrecte');
+
+			}
+
+		return;
     }
     
     /* *** Check inputs from a "HTML Form" for the item table *** */
-    
-    public function validate_post(&$item, &$error_message)
+
+	function _validateDate($date)
     {
-    	
-    	if($item['created_by_user_id'] < 1)
-    	{
-    		$error_message .= ('<br>"Crée par" est obligatoire');
-    	}
-    	
-    	if($item['modified_by_user_id'] < 1)
-    	{
-    		$item['modified_by_user_id'] = NULL;
-    	}
-    	
-    	if($item['control_by_user_id'] < 1)
-    	{
-    		$item['control_by_user_id'] = NULL;
-    	}
-    	
-    	if($item['stocking_place_id'] < 1)
-    	{
-    		$item['stocking_place_id'] = NULL;
-    	}
-    	
-    	if($item['item_state_id'] < 1)
-    	{
-    		$item['item_state_id'] = NULL;
-    	}
-    	
-    	if($item['supplier_id'] < 1)
-    	{
-    		$item['supplier_id'] = NULL;
-    	}
-    	
-    	if(empty($item['buying_date']))
-    		$item['buying_date'] = NULL;
-    	
-    	if($item['buying_date'] != NULL)
-	    	if(!$this->_validateDate($item['buying_date']))
-	    	{
-	    		$error_message .= ('<br>La date d\'achat est incorrecte');
-
-	    	}
-    	
-    	if(empty($item['created_date']))
-    		$item['created_date'] = NULL;
-    		
-    	
-    	if($item['created_date'] != NULL)
-    		if(!$this->_validateDate($item['created_date']))
-    		{
-    			$error_message .= ('<br>La date de création est incorrecte');
-
-    		}
-
-    	if(empty($item['modified_date']))
-    		$item['modified_date'] = NULL;
-
-    	if($item['modified_date'] != NULL)
-    		if(!$this->_validateDate($item['modified_date']))
-    		{
-    			$error_message .= ('<br>La date de modification est incorrecte');
-
-    		}
-    	
-    	if(empty($item['control_date']))
-    		$item['control_date'] = NULL;
-
-    	if($item['control_date'] != NULL)
-    		if(!$this->_validateDate($item['modified_date']))
-    		{
-    			$error_message .= ('<br>La date de contrôle est incorrecte');
-
-    		}
-    	
-    	return;
+		$d = DateTime::createFromFormat('Y-m-d', $date);
+		return $d && $d->format('Y-m-d') == $date;
     }
     
     /* *** Update an item *** */
