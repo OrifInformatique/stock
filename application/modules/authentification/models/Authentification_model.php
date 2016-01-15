@@ -1,4 +1,4 @@
-<?php
+<?php defined('BASEPATH') OR exit('No direct script access allowed');
 
 /**
  * Created by PhpStorm.
@@ -8,35 +8,39 @@
  */
 class Authentification_model extends CI_Model
 {
+    public $username;
+    public $password;
+    private $_table = "users";
+    private $_data = [];
+
     public function __construct()
     {
         parent::__construct();
     }
 
-    function login($username, $password)
+    public function validate()
     {
-        $this->db->select('id, username, password');
-        $this->db->from('users');
-        $this->db->where('username', $username);
-        $this->db->where('password', MD5($password));
-        $this->db->limit(1);
-        $query = $this->db->get();
-        return $query->num_rows() == 1 ? $query->result() : false;
+        $this->username = $this->input->post('username');
+        $this->password = $this->input->post('password');
+        $this->db->where("username", $this->username);
+        $query = $this->db->get($this->_table);
+        if ($query->num_rows()) {
+            $row = $query->row_array();
+            if ($row['password'] == hash("sha256", $this->password)) {
+                unset($row['password']);
+                $this->_data = $row;
+                return ERR_NONE;
+            }
+            return ERR_INVALID_PASSWORD;
+        } else {
+            return ERR_INVALID_USERNAME;
+        }
+
     }
 
-    public function valid_username()
+    public function get_data()
     {
-
-    }
-
-    function logged_in()
-    {
-        return (bool)$this->session->userdata('logged_in');
-    }
-
-    public function logout()
-    {
-        $this->session->sess_destroy();
+        return $this->_data;
     }
 
 }
