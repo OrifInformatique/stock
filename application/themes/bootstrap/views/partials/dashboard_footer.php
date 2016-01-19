@@ -11,6 +11,6 @@
 
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="<?= base_url('assets/bootstrap/dist/js/bootstrap.min.js'); ?>"></script>
-<script src="<?= base_url('assets/jasny-bootstrap/css/jasny-bootstrap.min.js'); ?>"></script>
+<script src="<?= base_url('assets/jasny-bootstrap/j/jasny-bootstrap.min.js'); ?>"></script>
 </body>
 </html>
