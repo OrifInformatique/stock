@@ -1,45 +1,48 @@
-<div class="container">
+<section class="container">
 
-    <header class="page-header">
-        <h1>Login</h1>
-    </header>
+    <section class="row">
 
-    <?php if (validation_errors()): ?>
-        <div class="alert alert-warning">
-            <?php echo validation_errors(); ?>
+        <?= form_open('', ['role' => 'login']); ?>
+        <?php $error = form_error("username", "<p class='text-danger'>", '</p>'); ?>
+        <div class="form-group <?= $error ? 'has-error' : '' ?>">
+            <?= form_label('Username', 'username', ['class' => 'label-control']); ?>
+            <div class="input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                <?= form_input('username', set_value('username'),
+                    ["id" => 'username', "class" => "form-control", "placeholder" => "Enter your username"]); ?>
+            </div>
+            <?= $error; ?>
         </div>
-    <?php endif; ?>
 
-    <?php echo form_open(); ?>
+        <?php $error = form_error("password", "<p class='text-danger'>", '</p>'); ?>
+        <div class="form-group <?= $error ? 'has-error' : '' ?>">
+            <?= form_label('Password', 'password', ['class' => 'label-control']); ?>
+            <div class="input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                <?= form_password('password', set_value('password'),
+                    ["class" => "form-control", "placeholder" => "Enter password"]); ?>
+            </div>
+            <?= $error; ?>
+        </div>
 
-    <?php echo form_label('Username : ', '', ["class" => "control-label"]); ?>
-    <div class="input-group">
-        <span class="input-group-addon"><li class="glyphicon glyphicon-user"></li></span>
-        <?php echo form_input('username', set_value('username'), ["class" => "form-control", "placeholder" => "Username"]); ?>
-    </div>
+        <div class="form-group">
+            <input type="checkbox" name="remember" value="1"/> Remember me
+        </div>
 
-    <?php echo form_label('Password : ', '', ["class" => "control-label"]); ?>
-    <div class="input-group">
-        <span class="input-group-addon"><li class="glyphicon glyphicon-lock"></li></span>
-        <?php echo form_password('password', set_value('password'), ["class" => "form-control", "placeholder" => "Password"]); ?>
-    </div>
+        <div class="well center-block" style="max-width:400px">
+            <?= form_submit('envoyer', 'Se connecter', ['class' => 'btn btn-primary btn-block']); ?>
+            <a href="<?= site_url(); ?>" class="btn btn-default btn-block">Retour à l'accueil</a>
+        </div>
 
-    <br/>
+        <section>
+            <a href="#">Forgot your password ?</a>
+        </section>
 
-    <?php echo form_submit('envoyer', 'Envoyer', ["class" => "btn btn-default"]); ?>
-
-    <?php echo form_close(); ?>
-
-    <br/>
-
-    <div class="well text-center">
-        <p>Username : OrifInfo2009</p>
-        <p>Password : OrifInfo2009</p>
-        <p>
-            <a href="<?php echo site_url('main/home') ?>">
-                <li class="glyphicon glyphicon-arrow-left"></li>
-                Back to Home page</a>
+        <p class="footer">Page rendered in <strong>{elapsed_time}</strong>
+            seconds. <?php echo (ENVIRONMENT === 'development') ? 'CodeIgniter Version <strong>' . CI_VERSION . '</strong>' : '' ?>
         </p>
-    </div>
 
-</div>
+        <?= form_close(); ?>
+    </section>
+
+</section>

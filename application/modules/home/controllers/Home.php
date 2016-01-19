@@ -16,7 +16,12 @@ class Home extends CI_Controller
 
     public function index()
     {
-        $this->template->build('home');
+        $this->template
+            ->set_partial('header', 'partials/default_header')
+            ->set_partial('navbar', 'partials/default_navbar')
+            ->set_partial('footer', 'partials/default_footer')
+            ->set_layout('dashboard')
+            ->build('home');
     }
 
 }

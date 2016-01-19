@@ -22,11 +22,13 @@ class Authentification_model extends CI_Model
     {
         $this->username = $this->input->post('username');
         $this->password = $this->input->post('password');
+
         $this->db->where("username", $this->username);
         $query = $this->db->get($this->_table);
+
         if ($query->num_rows()) {
             $row = $query->row_array();
-            if ($row['password'] == hash("sha256", $this->password)) {
+            if (password_verify($this->password, $row['password'])) {
                 unset($row['password']);
                 $this->_data = $row;
                 return ERR_NONE;
@@ -40,7 +42,13 @@ class Authentification_model extends CI_Model
 
     public function get_data()
     {
-        return $this->_data;
+        return $this->set_session();
     }
+
+    function set_session()
+    {
+
+    }
+
 
 }

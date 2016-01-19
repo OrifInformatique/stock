@@ -83,7 +83,7 @@ $autoload['drivers'] = array();
 |
 |	$autoload['helper'] = array('url', 'file');
 */
-$autoload['helper'] = array('url', 'form', 'asset');
+$autoload['helper'] = ['url', 'form'];
 
 /*
 | -------------------------------------------------------------------
@@ -97,7 +97,7 @@ $autoload['helper'] = array('url', 'form', 'asset');
 | config files.  Otherwise, leave it blank.
 |
 */
-$autoload['config'] = array('asset', 'template');
+$autoload['config'] = ['template'];
 
 /*
 | -------------------------------------------------------------------

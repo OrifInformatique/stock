@@ -1,24 +1,20 @@
-<?php
+<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
  * Created by PhpStorm.
- * User: MoJe
- * Date: 15.12.2015
- * Time: 10:55
+ * User: jeffreymostroso
+ * Date: 17.01.16
+ * Time: 18:49
  */
-class Dashboard extends CI_Controller
+class Dashboard extends MY_Controller
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function index()
     {
         $this->template
-            //->set_layout('dashboard')
+            ->set_partial('header', 'partials/dashboard_header')
+            ->set_partial('navbar', 'partials/dashboard_navbar')
+            ->set_partial('footer', 'partials/dashboard_footer')
+            ->set_layout('dashboard')
             ->build('dashboard');
     }
-
-
 }

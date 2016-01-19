@@ -1,29 +1,56 @@
-<div class="container-fluid">
+<!-- content -->
+<div class="container">
     <div class="row">
-
-        <div class="col-md-3" id="leftCol">
-
-            <div class="list-group well">
-                <a class="list-group-item" href='<?php echo site_url('user') ?>'>Utilisateurs</a>
-                <a class="list-group-item" href='<?php echo site_url('user_state') ?>'>Etats d'utilsateurs</a>
-                <a class="list-group-item" href='<?php echo site_url('user_type') ?>'>Type d'utilsateurs</a>
-                <a class="list-group-item" href='<?php echo site_url('department') ?>'>Lieux</a>
+        <div class="col-md-3">
+            <div class="list-group">
+                <a href="#" class="list-group-item active">Géstion du stock
+                    <span class="badge"><li class="glyphicon glyphicon-user"></li></span>
+                </a>
+                <a href="" class="list-group-item">Géstion des utilisateurs
+                    <span class="badge"><li class="glyphicon glyphicon-user"></li></span>
+                </a>
+                <a href="" class="list-group-item">Friends
+                    <span class="badge"><li class="glyphicon glyphicon-user"></li></span>
+                </a>
+                <a href="" class="list-group-item">
+                    <span class="badge"><li class=""></li></span>
+                </a>
+                <a href="" class="list-group-item">
+                    <span class="badge"><li class="glyphicon glyphicon"></li></span>
+                </a>
+                <a href="" class="list-group-item">Other
+                    <span class="badge"><li class="glyphicon glyphicon-user"></li></span>
+                </a>
             </div>
-
-            <div class="list-group well">
-                <a class="list-group-item" href='<?php echo site_url('item') ?>'>Articles</a>
-                <a class="list-group-item" href='<?php echo site_url('item_state') ?>'>Etats d'articles</a>
-                <a class="list-group-item" href='<?php echo site_url('item_tag') ?>'>Tags d'articles</a>
-                <a class="list-group-item" href='<?php echo site_url('item_tag_link') ?>'>Lien de tags
-                    d'articles</a>
-                <a class="list-group-item" href='<?php echo site_url('stocking_place') ?>'>Emplacements de
-                    stockage</a>
-                <a class="list-group-item" href='<?php echo site_url('supplier') ?>'>Fournisseurs</a>
-            </div>
-
-        </div>
+        </div><!-- /.col-md-3 -->
 
         <div class="col-md-9">
+            <div class="panel panel-default">
+
+
+            </div>
+
+            <!--            <div class="text-center">
+                            <nav>
+                                <ul class="pagination">
+                                    <li>
+                                        <a href="#" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                    <li class="active"><a href="#">1</a></li>
+                                    <li><a href="#">2</a></li>
+                                    <li><a href="#">3</a></li>
+                                    <li><a href="#">4</a></li>
+                                    <li><a href="#">5</a></li>
+                                    <li>
+                                        <a href="#" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>-->
 
         </div>
     </div>

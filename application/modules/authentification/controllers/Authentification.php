@@ -2,7 +2,6 @@
 
 class Authentification extends MY_Controller
 {
-
     public function __construct()
     {
         parent::__construct();
@@ -20,19 +19,20 @@ class Authentification extends MY_Controller
         if ($this->form_validation->run() == true) {
             $status = $this->authentification->validate();
             if ($status == ERR_INVALID_USERNAME) {
-                //$this->session->set_flashdata('error', 'Username is invalid');
-                $this->session->set_flashdata('error', ['message' => 'Username is invalid']);
+                $this->session->set_flashdata('error', 'Username is invalid');
             } elseif ($status == ERR_INVALID_PASSWORD) {
-                //$this->session->set_flashdata('error', 'Password is invalid');
-                $this->session->set_flashdata('error', ['message' => 'Password is invalid']);
+                $this->session->set_flashdata('error', 'Password is invalid');
             } else {
                 $this->session->set_userdata($this->authentification->get_data());
                 $this->session->set_userdata("logged_in", true);
                 redirect("dashboard");
             }
         }
-
-        $this->load->view('login');
+        $this->template
+            ->set_partial('header', 'partials/authentification_header')
+            ->set_partial('footer', 'partials/authentification_footer')
+            ->set_layout('blank')
+            ->build('login');
     }
 
     public function logged_in_check()
@@ -40,14 +40,6 @@ class Authentification extends MY_Controller
         if ($this->session->userdata("logged_in")) {
             redirect("dashboard");
         }
-    }
-
-    // test de hash
-
-    public function pwd($password)
-    {
-        $password = hash("sha256", $password);
-        var_dump($password);
     }
 
     /**
@@ -63,7 +55,7 @@ class Authentification extends MY_Controller
             foreach ($_SESSION as $key => $value) {
                 unset($_SESSION[$key]);
             }
-            $this->session->set_flashdata('error', 'Vous êtes maintenant déconnecté.');
+            $this->session->set_flashdata('error', 'Vous êtes maintenant déconnecté !');
             redirect('authentification/login', 'refresh');
         } else {
             redirect('/');
