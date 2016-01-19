@@ -1,0 +1,69 @@
+@CHARSET "UTF-8";
+
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    outline: none;
+}
+
+body {
+    background-color: #e6e6e6;
+}
+
+#logo {
+    text-align: center;
+    padding: 60px 0 55px 0;
+    border-bottom: 2px solid #c5c5c5;
+    background: #fff;
+}
+
+form[role=login] {
+    font: 14px/1.6em Lato, serif;
+    padding-top: 24px;
+    color: #959595;
+    max-width: 320px;
+    margin: 0 auto;
+}
+
+form[role=login] .input-group-addon {
+    border: none;
+    background: #fff;
+}
+
+form[role=login] input[type=text],
+form[role=login] input[type=password] {
+    border: none;
+    background: #fff;
+    box-shadow: none;
+    height: 36px;
+    -webkit-box-shadow: 1px 1px 2px 0px rgba(104, 104, 104, 0.4);
+    -moz-box-shadow: 1px 1px 2px 0px rgba(104, 104, 104, 0.4);
+    box-shadow: 1px 1px 2px 0px rgba(104, 104, 104, 0.4);
+}
+
+form[role=login] input[type=text]:focus,
+form[role=login] input[type=password]:focus {
+    background: #f6f6f6;
+}
+
+form[role=login] > div {
+    position: relative;
+    margin: 24px 0;
+}
+
+form[role=login] > section {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.form-control {
+    padding-left: 40px;
+}
+
+.form-control + .glyphicon {
+    position: absolute;
+    left: 0;
+    top: 13%;
+    padding: 8px 0 0 12px;
+}
