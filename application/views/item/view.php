@@ -30,16 +30,16 @@
 				<div class="divitem">
 					<div  class="tbitem">
 						<div style="font-size:1.2em; text-shadow: 1px 1px #888;">
-						<a href="<?php echo base_url().'item/view/'.$item['item_id']; ?>"><?php echo $item['article_nb']; ?></a>
+						<a href="<?php echo base_url().'item/view/'.$item->item_id; ?>"><?php echo $item->inventory_number; ?></a>
 						</div>
 							
 						<table><tr>
 							<td>
-							<?php if($access_level) echo '<a href="'.base_url().'item/remove/'.$item['item_id'].'" target="_parent"><button>X</button></a>'; ?>
+							<?php if($access_level) echo '<a href="'.base_url().'item/remove/'.$item->item_id.'" target="_parent"><button>X</button></a>'; ?>
 							
-							<?php echo $item['name'] ?> </td>
-							<td><div style="font-size:0.6em">Créé par : </div><?php echo $item_link['user'][intval($item['created_by_user_id'])]['initials']?></td>
-							<td><div style="font-style:italic"><?php echo substr($item['description'],0,50) ?></div></td>
+							<?php echo $item->name ?> </td>
+							<td><div style="font-size:0.6em">Créé par : </div><?php echo $item_link['user'][intval($item->created_by_user_id)]['username']?></td>
+							<td><div style="font-style:italic"><?php echo substr($item->description,0,50) ?></div></td>
 															
 						</tr></table>
 						

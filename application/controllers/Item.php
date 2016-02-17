@@ -1,39 +1,30 @@
-<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
+/**
+ * A controller to display and manage items
+ * 
+ * @author      Didier Viret
+ * @link        https://github.com/OrifInformatique/stock
+ * @copyright   Copyright (c) 2016, Orif <http://www.orif.ch>
+ */
 
-/* ********************************************************************************************
- * Item : Controller that lists item elements, with CRUD capabilities if authentified
- *
- * Uses jQuery for date popup
- *
- *********************************************************************************************/
+class Item extends MY_Controller {
 
-class Item extends CI_Controller {
+    /* MY_Controller variables definition */
+    protected $access_level = "*";
 
+
+    /**
+    * Constructor
+    */
 	public function __construct()
 	{
 			parent::__construct();
 			$this->load->model('item_model');
 			$this->load->library('form_validation');
 			$this->load->helper('stock_helper');
-			
 			$this->load->model('login_model');
-			
 	}
 
-	/* *** Check if authentified *** */
-	
-	private function __check_auth()
-	{
-		if($this->login_model->check_validated())
-		{
-			if($this->login_model->get_access_level()>=10)
-			{
-				return true;
-			}
-		}
-			
-		return false;
-	}
 	
 	/* *** Base *** */
 	
@@ -66,10 +57,7 @@ class Item extends CI_Controller {
 		// Build filters, links and build an array for the view
 		$output['filters'] = $this->item_model->construct_item_filters();
 		$output['item_link'] = $this->item_model->get_all_item_link_array();
-		$output['array_item'] = $this->item_model->get_item();
-		
-		// Build inventory number like "INFO-12345"
-		$this->item_model->build_item_inventory_nb($output['array_item'], $output['item_link']);
+		$output['array_item'] = $this->item_model->get_all();
 	
 		// Display found item to client browser
 		$this->_view_stock_header($output);
@@ -184,7 +172,7 @@ class Item extends CI_Controller {
 	
 	public function upload($item_id)
 	{	
-		if(!$this->__check_auth()) show_error("Authentification requise");
+		if(!$this->check_permission()) show_error("Authentification requise");
 		
 		$this->_view_stock_header($output);
 		$this->load->view('item/upload_form', array('error' => ' ', 'item_id' => $item_id));
@@ -195,7 +183,7 @@ class Item extends CI_Controller {
 	
 	function do_upload($item_id)
 	{
-		if(!$this->__check_auth()) show_error("Authentification requise");
+		if(!$this->check_permission()) show_error("Authentification requise");
 		
 		/* !!!!!!!!!!!!!!!!!!!!!!!!!! DEFINE HERE UPLOAD PATH !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 		$config['upload_path'] = './uploads/images/';
@@ -235,7 +223,7 @@ class Item extends CI_Controller {
 	
 	public function remove_tag($item_id, $tag_id)
 	{
-		if(!$this->__check_auth()) show_error("Authentification requise");
+		if(!$this->check_permission()) show_error("Authentification requise");
 		
 		$this->item_model->delete_tag($tag_id);
 		$this->view($item_id);
@@ -245,7 +233,7 @@ class Item extends CI_Controller {
 	
 	public function add_tag($item_id, $tag_id)
 	{
-		if(!$this->__check_auth()) show_error("Authentification requise");
+		if(!$this->check_permission()) show_error("Authentification requise");
 		
 		$this->item_model->create_tag($item_id, $tag_id);
 		$this->view($item_id);
@@ -255,7 +243,7 @@ class Item extends CI_Controller {
 	
 	public function update($item_id)
 	{
-		if(!$this->__check_auth()) show_error("Authentification requise");
+		if(!$this->check_permission()) show_error("Authentification requise");
 		
 		$output['item_link'] = $this->item_model->get_all_item_link_array();
 		$output['array_item'] = $this->item_model->get_item($item_id);
@@ -319,7 +307,7 @@ class Item extends CI_Controller {
 	
 	public function new_item()
 	{
-		if(!$this->__check_auth()) show_error("Authentification requise");
+		if(!$this->check_permission()) show_error("Authentification requise");
 	
 		$output['item_link'] = $this->item_model->get_all_item_link_array();
 		
@@ -338,7 +326,7 @@ class Item extends CI_Controller {
 	
 	public function create()
 	{
-		if(!$this->__check_auth()) show_error("Authentification requise");
+		if(!$this->check_permission()) show_error("Authentification requise");
 		
 		$output['item_link'] = $this->item_model->get_all_item_link_array();
 		
@@ -395,7 +383,7 @@ class Item extends CI_Controller {
 	
 	public function remove($item_id)
 	{
-		if(!$this->__check_auth()) show_error("Authentification requise");
+		if(!$this->check_permission()) show_error("Authentification requise");
 		
 		$output['item_id'] = $item_id;
 				
@@ -409,7 +397,7 @@ class Item extends CI_Controller {
 	
 	public function remove_confirmed($item_id)
 	{
-		if(!$this->__check_auth()) show_error("Authentification requise");
+		if(!$this->check_permission()) show_error("Authentification requise");
 	
 		$this->item_model->delete_item($item_id);
 		$this->view_all();
