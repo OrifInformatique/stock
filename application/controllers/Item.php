@@ -43,8 +43,7 @@ class Item extends MY_Controller {
 		// Retrieve privileges
 		$output['access_level'] = $this->login_model->get_access_level();
 		
-		// Send headers with login bar
-		$this->load->view('item/header', $output);
+		// Display login bar
 		$this->load->view('login_bar', $output);
 		
 	}
@@ -60,9 +59,10 @@ class Item extends MY_Controller {
 		$output['array_item'] = $this->item_model->get_all();
 	
 		// Display found item to client browser
-		$this->_view_stock_header($output);
+		$this->load->view('common/header');
+        $this->_view_stock_header($output);
 		$this->load->view('item/view', $output);
-		$this->load->view('item/footer');
+		$this->load->view('common/footer');
 	
 	}
 	
