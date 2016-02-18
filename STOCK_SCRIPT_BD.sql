@@ -117,8 +117,8 @@ CREATE TABLE IF NOT EXISTS `stock`.`item` (
   `created_date` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
   `modified_by_user_id` INT NULL,
   `modified_date` DATETIME NULL,
-  `control_by_user_id` INT NULL,
-  `control_date` DATETIME NULL,
+  `checked_by_user_id` INT NULL,
+  `checked_date` DATETIME NULL,
   `stocking_place_id` INT NULL,
   `item_condition_id` INT NULL,
   `item_group_id` INT NULL,
@@ -128,7 +128,7 @@ CREATE TABLE IF NOT EXISTS `stock`.`item` (
   INDEX `fk_modified_by_user_id_idx` (`modified_by_user_id` ASC),
   INDEX `fk_item_condition_id_idx` (`item_condition_id` ASC),
   INDEX `fk_supplier_id_idx` (`supplier_id` ASC),
-  INDEX `fk_control_by_user_id_idx` (`control_by_user_id` ASC),
+  INDEX `fk_checked_by_user_id_idx` (`checked_by_user_id` ASC),
   INDEX `fk_item_group_id_idx` (`item_group_id` ASC),
   CONSTRAINT `fk_created_by_user_id`
     FOREIGN KEY (`created_by_user_id`)
@@ -155,8 +155,8 @@ CREATE TABLE IF NOT EXISTS `stock`.`item` (
     REFERENCES `stock`.`supplier` (`supplier_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_control_by_user_id`
-    FOREIGN KEY (`control_by_user_id`)
+  CONSTRAINT `fk_checked_by_user_id`
+    FOREIGN KEY (`checked_by_user_id`)
     REFERENCES `stock`.`user` (`user_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
@@ -245,7 +245,7 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 -- -----------------------------------------------------
 START TRANSACTION;
 USE `stock`;
-INSERT INTO `stock`.`user_type` (`user_type_id`, `name`, `access_level`) VALUES (1, 'Invité', 1);
+INSERT INTO `stock`.`user_type` (`user_type_id`, `name`, `access_level`) VALUES (1, 'Invite', 1);
 INSERT INTO `stock`.`user_type` (`user_type_id`, `name`, `access_level`) VALUES (2, 'Observation', 2);
 INSERT INTO `stock`.`user_type` (`user_type_id`, `name`, `access_level`) VALUES (3, 'Formation', 4);
 INSERT INTO `stock`.`user_type` (`user_type_id`, `name`, `access_level`) VALUES (4, 'MSP', 8);
