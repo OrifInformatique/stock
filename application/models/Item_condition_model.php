@@ -12,6 +12,7 @@ class Item_condition_model extends MY_Model
     /* MY_Model variables definition */
     protected $_table = 'item_condition';
     protected $primary_key = 'item_condition_id';
+    protected $protected_attributes = ['item_condition_id'];
     protected $has_many = ['items'];
 
 

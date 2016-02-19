@@ -12,6 +12,7 @@ class Item_model extends MY_Model
     /* MY_Model variables definition */
     protected $_table = 'item';
     protected $primary_key = 'item_id';
+    protected $protected_attributes = ['item_id'];
     protected $belongs_to = ['supplier', 'stocking_place', 'item_condition',
                              'item_group',
                              'created_by_user' => ['model' => 'user_model'],

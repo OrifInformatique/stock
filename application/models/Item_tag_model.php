@@ -12,6 +12,7 @@ class Item_tag_model extends MY_Model
     /* MY_Model variables definition */
     protected $_table = 'item_tag';
     protected $primary_key = 'item_tag_id';
+    protected $protected_attributes = ['item_tag_id'];
     protected $has_many = ['item_tag_links'];
 
 

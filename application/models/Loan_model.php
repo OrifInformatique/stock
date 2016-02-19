@@ -12,6 +12,7 @@ class Loan_model extends MY_Model
     /* MY_Model variables definition */
     protected $_table = 'loan';
     protected $primary_key = 'loan_id';
+    protected $protected_attributes = ['loan_id'];
     protected $belongs_to = ['item',
                              // The user who registered this loan
                              'loan_by_user' => ['model' => 'User_model'],

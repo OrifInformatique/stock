@@ -12,6 +12,7 @@ class Supplier_model extends MY_Model
     /* MY_Model variables definition */
     protected $_table = 'supplier';
     protected $primary_key = 'supplier_id';
+    protected $protected_attributes = ['supplier_id'];
     protected $has_many = ['items'];
 
 

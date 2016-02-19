@@ -12,6 +12,7 @@ class Item_tag_link_model extends MY_Model
     /* MY_Model variables definition */
     protected $_table = 'item_tag_link';
     protected $primary_key = 'item_tag_link_id';
+    protected $protected_attributes = ['item_tag_link_id'];
     protected $belongs_to = ['item', 'item_tag'];
 
 

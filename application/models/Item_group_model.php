@@ -12,6 +12,7 @@ class Item_group_model extends MY_Model
     /* MY_Model variables definition */
     protected $_table = 'item_group';
     protected $primary_key = 'item_group_id';
+    protected $protected_attributes = ['item_group_id'];
     protected $has_many = ['items'];
 
 

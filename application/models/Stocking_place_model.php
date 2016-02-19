@@ -12,6 +12,7 @@ class Stocking_place_model extends MY_Model
     /* MY_Model variables definition */
     protected $_table = 'stocking_place';
     protected $primary_key = 'stocking_place_id';
+    protected $protected_attributes = ['stocking_place_id'];
     protected $has_many = ['items'];
 
 
