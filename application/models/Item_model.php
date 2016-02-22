@@ -13,23 +13,14 @@ class Item_model extends MY_Model
     protected $_table = 'item';
     protected $primary_key = 'item_id';
     protected $protected_attributes = ['item_id'];
-    protected $belongs_to = ['supplier', 'stocking_place', 'item_condition',
-                             'item_group',
-                             'created_by_user' => ['model' => 'user_model'],
-                             'modified_by_user' => ['model' => 'user_model'],
-                             'control_by_user' => ['model' => 'user_model']];
+    protected $belongs_to = ['supplier', 'stocking_place', 'item_condition', 'item_group',
+                             'created_by_user' => ['primary_key' => 'created_by_user_id',
+                                                   'model' => 'user_model'],
+                             'modified_by_user' => ['primary_key' => 'modified_by_user_id',
+                                                    'model' => 'user_model'],
+                             'checked_by_user' => ['primary_key' => 'checked_by_user_id',
+                                                   'model' => 'user_model']];
     protected $has_many = ['item_tag_links', 'loans'];
-
-    /* TO BE DEFINED **********
-    protected $validate = [
-        'items/create' => [
-            ['field' => 'name', 'label' => 'Name', 'rules' => 'trim|required|min_length[3]|max_length[64]|is_unique[item.name]'],
-        ],
-        'items/edit' => [
-            ['field' => 'name', 'label' => 'Name', 'rules' => 'trim|required|min_length[3]|max_length[64]'],
-        ],
-    ];
-    */
 
 
     /**

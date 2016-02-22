@@ -26,12 +26,31 @@ class Item extends MY_Controller {
 	}
 
 	
-	/* *** Base *** */
-	
+	/**
+    * Display items list with filters
+    */
 	public function index()
-	{
-		$this->view_all();
-	}
+    {
+        $output['title'] = $this->lang->line('page_item_list');
+        $output['items'] = $this->item_model->with('created_by_user')
+                                            ->get_all();
+
+        $this->display_view('item/list', $output);
+
+
+/* OLD
+        // Build filters, links and build an array for the view
+        $output['filters'] = $this->item_model->construct_item_filters();
+        $output['item_link'] = $this->item_model->get_all_item_link_array();
+        $output['array_item'] = $this->item_model->get_all();
+    
+        // Display found item to client browser
+        $this->load->view('common/header');
+        $this->_view_stock_header($output);
+        $this->load->view('item/view', $output);
+        $this->load->view('common/footer');
+*/
+    }
 	
 	/* *** Print header *** */
 	
@@ -47,24 +66,7 @@ class Item extends MY_Controller {
 		$this->load->view('login_bar', $output);
 		
 	}
-	
-	/* *** Show all stock items *** */
 
-	public function view_all()
-	{
-	
-		// Build filters, links and build an array for the view
-		$output['filters'] = $this->item_model->construct_item_filters();
-		$output['item_link'] = $this->item_model->get_all_item_link_array();
-		$output['array_item'] = $this->item_model->get_all();
-	
-		// Display found item to client browser
-		$this->load->view('common/header');
-        $this->_view_stock_header($output);
-		$this->load->view('item/view', $output);
-		$this->load->view('common/footer');
-	
-	}
 	
 	/* *** Show only one item *** */
 	

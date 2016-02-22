@@ -72,24 +72,31 @@ class MY_Controller extends CI_Controller
     * Display the view, adding header, footer and any other common view part
     *
     * @param  $view_parts : single view or array of view parts to display
+    *         $data : data array to send to the view
     */
-    public function display_view($view_parts)
+    public function display_view($view_parts, $data = NULL)
     {
+        // If not defined in $data, set page title to empty string
+        if (!isset($data['title'])) {
+            $data['title'] = '';
+        }
+
+        // Display common headers
+        $this->load->view('common/header', $data);
+        $this->load->view('common/login_bar');
+
         if (is_array($view_parts)) {
-
-            $this->load->view('common/header');
-
-            // Display every view parts
+            // Display multiple view parts defined in $data
             foreach ($view_parts as $view_part) {
-                $this->load->view($view_part);
+                $this->load->view($view_part, $data);
             }
-
-            $this->load->view('common/footer');
         }
         elseif (is_string($view_parts)) {
-            $this->load->view('common/header');
-            $this->load->view($view_parts);
-            $this->load->view('common/footer');
+            // Display unique view part defined in $data
+            $this->load->view($view_parts, $data);
         }
+
+        // Display common footer
+        $this->load->view('common/footer');
     }
 }

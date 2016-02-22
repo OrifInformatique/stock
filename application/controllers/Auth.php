@@ -42,13 +42,13 @@ class Auth extends MY_Controller
             if ($this->user_model->check_password($username, $password)) {
                 // Login success
 
-                $user = $this->user_model->get_by('username', $username);
-                $user_type = $this->user_type_model->get($user->user_type_id);
+                $user = $this->user_model->with('user_type')
+                                         ->get_by('username', $username);
 
                 // Set session variables
                 $_SESSION['user_id'] = (int)$user->user_id;
                 $_SESSION['username'] = (string)$user->username;
-                $_SESSION['user_access'] = (int)$user_type->access_level;
+                $_SESSION['user_access'] = (int)$user->user_type->access_level;
                 $_SESSION['logged_in'] = (bool)true;
 
                 // Set message and redirect

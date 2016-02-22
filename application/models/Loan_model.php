@@ -15,9 +15,11 @@ class Loan_model extends MY_Model
     protected $protected_attributes = ['loan_id'];
     protected $belongs_to = ['item',
                              // The user who registered this loan
-                             'loan_by_user' => ['model' => 'User_model'],
+                             'loan_by_user' => ['primary_key' => 'loan_by_user_id',
+                                                'model' => 'User_model'],
                              // The user who borrowed the item
-                             'loan_to_user' => ['model' => 'User_model']];
+                             'loan_to_user' => ['primary_key' => 'loan_to_user_id',
+                                                'model' => 'User_model']];
 
 
     /**

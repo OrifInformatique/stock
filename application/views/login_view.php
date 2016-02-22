@@ -1,22 +1,5 @@
 <div class="container">
      <div class="row">
-          <div class="col-lg-6 col-sm-6">
-               <h1><?php echo $this->lang->line('app_title'); ?></h1>
-          </div>
-          <div class="col-lg-6 col-sm-6">
-               
-               <ul class="nav nav-pills pull-right" style="margin-top:20px">
-                    <li class="active"><a href="#"><?php echo $this->lang->line('btn_login'); ?></a></li>
-                    <li><a href="#"><?php echo $this->lang->line('btn_signup'); ?></a></li>
-               </ul>
-               
-          </div>
-     </div>
-</div>
-<hr/>
-
-<div class="container">
-     <div class="row">
           <div class="col-lg-4 col-sm-4 well">
           <?php 
           $attributes = array("class" => "form-horizontal", "id" => "loginform", "name" => "loginform");

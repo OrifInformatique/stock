@@ -14,18 +14,18 @@ class User_model extends MY_Model
     protected $primary_key = 'user_id';
     protected $protected_attributes = ['user_id'];
     protected $belongs_to = ['user_type'];
-    protected $has_many = ['items_created' => ['model' => 'Item_model',
-                                               'primary_key' => 'created_by_user_id'],
-                           'items_modified' => ['model' => 'Item_model',
-                                                'primary_key' => 'modified_by_user_id'],
-                           'items_checked' => ['model' => 'Item_model',
-                                               'primary_key' => 'checked_by_user_id'],
+    protected $has_many = ['items_created' => ['primary_key' => 'created_by_user_id',
+                                               'model' => 'Item_model'],
+                           'items_modified' => ['primary_key' => 'modified_by_user_id',
+                                                'model' => 'Item_model'],
+                           'items_checked' => ['primary_key' => 'checked_by_user_id',
+                                               'model' => 'Item_model'],
                            // Loans registered by this user for another user
-                           'loans_registered' => ['model' => 'Loan_model',
-                                                  'primary_key' => 'loan_by_user_id'],
+                           'loans_registered' => ['primary_key' => 'loan_by_user_id',
+                                                  'model' => 'Loan_model'],
                            // Loans for this user
-                           'loans_made' => ['model' => 'Loan_model',
-                                            'primary_key' => 'loan_to_user_id']];
+                           'loans_made' => ['primary_key' => 'loan_to_user_id',
+                                            'model' => 'Loan_model']];
 
 
     /**
