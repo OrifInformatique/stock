@@ -63,9 +63,7 @@ class Auth extends MY_Controller
         }
 
         // Display login page
-        $this->load->view('common/header');
-        $this->load->view('login_view');
-        $this->load->view('common/footer');
+        $this->display_view('login_view');
     }
 
     /**

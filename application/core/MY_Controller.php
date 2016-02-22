@@ -66,4 +66,30 @@ class MY_Controller extends CI_Controller
             }
         }
     }
+
+
+    /**
+    * Display the view, adding header, footer and any other common view part
+    *
+    * @param  $view_parts : single view or array of view parts to display
+    */
+    public function display_view($view_parts)
+    {
+        if (is_array($view_parts)) {
+
+            $this->load->view('common/header');
+
+            // Display every view parts
+            foreach ($view_parts as $view_part) {
+                $this->load->view($view_part);
+            }
+
+            $this->load->view('common/footer');
+        }
+        elseif (is_string($view_parts)) {
+            $this->load->view('common/header');
+            $this->load->view($view_parts);
+            $this->load->view('common/footer');
+        }
+    }
 }
