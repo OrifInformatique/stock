@@ -412,6 +412,38 @@ class MY_Model extends CI_Model
         return $this;
     }
 
+
+    public function with_all()
+    {
+        // Add all relationships in _with array
+        foreach ($this->belongs_to as $key => $value) {
+            if (is_string($value)) {
+                $relationship = $value;
+            } else {
+                $relationship = $key;
+            }
+
+            $this->_with[] = $relationship;
+        }
+
+        foreach ($this->has_many as $key => $value) {
+            if (is_string($value)) {
+                $relationship = $value;
+            } else {
+                $relationship = $key;
+            }
+
+            $this->_with[] = $relationship;
+        }
+
+        if (!in_array('relate', $this->after_get)) {
+            $this->after_get[] = 'relate';
+        }
+
+        return $this;
+    }
+
+
     public function relate($row)
     {
         if (empty($row)) {

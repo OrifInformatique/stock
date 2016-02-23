@@ -27,7 +27,7 @@ class Item extends MY_Controller {
 
 	
 	/**
-    * Display items list with filters
+    * Display items list
     */
 	public function index()
     {
@@ -36,40 +36,14 @@ class Item extends MY_Controller {
                                             ->get_all();
 
         $this->display_view('item/list', $output);
-
-
-/* OLD
-        // Build filters, links and build an array for the view
-        $output['filters'] = $this->item_model->construct_item_filters();
-        $output['item_link'] = $this->item_model->get_all_item_link_array();
-        $output['array_item'] = $this->item_model->get_all();
-    
-        // Display found item to client browser
-        $this->load->view('common/header');
-        $this->_view_stock_header($output);
-        $this->load->view('item/view', $output);
-        $this->load->view('common/footer');
-*/
     }
 	
-	/* *** Print header *** */
 	
-	private function _view_stock_header(&$output = null)
-	{
-		
-		// Retrieve session data
-		$output['userdata'] = $this->login_model->get_session_userdata();
-		// Retrieve privileges
-		$output['access_level'] = $this->login_model->get_access_level();
-		
-		// Display login bar
-		$this->load->view('login_bar', $output);
-		
-	}
-
-	
-	/* *** Show only one item *** */
-	
+	/**
+    * Display details of one single item
+    *
+    * @param $id : the item to display
+    */
 	public function view($id, $message = '')
 	{
 	
@@ -79,20 +53,13 @@ class Item extends MY_Controller {
 			show_error('Aucun article spécifié.');
 		}
 	
-		$output['item_link'] = $this->item_model->get_all_item_link_array();
-		$output['array_item'] = $this->item_model->get_item($id);
-	
-		$this->item_model->build_item_inventory_nb($output['array_item'], $output['item_link']);
-	
-		// This allows to link tag to items
-		$this->item_model->build_item_tags($output['array_item']);
 
+
+		$output['items'] = $this->item_model->with_all()
+                                            ->get($id);
 		$output['message'] = $message;
 	
-		$this->_view_stock_header($output);
-		$this->load->view('item/view_single', $output);
-		$this->load->view('item/footer');
-	
+		$this->display_view('item/view_single', $output);
 	}
 	
 	/* *** Show by filter *** */
