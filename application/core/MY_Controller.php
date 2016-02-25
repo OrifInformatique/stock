@@ -23,7 +23,7 @@ class MY_Controller extends CI_Controller
 
         /* Check permission on construct */
         if (!$this->check_permission()) {
-            die("<h4>Access denied</h4>");
+            show_error($this->lang->line('msg_err_access_denied'));
         }
     }
 

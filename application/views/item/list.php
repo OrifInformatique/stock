@@ -11,12 +11,16 @@
             </tr>
         </thead>
         <tbody>
-            <?php for ($i = 0; $i < count($items); ++$i) { ?>
+            <?php foreach ($items as $item) { ?>
                 <tr>
-                    <td><?php echo $items[$i]->inventory_number; ?></td>
-                    <td><?php echo $items[$i]->name; ?></td>
-                    <td><?php echo $items[$i]->description; ?></td>
-                    <td><?php echo $items[$i]->created_by_user->username; ?></td>
+                    <td><a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" >
+                        <?php echo $item->inventory_number; ?>
+                    </a></td>
+                    <td><a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" >
+                        <?php echo $item->name; ?>
+                    </a></td>
+                    <td><?php echo $item->description; ?></td>
+                    <td><?php echo $item->created_by_user->username; ?></td>
                 </tr>
             <?php } ?>
         </tbody>

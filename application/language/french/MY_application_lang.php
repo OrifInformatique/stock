@@ -32,6 +32,7 @@ $lang['btn_signup']                     = 'S\'inscrire';
 
 // Messages
 $lang['msg_err_invalid_password']       = 'L\'identifiant et le mot de passe ne sont pas valides';
+$lang['msg_err_access_denied']          = 'Accès refusé';
 
 // Other texts
 $lang['text_login']                     = 'Connexion';

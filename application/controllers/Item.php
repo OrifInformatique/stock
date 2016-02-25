@@ -44,22 +44,19 @@ class Item extends MY_Controller {
     *
     * @param $id : the item to display
     */
-	public function view($id, $message = '')
+	public function view($id = NULL, $message = '')
 	{
-	
-		// Nothing specified, exit
 		if (empty($id))
 		{
-			show_error('Aucun article spécifié.');
+            // No item specified, display items list
+			redirect('/item');
 		}
 	
-
-
-		$output['items'] = $this->item_model->with_all()
-                                            ->get($id);
+		$output['item'] = $this->item_model->with_all()
+                                           ->get($id);
 		$output['message'] = $message;
 	
-		$this->display_view('item/view_single', $output);
+		$this->display_view('item/detail', $output);
 	}
 	
 	/* *** Show by filter *** */
