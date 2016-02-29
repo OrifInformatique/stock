@@ -1,8 +1,8 @@
 <div class="container">
     <!-- ITEM NAME AND DESCRIPTION -->
     <div class="row">
-        <div class="col-md-8"><h3><?php echo $item->name; ?></h3></div>
-        <div class="col-md-3"><h3><?php echo $item->inventory_number; ?></h3></div>
+        <div class="col-md-4"><h3><?php echo $item->inventory_number; ?></h3></div>
+        <div class="col-md-7"><h3><?php echo $item->name; ?></h3></div>
         <div class="col-md-1"><h6 class="text-right">ID <?php echo $item->item_id; ?></h6></div>
     </div>
     <div class="row">
@@ -11,65 +11,98 @@
 
     <!-- ITEM DETAILS -->
     <div class="row">
+        <div class="col-md-12">
+            <p class="bg-primary">&nbsp;<?php echo $this->lang->line('text_item_detail'); ?></p>
+        </div>
+        <div class="col-md-4">
+            <img src="<?php echo base_url('uploads/images/'.$item->image); ?>"
+                 width="100%"
+                 alt="<?php echo $this->lang->line('field_image'); ?>" />
+        </div>
         <div class="col-md-8">
-            <label>Remarques</label>
-            <p><?php echo $item->remarks; ?></p>
-
             <div class="row">
-                <div class="col-md-6">
-                    <label>Groupe</label><br />
-                    <p><?php if(!is_null($item->item_group)){echo $item->item_group->name;} ?></p>
+                <div class="col-md-4">
+                    <label><?php echo $this->lang->line('field_group'); ?> :&nbsp;</label>
+                    <?php if(!is_null($item->item_group)){echo $item->item_group->name;} ?>
                 </div>
-                <div class="col-md-6">
-                    <label>Numéro de série</label><br />
-                    <p><?php echo $item->serial_number; ?></p>
+                <div class="col-md-8">
+                    <label><?php echo $this->lang->line('field_serial_number'); ?> :&nbsp;</label>
+                    <?php echo $item->serial_number; ?>
                 </div>
             </div>
 
-            <button type="button">Voir document...</button>
-        </div>
-        <div class="col-md-4">
-            <img src="<?php echo $item->image; ?>" width="100%" />
+            <label><?php echo $this->lang->line('field_remarks'); ?></label>
+            <p><?php echo $item->remarks; ?></p>
+
+            <button type="button"><?php echo $this->lang->line('btn_linked_doc'); ?></button>
         </div>
     </div>
 
     <!-- ITEM STATUS, LOAN STATUS AND HISTORY -->
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-12">
+            <p class="bg-primary">&nbsp;<?php echo $this->lang->line('text_item_loan_status'); ?></p>
+        </div>
+        <div class="col-md-4">
             <?php if(!is_null($item->item_condition)){echo $item->item_condition->name;} ?><br />
-            Lieu de stockage :<br />
+            <label><?php echo $this->lang->line('field_stocking_place'); ?> :</label>
             <?php if(!is_null($item->stocking_place)){echo $item->stocking_place->name;} ?>
         </div>
         <div class="col-md-4">
-            <label>Prêt en cours</label><br />
-            <label>Date du prêt :&nbsp;</label>DATE DU PRET A DEFINIR<br />
-            <label>Retour prévu :&nbsp;</label>RETOUR PREVU A DEFINIR<br />
+            <label><?php echo $this->lang->line('field_current_loan'); ?></label><br />
+            <label><?php echo $this->lang->line('field_loan_date'); ?> :&nbsp;</label>
+            DATE DU PRET A DEFINIR<br />
+            <label><?php echo $this->lang->line('field_loan_planned_return'); ?> :&nbsp;</label>
+            RETOUR PREVU A DEFINIR<br />
         </div>
         <div class="col-md-3">
-            <button type="button">Historique des prêts...</button>
+            <button type="button"><?php echo $this->lang->line('btn_loans_history'); ?></button>
         </div>
     </div>
 
-    <!-- ITEM SUPPLIER AND BUYING INFORMATIONS -->
+    <!-- ITEM SUPPLIER, BUYING AND WARRANTY INFORMATIONS -->
     <div class="row">
-        <div class="col-md-4">
-            <label>Fournisseur :&nbsp;</label><?php if(!is_null($item->supplier)){echo $item->supplier->name;} ?><br />
-            <label>Réf. fournisseur :&nbsp;</label><?php echo $item->supplier_ref; ?>
+        <div class="col-md-12">
+            <p class="bg-primary">&nbsp;<?php echo $this->lang->line('text_item_buying_warranty'); ?></p>
         </div>
         <div class="col-md-4">
-            <label>Prix d'achat :&nbsp;</label><?php echo $item->buying_price; ?><br />
-            <label>Date d'achat :&nbsp;</label><?php echo $item->buying_date; ?>
+            <label><?php echo $this->lang->line('field_supplier'); ?> :&nbsp;</label>
+            <?php if(!is_null($item->supplier)){echo $item->supplier->name;} ?><br />
+            <label><?php echo $this->lang->line('field_supplier_ref'); ?> :&nbsp;</label>
+            <?php echo $item->supplier_ref; ?>
         </div>
         <div class="col-md-4">
-            <label>Durée de la garantie :&nbsp;</label><?php echo $item->warranty_duration; ?> mois<br />
-            ETAT DE LA GARANTIE A DEFINIR
+            <label><?php echo $this->lang->line('field_buying_price'); ?> :&nbsp;</label>
+            <?php echo $item->buying_price; ?><br />
+            <label><?php echo $this->lang->line('field_buying_date'); ?> :&nbsp;</label>
+            <?php echo $item->buying_date; ?>
+        </div>
+        <div class="col-md-4">
+            <label><?php echo $this->lang->line('field_warranty_duration'); ?> :&nbsp;</label>
+            <?php if (!empty($item->warranty_duration)) {
+                      echo $item->warranty_duration.' '.$this->lang->line('text_months');} ?><br />
+            
+            <?php //CHANGE TEXT COLOR BASED ON WARRANTY STATUS
+            if ($item->warranty_status == 1) {
+                echo '<div class="text-success bg-success" >';} // UNDER WARRANTY
+            elseif ($item->warranty_status == 2) {
+                echo '<div class="text-warning bg-warning" >';} // WARRANTY EXPIRES SOON
+            elseif ($item->warranty_status == 3) {
+                echo '<div class="text-danger bg-danger" >';}   // WARRANTY EXPIRED
+            else {echo '<div>';}
+
+            echo $this->lang->line('text_warranty_status')[$item->warranty_status]; ?>
+            </div>
         </div>
     </div>
 
     <!-- ITEM TAGS -->
     <div class="row">
         <div class="col-md-12">
-            <label>Tags :&nbsp;</label>TAGS A DEFINIR
+            <p class="bg-primary">&nbsp;<?php echo $this->lang->line('text_item_tags'); ?></p>
+        </div>
+        <div class="col-md-12">
+            TAGS A DEFINIR
         </div>
     </div>
 </div>

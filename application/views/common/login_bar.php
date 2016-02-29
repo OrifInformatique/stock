@@ -1,6 +1,9 @@
 <div class="container">
      <div class="row">
-          <div class="col-lg-6 col-sm-6">
+          <div class="col-lg-2 col-sm-2">
+               <img src="<?php echo base_url("assets/css/images/logo.jpg"); ?>" >
+          </div>
+          <div class="col-lg-4 col-sm-4">
                <h1><?php echo $this->lang->line('app_title'); ?></h1>
           </div>
           <div class="col-lg-6 col-sm-6">

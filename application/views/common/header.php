@@ -17,11 +17,12 @@
     ?>
     </title>
 
-    <!-- Custom CSS -->
+    <!-- Custom styles -->
     <!-- <link rel="stylesheet" href="<?php echo base_url("assets/css/style_stock.css"); ?>" /> -->
-    
+    <link rel="shortcut icon" href="<?php echo base_url("assets/css/images/favicon.ico"); ?>" type="image/x-icon" />
 
-    <!-- Bootstrap -->
+
+    <!-- Bootstrap styles -->
     <link rel="stylesheet" href="<?php echo base_url("assets/css/bootstrap.css"); ?>" />
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->

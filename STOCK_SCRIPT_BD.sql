@@ -176,7 +176,7 @@ CREATE TABLE IF NOT EXISTS `stock`.`loan` (
   `date` DATE NOT NULL,
   `item_localisation` VARCHAR(45) NULL,
   `remarks` TEXT NULL,
-  `return_delay` DATE NULL,
+  `planned_return_date` DATE NULL,
   `real_return_date` DATE NULL,
   `item_id` INT NOT NULL,
   `loan_by_user_id` INT NOT NULL,

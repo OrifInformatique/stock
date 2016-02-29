@@ -52,8 +52,11 @@ class Item extends MY_Controller {
 			redirect('/item');
 		}
 	
-		$output['item'] = $this->item_model->with_all()
-                                           ->get($id);
+        // Get item object and all related objects
+        $item = $this->item_model->with_all()
+                                 ->get($id);
+
+		$output['item'] = $item;
 		$output['message'] = $message;
 	
 		$this->display_view('item/detail', $output);
