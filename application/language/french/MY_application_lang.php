@@ -58,6 +58,6 @@ $lang['text_warranty_status']           = [0 => '',
                                            2 => 'Echéance proche',
                                            3 => 'Garantie Expirée'];
 $lang['text_item_detail']               = 'Photo et détail';
-$lang['text_item_loan_status']          = 'Disponibilité';
+$lang['text_item_loan_status']          = 'Disponibilité et prêts';
 $lang['text_item_buying_warranty']      = 'Achat et garantie';
 $lang['text_item_tags']                 = 'Tags';

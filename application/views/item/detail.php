@@ -49,11 +49,12 @@
             <?php if(!is_null($item->stocking_place)){echo $item->stocking_place->name;} ?>
         </div>
         <div class="col-md-4">
-            <label><?php echo $this->lang->line('field_current_loan'); ?></label><br />
+            <label><?php echo $this->lang->line('field_current_loan'); ?> :&nbsp;</label>
+            <?php if(!is_null($item->current_loan)){echo $item->current_loan->item_localisation;} ?><br />
             <label><?php echo $this->lang->line('field_loan_date'); ?> :&nbsp;</label>
-            DATE DU PRET A DEFINIR<br />
+            <?php if(!is_null($item->current_loan)){echo $item->current_loan->date;} ?><br />
             <label><?php echo $this->lang->line('field_loan_planned_return'); ?> :&nbsp;</label>
-            RETOUR PREVU A DEFINIR<br />
+            <?php if(!is_null($item->current_loan)){echo $item->current_loan->planned_return_date;} ?><br />
         </div>
         <div class="col-md-3">
             <button type="button"><?php echo $this->lang->line('btn_loans_history'); ?></button>

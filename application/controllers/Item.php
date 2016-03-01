@@ -52,10 +52,13 @@ class Item extends MY_Controller {
 			redirect('/item');
 		}
 	
-        // Get item object and all related objects
-        $item = $this->item_model->with_all()
+        // Get item object and related objects
+        $item = $this->item_model->with('supplier')
+                                 ->with('stocking_place')
+                                 ->with('item_condition')
+                                 ->with('item_group')
                                  ->get($id);
-
+                                 
 		$output['item'] = $item;
 		$output['message'] = $message;
 	

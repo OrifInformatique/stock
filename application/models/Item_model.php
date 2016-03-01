@@ -23,7 +23,8 @@ class Item_model extends MY_Model
     protected $has_many = ['item_tag_links', 'loans'];
 
     /* MY_Model callback methods */
-    protected $after_get = ['get_image', 'get_warranty_status'];
+    protected $after_get = ['get_image', 'get_warranty_status',
+                            'get_current_loan'];
 
 
     /**
@@ -90,6 +91,25 @@ class Item_model extends MY_Model
                 $item->warranty_status = 3;
             }
         }
+
+        return $item;
+    }
+
+    /**
+    * Get current loan related to this item, if one exists
+    *
+    * Attribute name : current_loan (NULL if item is currently not loaned)
+    */
+    protected function get_current_loan($item)
+    {
+        $this->load->model('loan_model');
+        $this->load->helper('date');
+
+        $where = "item_id=".$item->item_id." AND ".
+                 "date<='".mysqlDate('now')."' AND ".
+                 "real_return_date IS NULL";
+
+        $item->current_loan = $this->loan_model->get_by($where);
 
         return $item;
     }
