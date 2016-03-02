@@ -7,14 +7,13 @@
  * @copyright   Copyright (c) 2016, Orif <http://www.orif.ch>
  */
 
-define("SHORT_FORMAT_DATE", "d.m.Y");
 
 /**
 * Check if a given date (for example a date written in a form) is a valid date
 *
 * @return true if the date is valid, false else
 */
-function validateDate($date, $format = SHORT_FORMAT_DATE)
+function validateDate($date, $format)
 {
     // Check that $date is a valid date
     $d = DateTime::createFromFormat($format, $date);
@@ -69,23 +68,6 @@ function mysqlDateTime($date)
     else
     {
         return nice_date($date, 'Y-m-d H:i:s');
-    }
-}
-
-/**
-* Format a given date or the current date to the predifined "Short date format"
-*
-* @return The formated date
-*/
-function shortFormatDate($date)
-{
-    if (empty($date) || strtolower($date) == 'now')
-    {
-        return date(SHORT_FORMAT_DATE);
-    }
-    else
-    {
-        return nice_date($date, SHORT_FORMAT_DATE);
     }
 }
 

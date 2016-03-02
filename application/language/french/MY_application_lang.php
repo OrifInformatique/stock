@@ -14,6 +14,10 @@ $lang['app_title']                      = 'Gestion de stock';
 $lang['page_prefix']                    = 'Stock';
 $lang['page_item_list']                 = 'Liste des objets';
 
+// Date and time formats
+$lang['date_format_short']              = 'd.m.Y';
+$lang['datetime_format_short']          = 'd.m.Y H:i';
+
 // Fields labels
 $lang['field_username']                 = 'Identifiant';
 $lang['field_password']                 = 'Mot de passe';

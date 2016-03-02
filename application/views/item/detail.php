@@ -66,10 +66,14 @@
         <div class="col-md-4">
             <label><?php echo $this->lang->line('field_current_loan'); ?> :&nbsp;</label>
             <?php if(!is_null($item->current_loan)){echo $item->current_loan->item_localisation;} ?><br />
+
             <label><?php echo $this->lang->line('field_loan_date'); ?> :&nbsp;</label>
-            <?php if(!is_null($item->current_loan)){echo $item->current_loan->date;} ?><br />
+            <?php if(!is_null($item->current_loan)) {
+                      echo nice_date($item->current_loan->date, $this->lang->line('date_format_short'));} ?><br />
+
             <label><?php echo $this->lang->line('field_loan_planned_return'); ?> :&nbsp;</label>
-            <?php if(!is_null($item->current_loan)){echo $item->current_loan->planned_return_date;} ?><br />
+            <?php if(!is_null($item->current_loan)) {
+                      echo nice_date($item->current_loan->planned_return_date, $this->lang->line('date_format_short'));} ?><br />
         </div>
         <div class="col-md-3">
             <button type="button"><?php echo $this->lang->line('btn_loans_history'); ?></button>
@@ -91,7 +95,7 @@
             <label><?php echo $this->lang->line('field_buying_price'); ?> :&nbsp;</label>
             <?php echo $item->buying_price; ?><br />
             <label><?php echo $this->lang->line('field_buying_date'); ?> :&nbsp;</label>
-            <?php echo $item->buying_date; ?>
+            <?php echo nice_date($item->buying_date, $this->lang->line('date_format_short')); ?>
         </div>
         <div class="col-md-4">
             <label><?php echo $this->lang->line('field_warranty_duration'); ?> :&nbsp;</label>
