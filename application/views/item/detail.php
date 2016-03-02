@@ -44,7 +44,22 @@
             <p class="bg-primary">&nbsp;<?php echo $this->lang->line('text_item_loan_status'); ?></p>
         </div>
         <div class="col-md-4">
-            <?php if(!is_null($item->item_condition)){echo $item->item_condition->name;} ?><br />
+            <?php //CHANGE TEXT COLOR BASED ON ITEM CONDITION
+            if(!is_null($item->item_condition))
+            {
+                if ($item->item_condition_id == 10) {
+                    echo '<div class="text-success bg-success" >';} // ITEM AVAILABLE
+                elseif ($item->item_condition_id == 20) {
+                    echo '<div class="text-warning bg-warning" >';} // ITEM LOANED
+                elseif ($item->item_condition_id == 30) {
+                    echo '<div class="text-warning bg-warning" >';} // ITEM DEFECTIVE
+                elseif ($item->item_condition_id == 40) {
+                    echo '<div class="text-danger bg-danger" >';}   // NO MORE ITEM
+                else {echo '<div>';}
+
+                echo $item->item_condition->name.'</div>';
+            } ?>
+
             <label><?php echo $this->lang->line('field_stocking_place'); ?> :</label>
             <?php if(!is_null($item->stocking_place)){echo $item->stocking_place->name;} ?>
         </div>
