@@ -44,20 +44,20 @@
             <p class="bg-primary">&nbsp;<?php echo $this->lang->line('text_item_loan_status'); ?></p>
         </div>
         <div class="col-md-4">
-            <?php //CHANGE TEXT COLOR BASED ON ITEM CONDITION
+            <?php //CHANGE LABEL COLOR BASED ON ITEM CONDITION
             if(!is_null($item->item_condition))
             {
                 if ($item->item_condition_id == 10) {
-                    echo '<div class="text-success bg-success" >';} // ITEM AVAILABLE
+                    echo '<span class="label label-success" >';} // ITEM AVAILABLE
                 elseif ($item->item_condition_id == 20) {
-                    echo '<div class="text-warning bg-warning" >';} // ITEM LOANED
+                    echo '<span class="label label-warning" >';} // ITEM LOANED
                 elseif ($item->item_condition_id == 30) {
-                    echo '<div class="text-warning bg-warning" >';} // ITEM DEFECTIVE
+                    echo '<span class="label label-warning" >';} // ITEM DEFECTIVE
                 elseif ($item->item_condition_id == 40) {
-                    echo '<div class="text-danger bg-danger" >';}   // NO MORE ITEM
+                    echo '<span class="label label-danger" >';}  // NO MORE ITEM
                 else {echo '<div>';}
 
-                echo $item->item_condition->name.'</div>';
+                echo $item->item_condition->name.'</span><br />';
             } ?>
 
             <label><?php echo $this->lang->line('field_stocking_place'); ?> :</label>
@@ -68,12 +68,27 @@
             <?php if(!is_null($item->current_loan)){echo $item->current_loan->item_localisation;} ?><br />
 
             <label><?php echo $this->lang->line('field_loan_date'); ?> :&nbsp;</label>
-            <?php if(!is_null($item->current_loan)) {
-                      echo nice_date($item->current_loan->date, $this->lang->line('date_format_short'));} ?><br />
+            <?php
+            if(!is_null($item->current_loan)) {
+                if(!empty($item->current_loan->date))
+                {
+                    echo nice_date($item->current_loan->date, $this->lang->line('date_format_short'));
+                }
+            }
+            ?>
+            <br />
 
             <label><?php echo $this->lang->line('field_loan_planned_return'); ?> :&nbsp;</label>
-            <?php if(!is_null($item->current_loan)) {
-                      echo nice_date($item->current_loan->planned_return_date, $this->lang->line('date_format_short'));} ?><br />
+            <?php 
+            if(!is_null($item->current_loan))
+            {
+                if(!empty($item->current_loan->planned_return_date))
+                {
+                    echo nice_date($item->current_loan->planned_return_date, $this->lang->line('date_format_short'));
+                }
+            }
+            ?>
+            <br />
         </div>
         <div class="col-md-3">
             <button type="button"><?php echo $this->lang->line('btn_loans_history'); ?></button>
@@ -94,25 +109,31 @@
         <div class="col-md-4">
             <label><?php echo $this->lang->line('field_buying_price'); ?> :&nbsp;</label>
             <?php echo $item->buying_price; ?><br />
+
             <label><?php echo $this->lang->line('field_buying_date'); ?> :&nbsp;</label>
-            <?php echo nice_date($item->buying_date, $this->lang->line('date_format_short')); ?>
+            <?php
+            if (!empty($item->buying_date))
+            {
+                echo nice_date($item->buying_date, $this->lang->line('date_format_short'));
+            }
+            ?>
         </div>
         <div class="col-md-4">
             <label><?php echo $this->lang->line('field_warranty_duration'); ?> :&nbsp;</label>
             <?php if (!empty($item->warranty_duration)) {
                       echo $item->warranty_duration.' '.$this->lang->line('text_months');} ?><br />
             
-            <?php //CHANGE TEXT COLOR BASED ON WARRANTY STATUS
+            <?php //CHANGE LABEL COLOR BASED ON WARRANTY STATUS
             if ($item->warranty_status == 1) {
-                echo '<div class="text-success bg-success" >';} // UNDER WARRANTY
+                echo '<span class="label label-success" >';} // UNDER WARRANTY
             elseif ($item->warranty_status == 2) {
-                echo '<div class="text-warning bg-warning" >';} // WARRANTY EXPIRES SOON
+                echo '<span class="label label-warning" >';} // WARRANTY EXPIRES SOON
             elseif ($item->warranty_status == 3) {
-                echo '<div class="text-danger bg-danger" >';}   // WARRANTY EXPIRED
-            else {echo '<div>';}
+                echo '<span class="label label-danger" >';}  // WARRANTY EXPIRED
+            else {echo '<span>';}
 
-            echo $this->lang->line('text_warranty_status')[$item->warranty_status]; ?>
-            </div>
+                echo $this->lang->line('text_warranty_status')[$item->warranty_status]; ?>
+            </span>
         </div>
     </div>
 
@@ -122,7 +143,15 @@
             <p class="bg-primary">&nbsp;<?php echo $this->lang->line('text_item_tags'); ?></p>
         </div>
         <div class="col-md-12">
-            TAGS A DEFINIR
+            <?php
+            if (!empty($item->tags))
+            {
+                foreach($item->tags as $tag)
+                {
+                    echo '<span class="label label-default">'.$tag."</span>\n";
+                }
+            }
+            ?>
         </div>
     </div>
 </div>

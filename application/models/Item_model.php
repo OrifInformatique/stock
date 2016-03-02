@@ -24,7 +24,7 @@ class Item_model extends MY_Model
 
     /* MY_Model callback methods */
     protected $after_get = ['get_image', 'get_warranty_status',
-                            'get_current_loan'];
+                            'get_current_loan', 'get_tags'];
 
 
     /**
@@ -114,58 +114,32 @@ class Item_model extends MY_Model
         return $item;
     }
 
+    /**
+    * Get the tags related to this item, formated in an array
+    *
+    * Attribute name : tags (NULL if no tag is related to this item)
+    */
+    protected function get_tags($item)
+    {
+        $this->load->model('item_tag_link_model');
 
-/*****************************************************/
-/*** TO BE REPLACED (COPIED FROM OLD MODEL) **********/
-/*****************************************************/
-  
-    /* *** Updates item's image in database *** */
-    
-    public function set_image($id, $image_file_name)
-    {
-        
-        $update_array = array(
-                'image' => $image_file_name
-        );
-        
-        $this->db->where('item_id', $id);
-        $this->db->update('item', $update_array);
-        
-            
-    }
-    
-    /* *** Delete tag from database *** */
-    
-    public function delete_tag($id)
-    {
-        $this->db->where('item_tag_link_id', $id);
-        $this->db->delete('item_tag_link');  
-    
-    }
-    
-    /* *** Create tag in database *** */
-    
-    public function create_tag($id, $tag_id)
-    {
-        
-        $query = $this->db->get_where('item_tag_link',  array('item_id' => $id, 'item_tag_id' => $tag_id));
-        
-        if($query->num_rows() > 0) 
-            return false;
-        
-        $array_create = array(
-                'item_id' => $id,
-                'item_tag_id' => $tag_id
-        );
-        
-        $this->db->insert('item_tag_link', $array_create);
-    }
-    
-    /* *** Check date format *** */
-    
-    function _validateDate($date)
-    {
-        $d = DateTime::createFromFormat('Y-m-d', $date);
-        return $d && $d->format('Y-m-d') == $date;
+        $tag_links = $this->item_tag_link_model->with('item_tag')
+                                               ->get_many_by('item_id', $item->item_id);
+
+        if (!empty($tag_links))
+        {
+            foreach ($tag_links as $tag_link)
+            {
+                $tags_array[$tag_link->item_tag->item_tag_id] = $tag_link->item_tag->name;
+            }
+
+            $item->tags = $tags_array;
+        }
+        else
+        {
+            $item->tags = NULL;
+        }
+
+        return $item;
     }
 }
