@@ -42,6 +42,13 @@ $lang['header_item_name']               = 'Objet';
 $lang['header_item_description']        = 'Description';
 $lang['header_item_created_by']         = 'Créé par';
 
+$lang['header_loan_date']               = 'Prêté le';
+$lang['header_loan_planned_return']     = 'Retour prévu';
+$lang['header_loan_real_return']        = 'Retour effectif';
+$lang['header_loan_localisation']       = 'Lieu du prêt';
+$lang['header_loan_by_user']            = 'Prêté par';
+$lang['header_loan_to_user']            = 'Prêté à';
+
 // Buttons
 $lang['btn_cancel']                     = 'Annuler';
 $lang['btn_login']                      = 'Se connecter';

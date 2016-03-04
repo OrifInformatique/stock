@@ -20,9 +20,7 @@ class Item extends MY_Controller {
 	{
 			parent::__construct();
 			$this->load->model('item_model');
-			$this->load->library('form_validation');
-			$this->load->helper('stock_helper');
-			$this->load->model('login_model');
+            $this->load->model('loan_model');
 	}
 
 	
@@ -44,7 +42,7 @@ class Item extends MY_Controller {
     *
     * @param $id : the item to display
     */
-	public function view($id = NULL, $message = '')
+	public function view($id = NULL)
 	{
 		if (empty($id))
 		{
@@ -60,8 +58,33 @@ class Item extends MY_Controller {
                                  ->get($id);
                                  
 		$output['item'] = $item;
-		$output['message'] = $message;
 	
 		$this->display_view('item/detail', $output);
 	}
+
+
+    /**
+    * Display loans list for one given item
+    *
+    * @param $id : the item concerned
+    */
+    public function loans($id = NULL)
+    {
+        if (empty($id))
+        {
+            // No item specified, display items list
+            redirect('/item');
+        }
+    
+        // Get item object and related loans
+        $item = $this->item_model->get($id);
+        $loans = $this->loan_model->with('loan_by_user')
+                                  ->with('loan_to_user')
+                                  ->get_many_by('item_id', $item->item_id);
+                                 
+        $output['item'] = $item;
+        $output['loans'] = $loans;
+    
+        $this->display_view('item/loans', $output);
+    }
 }

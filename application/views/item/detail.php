@@ -34,7 +34,21 @@
             <label><?php echo $this->lang->line('field_remarks'); ?></label>
             <p><?php echo $item->remarks; ?></p>
 
-            <button type="button"><?php echo $this->lang->line('btn_linked_doc'); ?></button>
+            <!-- Button to display linked file -->
+            <?php
+            if (!empty($item->linked_file)) {
+                echo '<a href="'.base_url('uploads/files/'.$item->linked_file).'" '.
+                        'class="btn btn-default"  role="button" >'
+                        .$this->lang->line('btn_linked_doc').
+                     '</a>';
+            }
+            else {
+                echo '<a href="#" '.
+                     'class="btn btn-default disabled"  role="button" >'
+                         .$this->lang->line('btn_linked_doc').
+                     '</a>';
+            }
+            ?>
         </div>
     </div>
 
@@ -91,7 +105,14 @@
             <br />
         </div>
         <div class="col-md-3">
-            <button type="button"><?php echo $this->lang->line('btn_loans_history'); ?></button>
+            
+            <!-- Button to display loans history -->
+            <?php
+            echo '<a href="'.base_url('/item/loans/'.$item->item_id).'" '.
+                    'class="btn btn-default"  role="button" >'
+                    .$this->lang->line('btn_loans_history').
+                 '</a>';
+            ?>
         </div>
     </div>
 
