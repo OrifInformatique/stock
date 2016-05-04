@@ -145,7 +145,6 @@ class Item extends CI_Controller {
 		$this->_view_stock_header($output);
 		$this->load->view('item/view', $output);
 		$this->load->view('item/footer');
-
 	}
 	
 	/* *** Display by matching terms *** */
@@ -177,7 +176,6 @@ class Item extends CI_Controller {
 		$this->_view_stock_header($output);
 		$this->load->view('item/view', $output);
 		$this->load->view('item/footer');
-	
 	}
 
 	/* *** Base image upload request *** */
@@ -302,7 +300,7 @@ class Item extends CI_Controller {
 			}
 			else
 			{
-				show_error('Impossible d\'entrer les valeurs dans la base de données');
+				show_error("Impossible d'entrer les valeurs dans la base de données");
 			}
 		}
 		else 
@@ -331,7 +329,6 @@ class Item extends CI_Controller {
 		$this->_view_stock_header($output);
 		$this->load->view('item/create', $output);
 		$this->load->view('item/footer');
-		
 	}
 	
 	/* *** Check and insert item *** */
@@ -402,7 +399,6 @@ class Item extends CI_Controller {
 		$this->_view_stock_header($output);
 		$this->load->view('item/delete_confirm', $output);
 		$this->load->view('item/footer');
-		
 	}
 	
 	/* *** Remove item *** */
@@ -414,5 +410,4 @@ class Item extends CI_Controller {
 		$this->item_model->delete_item($item_id);
 		$this->view_all();
 	}
-	
 }
