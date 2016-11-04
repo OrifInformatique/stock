@@ -1,49 +1,47 @@
-<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 
-  'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
-<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-4 col-sm-4 well">
+            <?php 
+                $attributes = array("class" => "form-horizontal",
+                                    "id" => "loginform",
+                                    "name" => "loginform");
+                echo form_open("auth/login", $attributes);
+            ?>
+            <fieldset>
+                <legend><?php echo $this->lang->line('text_login'); ?></legend>
+                <div class="form-group">
+                    <div class="row colbox">
+                        <div class="col-lg-4 col-sm-4">
+                            <label for="username" class="control-label"><?php echo $this->lang->line('field_username'); ?></label>
+                        </div>
+                        <div class="col-lg-8 col-sm-8">
+                            <input class="form-control" id="username" name="username" placeholder="<?php echo $this->lang->line('field_username'); ?>" type="text" value="<?php echo set_value('username'); ?>" />
+                            <span class="text-danger"><?php echo form_error('username'); ?></span>
+                        </div>
+                    </div>
+                </div>
 
-<head>    
-    <title>Login</title>
-    
-    <?php echo link_tag('public/css/style_login.css'); ?> 
-    
-</head>
-<body>
-	
-	
-	<div class="login">
-		<div class="login-screen">
-			<div class="app-title">
-				<h1>Inventaire Orif</h1>
-			</div>
-
-			<div class="login-form">
-				<div class="control-group">	
-
-	
-					<?php echo $msg;?>
-				    <div id="login_form">
-				        <form action="<?php echo base_url();?>login/process" method="post" name="process">
-				            <h2>Login utilisateur</h2>
-				            <br>            
-				            <label for="username">Nom d'utilisateur</label>
-				            <input type="text" name="username" id="username" size="25" /><br>
-				        <br>
-				            <label for="password">Mot de passe</label>
-				            <input type="password" name="password" id="password" size="25" /><br>                            
-				        <br>
-        
-				            <input type="submit" value="Login" class="btn btn-primary btn-large btn-block" />  
-				            
-				        </form>
-				    </div>
-				    
-
-    			</div>
-		</div>
-	</div>
-</body>
-    
-    
-</body>
-</html>
+                <div class="form-group">
+                    <div class="row colbox">
+                        <div class="col-lg-4 col-sm-4">
+                            <label for="password" class="control-label"><?php echo $this->lang->line('field_password'); ?></label>
+                        </div>
+                        <div class="col-lg-8 col-sm-8">
+                            <input class="form-control" id="password" name="password" placeholder="<?php echo $this->lang->line('field_password'); ?>" type="password" value="<?php echo set_value('password'); ?>" />
+                            <span class="text-danger"><?php echo form_error('password'); ?></span>
+                        </div>
+                    </div>
+                </div>
+                                  
+                <div class="form-group">
+                    <div class="col-lg-12 col-sm-12 text-center">
+                        <input id="btn_login" name="btn_login" type="submit" class="btn btn-default" value="<?php echo $this->lang->line('btn_login'); ?>" />
+                        <input id="btn_cancel" name="btn_cancel" type="reset" class="btn btn-default" value="<?php echo $this->lang->line('btn_cancel'); ?>" />
+                    </div>
+                </div>
+          </fieldset>
+          <?php echo form_close(); ?>
+          <?php echo $this->session->flashdata('message'); ?>
+          </div>
+    </div>
+</div>
