@@ -7,6 +7,11 @@
  * @copyright   Copyright (c) 2016, Orif <http://www.orif.ch>
  */
 
+/*
+Menu:
+34 index
+*/
+
 class Item extends MY_Controller {
 
     /* MY_Controller variables definition */
@@ -108,12 +113,12 @@ class Item extends MY_Controller {
         $this->display_view('item/loans', $output);
     }
 
-	public function modify_item($id)
+	public function modify($id)
 	{
-
+    $uiae;
 	}
 
-	public function delete_item($id)
+	public function delete($id)
 	{
 		$data['db'] = 'item';
 		$data['id'] = $id;

@@ -15,30 +15,17 @@
         }
     ?></title>
 
-    <!-- Custom styles -->
-    <!-- <link rel="stylesheet" href="<?php echo base_url("assets/css/style_stock.css"); ?>" /> -->
-    <link rel="shortcut icon" href="<?php echo base_url("assets/css/images/favicon.ico"); ?>" type="image/x-icon" />
+    <!-- Icon -->
+    <link rel="shortcut icon" href="<?php echo base_url("assets/images/favicon.ico"); ?>" type="image/x-icon" />
 
 
     <!-- Bootstrap styles -->
-	<link 
+	<link
 		href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
 		rel="stylesheet"
 		integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7"
 		crossorigin="anonymous"
 	/>
-	
-	<script
-		src="https://code.jquery.com/jquery-3.1.0.min.js"
-		integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq"
-		crossorigin="anonymous"
-	></script>
-	
-	<script
-		src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
-		integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
-		crossorigin="anonymous"
-	></script>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->

@@ -2,7 +2,7 @@
   <div class="row">
     <a href="<?php echo base_url(); ?>" style="color:inherit">
       <div class="col-lg-2 col-sm-2">
-        <img src="<?php echo base_url("assets/css/images/logo.jpg"); ?>" >
+        <img src="<?php echo base_url("assets/images/logo.jpg"); ?>" >
       </div>
       <div class="col-lg-4 col-sm-4">
         <h1><?php echo $this->lang->line('app_title'); ?></h1>
@@ -22,4 +22,4 @@
     </div>
   </div>
 </div>
-<hr/>
+<hr />
