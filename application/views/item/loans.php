@@ -1,6 +1,12 @@
 <div class="container">
-
+	<!-- BUTTONS --><?php $item_page = base_url('item/view') . '/' .  $item->item_id; ?>
+	<em>
+		<a href="<?php echo $item_page; ?>" class="btn" role="button">Retour à l'objet</a>
+		<a href="<?php echo base_url('modify_loans/') ?>" class="btn" role="button">Modifier</a>
+	</em>
+	
     <!-- ITEM NAME AND DESCRIPTION -->
+	<a style="color:inherit;" href="<?php echo $item_page; ?>">
     <div class="row">
         <div class="col-md-4"><h3><?php echo $item->inventory_number; ?></h3></div>
         <div class="col-md-7"><h3><?php echo $item->name; ?></h3></div>
@@ -9,9 +15,13 @@
     <div class="row">
         <div class="col-md-12"><p><?php echo $item->description; ?></p></div>
     </div>
+	</a>
 
     <!-- LOANS LIST -->
-    <div class="row">
+	<?php if(empty($loans)) { ?>
+	<em style="font-size:1.5em;" class="text-warning">Aucun prêt à afficher</em>
+	<?php } else { ?>
+	<div class="row">
         <div class="col-lg-12 col-sm-12">
             <table class="table table-striped table-hover">
                 <thead>
@@ -26,18 +36,22 @@
                 </thead>
                 <tbody>
                 <?php foreach ($loans as $loan) { ?>
-                    <tr>
+                    <tr><a href="google.com" style="display:inline-block"><div style="width:100%;height:100%">
                         <td><?php echo $loan->date; ?></td>
                         <td><?php echo $loan->planned_return_date; ?></td>
                         <td><?php echo $loan->real_return_date; ?></td>
                         <td><?php echo $loan->item_localisation; ?></td>
                         <td><?php echo $loan->loan_by_user->username; ?></td>
                         <td><?php echo $loan->loan_to_user->lastname.' '.
-                                       $loan->loan_to_user->firstname; ?></td>
-                    </tr>
+                                       $loan->loan_to_user->firstname; ?>
+				        <a href="<?php echo base_url('/item/delete_loan').'/'.$loan->loan_id ?>" class="close" title="Supprimer le prêt">×</a></td>
+                    </div></a></tr>
                 <?php } ?>
                 </tbody>
             </table>
         </div>
     </div>
+	<?php } ?>
+	
+	<a href="<?php echo base_url(); ?>item/new-loan/" class="btn btn-primary">Nouveau…</a>
 </div>

@@ -34,6 +34,38 @@ class Item_model extends MY_Model
     {
         parent::__construct();
     }
+	
+	/*
+	 * Returns the id that will receive the next item
+	 */
+	public function get_future_id()
+	{
+		/*$query = "SELECT `AUTO_INCREMENT`";
+		$query .= "FROM  `INFORMATION_SCHEMA.TABLES`";
+		$query .= "WHERE TABLE_SCHEMA = `stock`";
+		$query .= "AND   TABLE_NAME   = `item`";*/
+		/*
+		$this->db->select('AUTO_INCREMENT');
+		$this->db->where('TABLE_SCHEMA', 'stock');
+		$this->db->where('TABLE_NAME', 'item');
+		$temp = $this->db->get('INFORMATION_SCHEMA.TABLES');
+		
+		foreach ($temp as $row)
+		{
+			$value = $row;
+		}*/
+		
+		$connection = mysqli_connect("localhost","root","");
+			$result = mysqli_query($connection, "SHOW TABLE STATUS FROM `stock` LIKE 'item'");
+		mysqli_close($connection);
+		
+		while ($row = mysqli_fetch_array($result))
+		{
+			$value = $row['Auto_increment'];
+		}
+		
+		return $value;
+	}
 
     /**
     * If no image is set, use "no_image.png"

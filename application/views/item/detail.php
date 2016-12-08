@@ -1,6 +1,14 @@
 <div class="container">
+    <!-- BUTTONS -->
+	<em>
+		<a href="<?php echo base_url(); ?>" class="btn" role="button">Retour à l’accueil</a>
+		<a href="<?php echo base_url('item/modify-item/'.$item->item_id); ?>" class="btn" role="button">Modifier</a>
+		<a href="<?php echo base_url('item/delete-item/'.$item->item_id); ?>" class="btn" role="button">Supprimer</a>
+	</em>
+	
     <!-- ITEM NAME AND DESCRIPTION -->
-    <div class="row">
+    <a style="color:inherit;" href="<?php echo base_url('item/view') . '/' .  $item->item_id; ?>">
+	<div class="row">
         <div class="col-md-4"><h3><?php echo $item->inventory_number; ?></h3></div>
         <div class="col-md-7"><h3><?php echo $item->name; ?></h3></div>
         <div class="col-md-1"><h6 class="text-right">ID <?php echo $item->item_id; ?></h6></div>
@@ -8,8 +16,9 @@
     <div class="row">
         <div class="col-md-12"><p><?php echo $item->description; ?></p></div>
     </div>
-
-    <!-- ITEM DETAILS -->
+	</a>
+	
+	<!-- ITEM DETAILS -->
     <div class="row">
         <div class="col-md-12">
             <p class="bg-primary">&nbsp;<?php echo $this->lang->line('text_item_detail'); ?></p>
