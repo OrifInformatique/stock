@@ -60,27 +60,42 @@ class Item extends MY_Controller {
 		$this->display_view('item/detail', $output);
 	}
 
-    // Add a new object
+  /**
+   * Add a new item
+   */
 	public function create()
     {
       //Test if input
+      $this->load->library('form_validation');
 
-      //Load the options
-  		$this->load->model('stocking_place_model');
-  		$data['stocking_places'] = $this->stocking_place_model->get_all();
-  		$this->load->model('supplier_model');
-  		$data['suppliers'] = $this->supplier_model->get_all();
-  		$this->load->model('item_group_model');
-  		$data['item_groups'] = $this->item_group_model->get_all();
+      $this->form_validation->set_rules("item_name", "Nom de l'item", 'required',
+      array('required' => "L'item doit avoir un nom"));
+      
 
-  		//Load the tags
-  		$this->load->model('item_tag_model');
+      // Get the ID that the new item will receive if it is created now
+      $data['future_id'] = $this->item_model->get_future_id();
 
-  		$data['item_tags'] = $this->item_tag_model->get_all();
-  		//Get the ID that the new item will receive if it is created now
-  		$data['future_id'] = $this->item_model->get_future_id();
+      if ($this->form_validation->run() === TRUE) {
+        $this->item_model->insert($_POST, TRUE);
 
-  		$this->display_view('item/form', $data);
+        header("Location: " . base_url() . "item/view/" . $data['future_id']);
+      } else {
+        //Load the options
+    		$this->load->model('stocking_place_model');
+    		$data['stocking_places'] = $this->stocking_place_model->get_all();
+    		$this->load->model('supplier_model');
+    		$data['suppliers'] = $this->supplier_model->get_all();
+    		$this->load->model('item_group_model');
+    		$data['item_groups'] = $this->item_group_model->get_all();
+
+    		// Load the tags
+    		$this->load->model('item_tag_model');
+
+    		$data['item_tags'] = $this->item_tag_model->get_all();
+
+
+    		$this->display_view('item/form', $data);
+      }
     }
 
     /**

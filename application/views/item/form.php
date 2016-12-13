@@ -1,3 +1,5 @@
+<em><?php echo validation_errors(); ?></em>
+
 <form class="container" method="post">
     <!-- ITEM NAME AND DESCRIPTION -->
     <div class="row">
@@ -6,7 +8,7 @@
         <div class="col-md-1"><h6 class="text-right">ID <?php echo $future_id; ?></h6></div>
     </div>
     <div class="row">
-        <div class="col-md-12"><p><input type="text" name="description" placeholder="Nom de l'objet" /></p></div>
+        <div class="col-md-12"><p><input type="text" name="description" placeholder="Description de l'objet" /></p></div>
     </div>
 
     <!-- ITEM DETAILS -->
@@ -88,10 +90,10 @@
 
             <label for="loan_date"><?php echo $this->lang->line('field_loan_date'); ?> :&nbsp;</label>
 			<input type="date" id="loan_date" name="loan_date" /><br />
-			
+
             <label for="loan_planned_return"><?php echo $this->lang->line('field_loan_planned_return'); ?> :&nbsp;</label>
 			<input type="date" id="loan_planned_return" name="loan_planned_return" /><br />
-            <?php 
+            <?php
             /*if(!is_null($item->current_loan))
             {
                 if(!empty($item->current_loan->planned_return_date))
@@ -102,7 +104,7 @@
             ?>
         </div>
         <div class="col-md-3">
-            
+
             <!-- Button to display loans history -->
             <?php
             /*echo '<a href="'.base_url('/item/loans/'.$item->item_id).'" '.
@@ -140,7 +142,7 @@
         <div class="col-md-4">
             <label for="warranty_duration"><?php echo $this->lang->line('field_warranty_duration'); ?> :&nbsp;</label>
             <input type="number" id="warranty_duration" name="warranty_duration" min="0" max="1000" value="24" onblur="change_warranty()" /> mois<br />
-            
+
             <?php //CHANGE LABEL COLOR BASED ON WARRANTY STATUS
 			//En garantie
 
@@ -178,28 +180,28 @@
 			<?php } ?>
         </div>
     </div>
-	
+
 	<button type="submit" class="btn btn-primary">Sauvegarder</button>
 </form>
 
 <script>
 function change_warranty()
-{	
+{
 	var buying_date = new Date(document.getElementById('buying_date').value);
 	console.log(buying_date.getFullYear() + "uie" + buying_date.getMonth() + "uie" + buying_date.getDate());
 	var duration = +document.getElementById('warranty_duration').value;
 	var span_garantie = document.getElementById('garantie');
-	
+
 	//Get remaining months (ceil)
 	var current_date = new Date();
-	
+
 	var remaining_months = (buying_date.getFullYear() * 12 + buying_date.getMonth()) + duration - (current_date.getFullYear() * 12 + current_date.getMonth());
-	
+
 	if (buying_date.getDate() >= current_date.getDate())
 		remaining_months++;
-	
+
 	console.log(remaining_months);
-	
+
 	if (remaining_months > 3)
 	{
 		//En garatie
