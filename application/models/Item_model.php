@@ -1,7 +1,7 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 /**
  * The Item model
- * 
+ *
  * @author      Didier Viret
  * @link        https://github.com/OrifInformatique/stock
  * @copyright   Copyright (c) 2016, Orif <http://www.orif.ch>
@@ -34,7 +34,7 @@ class Item_model extends MY_Model
     {
         parent::__construct();
     }
-	
+
 	/*
 	 * Returns the id that will receive the next item
 	 */
@@ -49,21 +49,21 @@ class Item_model extends MY_Model
 		$this->db->where('TABLE_SCHEMA', 'stock');
 		$this->db->where('TABLE_NAME', 'item');
 		$temp = $this->db->get('INFORMATION_SCHEMA.TABLES');
-		
+
 		foreach ($temp as $row)
 		{
 			$value = $row;
 		}*/
-		
+
 		$connection = mysqli_connect("localhost","root","");
 			$result = mysqli_query($connection, "SHOW TABLE STATUS FROM `stock` LIKE 'item'");
 		mysqli_close($connection);
-		
+
 		while ($row = mysqli_fetch_array($result))
 		{
 			$value = $row['Auto_increment'];
 		}
-		
+
 		return $value;
 	}
 
@@ -82,9 +82,9 @@ class Item_model extends MY_Model
 
     /**
     * Calculate a warranty status based on buying date and warranty duration
-    * 
+    *
     * Attribute name : warranty_status
-    * 
+    *
     * Values :
     *           0 : NO WARRANTY STATUS (buying date or warranty duration is not set)
     *           1 : UNDER WARRANTY
@@ -174,4 +174,15 @@ class Item_model extends MY_Model
 
         return $item;
     }
+/*
+    /**
+    *
+    *
+    * /
+    public function new_item($values)
+    {
+      if () {
+        $this->load->model();
+      }
+    }*/
 }

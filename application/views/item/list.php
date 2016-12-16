@@ -23,7 +23,12 @@
             <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo $item->name; ?></a>
           </td>
             <td><?php echo $item->description; ?></td>
-            <td><?php echo $item->created_by_user->username; ?><a href="<?php echo base_url('/item/delete-item').'/'.$item->item_id ?>" class="close" title="Supprimer l'objet">×</a></td>
+          <td><?php
+          if (is_null($item->created_by_user_id)) {
+            echo "<i>Anonymous</i>";
+          } else {
+            echo $item->created_by_user->username;
+          } ?><a href="<?php echo base_url('/item/delete-item').'/'.$item->item_id ?>" class="close" title="Supprimer l'objet">×</a></td>
           </tr>
       <?php } ?>
     </tbody>
