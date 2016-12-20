@@ -86,13 +86,13 @@
         </div>
         <div class="col-md-4"><!-- LOANS -->
             <label for="current_loan"><?php echo $this->lang->line('field_current_loan'); ?> :&nbsp;</label>
-            <input type="text" id="current_loan" name="current_loan" value="<?php echo set_value('current_loan'); ?>" /><br />
+            <input type="text" id="current_loan" name="item_localisation" value="<?php echo set_value('item_localisation'); ?>" /><br />
 
             <label for="loan_date"><?php echo $this->lang->line('field_loan_date'); ?> :&nbsp;</label>
-			<input type="date" id="loan_date" name="loan_date" value="<?php echo set_value('loan_date'); ?>" /><br />
+			<input type="date" id="loan_date" name="date" value="<?php echo set_value('date'); ?>" /><br />
 
             <label for="loan_planned_return"><?php echo $this->lang->line('field_loan_planned_return'); ?> :&nbsp;</label>
-			<input type="date" id="loan_planned_return" name="loan_planned_return" value="<?php echo set_value('loan_planned_return'); ?>" /><br />
+			<input type="date" id="loan_planned_return" name="planned_return_date" value="<?php echo set_value('planned_return_date'); ?>" /><br />
             <?php
             /*if(!is_null($item->current_loan))
             {
@@ -163,7 +163,7 @@
             }*/
             ?>
 			<?php foreach ($item_tags as $item_tag) { ?>
-			<label class="checkbox-inline"><input type="checkbox" name="item_link" value="<?php echo $item_tag->item_tag_id; ?>" <?php set_checkbox('item_link', $item_tag->item_tag_id); ?> /> <?php echo $item_tag->name; ?></label>
+			<label class="checkbox-inline"><input type="checkbox" name="tag<?php echo $item_tag->item_tag_id; ?>" value="<?php echo $item_tag->item_tag_id; ?>" <?php set_checkbox('item_link', $item_tag->item_tag_id); ?> /> <?php echo $item_tag->name; ?></label>
 			<?php } ?>
         </div>
     </div>
@@ -175,7 +175,6 @@
 function change_warranty()
 {
 	var buying_date = new Date(document.getElementById('buying_date').value);
-	console.log(buying_date.getFullYear() + "uie" + buying_date.getMonth() + "uie" + buying_date.getDate());
 	var duration = +document.getElementById('warranty_duration').value;
 	var span_garantie = document.getElementById('garantie');
 
@@ -187,23 +186,21 @@ function change_warranty()
 	if (buying_date.getDate() >= current_date.getDate())
 		remaining_months++;
 
-	console.log(remaining_months);
-
 	if (remaining_months > 3)
 	{
-		//En garatie
+		// Under warranty
 		span_garantie.innerHTML = "<?php echo $this->lang->line('text_warranty_status')[1]; ?>";
 		span_garantie.className = "label label-success";
 	}
 	else if (remaining_months > 0)
 	{
-		//Garantie proche de l'expiration
+		// Warranty expires soon
 		span_garantie.innerHTML = "<?php echo $this->lang->line('text_warranty_status')[2]; ?>";
 		span_garantie.className = "label label-warning";
 	}
 	else
 	{
-		//Garantie expirée
+		// Warranty expired
 		span_garantie.innerHTML = "<?php echo $this->lang->line('text_warranty_status')[3]; ?>";
 		span_garantie.className = "label label-danger";
 	}

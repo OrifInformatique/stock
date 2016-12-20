@@ -19,7 +19,7 @@ class Item extends MY_Controller {
 	{
 			parent::__construct();
 			$this->load->model('item_model');
-            $this->load->model('loan_model');
+      $this->load->model('loan_model');
 	}
 
 
@@ -65,8 +65,10 @@ class Item extends MY_Controller {
    */
 	public function create()
   {
-    //Test if input
+    // Test input
     $this->load->library('form_validation');
+
+
 
     $this->form_validation->set_rules("name", "Nom de l'item", 'required',
     array('required' => "L'item doit avoir un nom"));
@@ -75,9 +77,30 @@ class Item extends MY_Controller {
     $data['future_id'] = $this->item_model->get_future_id();
 
     if ($this->form_validation->run() === TRUE) {
-      // Does not work
-      $this->item_model->insert(array("name" => $_POST["name"]));
-      $itemData;
+      $itemArray = array();
+      $loanArray = array();
+
+      $this->load->model('item_tag_link_model');
+
+      foreach($_POST as $key => $value) {
+        if ($key == "item_localisation" || $key == "date" || $key == "planned_return_date") {
+          $insertLoan = TRUE;
+
+          $loanArray[$key] = $value;
+        } else if (substr($key, 0, 3) == "tag") {
+          // Create link
+          $linkArray = array("item_tag_id" => $value, "item_id" => $data['future_id']);
+          $this->item_tag_link_model->insert($linkArray);
+        } else {
+          $itemArray[$key] = $value;
+        }
+      }
+
+      $this->item_model->insert($itemArray);
+
+      if (isset($insertLoan)) {
+        $this->loan_model->insert($loanArray);
+      }
 
       header("Location: " . base_url() . "item/view/" . $data['future_id']);
     } else {
@@ -89,8 +112,8 @@ class Item extends MY_Controller {
   		$this->load->model('item_group_model');
   		$data['item_groups'] = $this->item_group_model->get_all();
 
-  		// Load the tags
-  		$this->load->model('item_tag_model');
+      // Load the tags
+      $this->load->model('item_tag_model');
 
   		$data['item_tags'] = $this->item_tag_model->get_all();
 
