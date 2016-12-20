@@ -174,15 +174,4 @@ class Item_model extends MY_Model
 
         return $item;
     }
-/*
-    /**
-    *
-    *
-    * /
-    public function new_item($values)
-    {
-      if () {
-        $this->load->model();
-      }
-    }*/
 }
