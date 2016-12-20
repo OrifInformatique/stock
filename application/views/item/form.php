@@ -1,6 +1,6 @@
 <em><?php echo validation_errors(); ?></em>
 
-<form class="container" method="post">
+<form class="container" method="post" enctype="multipart/form-data">
     <!-- ITEM NAME AND DESCRIPTION -->
     <div class="row">
         <div class="col-md-4"><h3><input type="text" name="inventory_number" placeholder="Numéro d'inventaire" value="<?php echo set_value('inventory_number'); ?>" /></h3></div>
@@ -17,7 +17,8 @@
             <p class="bg-primary">&nbsp;<?php echo $this->lang->line('text_item_detail'); ?></p>
         </div>
         <div class="col-md-4">
-			<!--<input type="file" name="photo" accept="image/*" />--><em>Pas de fonction d’image pour l’instant</em>
+          Ajoutez une image (hauteur et largeur max. 550px):
+			    <input type="file" name="photo" accept="image/*" />
         </div>
         <div class="col-md-8">
             <div class="row">

@@ -68,8 +68,6 @@ class Item extends MY_Controller {
     // Test input
     $this->load->library('form_validation');
 
-
-
     $this->form_validation->set_rules("name", "Nom de l'item", 'required',
     array('required' => "L'item doit avoir un nom"));
 
@@ -78,6 +76,21 @@ class Item extends MY_Controller {
 
     if ($this->form_validation->run() === TRUE) {
       $itemArray = array();
+
+      // IMAGE UPLOADING
+      $config['upload_path']          = "./uploads/images/";
+      $config['allowed_types']        = 'gif|jpg|png';
+      $config['max_size']             = 100;
+      $config['max_width']            = 550;
+      $config['max_height']           = 550;
+
+      $this->load->library('upload', $config);
+
+      if ($this->upload->do_upload('photo'))
+      {
+              $itemArray['image'] = $this->upload->data('file_name');
+      }
+
       $linkArray = array();
 
       $this->load->model('item_tag_link_model');
@@ -98,6 +111,7 @@ class Item extends MY_Controller {
       }
 
       header("Location: " . base_url() . "item/view/" . $data['future_id']);
+      exit();
     } else {
       // Load the options
   		$this->load->model('stocking_place_model');
@@ -111,7 +125,6 @@ class Item extends MY_Controller {
       $this->load->model('item_tag_model');
 
   		$data['item_tags'] = $this->item_tag_model->get_all();
-
 
   		$this->display_view('item/form', $data);
     }
