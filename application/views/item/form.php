@@ -111,10 +111,10 @@
                     'class="btn btn-default"  role="button" >'
                     .$this->lang->line('btn_loans_history').
                  '</a>';*/
-			echo '<a href="#" '.
+			/*echo '<a href="#" '.
                     'class="btn btn-default"  role="button" >'
                     .$this->lang->line('btn_loans_history').
-                 '</a>';
+                 '</a>';*/
             ?>
         </div>
     </div>

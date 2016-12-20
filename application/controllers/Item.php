@@ -78,9 +78,15 @@ class Item extends MY_Controller {
 
     if ($this->form_validation->run() === TRUE) {
       $itemArray = array();
-      $loanArray = array();
+      $loanArray = array("item_id" => $data['future_id'],
+                         "loan_by_user_id" => 1,
+                         "loan_to_user_id" => 1);
+
+      $linkArray = array();
 
       $this->load->model('item_tag_link_model');
+
+      $insertLoan = FALSE;
 
       foreach($_POST as $key => $value) {
         if ($key == "item_localisation" || $key == "date" || $key == "planned_return_date") {
@@ -88,23 +94,25 @@ class Item extends MY_Controller {
 
           $loanArray[$key] = $value;
         } else if (substr($key, 0, 3) == "tag") {
-          // Create link
-          $linkArray = array("item_tag_id" => $value, "item_id" => $data['future_id']);
-          $this->item_tag_link_model->insert($linkArray);
+          // Stock link to be created when the item will exist
+          $linkArray[] = $value;
         } else {
           $itemArray[$key] = $value;
         }
       }
-
       $this->item_model->insert($itemArray);
 
-      if (isset($insertLoan)) {
+      if ($insertLoan) {
         $this->loan_model->insert($loanArray);
+      }
+
+      foreach ($linkArray as $tag) {
+        $this->item_tag_link_model->insert(array("item_tag_id" => $tag, "item_id" => ($data['future_id'])));
       }
 
       header("Location: " . base_url() . "item/view/" . $data['future_id']);
     } else {
-      //Load the options
+      // Load the options
   		$this->load->model('stocking_place_model');
   		$data['stocking_places'] = $this->stocking_place_model->get_all();
   		$this->load->model('supplier_model');
