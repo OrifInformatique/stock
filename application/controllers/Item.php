@@ -78,33 +78,20 @@ class Item extends MY_Controller {
 
     if ($this->form_validation->run() === TRUE) {
       $itemArray = array();
-      $loanArray = array("item_id" => $data['future_id'],
-                         "loan_by_user_id" => 1,
-                         "loan_to_user_id" => 1);
-
       $linkArray = array();
 
       $this->load->model('item_tag_link_model');
 
-      $insertLoan = FALSE;
-
       foreach($_POST as $key => $value) {
-        if ($key == "item_localisation" || $key == "date" || $key == "planned_return_date") {
-          $insertLoan = TRUE;
-
-          $loanArray[$key] = $value;
-        } else if (substr($key, 0, 3) == "tag") {
+        if (substr($key, 0, 3) == "tag") {
           // Stock link to be created when the item will exist
           $linkArray[] = $value;
         } else {
           $itemArray[$key] = $value;
         }
       }
-      $this->item_model->insert($itemArray);
 
-      if ($insertLoan) {
-        $this->loan_model->insert($loanArray);
-      }
+      $this->item_model->insert($itemArray);
 
       foreach ($linkArray as $tag) {
         $this->item_tag_link_model->insert(array("item_tag_id" => $tag, "item_id" => ($data['future_id'])));

@@ -8,7 +8,7 @@
         <div class="col-md-1"><h6 class="text-right">ID <?php echo $future_id; ?></h6></div>
     </div>
     <div class="row">
-        <div class="col-md-12"><p><input type="text" name="description" placeholder="Description de l'objet" value="<?php echo set_value('description'); ?>" /></p></div>
+        <div class="col-md-12"><p><input type="text" class="form-control" name="description" placeholder="Description de l'objet" value="<?php echo set_value('description'); ?>" /></p></div>
     </div>
 
     <!-- ITEM DETAILS -->
@@ -84,38 +84,7 @@
 			</select>
             <?php /*if(!is_null($item->stocking_place)){echo $item->stocking_place->name;}*/ ?>
         </div>
-        <div class="col-md-4"><!-- LOANS -->
-            <label for="current_loan"><?php echo $this->lang->line('field_current_loan'); ?> :&nbsp;</label>
-            <input type="text" id="current_loan" name="item_localisation" value="<?php echo set_value('item_localisation'); ?>" /><br />
-
-            <label for="loan_date"><?php echo $this->lang->line('field_loan_date'); ?> :&nbsp;</label>
-			<input type="date" id="loan_date" name="date" value="<?php echo set_value('date'); ?>" /><br />
-
-            <label for="loan_planned_return"><?php echo $this->lang->line('field_loan_planned_return'); ?> :&nbsp;</label>
-			<input type="date" id="loan_planned_return" name="planned_return_date" value="<?php echo set_value('planned_return_date'); ?>" /><br />
-            <?php
-            /*if(!is_null($item->current_loan))
-            {
-                if(!empty($item->current_loan->planned_return_date))
-                {
-                    echo nice_date($item->current_loan->planned_return_date, $this->lang->line('date_format_short'));
-                }
-            }*/
-            ?>
-        </div>
-        <div class="col-md-3">
-
-            <!-- Button to display loans history -->
-            <?php
-            /*echo '<a href="'.base_url('/item/loans/'.$item->item_id).'" '.
-                    'class="btn btn-default"  role="button" >'
-                    .$this->lang->line('btn_loans_history').
-                 '</a>';*/
-			/*echo '<a href="#" '.
-                    'class="btn btn-default"  role="button" >'
-                    .$this->lang->line('btn_loans_history').
-                 '</a>';*/
-            ?>
+        <div class="col-md-7">
         </div>
     </div>
 
