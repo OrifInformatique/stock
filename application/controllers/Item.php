@@ -160,19 +160,44 @@ class Item extends MY_Controller {
         $uiae;
 	}*/
 
-	public function delete($id)
+	public function delete($id, $command = NULL)
 	{
-		$data['db'] = 'item';
-		$data['id'] = $id;
+    if (empty($command))
+    {
+      $data['db'] = 'item';
+  		$data['id'] = $id;
 
-		$this->display_view('item/confirm_delete', $data);
+  		$this->display_view('item/confirm_delete', $data);
+    } else {
+      $this->load->model("item_model");
+      $this->load->model("loan_model");
+      $this->load->model("item_tag_link_model");
+
+      $this->item_model->update($id, array("description" => "FAC"));
+
+      //DOES NOT WORK IN ALL CASES…
+      $this->item_tag_link_model->delete_by( array('item_id' => $id) );
+      $this->loan_model->delete_by( array('item_id' => $id) );
+      $this->item_model->delete($id);
+
+      redirect('/item');
+    }
 	}
 
-	public function delete_loan($id)
+	public function delete_loan($id, $command = NULL)
 	{
-		$data['db'] = 'loan';
-		$data['id'] = $id;
+    if (empty($command))
+    {
+  		$data['db'] = 'loan';
+  		$data['id'] = $id;
 
-		$this->display_view('item/confirm_delete', $data);
+  		$this->display_view('item/confirm_delete', $data);
+    } else {
+      $this->load->model("loan_model");
+
+      $this->loan_model->delete($id);
+
+      redirect('/item');
+    }
 	}
 }

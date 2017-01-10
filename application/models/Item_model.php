@@ -67,6 +67,10 @@ class Item_model extends MY_Model
 		return $value;
 	}
 
+  /**
+  *
+  */
+
     /**
     * If no image is set, use "no_image.png"
     */

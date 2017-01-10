@@ -2,10 +2,10 @@
     <!-- BUTTONS -->
 	<em>
 		<a href="<?php echo base_url(); ?>" class="btn" role="button">Retour à l’accueil</a>
-		<a href="<?php echo base_url('item/modify-item/'.$item->item_id); ?>" class="btn" role="button">Modifier</a>
-		<a href="<?php echo base_url('item/delete-item/'.$item->item_id); ?>" class="btn" role="button">Supprimer</a>
+		<a href="<?php echo base_url('item/modify/'.$item->item_id); ?>" class="btn" role="button">Modifier</a>
+		<a href="<?php echo base_url('item/delete/'.$item->item_id); ?>" class="btn" role="button">Supprimer</a>
 	</em>
-	
+
     <!-- ITEM NAME AND DESCRIPTION -->
     <a style="color:inherit;" href="<?php echo base_url('item/view') . '/' .  $item->item_id; ?>">
 	<div class="row">
@@ -17,7 +17,7 @@
         <div class="col-md-12"><p><?php echo $item->description; ?></p></div>
     </div>
 	</a>
-	
+
 	<!-- ITEM DETAILS -->
     <div class="row">
         <div class="col-md-12">
@@ -102,7 +102,7 @@
             <br />
 
             <label><?php echo $this->lang->line('field_loan_planned_return'); ?> :&nbsp;</label>
-            <?php 
+            <?php
             if(!is_null($item->current_loan))
             {
                 if(!empty($item->current_loan->planned_return_date))
@@ -114,7 +114,7 @@
             <br />
         </div>
         <div class="col-md-3">
-            
+
             <!-- Button to display loans history -->
             <?php
             echo '<a href="'.base_url('/item/loans/'.$item->item_id).'" '.
@@ -152,7 +152,7 @@
             <label><?php echo $this->lang->line('field_warranty_duration'); ?> :&nbsp;</label>
             <?php if (!empty($item->warranty_duration)) {
                       echo $item->warranty_duration.' '.$this->lang->line('text_months');} ?><br />
-            
+
             <?php //CHANGE LABEL COLOR BASED ON WARRANTY STATUS
             if ($item->warranty_status == 1) {
                 echo '<span class="label label-success" >';} // UNDER WARRANTY
