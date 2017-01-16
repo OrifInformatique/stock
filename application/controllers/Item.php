@@ -22,7 +22,6 @@ class Item extends MY_Controller {
       $this->load->model('loan_model');
 	}
 
-
 	/**
     * Display items list
     */
@@ -72,7 +71,7 @@ class Item extends MY_Controller {
     array('required' => "L'item doit avoir un nom"));
 
     // Get the ID that the new item will receive if it is created now
-    $data['future_id'] = $this->item_model->get_future_id();
+    $data['item_id'] = $this->item_model->get_future_id();
 
     if ($this->form_validation->run() === TRUE) {
       $itemArray = array();
@@ -154,11 +153,94 @@ class Item extends MY_Controller {
 
       $this->display_view('item/loans', $output);
   }
-/* NOT FOR NOW
+
 	public function modify($id)
 	{
-        $uiae;
-	}*/
+    $this->load->model('item_tag_link_model');
+
+    // If there is no submit,
+    if (empty($_POST))
+    {
+      // get the data from the item with this id,
+      $data = get_object_vars($this->item_model->get($id));
+
+      // including its tags
+      $this->item_tag_link_model->get(array("item_id" => $id));
+
+      // Load the tags
+      $this->load->model('item_tag_model');
+      $data['item_tags'] = $this->item_tag_model->get_all();
+
+      // Load the options
+      $this->load->model('stocking_place_model');
+      $data['stocking_places'] = $this->stocking_place_model->get_all();
+      $this->load->model('supplier_model');
+      $data['suppliers'] = $this->supplier_model->get_all();
+      $this->load->model('item_group_model');
+      $data['item_groups'] = $this->item_group_model->get_all();
+
+      //
+    } else {
+      // Test input
+      $this->load->library('form_validation');
+
+      $this->form_validation->set_rules("name", "Nom de l'item", 'required',
+      array('required' => "L'item doit avoir un nom"));
+
+      if ($this->form_validation->run() === TRUE) {
+        $itemArray = array();
+
+        // IMAGE UPLOADING
+        $config['upload_path']          = "./uploads/images/";
+        $config['allowed_types']        = 'gif|jpg|png';
+        $config['max_size']             = 100;
+        $config['max_width']            = 550;
+        $config['max_height']           = 550;
+
+        $this->load->library('upload', $config);
+
+        if ($this->upload->do_upload('photo'))
+        {
+          $itemArray['image'] = $this->upload->data('file_name');
+        }
+
+        $linkArray = array();
+
+        foreach($_POST as $key => $value) {
+          if (substr($key, 0, 3) == "tag") {
+            // Stock link to be created when the item will exist
+            $linkArray[] = $value;
+          } else {
+            $itemArray[$key] = $value;
+          }
+        }
+
+        $this->item_model->update($itemArray, $id);
+
+        foreach ($linkArray as $tag) {
+          $this->item_tag_link_model->insert(array("item_tag_id" => $tag, "item_id" => $id));
+        }
+
+        header("Location: " . base_url() . "item/view/" . $data['future_id']);
+        exit();
+      } else {
+        // Load the options
+    		$this->load->model('stocking_place_model');
+    		$data['stocking_places'] = $this->stocking_place_model->get_all();
+    		$this->load->model('supplier_model');
+    		$data['suppliers'] = $this->supplier_model->get_all();
+    		$this->load->model('item_group_model');
+    		$data['item_groups'] = $this->item_group_model->get_all();
+
+        // Load the tags
+        $this->load->model('item_tag_model');
+
+    		$data['item_tags'] = $this->item_tag_model->get_all();
+
+    	}
+    }
+    $this->display_view('item/form', $data);
+	}
 
 	public function delete($id, $command = NULL)
 	{
@@ -175,7 +257,6 @@ class Item extends MY_Controller {
 
       $this->item_model->update($id, array("description" => "FAC"));
 
-      //DOES NOT WORK IN ALL CASES…
       $this->item_tag_link_model->delete_by( array('item_id' => $id) );
       $this->loan_model->delete_by( array('item_id' => $id) );
       $this->item_model->delete($id);

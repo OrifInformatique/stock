@@ -3,12 +3,12 @@
 <form class="container" method="post" enctype="multipart/form-data">
     <!-- ITEM NAME AND DESCRIPTION -->
     <div class="row">
-        <div class="col-md-4"><h3><input type="text" name="inventory_number" placeholder="Numéro d'inventaire" value="<?php echo set_value('inventory_number'); ?>" /></h3></div>
-        <div class="col-md-7"><h3><input type="text" name="name" placeholder="Nom de l'objet" value="<?php echo set_value('item_name'); ?>" /></h3></div>
-        <div class="col-md-1"><h6 class="text-right">ID <?php echo $future_id; ?></h6></div>
+        <div class="col-md-4"><h3><input type="text" name="inventory_number" placeholder="Numéro d'inventaire" value="<?php if(isset($inventory_number)) {echo $inventory_number;} else {echo set_value('inventory_number');} ?>" /></h3></div>
+        <div class="col-md-7"><h3><input type="text" name="name" placeholder="Nom de l'objet" value="<?php if(isset($name)) {echo $name;} else {echo set_value('name');} ?>" /></h3></div>
+        <div class="col-md-1"><h6 class="text-right">ID <?php echo $item_id; ?></h6></div>
     </div>
     <div class="row">
-        <div class="col-md-12"><p><input type="text" class="form-control" name="description" placeholder="Description de l'objet" value="<?php echo set_value('description'); ?>" /></p></div>
+        <div class="col-md-12"><p><input type="text" class="form-control" name="description" placeholder="Description de l'objet" value="<?php if(isset($description)) {echo $description;} else {echo set_value('description');} ?>" /></p></div>
     </div>
 
     <!-- ITEM DETAILS -->
@@ -25,17 +25,17 @@
                 <div class="col-md-4">
                     <label><?php echo $this->lang->line('field_group'); ?> :&nbsp;</label>
                     <select name="item_group_id"><?php foreach ($item_groups as $item_group) { ?>
-					<option value="<?php echo $item_group->item_group_id; ?>" <?php echo set_select('item_group_id', $item_group->item_group_id); ?>><?php echo $item_group->name; ?></option>
+					<option value="<?php echo $item_group->item_group_id; ?>" <?php if (isset($item_group_id)) {if( $item_group_id == $item_group->item_group_id) {echo "selected";}} else {echo set_select('item_group_id', $item_group->item_group_id);} ?>><?php echo $item_group->name; ?></option>
 					<?php } ?></select>
                 </div>
                 <div class="col-md-8">
                     <label for="serial_number"><?php echo $this->lang->line('field_serial_number'); ?> :&nbsp;</label>
-                    <input type="text" id="serial_number" name="serial_number" value="<?php echo set_value('serial_number'); ?>" />
+                    <input type="text" id="serial_number" name="serial_number" value="<?php if(isset($name)) {echo $name;} else {echo set_value('name');} ?>" />
                 </div>
             </div>
 
             <label for="remarks"><?php echo $this->lang->line('field_remarks'); ?></label>
-            <p><textarea id="remarks" name="remarks" value="<?php echo set_value('remarks'); ?>"></textarea></p>
+            <p><textarea id="remarks" name="remarks" value="<?php if(isset($remarks)) {echo $remarks;} else {echo set_value('remarks');} ?>"></textarea></p>
 
             <!-- Button to display linked file -->
             <?php
@@ -80,7 +80,7 @@
             <label><?php echo $this->lang->line('field_stocking_place'); ?> :</label>
 			<select name="stocking_place_id">
 				<?php foreach ($stocking_places as $stocking_place) { ?>
-				<option value="<?php echo $stocking_place->stocking_place_id; ?>" <?php echo set_select('stocking_place_id', $stocking_place->stocking_place_id); ?>><?php echo $stocking_place->name; ?></option>
+				<option value="<?php echo $stocking_place->stocking_place_id; ?>" <?php if (isset($stocking_place_id)) {if( $stocking_place_id == $stocking_place->stocking_place_id) {echo "selected";}} else {echo set_select('stocking_place_id', $stocking_place->stocking_place_id);} ?>><?php echo $stocking_place->name; ?></option>
 				<?php } ?>
 			</select>
             <?php /*if(!is_null($item->stocking_place)){echo $item->stocking_place->name;}*/ ?>
@@ -97,7 +97,7 @@
         <div class="col-md-4">
             <label for="supplier_id"><?php echo $this->lang->line('field_supplier'); ?> :&nbsp;</label>
             <select name="supplier_id"><?php foreach ($suppliers as $supplier) { ?>
-				<option value="<?php echo $supplier->supplier_id; ?>" <?php echo set_select('supplier_id', $supplier->supplier_id); ?>><?php echo $supplier->name; ?></option>
+				<option value="<?php echo $supplier->supplier_id; ?>" <?php if (isset($supplier_id)) {if( $supplier_id == $supplier->supplier_id) {echo "selected";}} else {echo set_select('stocking_place_id', $supplier->supplier_id);} ?>><?php echo $supplier->name; ?></option>
 				<?php } ?></select><br />
             <label for="supplier_ref"><?php echo $this->lang->line('field_supplier_ref'); ?> :&nbsp;</label>
             <input type="text" id="supplier_ref" name="supplier_ref" value="<?php echo set_value('supplier_ref'); ?>" />
