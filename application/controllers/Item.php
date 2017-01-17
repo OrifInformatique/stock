@@ -106,10 +106,10 @@ class Item extends MY_Controller {
       $this->item_model->insert($itemArray);
 
       foreach ($linkArray as $tag) {
-        $this->item_tag_link_model->insert(array("item_tag_id" => $tag, "item_id" => ($data['future_id'])));
+        $this->item_tag_link_model->insert(array("item_tag_id" => $tag, "item_id" => ($data['item_id'])));
       }
 
-      header("Location: " . base_url() . "item/view/" . $data['future_id']);
+      header("Location: " . base_url() . "item/view/" . $data['item_id']);
       exit();
     } else {
       // Load the options
@@ -178,8 +178,6 @@ class Item extends MY_Controller {
       $data['suppliers'] = $this->supplier_model->get_all();
       $this->load->model('item_group_model');
       $data['item_groups'] = $this->item_group_model->get_all();
-
-      //
     } else {
       // Test input
       $this->load->library('form_validation');
@@ -188,9 +186,11 @@ class Item extends MY_Controller {
       array('required' => "L'item doit avoir un nom"));
 
       if ($this->form_validation->run() === TRUE) {
+        //Declarations
         $itemArray = array();
 
         // IMAGE UPLOADING
+        /* NOT FOR NOW
         $config['upload_path']          = "./uploads/images/";
         $config['allowed_types']        = 'gif|jpg|png';
         $config['max_size']             = 100;
@@ -203,25 +203,27 @@ class Item extends MY_Controller {
         {
           $itemArray['image'] = $this->upload->data('file_name');
         }
+        */
 
-        $linkArray = array();
+        // Delete ALL the tags for this object
+        $this->item_tag_link_model->delete_by(array('item_id' => $id));
 
         foreach($_POST as $key => $value) {
+          // If it is a tag, since their keys are tag1, tag2, …
           if (substr($key, 0, 3) == "tag") {
-            // Stock link to be created when the item will exist
-            $linkArray[] = $value;
+            // put it in the array for tags.
+            $this->item_tag_link_model->insert(array("item_tag_id" => $value, "item_id" => $id));
+          // Otherwise,
           } else {
+            // put it in th array for item properties.
             $itemArray[$key] = $value;
           }
         }
 
-        $this->item_model->update($itemArray, $id);
+        // Execute the changes in the item table
+        $this->item_model->update($id, $itemArray);
 
-        foreach ($linkArray as $tag) {
-          $this->item_tag_link_model->insert(array("item_tag_id" => $tag, "item_id" => $id));
-        }
-
-        header("Location: " . base_url() . "item/view/" . $data['future_id']);
+        header("Location: " . base_url() . "item/view/" . $id);
         exit();
       } else {
         // Load the options
@@ -236,7 +238,6 @@ class Item extends MY_Controller {
         $this->load->model('item_tag_model');
 
     		$data['item_tags'] = $this->item_tag_model->get_all();
-
     	}
     }
     $this->display_view('item/form', $data);
