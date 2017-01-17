@@ -165,7 +165,7 @@ class Item extends MY_Controller {
       $data = get_object_vars($this->item_model->get($id));
 
       // including its tags
-      $this->item_tag_link_model->get(array("item_id" => $id));
+      $data['tag_links'] = $this->item_tag_link_model->get_many_by("item_id", $id);
 
       // Load the tags
       $this->load->model('item_tag_model');

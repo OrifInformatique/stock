@@ -133,7 +133,24 @@
             }*/
             ?>
 			<?php foreach ($item_tags as $item_tag) { ?>
-			<label class="checkbox-inline"><input type="checkbox" name="tag<?php echo $item_tag->item_tag_id; ?>" value="<?php echo $item_tag->item_tag_id; ?>" <?php set_checkbox('item_link', $item_tag->item_tag_id); ?> /> <?php echo $item_tag->name; ?></label>
+			<label class="checkbox-inline"><input type="checkbox" name="tag<?php echo $item_tag->item_tag_id; ?>" value="true"
+        <?php
+        if (isset($tag_links))
+        {
+          foreach ($tag_links as $tag_link)
+          {
+            if ($tag_link->item_tag_id == $item_tag->item_tag_id)
+            {
+              echo 'checked';
+            }
+          }
+        }
+        else
+        {
+          echo set_checkbox('tag' . $item_tag->item_tag_id, "true");
+        }
+        ?> />
+      <?php echo $item_tag->name; ?></label>
 			<?php } ?>
         </div>
     </div>
