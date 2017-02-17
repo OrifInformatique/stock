@@ -2,7 +2,6 @@
 	<!-- BUTTONS --><?php $item_page = base_url('item/view') . '/' .  $item->item_id; ?>
 	<em>
 		<a href="<?php echo $item_page; ?>" class="btn" role="button"><?php echo $this->lang->line('btn_back_to_object'); ?></a>
-		<a href="<?php echo base_url('modify_loans/') ?>" class="btn" role="button">Modifier</a>
 	</em>
 
     <!-- ITEM NAME AND DESCRIPTION -->
@@ -36,8 +35,8 @@
                 </thead>
                 <tbody>
                 <?php foreach ($loans as $loan) { ?>
-                    <tr><a href="google.com" style="display:inline-block"><div style="width:100%;height:100%">
-                        <td><?php echo $loan->date; ?></td>
+                    <tr><div style="width:100%;height:100%">
+                        <td><a href="<?php echo base_url('/item/modify_loan').'/'.$loan->loan_id ?>"><?php echo $loan->date; ?></a></td>
                         <td><?php echo $loan->planned_return_date; ?></td>
                         <td><?php echo $loan->real_return_date; ?></td>
                         <td><?php echo $loan->item_localisation; ?></td>

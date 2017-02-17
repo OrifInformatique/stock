@@ -177,6 +177,50 @@ class Item extends MY_Controller {
   }
 
   /**
+  * Modify some loan
+  *
+  * @param $id : the loan
+  */
+  public function modify_loan($id = NULL)
+  {
+    // get the data from the loan with this id (to fill the form or to get the concerned item)
+    $data = get_object_vars($this->loan_model->get($id));
+
+    if (!empty($_POST)) {
+      // test input
+      $this->load->library('form_validation');
+
+      $this->form_validation->set_rules("date", "Date du prêt", 'required',
+      array('required' => "La date du prêt doit être fournie"));
+
+      if ($this->form_validation->run() === TRUE) {
+        //Declarations
+        $loanArray = $_POST;
+
+        // Execute the changes in the item table
+        $this->loan_model->update($id, $loanArray);
+
+        header("Location: " . base_url() . "item/loans/" . $data["item_id"]);
+        exit();
+      } else {
+        // Load the options
+    		$this->load->model('stocking_place_model');
+    		$data['stocking_places'] = $this->stocking_place_model->get_all();
+    		$this->load->model('supplier_model');
+    		$data['suppliers'] = $this->supplier_model->get_all();
+    		$this->load->model('item_group_model');
+    		$data['item_groups'] = $this->item_group_model->get_all();
+
+        // Load the tags
+        $this->load->model('item_tag_model');
+
+    		$data['item_tags'] = $this->item_tag_model->get_all();
+    	}
+    }
+    $this->display_view('item/loan_form', $data);
+  }
+
+  /**
   * Display loans list for one given item
   *
   * @param $id : the item concerned
