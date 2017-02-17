@@ -77,7 +77,7 @@ class Item extends MY_Controller {
       $itemArray = array();
 
       // IMAGE UPLOADING
-      $config['upload_path']          = "./uploads/images/";
+      $config['upload_path']          = './uploads/images/';
       $config['allowed_types']        = 'gif|jpg|png';
       $config['max_size']             = 100;
       $config['max_width']            = 550;
@@ -85,9 +85,12 @@ class Item extends MY_Controller {
 
       $this->load->library('upload', $config);
 
+      // Name: [id_item]_[00number]
       if ($this->upload->do_upload('photo'))
       {
               $itemArray['image'] = $this->upload->data('file_name');
+      } else {
+        die($this->upload->display_errors());
       }
 
       $linkArray = array();
@@ -190,7 +193,6 @@ class Item extends MY_Controller {
         $itemArray = array();
 
         // IMAGE UPLOADING
-        /* NOT FOR NOW
         $config['upload_path']          = "./uploads/images/";
         $config['allowed_types']        = 'gif|jpg|png';
         $config['max_size']             = 100;
@@ -203,7 +205,6 @@ class Item extends MY_Controller {
         {
           $itemArray['image'] = $this->upload->data('file_name');
         }
-        */
 
         // Delete ALL the tags for this object
         $this->item_tag_link_model->delete_by(array('item_id' => $id));
