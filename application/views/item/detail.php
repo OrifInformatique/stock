@@ -1,9 +1,9 @@
 <div class="container">
     <!-- BUTTONS -->
 	<em>
-		<a href="<?php echo base_url(); ?>" class="btn" role="button">Retour à l’accueil</a>
-		<a href="<?php echo base_url('item/modify/'.$item->item_id); ?>" class="btn" role="button">Modifier</a>
-		<a href="<?php echo base_url('item/delete/'.$item->item_id); ?>" class="btn" role="button">Supprimer</a>
+		<a href="<?php echo base_url(); ?>" class="btn" role="button"><?php echo $this->lang->line('btn_back_to_main'); ?></a>
+		<a href="<?php echo base_url('item/modify/'.$item->item_id); ?>" class="btn" role="button"><?php echo $this->lang->line('btn_modify_item'); ?></a>
+		<a href="<?php echo base_url('item/delete/'.$item->item_id); ?>" class="btn" role="button"><?php echo $this->lang->line('btn_delete_item'); ?></a>
 	</em>
 
     <!-- ITEM NAME AND DESCRIPTION -->
@@ -120,6 +120,14 @@
             echo '<a href="'.base_url('/item/loans/'.$item->item_id).'" '.
                     'class="btn btn-default"  role="button" >'
                     .$this->lang->line('btn_loans_history').
+                 '</a>';
+            ?>
+
+						<!-- Button to create new loan -->
+						<?php
+            echo '<a href="'.base_url('/item/create-loan/'.$item->item_id).'" '.
+                    'class="btn btn-default"  role="button" >'
+                    .$this->lang->line('btn_create_loan').
                  '</a>';
             ?>
         </div>

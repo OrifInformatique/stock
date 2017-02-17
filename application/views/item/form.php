@@ -155,7 +155,7 @@
         </div>
     </div>
 
-	<button type="submit" class="btn btn-primary">Sauvegarder</button>
+	<button type="submit" class="btn btn-primary"><?php echo $this->lang->line('btn_submit'); ?></button>
 </form>
 
 <script>

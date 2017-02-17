@@ -1,10 +1,10 @@
 <div class="container">
 	<!-- BUTTONS --><?php $item_page = base_url('item/view') . '/' .  $item->item_id; ?>
 	<em>
-		<a href="<?php echo $item_page; ?>" class="btn" role="button">Retour à l'objet</a>
+		<a href="<?php echo $item_page; ?>" class="btn" role="button"><?php echo $this->lang->line('btn_back_to_object'); ?></a>
 		<a href="<?php echo base_url('modify_loans/') ?>" class="btn" role="button">Modifier</a>
 	</em>
-	
+
     <!-- ITEM NAME AND DESCRIPTION -->
 	<a style="color:inherit;" href="<?php echo $item_page; ?>">
     <div class="row">
@@ -19,7 +19,7 @@
 
     <!-- LOANS LIST -->
 	<?php if(empty($loans)) { ?>
-	<em style="font-size:1.5em;" class="text-warning">Aucun prêt à afficher</em>
+	<em style="font-size:1.5em;" class="text-warning"><?php echo $this->lang->line('msg_no_loan'); ?></em>
 	<?php } else { ?>
 	<div class="row">
         <div class="col-lg-12 col-sm-12">
@@ -52,6 +52,6 @@
         </div>
     </div>
 	<?php } ?>
-	
-	<a href="<?php echo base_url(); ?>item/new-loan/" class="btn btn-primary">Nouveau…</a>
+
+	<a href="<?php echo base_url(); ?>item/create-loan/<?php echo $item->item_id; ?>" class="btn btn-primary">Nouveau…</a>
 </div>

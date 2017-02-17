@@ -133,11 +133,11 @@ class Item extends MY_Controller {
   }
 
   /**
-  * Display loans list for one given item
+  * Create loan for one given item
   *
   * @param $id : the item concerned
   */
-  public function loans($id = NULL)
+  public function create_loan($id = NULL)
   {
       if (empty($id))
       {
@@ -151,10 +151,54 @@ class Item extends MY_Controller {
                                 ->with('loan_to_user')
                                 ->get_many_by('item_id', $item->item_id);
 
-      $output['item'] = $item;
-      $output['loans'] = $loans;
+      $data['item'] = $item;
+      $data['loans'] = $loans;
 
-      $this->display_view('item/loans', $output);
+      // Test input
+      $this->load->library('form_validation');
+
+      $this->form_validation->set_rules("date", "Date du prêt", 'required',
+      array('required' => "La date du prêt doit être fournie"));
+
+      if ($this->form_validation->run() === TRUE) {
+        $loanArray = $_POST;
+        $loanArray["item_id"] = $id;
+
+        // For now, loans are from and for Orif
+        $loanArray["loan_to_user_id"] = $loanArray["loan_by_user_id"] = 1;
+
+        $this->loan_model->insert($loanArray);
+
+        header("Location: " . base_url() . "item/loans/" . $id);
+        exit();
+      } else {
+        $this->display_view('item/loan_form', $data);
+      }
+  }
+
+  /**
+  * Display loans list for one given item
+  *
+  * @param $id : the item concerned
+  */
+  public function loans($id = NULL)
+  {
+    if (empty($id))
+    {
+        // No item specified, display items list
+        redirect('/item');
+    }
+
+    // Get item object and related loans
+    $item = $this->item_model->get($id);
+    $loans = $this->loan_model->with('loan_by_user')
+                              ->with('loan_to_user')
+                              ->get_many_by('item_id', $item->item_id);
+
+    $output['item'] = $item;
+    $output['loans'] = $loans;
+
+    $this->display_view('item/loans', $output);
   }
 
 	public function modify($id)
