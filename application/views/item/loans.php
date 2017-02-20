@@ -43,7 +43,7 @@
                         <td><?php echo $loan->loan_by_user->username; ?></td>
                         <td><?php echo $loan->loan_to_user->lastname.' '.
                                        $loan->loan_to_user->firstname; ?>
-				        <a href="<?php echo base_url('/item/delete_loan').'/'.$loan->loan_id ?>" class="close" title="Supprimer le prêt">×</a></td>
+				        <a href="<?php echo base_url('/item/delete-loan').'/'.$loan->loan_id ?>" class="close" title="Supprimer le prêt">×</a></td>
                     </div></a></tr>
                 <?php } ?>
                 </tbody>

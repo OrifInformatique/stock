@@ -200,7 +200,7 @@ class Item extends MY_Controller {
         // Execute the changes in the item table
         $this->loan_model->update($id, $loanArray);
 
-        header("Location: " . base_url() . "item/loans/" . $data["item_id"]);
+        redirect("/item/loans/" . $data["item_id"]);
         exit();
       } else {
         // Load the options
@@ -312,7 +312,7 @@ class Item extends MY_Controller {
         // Execute the changes in the item table
         $this->item_model->update($id, $itemArray);
 
-        header("Location: " . base_url() . "item/view/" . $id);
+        redirect("/item/view/" . $id);
         exit();
       } else {
         // Load the options
@@ -366,9 +366,12 @@ class Item extends MY_Controller {
     } else {
       $this->load->model("loan_model");
 
+      // get the data from the loan with this id (to fill the form or to get the concerned item)
+      $data = get_object_vars($this->loan_model->get($id));
+
       $this->loan_model->delete($id);
 
-      redirect('/item');
+      redirect("/item/loans/" . $data["item_id"]);
     }
 	}
 }

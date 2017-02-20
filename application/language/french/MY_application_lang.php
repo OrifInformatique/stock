@@ -60,13 +60,15 @@ $lang['btn_modify_item']                = 'Modifier';
 $lang['btn_delete_item']                = 'Supprimer';
 $lang['btn_linked_doc']                 = 'Voir document…';
 $lang['btn_loans_history']              = 'Historique des prêts…';
-$lang['btn_create_loan']                = 'Ajouter un lien…';
+$lang['btn_create_loan']                = 'Ajouter un prêt…';
 $lang['btn_submit']                     = 'Sauvegarder';
+$lang['btn_toggle_filters']             = 'Voir/masquer les filtres';
 
 // Messages
 $lang['msg_err_invalid_password']       = 'L\'identifiant et le mot de passe ne sont pas valides';
 $lang['msg_err_access_denied']          = 'Accès refusé';
 $lang['msg_no_loan']                    = 'Aucun prêt à afficher';
+$lang['msg_no_item']                    = 'Aucun objet à afficher';
 
 // Other texts
 $lang['text_login']                     = 'Connexion';

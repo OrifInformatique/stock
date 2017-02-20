@@ -1,8 +1,12 @@
 <div class="container">
 <div class="row">
 <div class="col-lg-12 col-sm-12">
+  <button data-toggle="collapse" data-target="#filters"><?php echo $this->lang->line('btn_toggle_filters'); ?></button>
+  <form class="collapse" id="filters" method="post">
+
+  </form>
 <?php if(empty($items)) { ?>
-  <em>Aucun objet à afficher</em>
+  <em><?php echo $this->lang->line('msg_no_item'); ?></em>
 <?php } else { ?>
   <table class="table table-striped table-hover">
     <thead>

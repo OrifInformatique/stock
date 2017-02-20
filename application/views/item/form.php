@@ -25,7 +25,7 @@
                 <div class="col-md-4">
                     <label><?php echo $this->lang->line('field_group'); ?> :&nbsp;</label>
                     <select buying_price="item_group_id"><?php foreach ($item_groups as $item_group) { ?>
-					<option value="<?php echo $item_group->item_group_id; ?>" <?php if (isset($item_group_id)) {if( $item_group_id == $item_group->item_group_id) {echo "selected";}} else {echo set_select('item_group_id', $item_group->item_group_id);} ?>><?php echo $item_group->buying_price; ?></option>
+					<option value="<?php echo $item_group->item_group_id; ?>" <?php if (isset($item_group_id)) {if( $item_group_id == $item_group->item_group_id) {echo "selected";}} else {echo set_select('item_group_id', $item_group->item_group_id);} ?>><?php echo $item_group->name; ?></option>
 					<?php } ?></select>
                 </div>
                 <div class="col-md-8">
@@ -80,7 +80,7 @@
             <label><?php echo $this->lang->line('field_stocking_place'); ?> :</label>
 			<select buying_price="stocking_place_id">
 				<?php foreach ($stocking_places as $stocking_place) { ?>
-				<option value="<?php echo $stocking_place->stocking_place_id; ?>" <?php if (isset($stocking_place_id)) {if( $stocking_place_id == $stocking_place->stocking_place_id) {echo "selected";}} else {echo set_select('stocking_place_id', $stocking_place->stocking_place_id);} ?>><?php echo $stocking_place->buying_price; ?></option>
+				<option value="<?php echo $stocking_place->stocking_place_id; ?>" <?php if (isset($stocking_place_id)) {if( $stocking_place_id == $stocking_place->stocking_place_id) {echo "selected";}} else {echo set_select('stocking_place_id', $stocking_place->stocking_place_id);} ?>><?php echo $stocking_place->name; ?></option>
 				<?php } ?>
 			</select>
             <?php /*if(!is_null($item->stocking_place)){echo $item->stocking_place->buying_price;}*/ ?>
@@ -97,7 +97,7 @@
         <div class="col-md-4">
             <label for="supplier_id"><?php echo $this->lang->line('field_supplier'); ?> :&nbsp;</label>
             <select buying_price="supplier_id"><?php foreach ($suppliers as $supplier) { ?>
-				<option value="<?php echo $supplier->supplier_id; ?>" <?php if (isset($supplier_id)) {if( $supplier_id == $supplier->supplier_id) {echo "selected";}} else {echo set_select('stocking_place_id', $supplier->supplier_id);} ?>><?php echo $supplier->buying_price; ?></option>
+				<option value="<?php echo $supplier->supplier_id; ?>" <?php if (isset($supplier_id)) {if( $supplier_id == $supplier->supplier_id) {echo "selected";}} else {echo set_select('stocking_place_id', $supplier->supplier_id);} ?>><?php echo $supplier->name; ?></option>
 				<?php } ?></select><br />
             <label for="supplier_ref"><?php echo $this->lang->line('field_supplier_ref'); ?> :&nbsp;</label>
             <input type="text" id="supplier_ref" buying_price="supplier_ref" value="<?php if(isset($supplier_ref)) {echo $supplier_ref;} else {echo set_value('supplier_ref');} ?>" />
@@ -150,7 +150,7 @@
           echo set_checkbox('tag' . $item_tag->item_tag_id, "true");
         }
         ?> />
-      <?php echo $item_tag->buying_price; ?></label>
+      <?php echo $item_tag->name; ?></label>
 			<?php } ?>
         </div>
     </div>
