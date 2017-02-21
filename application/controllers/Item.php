@@ -27,8 +27,12 @@ class Item extends MY_Controller {
     */
 	public function index()
     {
+        $this->load->model('item_tag_model');
+
         $output['title'] = $this->lang->line('page_item_list');
         $output['items'] = $this->item_model->with('created_by_user')
+                                            ->get_all();
+        $output['item_tags'] = $this->item_tag_model->with('created_by_user')
                                             ->get_all();
 
         $this->display_view('item/list', $output);

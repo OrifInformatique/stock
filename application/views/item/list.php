@@ -1,9 +1,27 @@
 <div class="container">
 <div class="row">
 <div class="col-lg-12 col-sm-12">
-  <button data-toggle="collapse" data-target="#filters"><?php echo $this->lang->line('btn_toggle_filters'); ?></button>
-  <form class="collapse" id="filters" method="post">
-
+  <button class="btn" type="button" data-toggle="collapse" data-target="#filters"><?php echo $this->lang->line('btn_toggle_filters'); ?></button>
+  <form class="collapse<?php
+// If filters were set, show the form
+if (!empty($_GET)) {
+  echo " in";
+}
+   ?>" id="filters" method="get">
+   <div class="col-md-12">
+     <?php echo $this->lang->line('text_kinds_to_show'); ?><br />
+ <?php foreach ($item_tags as $item_tag) { ?>
+ <label class="checkbox-inline"><input type="checkbox" name="t<?php echo $item_tag->item_tag_id; ?>" value="<?php echo $item_tag->item_tag_id; ?>"
+   <?php
+       if (isset($_GET['t' . $item_tag->item_tag_id]))
+       {
+         echo 'checked';
+       }
+   ?> />
+ <?php echo $item_tag->name; ?></label>
+ <?php } ?>
+   </div>
+    <button type="submit"><?php echo $this->lang->line('btn_submit_filters'); ?></button>
   </form>
 <?php if(empty($items)) { ?>
   <em><?php echo $this->lang->line('msg_no_item'); ?></em>

@@ -62,6 +62,7 @@ $lang['btn_linked_doc']                 = 'Voir document…';
 $lang['btn_loans_history']              = 'Historique des prêts…';
 $lang['btn_create_loan']                = 'Ajouter un prêt…';
 $lang['btn_submit']                     = 'Sauvegarder';
+$lang['btn_submit_filters']             = 'Activer les filtres';
 $lang['btn_toggle_filters']             = 'Voir/masquer les filtres';
 
 // Messages
@@ -81,3 +82,4 @@ $lang['text_item_detail']               = 'Photo et détail';
 $lang['text_item_loan_status']          = 'Disponibilité et prêts';
 $lang['text_item_buying_warranty']      = 'Achat et garantie';
 $lang['text_item_tags']                 = 'Tags';
+$lang['text_kinds_to_show']             = 'Afficher uniquement les…';
