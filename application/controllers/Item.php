@@ -27,13 +27,70 @@ class Item extends MY_Controller {
     */
 	public function index()
     {
-        $this->load->model('item_tag_model');
+      $output['title'] = $this->lang->line('page_item_list');
 
-        $output['title'] = $this->lang->line('page_item_list');
-        $output['items'] = $this->item_model->with('created_by_user')
-                                            ->get_all();
-        $output['item_tags'] = $this->item_tag_model->with('created_by_user')
-                                            ->get_all();
+      $this->load->model('item_tag_model');
+      $output['item_tags'] = $this->item_tag_model->get_all();
+
+        // If no options are set
+        if (empty($_GET)) {
+
+          $output['items'] = $this->item_model->with('created_by_user')
+                                              ->get_all();
+
+        // If options are set
+        } else {
+          /*$this->load->model('item_tag_link_model');
+          // Convert $_GET to SQL/MY_Model
+          //->where
+
+          // Set the WHERE clause
+          $where = "";
+
+          // Add all the tags wanted to it
+          foreach ($_GET as $num)
+          {
+            $where .= " OR item_tag_id = " . $num;
+          }
+
+          // Delete the initial OR
+          $where = substr($where, 4);
+          $output['where'] = $where;
+
+          $output['items'] = $this->item_model->with('item_tag_links')->get_many_by($where);*/
+
+          // FIRST PART
+          $this->load->model('item_tag_link_model');
+
+          // Set the WHERE clause
+          $where = "";
+
+          // Add all the tags wanted to it
+          foreach ($_GET as $num)
+          {
+            $where .= " OR item_tag_id = " . $num;
+          }
+
+          // Delete the initial OR
+          $where = substr($where, 4);
+
+          $temp = $this->item_tag_link_model->get_many_by($where);
+
+          // SECOND PART
+          // Set the WHERE clause
+          $where = "";
+
+          // Add all the tags wanted to it
+          foreach ($temp as $num)
+          {
+            $where .= " OR item_id = " . $num->item_id;
+          }
+
+          // Delete the initial OR
+          $where = substr($where, 4);
+
+          $output["items"] = $this->item_model->with('created_by_user')->get_many_by($where);
+        }
 
         $this->display_view('item/list', $output);
     }

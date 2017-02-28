@@ -9,7 +9,7 @@ if (!empty($_GET)) {
 }
    ?>" id="filters" method="get">
    <div class="col-md-12">
-     <?php echo $this->lang->line('text_kinds_to_show'); ?><br />
+     <i><?php echo $this->lang->line('text_kinds_to_show'); ?></i><br />
  <?php foreach ($item_tags as $item_tag) { ?>
  <label class="checkbox-inline"><input type="checkbox" name="t<?php echo $item_tag->item_tag_id; ?>" value="<?php echo $item_tag->item_tag_id; ?>"
    <?php
