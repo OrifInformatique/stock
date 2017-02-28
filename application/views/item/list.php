@@ -20,6 +20,8 @@ if (!empty($_GET)) {
    ?> />
  <?php echo $item_tag->name; ?></label>
  <?php } ?>
+ <button type="button" onclick="btn_all()"><?php echo $this->lang->line('btn_all'); ?></button>
+ <button type="button" onclick="btn_none()"><?php echo $this->lang->line('btn_none'); ?></button>
    </div>
     <button type="submit"><?php echo $this->lang->line('btn_submit_filters'); ?></button>
   </form>
@@ -60,3 +62,13 @@ if (!empty($_GET)) {
 </div>
 </div>
 </div>
+
+<script>
+function btn_all() {
+  $("input[type='checkbox']").prop("checked", true);
+}
+
+function btn_none() {
+  $("input[type='checkbox']").prop("checked", false);
+}
+</script>

@@ -64,6 +64,8 @@ $lang['btn_create_loan']                = 'Ajouter un prêt…';
 $lang['btn_submit']                     = 'Sauvegarder';
 $lang['btn_submit_filters']             = 'Activer les filtres';
 $lang['btn_toggle_filters']             = 'Voir/masquer les filtres';
+$lang['btn_all']                        = 'Tout';
+$lang['btn_none']                       = 'Rien';
 
 // Messages
 $lang['msg_err_invalid_password']       = 'L\'identifiant et le mot de passe ne sont pas valides';
