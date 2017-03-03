@@ -86,15 +86,16 @@ class Item extends MY_Controller {
             }
           }
 
+          $where2 = "";
+
           if (isset($where['t']))
           {
             $this->load->model('item_tag_link_model');
 
             $temp = $this->item_tag_link_model->get_many_by($where['t']);
 
-            // SECOND PART
             // Set the WHERE clause
-            $where2 = "";
+            $where2 .= "(";
 
             // Add all the tags wanted to it
             foreach ($temp as $num)
@@ -105,8 +106,40 @@ class Item extends MY_Controller {
             // Delete the initial OR
             $where2 = substr($where2, 4);
 
-            $output["items"] = $this->item_model->with('created_by_user')->get_many_by($where2);
+            $where2 .= ")";
           }
+
+          if (isset($where['c']))
+          {
+            if ($where2 != "")
+            {
+              $where2 .= " AND ";
+            }
+
+            $where2 .= "(" . $where['c'] . ")";
+          }
+
+          if (isset($where['g']))
+          {
+            if ($where2 != "")
+            {
+              $where2 .= " AND ";
+            }
+
+            $where2 .= "(" . $where['g'] . ")";
+          }
+
+          if (isset($where['s']))
+          {
+            if ($where2 != "")
+            {
+              $where2 .= " AND ";
+            }
+
+            $where2 .= "(" . $where['s'] . ")";
+          }
+
+          $output["items"] = $this->item_model->with('created_by_user')->get_many_by($where2);
         }
 
         $this->display_view('item/list', $output);
