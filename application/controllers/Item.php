@@ -31,6 +31,12 @@ class Item extends MY_Controller {
 
       $this->load->model('item_tag_model');
       $output['item_tags'] = $this->item_tag_model->get_all();
+      $this->load->model('item_condition_model');
+      $output['item_conditions'] = $this->item_condition_model->get_all();
+      $this->load->model('item_group_model');
+      $output['item_groups'] = $this->item_group_model->get_all();
+      $this->load->model('stocking_place_model');
+      $output['stocking_places'] = $this->stocking_place_model->get_all();
 
         // If no options are set
         if (empty($_GET)) {
@@ -60,36 +66,47 @@ class Item extends MY_Controller {
           $output['items'] = $this->item_model->with('item_tag_links')->get_many_by($where);*/
 
           // FIRST PART
-          $this->load->model('item_tag_link_model');
 
-          // Set the WHERE clause
-          $where = "";
+          $column = array(
+            "t" => "item_tag_id",
+            "c" => "item_condition_id",
+            "g" => "item_group_id",
+            "s" => "stocking_place_id");
 
-          // Add all the tags wanted to it
-          foreach ($_GET as $num)
+          // Checkbox classification
+
+          foreach ($_GET as $key => $num)
           {
-            $where .= " OR item_tag_id = " . $num;
+            $cat = $key[0];
+            if (isset($where[$cat]))
+            {
+              $where[$cat] .= " OR " . $column[$cat] . " = " . $num;
+            } else {
+              $where[$cat] = $column[$cat] . " = " . $num;
+            }
           }
 
-          // Delete the initial OR
-          $where = substr($where, 4);
-
-          $temp = $this->item_tag_link_model->get_many_by($where);
-
-          // SECOND PART
-          // Set the WHERE clause
-          $where = "";
-
-          // Add all the tags wanted to it
-          foreach ($temp as $num)
+          if (isset($where['t']))
           {
-            $where .= " OR item_id = " . $num->item_id;
+            $this->load->model('item_tag_link_model');
+
+            $temp = $this->item_tag_link_model->get_many_by($where['t']);
+
+            // SECOND PART
+            // Set the WHERE clause
+            $where2 = "";
+
+            // Add all the tags wanted to it
+            foreach ($temp as $num)
+            {
+              $where2 .= " OR item_id = " . $num->item_id;
+            }
+
+            // Delete the initial OR
+            $where2 = substr($where2, 4);
+
+            $output["items"] = $this->item_model->with('created_by_user')->get_many_by($where2);
           }
-
-          // Delete the initial OR
-          $where = substr($where, 4);
-
-          $output["items"] = $this->item_model->with('created_by_user')->get_many_by($where);
         }
 
         $this->display_view('item/list', $output);

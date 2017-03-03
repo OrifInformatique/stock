@@ -48,6 +48,10 @@ $lang['header_loan_real_return']        = 'Retour effectif';
 $lang['header_loan_localisation']       = 'Lieu du prêt';
 $lang['header_loan_by_user']            = 'Prêté par';
 $lang['header_loan_to_user']            = 'Prêté à';
+$lang['header_tags']                    = 'Tags :';
+$lang['header_conditions']              = 'Conditions :';
+$lang['header_groups']                  = 'Groupes :';
+$lang['header_stocking_places']         = 'Lieux de stockage :';
 
 // Buttons
 $lang['btn_cancel']                     = 'Annuler';

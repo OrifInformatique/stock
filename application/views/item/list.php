@@ -8,10 +8,13 @@ if (!empty($_GET)) {
   echo " in";
 }
    ?>" id="filters" method="get">
+
+   <!-- TAGS -->
+
    <div class="col-md-12">
-     <i><?php echo $this->lang->line('text_kinds_to_show'); ?></i><br />
+     <i><?php echo $this->lang->line('header_tags'); ?></i><br />
  <?php foreach ($item_tags as $item_tag) { ?>
- <label class="checkbox-inline"><input type="checkbox" name="t<?php echo $item_tag->item_tag_id; ?>" value="<?php echo $item_tag->item_tag_id; ?>"
+ <label class="checkbox-inline"><input data-tag="a" type="checkbox" name="t<?php echo $item_tag->item_tag_id; ?>" value="<?php echo $item_tag->item_tag_id; ?>"
    <?php
        if (isset($_GET['t' . $item_tag->item_tag_id]))
        {
@@ -20,10 +23,64 @@ if (!empty($_GET)) {
    ?> />
  <?php echo $item_tag->name; ?></label>
  <?php } ?>
- <button type="button" onclick="btn_all()"><?php echo $this->lang->line('btn_all'); ?></button>
- <button type="button" onclick="btn_none()"><?php echo $this->lang->line('btn_none'); ?></button>
+ <button type="button" onclick="$('[data-tag]').attr('checked', false);$('[data-tag]').click()"><?php echo $this->lang->line('btn_all'); ?></button>
+ <button type="button" onclick="$('[data-tag]').attr('checked', false)"><?php echo $this->lang->line('btn_none'); ?></button>
    </div>
-    <button type="submit"><?php echo $this->lang->line('btn_submit_filters'); ?></button>
+
+   <!-- CONDITIONS -->
+
+   <div class="col-md-12">
+    <i><?php echo $this->lang->line('header_conditions'); ?></i><br />
+    <?php foreach ($item_conditions as $item_condition) { ?>
+    <label class="checkbox-inline"><input data-condition="a" type="checkbox" name="c<?php echo $item_condition->item_condition_id; ?>" value="<?php echo $item_condition->item_condition_id; ?>"
+      <?php
+          if (isset($_GET['c' . $item_condition->item_condition_id]))
+          {
+            echo 'checked';
+          }
+      ?> />
+    <?php echo $item_condition->name; ?></label>
+    <?php } ?>
+    <button type="button" onclick="$('[data-condition]').attr('checked', false);$('[data-condition]').click()"><?php echo $this->lang->line('btn_all'); ?></button>
+    <button type="button" onclick="$('[data-condition]').attr('checked', false)"><?php echo $this->lang->line('btn_none'); ?></button>
+      </div>
+
+    <!-- GROUPS -->
+
+    <div class="col-md-12">
+     <i><?php echo $this->lang->line('header_groups'); ?></i><br />
+     <?php foreach ($item_groups as $item_group) { ?>
+     <label class="checkbox-inline"><input data-group="a" type="checkbox" name="g<?php echo $item_group->item_group_id; ?>" value="<?php echo $item_group->item_group_id; ?>"
+       <?php
+           if (isset($_GET['g' . $item_group->item_group_id]))
+           {
+             echo 'checked';
+           }
+       ?> />
+     <?php echo $item_group->name; ?></label>
+     <?php } ?>
+     <button type="button" onclick="$('[data-group]').attr('checked', false);$('[data-group]').click()"><?php echo $this->lang->line('btn_all'); ?></button>
+     <button type="button" onclick="$('[data-group]').attr('checked', false)"><?php echo $this->lang->line('btn_none'); ?></button>
+       </div>
+
+     <!-- STOCKING PLACES -->
+
+     <div class="col-md-12">
+      <i><?php echo $this->lang->line('header_stocking_places'); ?></i><br />
+      <?php foreach ($stocking_places as $stocking_place) { ?>
+      <label class="checkbox-inline"><input data-place="a" type="checkbox" name="s<?php echo $stocking_place->stocking_place_id; ?>" value="<?php echo $stocking_place->stocking_place_id; ?>"
+        <?php
+            if (isset($_GET['s' . $stocking_place->stocking_place_id]))
+            {
+              echo 'checked';
+            }
+        ?> />
+      <?php echo $stocking_place->name; ?></label>
+      <?php } ?>
+      <button type="button" onclick="$('[data-place]').attr('checked', false);$('[data-place]').click()"><?php echo $this->lang->line('btn_all'); ?></button>
+      <button type="button" onclick="$('[data-place]').attr('checked', false)"><?php echo $this->lang->line('btn_none'); ?></button>
+        </div>
+    <button type="submit"><strong><?php echo $this->lang->line('btn_submit_filters'); ?></strong></button>
   </form>
 <?php if(empty($items)) { ?>
   <em><?php echo $this->lang->line('msg_no_item'); ?></em>
@@ -62,13 +119,3 @@ if (!empty($_GET)) {
 </div>
 </div>
 </div>
-
-<script>
-function btn_all() {
-  $("input[type='checkbox']").prop("checked", true);
-}
-
-function btn_none() {
-  $("input[type='checkbox']").prop("checked", false);
-}
-</script>
