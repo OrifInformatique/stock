@@ -186,7 +186,7 @@ class Item extends MY_Controller {
 
     if ($this->form_validation->run() === TRUE) {
       $itemArray = array();
-
+/*
       // IMAGE UPLOADING
       $config['upload_path']          = './uploads/images/';
       $config['allowed_types']        = 'gif|jpg|png';
@@ -202,7 +202,7 @@ class Item extends MY_Controller {
               $itemArray['image'] = $this->upload->data('file_name');
       } else {
         die($this->upload->display_errors());
-      }
+      }*/
 
       $linkArray = array();
 
@@ -233,6 +233,8 @@ class Item extends MY_Controller {
   		$data['suppliers'] = $this->supplier_model->get_all();
   		$this->load->model('item_group_model');
   		$data['item_groups'] = $this->item_group_model->get_all();
+      $this->load->model('item_condition_model');
+      $data['condishes'] = $this->item_condition_model->get_all();
 
       // Load the tags
       $this->load->model('item_tag_model');
@@ -380,6 +382,8 @@ class Item extends MY_Controller {
       $data['suppliers'] = $this->supplier_model->get_all();
       $this->load->model('item_group_model');
       $data['item_groups'] = $this->item_group_model->get_all();
+      $this->load->model('item_condition_model');
+      $data['condishes'] = $this->item_condition_model->get_all();
     } else {
       // Test input
       $this->load->library('form_validation');
@@ -433,6 +437,8 @@ class Item extends MY_Controller {
     		$data['suppliers'] = $this->supplier_model->get_all();
     		$this->load->model('item_group_model');
     		$data['item_groups'] = $this->item_group_model->get_all();
+        $this->load->model('item_condition_model');
+        $data['condishes'] = $this->item_condition_model->get_all();
 
         // Load the tags
         $this->load->model('item_tag_model');

@@ -109,7 +109,7 @@ if (!empty($_GET)) {
             echo "<i>Anonymous</i>";
           } else {
             echo $item->created_by_user->username;
-          } ?><a href="<?php echo base_url('/item/delete-item').'/'.$item->item_id ?>" class="close" title="Supprimer l'objet">×</a></td>
+          } ?><a href="<?php echo base_url('/item/delete').'/'.$item->item_id ?>" class="close" title="Supprimer l'objet">×</a></td>
           </tr>
       <?php } ?>
     </tbody>
