@@ -449,6 +449,9 @@ class Item extends MY_Controller {
     		$data['item_tags'] = $this->item_tag_model->get_all();
     	}
     }
+
+    $data['modify'] = true;
+
     $this->display_view('item/form', $data);
 	}
 

@@ -281,8 +281,7 @@ COMMIT;
 -- -----------------------------------------------------
 START TRANSACTION;
 USE `stock`;
-INSERT INTO `stock`.`item_condition` (`item_condition_id`, `name`) VALUES (10, 'En stock');
-INSERT INTO `stock`.`item_condition` (`item_condition_id`, `name`) VALUES (20, 'En prêt');
+INSERT INTO `stock`.`item_condition` (`item_condition_id`, `name`) VALUES (10, 'Fonctionnel');
 INSERT INTO `stock`.`item_condition` (`item_condition_id`, `name`) VALUES (30, 'Défectueux');
 INSERT INTO `stock`.`item_condition` (`item_condition_id`, `name`) VALUES (40, 'Plus disponible');
 

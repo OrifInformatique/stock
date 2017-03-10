@@ -144,6 +144,7 @@
     </div>
 
 	<button type="submit" class="btn btn-primary"><?php echo $this->lang->line('btn_submit'); ?></button>
+  <a class="btn btn-primary" href="<?php echo base_url(); if(isset($modify)) {echo "item/view/" . $item_id;} ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
 </form>
 
 <script>
@@ -165,19 +166,19 @@ function change_warranty()
 	{
 		// Under warranty
 		span_garantie.innerHTML = "<?php echo $this->lang->line('text_warranty_status')[1]; ?>";
-		span_garantie.classbuying_price = "label label-success";
+		span_garantie.class = "label label-success";
 	}
 	else if (remaining_months > 0)
 	{
 		// Warranty expires soon
 		span_garantie.innerHTML = "<?php echo $this->lang->line('text_warranty_status')[2]; ?>";
-		span_garantie.classbuying_price = "label label-warning";
+		span_garantie.class = "label label-warning";
 	}
 	else
 	{
 		// Warranty expired
 		span_garantie.innerHTML = "<?php echo $this->lang->line('text_warranty_status')[3]; ?>";
-		span_garantie.classbuying_price = "label label-danger";
+		span_garantie.class = "label label-danger";
 	}
 }
 </script>

@@ -70,17 +70,28 @@
             <?php //CHANGE LABEL COLOR BASED ON ITEM CONDITION
             if(!is_null($item->item_condition))
             {
-                if ($item->item_condition_id == 10) {
-                    echo '<span class="label label-success" >';} // ITEM AVAILABLE
-                elseif ($item->item_condition_id == 20) {
-                    echo '<span class="label label-warning" >';} // ITEM LOANED
+								/* Here there is work to do */
+								if ($item->item_condition_id == 10) {
+									// [last_loan.real_return_date < today]
+
+									if (is_null($item->current_loan))
+									{
+										echo '<span class="label label-success">'; // ITEM AVAILABLE
+										$condition_label = "Disponible";
+									} else {
+                    echo '<span class="label label-warning">'; // ITEM LOANED
+										$condition_label = "En prêt";
+									}
+								}
                 elseif ($item->item_condition_id == 30) {
-                    echo '<span class="label label-warning" >';} // ITEM DEFECTIVE
+                    echo '<span class="label label-warning">';
+										$condition_label = $item->item_condition->name;} // ITEM DEFECTIVE
                 elseif ($item->item_condition_id == 40) {
-                    echo '<span class="label label-danger" >';}  // NO MORE ITEM
+                    echo '<span class="label label-danger">';
+										$condition_label = $item->item_condition->name;}  // NO MORE ITEM
                 else {echo '<div>';}
 
-                echo $item->item_condition->name.'</span><br />';
+                echo $condition_label.'</span><br />';
             } ?>
 
             <label><?php echo $this->lang->line('field_stocking_place'); ?> :</label>
