@@ -1,4 +1,4 @@
-<em><?php echo validation_errors() . $upload_errors; ?></em>
+<em><?php echo validation_errors(); if (isset($upload_errors)) {echo $upload_errors;} ?></em>
 
 <form class="container" method="post" enctype="multipart/form-data">
     <!-- ITEM buying_price AND DESCRIPTION -->
