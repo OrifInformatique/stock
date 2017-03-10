@@ -184,9 +184,8 @@ class Item extends MY_Controller {
     // Get the ID that the new item will receive if it is created now
     $data['item_id'] = $this->item_model->get_future_id();
 
-    if ($this->form_validation->run() === TRUE) {
-      $itemArray = array();
-
+    $data['upload_errors'] = "";
+    if (isset($_POST['photo'])) {
       // IMAGE UPLOADING
       //$config['upload_path']          = './uploads/images/';
       $config['upload_path']          = 'C:\\wamp64\\www\\stock\\uploads\\images\\'; //TOUJOURS INVALIDE
@@ -198,13 +197,18 @@ class Item extends MY_Controller {
       $this->load->library('upload');
       $this->upload->initialize($config);
 
-      // Name: [id_item]_[00number]
       if ($this->upload->do_upload('photo'))
       {
         $itemArray['image'] = $this->upload->data('file_name');
       } else {
-        die($this->upload->display_errors());
+        $data['upload_errors'] = $this->upload->display_errors();
+        $upload_failed = TRUE;
       }
+    }
+
+    // If there is no problem with the form (including the image)
+    if ($this->form_validation->run() === TRUE && !isset($upload_failed)) {
+      $itemArray = array();
 
       $linkArray = array();
 
