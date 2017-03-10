@@ -72,43 +72,33 @@
             {
 								/* Here there is work to do */
 								if ($item->item_condition_id == 10) {
-									// [last_loan.real_return_date < today]
-
-									if (is_null($item->current_loan))
-									{
-										echo '<span class="label label-success">'; // ITEM AVAILABLE
-										$condition_label = "Disponible";
-									} else {
-                    echo '<span class="label label-warning">'; // ITEM LOANED
-										$condition_label = "En prêt";
-									}
-								}
+									echo '<span class="label label-success">';} // ITEM WORKS
                 elseif ($item->item_condition_id == 30) {
-                    echo '<span class="label label-warning">';
-										$condition_label = $item->item_condition->name;} // ITEM DEFECTIVE
+                    echo '<span class="label label-warning">';} // ITEM DEFECTIVE
                 elseif ($item->item_condition_id == 40) {
-                    echo '<span class="label label-danger">';
-										$condition_label = $item->item_condition->name;}  // NO MORE ITEM
+                    echo '<span class="label label-danger">';}  // NO MORE ITEM
                 else {echo '<div>';}
 
-                echo $condition_label.'</span><br />';
+                echo $item->item_condition->name.'</span><br />';
             } ?>
 
             <label><?php echo $this->lang->line('field_stocking_place'); ?> :</label>
             <?php if(!is_null($item->stocking_place)){echo $item->stocking_place->name;} ?>
         </div>
         <div class="col-md-4">
-            <label><?php echo $this->lang->line('field_current_loan'); ?> :&nbsp;</label>
-            <?php if(!is_null($item->current_loan)){echo $item->current_loan->item_localisation;} ?><br />
+						<?php if (is_null($item->current_loan)) { ?>
+							<span class="label label-success">Disponible</span>
+            <?php } else { ?>
+							<span class="label label-warning">En prêt</span><br />
+						<label><?php echo $this->lang->line('field_current_loan'); ?> :&nbsp;</label>
+            <?php echo $item->current_loan->item_localisation; ?><br />
 
             <label><?php echo $this->lang->line('field_loan_date'); ?> :&nbsp;</label>
             <?php
-            if(!is_null($item->current_loan)) {
                 if(!empty($item->current_loan->date))
                 {
                     echo nice_date($item->current_loan->date, $this->lang->line('date_format_short'));
                 }
-            }
             ?>
             <br />
 
@@ -122,7 +112,7 @@
                 }
             }
             ?>
-            <br />
+						<?php } ?>
         </div>
         <div class="col-md-3">
 
