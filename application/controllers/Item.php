@@ -186,23 +186,25 @@ class Item extends MY_Controller {
 
     if ($this->form_validation->run() === TRUE) {
       $itemArray = array();
-/*
+
       // IMAGE UPLOADING
-      $config['upload_path']          = './uploads/images/';
+      //$config['upload_path']          = './uploads/images/';
+      $config['upload_path']          = 'C:\\wamp64\\www\\stock\\uploads\\images\\'; //TOUJOURS INVALIDE
       $config['allowed_types']        = 'gif|jpg|png';
       $config['max_size']             = 100;
       $config['max_width']            = 550;
       $config['max_height']           = 550;
 
-      $this->load->library('upload', $config);
+      $this->load->library('upload');
+      $this->upload->initialize($config);
 
       // Name: [id_item]_[00number]
       if ($this->upload->do_upload('photo'))
       {
-              $itemArray['image'] = $this->upload->data('file_name');
+        $itemArray['image'] = $this->upload->data('file_name');
       } else {
         die($this->upload->display_errors());
-      }*/
+      }
 
       $linkArray = array();
 
@@ -402,7 +404,8 @@ class Item extends MY_Controller {
         $config['max_width']            = 550;
         $config['max_height']           = 550;
 
-        $this->load->library('upload', $config);
+        $this->load->library('upload');
+        $this->upload->initialize($config);
 
         if ($this->upload->do_upload('photo'))
         {
