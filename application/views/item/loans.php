@@ -43,7 +43,9 @@
                         <td><?php echo $loan->loan_by_user->username; ?></td>
                         <td><?php echo $loan->loan_to_user->lastname.' '.
                                        $loan->loan_to_user->firstname; ?>
-				        <a href="<?php echo base_url('/item/delete-loan').'/'.$loan->loan_id ?>" class="close" title="Supprimer le prêt">×</a></td>
+
+								<?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?>
+				        <a href="<?php echo base_url('/item/delete-loan').'/'.$loan->loan_id ?>" class="close" title="Supprimer le prêt">×</a><?php } ?></td>
                     </div></a></tr>
                 <?php } ?>
                 </tbody>
@@ -51,6 +53,7 @@
         </div>
     </div>
 	<?php } ?>
-
+<?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?>
 	<a href="<?php echo base_url(); ?>item/create-loan/<?php echo $item->item_id; ?>" class="btn btn-primary">Nouveau…</a>
+<?php } ?>
 </div>

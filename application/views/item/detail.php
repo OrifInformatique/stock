@@ -2,8 +2,10 @@
     <!-- BUTTONS -->
 	<em>
 		<a href="<?php echo base_url(); ?>" class="btn" role="button"><?php echo $this->lang->line('btn_back_to_main'); ?></a>
+		<?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?>
 		<a href="<?php echo base_url('item/modify/'.$item->item_id); ?>" class="btn" role="button"><?php echo $this->lang->line('btn_modify_item'); ?></a>
 		<a href="<?php echo base_url('item/delete/'.$item->item_id); ?>" class="btn" role="button"><?php echo $this->lang->line('btn_delete_item'); ?></a>
+		<?php } ?>
 	</em>
 
     <!-- ITEM NAME AND DESCRIPTION -->
@@ -123,14 +125,15 @@
                     .$this->lang->line('btn_loans_history').
                  '</a>';
             ?>
-
+<?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?>
 						<!-- Button to create new loan -->
 						<?php
             echo '<a href="'.base_url('/item/create-loan/'.$item->item_id).'" '.
                     'class="btn btn-default"  role="button" >'
                     .$this->lang->line('btn_create_loan').
                  '</a>';
-            ?>
+            } ?>
+
         </div>
     </div>
 

@@ -109,7 +109,8 @@ if (!empty($_GET)) {
             echo "<i>Anonymous</i>";
           } else {
             echo $item->created_by_user->username;
-          } ?><a href="<?php echo base_url('/item/delete').'/'.$item->item_id ?>" class="close" title="Supprimer l'objet">×</a></td>
+          }
+          if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?><a href="<?php echo base_url('/item/delete').'/'.$item->item_id ?>" class="close" title="Supprimer l'objet">×</a><?php } ?></td>
           </tr>
       <?php } ?>
     </tbody>
