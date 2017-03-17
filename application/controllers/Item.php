@@ -225,6 +225,8 @@ class Item extends MY_Controller {
           }
         }
 
+        $itemArray["created_by_user_id"] = $_SESSION['user_id'];
+
         $this->item_model->insert($itemArray);
 
         foreach ($linkArray as $tag) {
