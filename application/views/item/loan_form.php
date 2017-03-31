@@ -12,4 +12,5 @@
 	<input class="form-control" name="item_localisation" value="<?php if(isset($item_localisation)) {echo $item_localisation;} else {echo set_value('item_localisation');} ?>" /><br />
 
 	<button type="submit" class="btn btn-primary"><?php echo $this->lang->line('btn_submit'); ?></button>
+	<a class="btn btn-primary" href="<?php echo base_url() . "item/view/" . $item_id; ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
 </form>

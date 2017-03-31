@@ -282,6 +282,7 @@ class Item extends MY_Controller {
 
       $data['item'] = $item;
       $data['loans'] = $loans;
+      $data['item_id'] = $id;
 
       // Test input
       $this->load->library('form_validation');

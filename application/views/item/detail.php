@@ -89,7 +89,7 @@
         </div>
         <div class="col-md-4">
 						<?php if (is_null($item->current_loan)) { ?>
-							<span class="label label-success">Disponible</span>
+							<span class="label label-success">Pas de prêt en cours</span>
             <?php } else { ?>
 							<span class="label label-warning">En prêt</span><br />
 						<label><?php echo $this->lang->line('field_current_loan'); ?> :&nbsp;</label>
