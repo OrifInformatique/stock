@@ -54,6 +54,7 @@ $lang['header_groups']                  = 'Groupes :';
 $lang['header_stocking_places']         = 'Lieux de stockage :';
 
 // Buttons
+$lang['btn_admin']                      = 'Administration';
 $lang['btn_cancel']                     = 'Annuler';
 $lang['btn_login']                      = 'Se connecter';
 $lang['btn_logout']                     = 'Se déconnecter';

@@ -292,6 +292,17 @@ class Item extends MY_Controller {
 
       if ($this->form_validation->run() === TRUE) {
         $loanArray = $_POST;
+
+        if ($loanArray["planned_return_date"] == 0 || $loanArray["planned_return_date"] == "0000-00-00" || $loanArray["planned_return_date"] == "")
+        {
+          $loanArray["planned_return_date"] = NULL;
+        }
+
+        if ($loanArray["real_return_date"] == 0 || $loanArray["real_return_date"] == "0000-00-00" || $loanArray["real_return_date"] == "")
+        {
+          $loanArray["real_return_date"] = NULL;
+        }
+
         $loanArray["item_id"] = $id;
 
         // For now, loans are from and for Orif
