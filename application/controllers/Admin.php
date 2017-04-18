@@ -10,7 +10,7 @@
 class Admin extends MY_Controller
 {
     /* MY_Controller variables definition */
-    protected $access_level = "*";
+    protected $access_level = "8";
 
 
     /**
@@ -20,7 +20,7 @@ class Admin extends MY_Controller
     {
         parent::__construct();
 
-        $this->load->model('user_model');
+
         $this->load->model('user_type_model');
         $this->load->library('form_validation');
     }
@@ -30,13 +30,18 @@ class Admin extends MY_Controller
     */
     public function index()
     {
-      if($_SESSION['user_access'] == 16)
-      {
+      $this->display_view("admin/menu");
+    }
 
+    /**
+    * As the name says, view the users.
+    */
+    public function view_users()
+    {
+      $this->load->model('user_model');
+      $output["users"] = $this->user_model->with("user_type")
+                                          ->get_all();
 
-        $this->display_view("admin/menu");
-      } else {
-        redirect("/");
-      }
+      $this->display_view("admin/users/list", $output);
     }
 }

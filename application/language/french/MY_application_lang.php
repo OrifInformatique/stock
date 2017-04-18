@@ -53,6 +53,13 @@ $lang['header_conditions']              = 'Conditions :';
 $lang['header_groups']                  = 'Groupes :';
 $lang['header_stocking_places']         = 'Lieux de stockage :';
 
+$lang['header_username']                = 'Identifiant';
+$lang['header_lastname']                = 'Nom';
+$lang['header_firstname']               = 'Prénom';
+$lang['header_email']                   = 'E-mail';
+$lang['header_user_type']               = 'Statut';
+$lang['header_is_active']               = 'Activé';
+
 // Buttons
 $lang['btn_admin']                      = 'Administration';
 $lang['btn_cancel']                     = 'Annuler';
