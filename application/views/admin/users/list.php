@@ -1,10 +1,10 @@
 <div class="container">
   <h1 style="text-align: center"><select id="regions" style="border:none;width:205px;" onchange="changeRegion()">
-    <option value="users" selected>Utilisateurs</option>
-    <option value="tags">Tags</option>
-    <option value="stocking_places">Lieux de stockage</option>
-    <option value="suppliers">Fournisseurs</option>
-    <option value="item_groups">Groupes d'objets</option>
+    <option value="user">Utilisateurs</option>
+    <option value="tag">Tags</option>
+    <option value="stocking_place">Lieux de stockage</option>
+    <option value="supplier">Fournisseurs</option>
+    <option value="item_group">Groupes d'objets</option>
   </select>, Administration</h1>
   <!-- First something more simple <span onclick="minilist()">Utilisateurs</span>, Administration -->
 <div class="row">
@@ -24,7 +24,7 @@
       <?php foreach ($users as $user) { ?>
 		  <tr>
           <td>
-            <a href="<?php echo base_url('/admin/edit_user').'/'.$user->user_id ?>" style="display:block"><?php echo $user->username; ?></a>
+            <a href="<?php echo base_url('/admin/modify_user').'/'.$user->user_id ?>" style="display:block"><?php echo $user->username; ?></a>
           </td>
           <td><?php echo $user->lastname; ?></td>
           <td><?php echo $user->firstname; ?></td>
@@ -39,10 +39,10 @@
       <?php } ?>
     </tbody>
   </table>
-<a href="<?php echo base_url(); ?>admin/new_user" class="btn btn-primary">Nouveau…</a>
+<a href="<?php echo base_url(); ?>admin/new_user/" class="btn btn-primary">Nouveau…</a>
 </div>
 </div>
 </div>
 
-<script src="<?php echo base_url(); ?>assets/js/geography.js">
+<script src="<?php echo base_url(); ?>assets/js/geoline.js">
 </script>

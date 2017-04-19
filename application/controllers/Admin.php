@@ -20,8 +20,6 @@ class Admin extends MY_Controller
     {
         parent::__construct();
 
-
-        $this->load->model('user_type_model');
         $this->load->library('form_validation');
     }
 
@@ -39,9 +37,67 @@ class Admin extends MY_Controller
     public function view_users()
     {
       $this->load->model('user_model');
+      $this->load->model('user_type_model');
       $output["users"] = $this->user_model->with("user_type")
                                           ->get_all();
 
       $this->display_view("admin/users/list", $output);
+    }
+
+    /**
+    * Modify a user
+    */
+    public function modify_user($id = NULL)
+    {
+      $this->load->model('user_model');
+      $this->load->model('user_type_model');
+      $output = get_object_vars($this->user_model->get($id));
+      $output["users"] = $this->user_model->get_all();
+
+      $this->display_view("admin/users/form", $output);
+    }
+
+    /**
+    * As the name says, view the tags.
+    */
+    public function view_tags()
+    {
+      $this->load->model('item_tag_model');
+      $output["tags"] = $this->item_tag_model->get_all();
+
+      $this->display_view("admin/tags/list", $output);
+    }
+
+    /**
+    * As the name says, view the stocking places.
+    */
+    public function view_stocking_places()
+    {
+      $this->load->model('stocking_place_model');
+      $output["stocking_places"] = $this->stocking_place_model->get_all();
+
+      $this->display_view("admin/stocking_places/list", $output);
+    }
+
+    /**
+    * As the name says, view the suppliers.
+    */
+    public function view_suppliers()
+    {
+      $this->load->model('supplier_model');
+      $output["suppliers"] = $this->supplier_model->get_all();
+
+      $this->display_view("admin/suppliers/list", $output);
+    }
+
+    /**
+    * As the name says, view the item groups.
+    */
+    public function view_item_groups()
+    {
+      $this->load->model('item_group_model');
+      $output["item_groups"] = $this->item_group_model->get_all();
+
+      $this->display_view("admin/item_groups/list", $output);
     }
 }
