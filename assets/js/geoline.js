@@ -10,7 +10,7 @@ function changeRegion() {
 }
 
 function changeNew() {
-  location.href = "../view_" + $("#regions").val() + "/";
+  location.href = "../new_" + $("#regions").val() + "/";
 }
 
 function changeAction() {

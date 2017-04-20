@@ -53,6 +53,32 @@ class Admin extends MY_Controller
       $this->load->model('user_type_model');
       $output = get_object_vars($this->user_model->get($id));
       $output["users"] = $this->user_model->get_all();
+      $output["user_types"] = $this->user_type_model->get_all();
+
+      $this->display_view("admin/users/form", $output);
+    }
+
+    /**
+    * Create a new user
+    */
+    public function new_user()
+    {
+      if (!empty(users)) {
+        //username: unique and not void
+        $this->form_validation->set_rules();
+
+        //Password: 6 chars or more
+        $this->form_validation->set_rules();
+
+        if($this->form_validation->run() === TRUE)
+        {
+          redirect("/admin/view_users/");
+          exit();
+        } else {
+          $this->load->model('user_type_model');
+          $output["user_types"] = $this->user_type_model->get_all();
+        }
+      }
 
       $this->display_view("admin/users/form", $output);
     }

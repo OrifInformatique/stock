@@ -5,7 +5,7 @@
     <option value="stocking_place">Lieux de stockage</option>
     <option value="supplier">Fournisseurs</option>
     <option value="item_group">Groupes d'objets</option>
-  </select>, Administration</h1>
+  </select><a class="like-normal" href="<?php echo base_url(); ?>admin/">, <span class="word-administration">Administration</span></a></h1>
   <!-- First something more simple <span onclick="minilist()">Utilisateurs</span>, Administration -->
 <div class="row">
 <div class="col-lg-12 col-sm-12">

@@ -21,9 +21,48 @@
     <!-- Bootstrap styles -->
 	<link rel="stylesheet" href="<?php echo base_url("assets/css/bootstrap.css"); ?>" />
 
-    <!-- Custom styles / Dopylnitelni staiove -->
+    <!-- Custom styles -->
     <style>
         h1 select {border:none;}
+
+        a.line-through {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        a.line-through:hover span {
+            text-decoration: line-through;
+        }
+
+        a.like-normal {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        div.link-admin {
+            padding: 5px 0;
+        }
+
+        .word-administration {
+            font-family: monospace;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .action {
+            font-style: italic;
+        }
+
+        label {
+            display: block;
+            padding: 5px 0;
+            font-style: italic;
+        }
+
+        label input {
+            font-weight: normal;
+            font-style: normal;
+        }
     </style>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
