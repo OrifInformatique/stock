@@ -43,25 +43,8 @@
             padding: 5px 0;
         }
 
-        .word-administration {
-            font-family: monospace;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .action {
-            font-style: italic;
-        }
-
         label {
             display: block;
-            padding: 5px 0;
-            font-style: italic;
-        }
-
-        label input {
-            font-weight: normal;
-            font-style: normal;
         }
     </style>
 

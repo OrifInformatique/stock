@@ -31,34 +31,40 @@ if(isset($users)) { ?>
   <em><?php echo validation_errors(); if (isset($upload_errors)) {echo $upload_errors;} ?></em>
 
   <form class="container" method="post">
-    <!--<div class="form-group">-->
-      <label for="username">Identifiant :
-      <input class="form-control" name="username" id="username" value="" /></label>
-    <!--</div>-->
+   <div class="form-group">
+      <label for="username">Identifiant :</label>
+      <input class="form-control" name="username" id="username" value="<?php echo set_value('username'); ?>" />
+    </div>
 
-    <label>Nom :
-    <input class="form-control" name="lastname" id="lastname" value="" /></label>
+    <div class="form-group">
+      <label for="lastname">Nom :</label>
+      <input class="form-control" name="lastname" id="lastname" value="<?php echo set_value('lastname'); ?>" />
+    </div>
 
-    <label>Prénom :
-    <input class="form-control" name="firstname" id="firstname" value="" /></label>
+    <div class="form-group">
+      <label for="firstname">Prénom :</label>
+      <input class="form-control" name="firstname" id="firstname" value="<?php echo set_value('firstname'); ?>" />
+    </div>
 
-    <label>E-mail :
-    <input class="form-control" name="email" id="email" value="" type="email" /></label>
+    <div class="form-group">
+      <label for="email">E-mail :</label>
+      <input class="form-control" name="email" id="email" value="<?php echo set_value('email'); ?>" type="email" />
+    </div>
 
     <div class="form-group"><label for="user_type_id">Statut :</label>
     <select class="form-control" name="user_type_id">
       <?php foreach ($user_types as $user_type) { ?>
-      <option value="<?php echo $user_type->user_type_id; ?>"><?php echo $user_type->name; ?></option>
+      <option value="<?php echo $user_type->user_type_id; ?>" <?php echo set_select('user_type_id', $user_type->user_type_id); ?> ><?php echo $user_type->name; ?></option>
       <?php } ?>
     </select></div>
 
     <div class="form-group"><label for="pwd">Mot de passe<?php if ($update_user) { ?> (vide: ne rien changer)<?php } ?> :</label>
-    <input class="form-control" name="pwd" id="pwd" type="password" value="" /></div>
+    <input class="form-control" name="pwd" id="pwd" type="password" value="<?php echo set_value('pwd'); ?>" /></div>
 
     <div class="form-group"><label for="pwdagain">Confirmer le mot de passe :</label>
-    <input class="form-control" name="pwdagain" id="pwdagain" type="password" value="" /></div>
+    <input class="form-control" name="pwdagain" id="pwdagain" type="password" value="<?php echo set_value('pwdagain'); ?>" /></div>
 
-    <div class="form-group"><label><input name="is_active" type="checkbox" checked="checked" /> Activé</label></div>
+    <div class="form-group"><label><input name="is_active" type="checkbox" value="TRUE" <?php echo set_checkbox('is_active', 'TRUE', true); ?> /> Activé</label></div>
 
     <button type="submit" class="btn btn-primary"><?php echo $this->lang->line('btn_submit'); ?></button>
     <a class="btn btn-primary" href="<?php echo base_url() . "admin/view_users/"; ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
