@@ -50,6 +50,63 @@ class Admin extends MY_Controller
     public function modify_user($id = NULL)
     {
       $this->load->model('user_model');
+      $output = get_object_vars($this->user_model->get($id))
+
+      if (!empty($_POST)) {
+        // VALIDATION
+
+        //username: not void, unique
+        $this->form_validation->set_rules('username', 'Identifiant', 'required', 'Un identifiant doit être fourni');
+        $this->form_validation->set_rules('username', 'Identifiant', 'callback_unique_username');
+
+        //firstname: not void
+        $this->form_validation->set_rules('firstname', 'Prénom', 'required', 'Le prénom doit être indiqué');
+
+        //lastname: not void
+        $this->form_validation->set_rules('lastname', 'Nom', 'required', 'Le nom doit être indiqué');
+
+        //email: void
+        if (isset($_POST['email'])) {
+          // or valid
+          $this->form_validation->set_rules('email', 'Nom', 'valid_email', 'Entrez une adresse email valide ou aucune.');
+        }
+
+        // If the password needs to be modified,
+        if (isset($_POST['pwd'])) {
+          // it needs to be long 6 chars or more and confirmed
+          $this->form_validation->set_rules('pwd', 'Mot de passe', 'min_length[6]', 'Le mot de passe doit faire au moins 6 caractères');
+          $this->form_validation->set_rules('pwdagain', 'Mot de passe', 'matches[pwd]', 'Le mot de passe a été mal confirmé');
+        }
+
+        if($this->form_validation->run() === TRUE)
+        {
+          $userArray["is_active"] = 0;
+
+          foreach($_POST as $forminput => $formoutput) {
+            // Password needs to be hashed first, so it's not the same thing as the other
+            if ($forminput != "pwd" && $forminput != "pwdagain" && $forminput != "is_active" && $forminput != "email") {
+              $userArray[$forminput] = $formoutput;
+            // Do the hash only once…
+            } else if ($forminput == "pwd" && $formoutput != "") {
+              $userArray["password"] = password_hash($formoutput, PASSWORD_DEFAULT);
+            } else if ($forminput == "is_active" && $formoutput == "TRUE") {
+              $userArray["is_active"] = 1;
+            } else if ($forminput == "email") {
+              if ($formoutput != "") {
+                $userArray["email"] = $formoutput;
+              }
+            }
+          }
+
+          $this->load->model('user_model');
+          $this->user_model->update($id, $userArray);
+
+          redirect("/admin/view_users/");
+          exit();
+        }
+      }
+
+      $this->load->model('user_model');
       $this->load->model('user_type_model');
       $output = get_object_vars($this->user_model->get($id));
       $output["users"] = $this->user_model->get_all();
@@ -63,9 +120,7 @@ class Admin extends MY_Controller
 
       // Get this user. If it fails, it doesn't exist, so the username is unique!
       $user = $this->user_model->get_by('username', $argUsername);
-
-      // How to verify if it is void?
-
+      
       if(isset($user->user_id)) {
         $this->form_validation->set_message('unique_username', 'Cet identifiant est déjà utilisé');
         return FALSE;
@@ -92,8 +147,11 @@ class Admin extends MY_Controller
         //lastname: not void
         $this->form_validation->set_rules('lastname', 'Nom', 'required', 'Le nom doit être indiqué');
 
-        //email: not void
-        $this->form_validation->set_rules('email', 'Nom', 'valid_email', 'Vous n\'avez pas fourni une adresse email valide');
+        //email: void
+        if (isset($_POST['email'])) {
+          // or valid
+          $this->form_validation->set_rules('email', 'Nom', 'valid_email', 'Entrez une adresse email valide ou aucune.');
+        }
 
         //Password: 6 chars or more, confirmed
         $this->form_validation->set_rules('pwd', 'Mot de passe', 'min_length[6]', 'Le mot de passe doit faire au moins 6 caractères');
@@ -101,23 +159,29 @@ class Admin extends MY_Controller
 
         if($this->form_validation->run() === TRUE)
         {
-          foreach($_POST as $forminput -> $formoutput) {
-            $userArray["is_active"] = 0;
+          $userArray["is_active"] = 0;
 
+          foreach($_POST as $forminput => $formoutput) {
             // Password needs to be hashed first, so it's not the same thing as the other
-            if ($forminput != "pwd" && $forminput != "pwdagain" && $forminput != "is_active") {
+            if ($forminput != "pwd" && $forminput != "pwdagain" && $forminput != "is_active" && $forminput != "email") {
               $userArray[$forminput] = $formoutput;
             // Do the hash only once…
-            } else if ($forminput == "pwd") {
+            } else if ($forminput == "pwd" && $formoutput != "") {
               $userArray["password"] = password_hash($formoutput, PASSWORD_DEFAULT);
             } else if ($forminput == "is_active" && $formoutput == "TRUE") {
               $userArray["is_active"] = 1;
+            } else if ($forminput == "email") {
+              if ($formoutput != "") {
+                $userArray["email"] = $formoutput;
+              }
             }
 
-            $this->load->model('user_model');
-            $this->user_model->insert($userArray);
-            $this->$userArray;
+            // Why?
+            //$this->$userArray;
           }
+
+          $this->load->model('user_model');
+          $this->user_model->insert($userArray);
 
           redirect("/admin/view_users/");
           exit();
