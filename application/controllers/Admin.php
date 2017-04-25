@@ -50,24 +50,19 @@ class Admin extends MY_Controller
     public function modify_user($id = NULL)
     {
       $this->load->model('user_model');
-      $output = get_object_vars($this->user_model->get($id))
 
       if (!empty($_POST)) {
         // VALIDATION
 
-        //username: not void, unique
-        $this->form_validation->set_rules('username', 'Identifiant', 'required', 'Un identifiant doit être fourni');
-        $this->form_validation->set_rules('username', 'Identifiant', 'callback_unique_username');
-
-        //firstname: not void
-        $this->form_validation->set_rules('firstname', 'Prénom', 'required', 'Le prénom doit être indiqué');
-
-        //lastname: not void
-        $this->form_validation->set_rules('lastname', 'Nom', 'required', 'Le nom doit être indiqué');
+        //username: if changed,
+        if ($_POST['username'] != get_object_vars($this->user_model->get($id))['username']) {
+          $this->form_validation->set_rules('username', 'Identifiant', 'required', 'Un identifiant doit être fourni'); // not void
+          $this->form_validation->set_rules('username', 'Identifiant', 'callback_unique_username'); // and unique.
+        }
 
         //email: void
         if (isset($_POST['email'])) {
-          // or valid
+          // or valid.
           $this->form_validation->set_rules('email', 'Nom', 'valid_email', 'Entrez une adresse email valide ou aucune.');
         }
 
@@ -98,12 +93,15 @@ class Admin extends MY_Controller
             }
           }
 
-          $this->load->model('user_model');
+          
           $this->user_model->update($id, $userArray);
 
           redirect("/admin/view_users/");
           exit();
         }
+      // The values of the user are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
+      } else {
+        $output = get_object_vars($this->user_model->get($id));
       }
 
       $this->load->model('user_model');
@@ -141,12 +139,6 @@ class Admin extends MY_Controller
         $this->form_validation->set_rules('username', 'Identifiant', 'required', 'Un identifiant doit être fourni');
         $this->form_validation->set_rules('username', 'Identifiant', 'callback_unique_username');
 
-        //firstname: not void
-        $this->form_validation->set_rules('firstname', 'Prénom', 'required', 'Le prénom doit être indiqué');
-
-        //lastname: not void
-        $this->form_validation->set_rules('lastname', 'Nom', 'required', 'Le nom doit être indiqué');
-
         //email: void
         if (isset($_POST['email'])) {
           // or valid
@@ -175,9 +167,6 @@ class Admin extends MY_Controller
                 $userArray["email"] = $formoutput;
               }
             }
-
-            // Why?
-            //$this->$userArray;
           }
 
           $this->load->model('user_model');
@@ -192,6 +181,18 @@ class Admin extends MY_Controller
       $output["user_types"] = $this->user_type_model->get_all();
 
       $this->display_view("admin/users/form", $output);
+    }
+
+    /**
+    * Delete a user. If $confirm is not NULL, it will be directly deleted. Otherwise, a confirmation will be shown.
+    */
+    public function delete_user($id = NULL, $confirm = NULL) {
+      if (!is_null($confirm)) {
+        $output = get_object_vars($this->user_model->get($id));
+        $this->display_view("admin/users/delete", $output);
+      } else {
+        redirect("/admin/view_users/");
+      }
     }
 
     /**
