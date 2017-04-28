@@ -184,13 +184,22 @@ class Admin extends MY_Controller
     }
 
     /**
-    * Delete a user. If $confirm is not NULL, it will be directly deleted. Otherwise, a confirmation will be shown.
+    * Delete a user. 
+    * If $action is NULL, a confirmation will be shown.
+    * If it is "d", is_active will be set to 0.
+    * If it is anything else, the user will be deleted. 
     */
-    public function delete_user($id = NULL, $confirm = NULL) {
-      if (!is_null($confirm)) {
+    public function delete_user($id = NULL, $action = NULL) {
+      $this->load->model('user_model');
+      if (is_null($action)) {
         $output = get_object_vars($this->user_model->get($id));
+        $output["users"] = $this->user_model->get_all();
         $this->display_view("admin/users/delete", $output);
+      } else if($action == "d") {
+        $this->user_model->update($id, array('is_active' => 0));
+        redirect("/admin/view_users/");
       } else {
+        $this->user_model->delete($id);
         redirect("/admin/view_users/");
       }
     }
