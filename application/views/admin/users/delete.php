@@ -18,7 +18,7 @@
   <div><em>Voulez-vous vraiment supprimer l'utilisateur "<?php echo $username; ?>" ?</em></div>
 <div class="btn-group">
   <a href="<?php echo base_url().uri_string()."/confirmed";?>" class="btn btn-danger btn-lg">Oui</a>
-  <a href="<?php echo base_url()."/admin/view_users";?>" class="btn btn-lg">Non</a>
+  <a href="<?php echo base_url()."admin/view_users/";?>" class="btn btn-lg">Non</a>
 <?php if($is_active == 1) { ?>
   <a href="<?php echo base_url().uri_string()."/d";?>" class="btn btn-warning btn-lg">Le désactiver</a>
 <?php } ?>
