@@ -92,7 +92,6 @@ class Admin extends MY_Controller
               }
             }
           }
-
           
           $this->user_model->update($id, $userArray);
 
@@ -213,6 +212,38 @@ class Admin extends MY_Controller
       $output["tags"] = $this->item_tag_model->get_all();
 
       $this->display_view("admin/tags/list", $output);
+    }
+
+    /**
+    * Modify a tag
+    */
+    public function modify_tag($id = NULL)
+    {
+      // Load the needed model
+      $this->load->model('item_tag_model');
+
+      if (empty($_POST)) {
+        // The object to modify itself
+        $output = get_object_vars($this->item_tag_model->get($id));
+
+        // The others, for the GeoLine
+        $output["tags"] = $this->item_tag_model->get_all();
+
+        $this->display_view("admin/tags/form", $output);
+      } else {
+
+      }
+    }
+
+    /**
+    * Modify a tag
+    */
+    public function secret_tag($id = NULL)
+    {
+      $this->load->model('item_tag_model');
+      $output["tags"] = $this->item_tag_model->get_all();
+
+      $this->display_view("admin/tags/form", $output);
     }
 
     /**
