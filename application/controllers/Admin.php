@@ -44,6 +44,10 @@ class Admin extends MY_Controller
       $this->display_view("admin/users/list", $output);
     }
 
+    /* *********************************************************************************************************
+    USERS
+    ********************************************************************************************************* */
+
     /**
     * Modify a user
     */
@@ -203,6 +207,10 @@ class Admin extends MY_Controller
       }
     }
 
+    /* *********************************************************************************************************
+    TAGS
+    ********************************************************************************************************* */
+
     /**
     * As the name says, view the tags.
     */
@@ -215,36 +223,74 @@ class Admin extends MY_Controller
     }
 
     /**
-    * Modify a tag
+    * Modify a tag. Work in progress
     */
     public function modify_tag($id = NULL)
     {
       // Load the needed model
       $this->load->model('item_tag_model');
 
-      if (empty($_POST)) {
-        // The object to modify itself
-        $output = get_object_vars($this->item_tag_model->get($id));
+      if (!empty($_POST)) {
+        $this->form_validation->set_rules('name', 'Nom', 'required', 'Le tag doit avoir un nom');
 
-        // The others, for the GeoLine
-        $output["tags"] = $this->item_tag_model->get_all();
+        if ($this->form_validation->run() === TRUE)
+        {
+          $this->item_tag_model->update($id, $_POST);
 
-        $this->display_view("admin/tags/form", $output);
+          redirect("/admin/view_tags/");
+          exit();
+        }
       } else {
-
+        // The object to modify
+        $output = get_object_vars($this->item_tag_model->get($id));
       }
-    }
-
-    /**
-    * Modify a tag
-    */
-    public function secret_tag($id = NULL)
-    {
-      $this->load->model('item_tag_model');
+      // The others, for the GeoLine
       $output["tags"] = $this->item_tag_model->get_all();
 
       $this->display_view("admin/tags/form", $output);
     }
+
+    /**
+    * Create a tag.
+    */
+    public function new_tag()
+    {
+      $this->load->model('item_tag_model');
+
+      if (!empty($_POST)) {
+        $this->form_validation->set_rules('name', 'Nom', 'required', 'Le tag doit avoir un nom');
+
+        if ($this->form_validation->run() === TRUE)
+        {
+          $this->item_tag_model->insert($_POST);
+
+          redirect("/admin/view_tags/");
+        }
+      }
+
+      $this->display_view("admin/tags/form");
+    }
+
+    /**
+    * Delete a tag. 
+    * If $action is NULL, a confirmation will be shown.
+    * If it is anything else, the user will be deleted. 
+    */
+    public function delete_tag($id = NULL, $action = NULL) {
+      $this->load->model('item_tag_model');
+      if (is_null($action)) {
+        $output = get_object_vars($this->item_tag_model->get($id));
+        $output["tags"] = $this->item_tag_model->get_all();
+        $this->display_view("admin/tags/delete", $output);
+      } else {
+        $this->item_tag_model->delete($id);
+        redirect("/admin/view_tags/");
+      }
+    }
+
+    /* *********************************************************************************************************
+    STOCKING PLACES
+    ********************************************************************************************************* */
 
     /**
     * As the name says, view the stocking places.
@@ -257,6 +303,10 @@ class Admin extends MY_Controller
       $this->display_view("admin/stocking_places/list", $output);
     }
 
+    /* *********************************************************************************************************
+    SUPPLIERS
+    ********************************************************************************************************* */
+
     /**
     * As the name says, view the suppliers.
     */
@@ -267,6 +317,10 @@ class Admin extends MY_Controller
 
       $this->display_view("admin/suppliers/list", $output);
     }
+
+    /* *********************************************************************************************************
+    ITEM GROUPS
+    ********************************************************************************************************* */
 
     /**
     * As the name says, view the item groups.
