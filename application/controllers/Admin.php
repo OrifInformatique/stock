@@ -303,6 +303,75 @@ class Admin extends MY_Controller
       $this->display_view("admin/stocking_places/list", $output);
     }
 
+    /**
+    * As the name says, modify a stocking place, which id is $id
+    */
+    public function modify_stocking_place($id = NULL)
+    {
+      $this->load->model('stocking_place_model');
+
+      if (!empty($_POST)) {
+        $this->form_validation->set_rules('short', 'Nom court', 'required', 'Le lieu de stockage doit avoir un nom court');
+        $this->form_validation->set_rules('name', 'Nom long', 'required', 'Le lieu de stockage doit avoir un nom long');
+
+        if ($this->form_validation->run() === TRUE)
+        {
+          $this->stocking_place_model->update($id, $_POST);
+
+          redirect("/admin/view_stocking_places/");
+          exit();
+        }
+      } else {
+        $output = get_object_vars($this->stocking_place_model->get($id));
+      }
+
+      $output["stocking_places"] = $this->stocking_place_model->get_all();
+
+      $this->display_view("admin/stocking_places/form", $output);
+    }
+
+    /**
+    * As the name says, create a new stocking place
+    */
+    public function new_stocking_place()
+    {
+      $this->load->model('stocking_place_model');
+
+      if (!empty($_POST)) {
+        $this->form_validation->set_rules('short', 'Nom court', 'required', 'Le lieu de stockage doit avoir un nom court');
+        $this->form_validation->set_rules('name', 'Nom long', 'required', 'Le lieu de stockage doit avoir un nom long');
+
+        if ($this->form_validation->run() === TRUE)
+        {
+          $this->stocking_place_model->insert($_POST);
+
+          redirect("/admin/view_stocking_places/");
+          exit();
+        }
+      }
+
+      $this->display_view("admin/stocking_places/form");
+    }
+
+    /**
+    * As the name says, view the stocking places.
+    */
+    public function delete_stocking_place($id = NULL, $action = NULL)
+    {
+      $this->load->model('stocking_place_model');
+
+      if (is_null($action)) {
+        $output["stocking_places"] = $this->stocking_place_model->get_all();
+        $output = get_object_vars($this->stocking_place_model->get($id));
+
+        $this->display_view("admin/stocking_places/delete", $output);
+      } else {
+        $this->stocking_place_model->delete($id);
+        redirect("/admin/view_stocking_places/");
+      }
+
+    }
+
     /* *********************************************************************************************************
     SUPPLIERS
     ********************************************************************************************************* */
