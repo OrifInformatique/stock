@@ -56,14 +56,13 @@ class Admin extends MY_Controller
 
         //username: if changed,
         if ($_POST['username'] != get_object_vars($this->user_model->get($id))['username']) {
-          $this->form_validation->set_rules('username', 'Identifiant', 'required', 'Un identifiant doit être fourni'); // not void
-          $this->form_validation->set_rules('username', 'Identifiant', 'callback_unique_username'); // and unique.
+          $this->form_validation->set_rules('username', 'Identifiant', 'required|callback_unique_username', 'Un identifiant unique doit être fourni'); // not void and unique.
         }
 
         //email: void
         if (isset($_POST['email'])) {
           // or valid.
-          $this->form_validation->set_rules('email', 'Nom', 'valid_email', 'Entrez une adresse email valide ou aucune.');
+          $this->form_validation->set_rules('email', 'Mail', 'valid_email', 'Entrez une adresse email valide ou aucune.');
         }
 
         // If the password needs to be modified,
@@ -88,8 +87,10 @@ class Admin extends MY_Controller
               $userArray["is_active"] = 1;
             } else if ($forminput == "email") {
               if ($formoutput != "") {
-                $userArray["email"] = $formoutput;
-              }
+				  $userArray["email"] = $formoutput;
+              } else {
+				  $userArray["email"] = "";
+			  }
             }
           }
 
@@ -136,17 +137,16 @@ class Admin extends MY_Controller
         // VALIDATION
 
         //username: not void, unique
-        $this->form_validation->set_rules('username', 'Identifiant', 'required', 'Un identifiant doit être fourni');
-        $this->form_validation->set_rules('username', 'Identifiant', 'callback_unique_username');
+        $this->form_validation->set_rules('username', 'Identifiant', 'required|callback_unique_username', 'Un identifiant unique doit être fourni');
 
         //email: void
         if (isset($_POST['email'])) {
           // or valid
-          $this->form_validation->set_rules('email', 'Nom', 'valid_email', 'Entrez une adresse email valide ou aucune.');
+          $this->form_validation->set_rules('email', 'Mail', 'valid_email', 'Entrez une adresse email valide ou aucune.');
         }
 
         //Password: 6 chars or more, confirmed
-        $this->form_validation->set_rules('pwd', 'Mot de passe', 'min_length[6]', 'Le mot de passe doit faire au moins 6 caractères');
+        $this->form_validation->set_rules('pwd', 'Mot de passe', 'required|min_length[6]', 'Le mot de passe doit faire au moins 6 caractères');
         $this->form_validation->set_rules('pwdagain', 'Mot de passe', 'matches[pwd]', 'Le mot de passe a été mal confirmé');
 
         if($this->form_validation->run() === TRUE)
