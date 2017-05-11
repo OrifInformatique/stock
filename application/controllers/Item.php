@@ -89,13 +89,13 @@ class Item extends MY_Controller {
           $where2 = "";
 
           if (isset($where['t']))
-          {
+          {  
             $this->load->model('item_tag_link_model');
 
             $temp = $this->item_tag_link_model->get_many_by($where['t']);
-
+			
             // Set the WHERE clause
-            $where2 .= "(";
+            //$where2 .= "(";
 
             // Add all the tags wanted to it
             foreach ($temp as $num)
@@ -104,10 +104,9 @@ class Item extends MY_Controller {
             }
 
             // Delete the initial OR
-            $where2 = substr($where2, 4);
-
+            $where2 = "(".substr($where2, 3);
             $where2 .= ")";
-          }
+		  }
 
           if (isset($where['c']))
           {
@@ -138,10 +137,15 @@ class Item extends MY_Controller {
 
             $where2 .= "(" . $where['s'] . ")";
           }
-
+		  
+		  // Aucun item pour les tags sélectionnés
+		  if (substr($where2,0,2) == "()") {
+			  $where2="(1=2".substr($where2,1);
+		  }
+		  
           $output["items"] = $this->item_model->with('created_by_user')->get_many_by($where2);
         }
-
+		
         $this->display_view('item/list', $output);
     }
 
@@ -346,7 +350,16 @@ class Item extends MY_Controller {
 
         if ($this->form_validation->run() === TRUE) {
           //Declarations
-          $loanArray = $_POST;
+		  
+		  $loanArray = $_POST;
+		  
+		  if ($loanArray["planned_return_date"] == 0 || $loanArray["planned_return_date"] == "0000-00-00" || $loanArray["planned_return_date"] == "") {
+			$loanArray["planned_return_date"] = NULL;
+		  }
+		  
+		  if ($loanArray["real_return_date"] == 0 || $loanArray["real_return_date"] == "0000-00-00" || $loanArray["real_return_date"] == "") {
+			$loanArray["real_return_date"] = NULL;
+		  }
 
           // Execute the changes in the item table
           $this->loan_model->update($id, $loanArray);
