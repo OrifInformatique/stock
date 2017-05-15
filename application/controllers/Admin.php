@@ -354,7 +354,7 @@ class Admin extends MY_Controller
     }
 
     /**
-    * As the name says, view the stocking places.
+    * Delete the stocking place $id. If $action is null, a confirmation will be shown
     */
     public function delete_stocking_place($id = NULL, $action = NULL)
     {
@@ -387,6 +387,48 @@ class Admin extends MY_Controller
       $this->display_view("admin/suppliers/list", $output);
     }
 
+    /**
+    * As the name says, view the suppliers.
+    */
+    public function modify_supplier($id = NULL)
+    {
+      $this->load->model('supplier_model');
+      $output["suppliers"] = $this->supplier_model->get_all();
+
+      $this->display_view("admin/suppliers/list", $output);
+    }
+
+    /**
+    * As the name says, view the suppliers.
+    */
+    public function new_supplier()
+    {
+      $this->load->model('supplier_model');
+      $output["suppliers"] = $this->supplier_model->get_all();
+
+      $this->display_view("admin/suppliers/list", $output);
+    }
+
+    /**
+    * As the name says, view the suppliers.
+    */
+    public function delete_supplier($id = NULL, $action = NULL)
+    {
+      $this->load->model('supplier_model');
+
+      if (!isset($action)) {
+        $output["suppliers"] = $this->supplier_model->get_all();
+
+        $this->display_view("admin/suppliers/delete", $output);
+      } else {
+        // delete it!
+        $this->supplier_model->delete($id);
+        
+        // redirect the user to the updated table
+        redirect("/admin/view_stocking_places/");
+      }
+    }
+
     /* *********************************************************************************************************
     ITEM GROUPS
     ********************************************************************************************************* */
@@ -395,6 +437,39 @@ class Admin extends MY_Controller
     * As the name says, view the item groups.
     */
     public function view_item_groups()
+    {
+      $this->load->model('item_group_model');
+      $output["item_groups"] = $this->item_group_model->get_all();
+
+      $this->display_view("admin/item_groups/list", $output);
+    }
+
+    /**
+    * As the name says, view the item groups.
+    */
+    public function modify_item_group()
+    {
+      $this->load->model('item_group_model');
+      $output["item_groups"] = $this->item_group_model->get_all();
+
+      $this->display_view("admin/item_groups/list", $output);
+    }
+
+    /**
+    * As the name says, view the item groups.
+    */
+    public function new_item_group()
+    {
+      $this->load->model('item_group_model');
+      $output["item_groups"] = $this->item_group_model->get_all();
+
+      $this->display_view("admin/item_groups/list", $output);
+    }
+
+    /**
+    * As the name says, view the item groups.
+    */
+    public function delete_item_group()
     {
       $this->load->model('item_group_model');
       $output["item_groups"] = $this->item_group_model->get_all();
