@@ -215,6 +215,18 @@ class Admin extends MY_Controller
       $this->display_view("admin/tags/list", $output);
     }
 
+    public function delete_tag($id = NULL, $action = NULL) {		
+      $this->load->model('item_tag_model');
+      if (is_null($action)) {
+        $output = get_object_vars($this->item_tag_model->get($id));
+        $output["tags"] = $this->item_tag_model->get_all();
+        $this->display_view("admin/tags/delete", $output);
+      } else {
+        $this->item_tag_model->delete($id);
+        redirect("/admin/view_tags/");
+      }
+    }
+	
     /**
     * As the name says, view the stocking places.
     */
