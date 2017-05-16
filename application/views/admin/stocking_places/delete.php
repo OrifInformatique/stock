@@ -1,7 +1,7 @@
 <div class="container"><h1 style="text-align: center">
   <select id="rows" onchange="changeRow()" style="text-align: right;">
-    <?php foreach($tags as $tag) { ?>
-    <option value="<?php echo $tag->item_tag_id; ?>"<?php if ($item_tag_id == $tag->item_tag_id) {echo " selected";} ?>>"<?php echo $tag->name; ?>"</option>
+    <?php foreach($stocking_places as $stocking_place) { ?>
+    <option value="<?php echo $stocking_place->stocking_place_id; ?>"<?php if ($stocking_place_id == $stocking_place->stocking_place_id) {echo " selected";} ?>>"<?php echo $stocking_place->name; ?>"</option>
     <?php } ?>
   </select>, <select id="actions" onchange="changeAction()">
     <option value="delete">Suppression</option>
@@ -11,7 +11,7 @@
     <option value="stocking_place">Lieux de stockage</option>
     <option value="user">Utilisateurs</option>
     <option value="tag">Tags</option>
-    <option value="supplier">Fournisseurs</option>
+    <option value="stocking_place">Fournisseurs</option>
     <option value="item_group">Groupes d'objets</option>
   </select><a class="like-normal" href="<?php echo base_url(); ?>admin/">, <span class="word-administration">Administration</span></a></h1>
 
@@ -22,3 +22,6 @@
 </div>
 
  </div>
+
+ <script src="<?php echo base_url(); ?>assets/js/geoline.js">
+</script>

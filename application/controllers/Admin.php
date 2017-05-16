@@ -395,7 +395,7 @@ class Admin extends MY_Controller
       $this->load->model('supplier_model');
       $output["suppliers"] = $this->supplier_model->get_all();
 
-      $this->display_view("admin/suppliers/list", $output);
+      $this->display_view("admin/suppliers/form", $output);
     }
 
     /**
@@ -406,7 +406,7 @@ class Admin extends MY_Controller
       $this->load->model('supplier_model');
       $output["suppliers"] = $this->supplier_model->get_all();
 
-      $this->display_view("admin/suppliers/list", $output);
+      $this->display_view("admin/suppliers/form", $output);
     }
 
     /**
@@ -417,6 +417,7 @@ class Admin extends MY_Controller
       $this->load->model('supplier_model');
 
       if (!isset($action)) {
+        $output = get_object_vars($this->supplier_model->get($id));
         $output["suppliers"] = $this->supplier_model->get_all();
 
         $this->display_view("admin/suppliers/delete", $output);
@@ -447,12 +448,12 @@ class Admin extends MY_Controller
     /**
     * As the name says, view the item groups.
     */
-    public function modify_item_group()
+    public function modify_item_group($id = NULL)
     {
       $this->load->model('item_group_model');
       $output["item_groups"] = $this->item_group_model->get_all();
 
-      $this->display_view("admin/item_groups/list", $output);
+      $this->display_view("admin/item_groups/form", $output);
     }
 
     /**
@@ -463,17 +464,27 @@ class Admin extends MY_Controller
       $this->load->model('item_group_model');
       $output["item_groups"] = $this->item_group_model->get_all();
 
-      $this->display_view("admin/item_groups/list", $output);
+      $this->display_view("admin/item_groups/form", $output);
     }
 
     /**
     * As the name says, view the item groups.
     */
-    public function delete_item_group()
+    public function delete_item_group($id = NULL, $action = NULL)
     {
       $this->load->model('item_group_model');
-      $output["item_groups"] = $this->item_group_model->get_all();
 
-      $this->display_view("admin/item_groups/list", $output);
+      if (!isset($action)) {
+        $output = get_object_vars($this->item_group_model->get($id));
+        $output["item_groups"] = $this->item_group_model->get_all();
+
+        $this->display_view("admin/item_groups/delete", $output);
+      } else {
+        // delete it!
+        $this->item_group_model->delete($id);
+        
+        // redirect the user to the updated table
+        redirect("/admin/view_item_groups/");
+      }
     }
 }
