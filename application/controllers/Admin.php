@@ -226,6 +226,89 @@ class Admin extends MY_Controller
         redirect("/admin/view_tags/");
       }
     }
+
+    /**
+    * Modify a tag
+    */
+    public function modify_tag($id = NULL)
+    {
+      $this->load->model('item_tag_model');
+
+      if (!empty($_POST)) {
+        // VALIDATION
+
+        //name: if changed,
+        if ($_POST['name'] != get_object_vars($this->item_tag_model->get($id))['name']) {
+          $this->form_validation->set_rules('name', 'Identifiant', 'required|callback_unique_tagname', 'Un nom de tag doit être fourni'); // not void
+        }
+
+        if($this->form_validation->run() === TRUE)
+		{
+          foreach($_POST as $forminput => $formoutput) {
+              $tagArray[$forminput] = $formoutput;
+          }
+		  
+		  $this->item_tag_model->update($id, $tagArray);
+
+        redirect("/admin/view_tags/");
+        exit();
+      }
+	  
+      // The values of the tag are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
+      } else {
+        $output = get_object_vars($this->item_tag_model->get($id));
+      }
+
+      $this->load->model('item_tag_model');
+      $output = get_object_vars($this->item_tag_model->get($id));
+      $output["tags"] = $this->item_tag_model->get_all();	  
+	  
+      $this->display_view("admin/tags/form", $output);
+    }
+
+    /**
+    * Create a new tag
+    */
+    public function new_tag()
+    {
+      if (!empty($_POST)) {
+        // VALIDATION
+
+        //name: not void
+        $this->form_validation->set_rules('name', 'Identifiant', 'required|callback_unique_tagname', 'Un nom de tag unique doit être fourni');
+
+        if($this->form_validation->run() === TRUE)
+        {
+          foreach($_POST as $forminput => $formoutput) {
+              $tagArray[$forminput] = $formoutput;
+          }
+
+          $this->load->model('item_tag_model');
+          $this->item_tag_model->insert($tagArray);
+
+          redirect("/admin/view_tags/");
+          exit();
+        }
+	  }
+
+      $this->display_view("admin/tags/form");
+    }
+
+    public function unique_tagname($argName) {
+      $this->load->model('item_tag_model');
+
+      // Get this tag. If it fails, it doesn't exist, so the username is unique!
+      $tag = $this->item_tag_model->get_by('name', $argName);
+      
+      if(isset($tag->item_tag_id)) {
+        $this->form_validation->set_message('unique_tagname', 'Cet nom est déjà utilisé');
+        return FALSE;
+      } else {
+        return TRUE;
+      }
+    }
+
+	
 	
     /**
     * As the name says, view the stocking places.
