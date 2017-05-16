@@ -31,7 +31,7 @@
       <?php } ?>
     </tbody>
   </table>
-<a href="<?php echo base_url(); ?>admin/new_user/" class="btn btn-primary">Nouveau…</a>
+<a href="<?php echo base_url(); ?>admin/new_stocking_place/" class="btn btn-primary">Nouveau…</a>
 </div>
 </div>
 </div>

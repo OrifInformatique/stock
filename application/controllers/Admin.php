@@ -215,6 +215,9 @@ class Admin extends MY_Controller
       $this->display_view("admin/tags/list", $output);
     }
 
+    /**
+    * Delete an unused tag
+    */
     public function delete_tag($id = NULL, $action = NULL) {		
       $this->load->model('item_tag_model');
       if (is_null($action)) {
@@ -307,8 +310,6 @@ class Admin extends MY_Controller
         return TRUE;
       }
     }
-
-	
 	
     /**
     * As the name says, view the stocking places.
@@ -321,6 +322,92 @@ class Admin extends MY_Controller
       $this->display_view("admin/stocking_places/list", $output);
     }
 
+    /**
+    * Delete an unused stocking_place
+    */
+    public function delete_stocking_place($id = NULL, $action = NULL) {		
+      $this->load->model('stocking_place_model');
+      if (is_null($action)) {
+        $output = get_object_vars($this->stocking_place_model->get($id));
+        $output["stocking_places"] = $this->stocking_place_model->get_all();
+        $this->display_view("admin/stocking_places/delete", $output);
+      } else {
+        $this->stocking_place_model->delete($id);
+        redirect("/admin/view_stocking_places/");
+      }
+    }
+
+
+    /**
+    * Modify a stocking_place
+    */
+    public function modify_stocking_place($id = NULL)
+    {
+      $this->load->model('stocking_place_model');
+
+      if (!empty($_POST)) {
+        // VALIDATION
+
+        //name: if changed,
+        if ($_POST['name'] != get_object_vars($this->stocking_place_model->get($id))['name']) {
+          $this->form_validation->set_rules('name', 'Identifiant', 'required', 'Un nom de tag doit être fourni'); // not void
+        }
+		$this->form_validation->set_rules('short', 'court', 'required', 'Un nom court d emplacement doit être fourni');
+
+        if($this->form_validation->run() === TRUE)
+		{
+          foreach($_POST as $forminput => $formoutput) {
+              $spArray[$forminput] = $formoutput;
+          }
+		  
+		  $this->stocking_place_model->update($id, $spArray);
+
+        redirect("/admin/view_stocking_places/");
+        exit();
+      }
+	  
+      // The values of the tag are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
+      } else {
+        $output = get_object_vars($this->stocking_place_model->get($id));
+      }
+
+      $this->load->model('stocking_place_model');
+      $output = get_object_vars($this->stocking_place_model->get($id));
+      $output["stocking_places"] = $this->stocking_place_model->get_all();	  
+	  
+      $this->display_view("admin/stocking_places/form", $output);
+    }
+
+    /**
+    * Create a new stocking_place
+    */
+    public function new_stocking_place()
+    {
+      if (!empty($_POST)) {
+        // VALIDATION
+
+        //name: not void
+        $this->form_validation->set_rules('name', 'Identifiant', 'required', 'Un nom d emplacement unique doit être fourni');
+		$this->form_validation->set_rules('short', 'court', 'required', 'Un nom court d emplacement doit être fourni');
+
+        if($this->form_validation->run() === TRUE)
+        {
+          foreach($_POST as $forminput => $formoutput) {
+              $spArray[$forminput] = $formoutput;
+          }
+
+          $this->load->model('stocking_place_model');
+          $this->stocking_place_model->insert($spArray);
+
+          redirect("/admin/view_stocking_places/");
+          exit();
+        }
+	  }
+
+      $this->display_view("admin/stocking_places/form");
+    }
+	
+	
     /**
     * As the name says, view the suppliers.
     */
