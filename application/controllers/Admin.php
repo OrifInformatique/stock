@@ -350,8 +350,9 @@ class Admin extends MY_Controller
 
         //name: if changed,
         if ($_POST['name'] != get_object_vars($this->stocking_place_model->get($id))['name']) {
-          $this->form_validation->set_rules('name', 'Identifiant', 'required', 'Un nom de tag doit être fourni'); // not void
+          $this->form_validation->set_rules('name', 'Identifiant', 'required|callback_unique_stocking_place', 'Un nom de tag doit être fourni'); // not void
         }
+		
 		$this->form_validation->set_rules('short', 'court', 'required', 'Un nom court d emplacement doit être fourni');
 
         if($this->form_validation->run() === TRUE)
@@ -387,7 +388,7 @@ class Admin extends MY_Controller
         // VALIDATION
 
         //name: not void
-        $this->form_validation->set_rules('name', 'Identifiant', 'required', 'Un nom d emplacement unique doit être fourni');
+        $this->form_validation->set_rules('name', 'Identifiant', 'required|callback_unique_stocking_place', 'Un nom d emplacement unique doit être fourni');
 		$this->form_validation->set_rules('short', 'court', 'required', 'Un nom court d emplacement doit être fourni');
 
         if($this->form_validation->run() === TRUE)
@@ -405,6 +406,20 @@ class Admin extends MY_Controller
 	  }
 
       $this->display_view("admin/stocking_places/form");
+    }
+
+    public function unique_stocking_place($argName) {
+      $this->load->model('stocking_place_model');
+
+      // Get this sp. If it fails, it doesn't exist, so the username is unique!
+      $sp = $this->stocking_place_model->get_by('name', $argName);
+      
+      if(isset($sp->stocking_place_id)) {
+        $this->form_validation->set_message('unique_stocking_place', 'Cet identifiant est déjà utilisé');
+        return FALSE;
+      } else {
+        return TRUE;
+      }
     }
 	
 	
