@@ -435,6 +435,88 @@ class Admin extends MY_Controller
     }
 
     /**
+    * Delete an unused supplier
+    */
+    public function delete_supplier($id = NULL, $action = NULL) {		
+      $this->load->model('supplier_model');
+      if (is_null($action)) {
+        $output = get_object_vars($this->supplier_model->get($id));
+        $output["suppliers"] = $this->supplier_model->get_all();
+        $this->display_view("admin/suppliers/delete", $output);
+      } else {
+        $this->supplier_model->delete($id);
+        redirect("/admin/view_suppliers/");
+      }
+    }
+
+    /**
+    * Modify a supplier
+    */
+    public function modify_supplier($id = NULL)
+    {
+      $this->load->model('supplier_model');
+
+      if (!empty($_POST)) {
+        // VALIDATION
+
+        //name: if changed,
+        $this->form_validation->set_rules('name', 'Identifiant', 'required', 'Un nom de fournisseur doit être fourni'); // not void
+
+        if($this->form_validation->run() === TRUE)
+		{
+          foreach($_POST as $forminput => $formoutput) {
+              $spArray[$forminput] = $formoutput;
+          }
+		  
+		  $this->supplier_model->update($id, $spArray);
+
+        redirect("/admin/view_suppliers/");
+        exit();
+      }
+	  
+      // The values of the tag are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
+      } else {
+        $output = get_object_vars($this->supplier_model->get($id));
+      }
+
+      $this->load->model('supplier_model');
+      $output = get_object_vars($this->supplier_model->get($id));
+      $output["suppliers"] = $this->supplier_model->get_all();	  
+	  
+      $this->display_view("admin/suppliers/form", $output);
+    }
+	
+    /**
+    * Create a new supplier
+    */
+    public function new_supplier()
+    {
+      if (!empty($_POST)) {
+        // VALIDATION
+
+        //name: not void
+        $this->form_validation->set_rules('name', 'Identifiant', 'required', 'Un nom de fournisseur doit être fourni');
+
+        if($this->form_validation->run() === TRUE)
+        {
+          foreach($_POST as $forminput => $formoutput) {
+              $spArray[$forminput] = $formoutput;
+          }
+
+          $this->load->model('supplier_model');
+          $this->supplier_model->insert($spArray);
+
+          redirect("/admin/view_suppliers/");
+          exit();
+        }
+	  }
+
+      $this->display_view("admin/suppliers/form");
+    }
+
+
+	
+    /**
     * As the name says, view the item groups.
     */
     public function view_item_groups()

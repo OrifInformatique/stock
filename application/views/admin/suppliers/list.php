@@ -43,7 +43,7 @@
       <?php } ?>
     </tbody>
   </table>
-<a href="<?php echo base_url(); ?>admin/new_user/" class="btn btn-primary">Nouveau…</a>
+<a href="<?php echo base_url(); ?>admin/new_supplier/" class="btn btn-primary">Nouveau…</a>
 </div>
 </div>
 </div>
