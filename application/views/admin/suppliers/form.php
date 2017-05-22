@@ -37,15 +37,40 @@ if(isset($suppliers)) { ?>
     </div>
 
    <div class="form-group">
-      <label for="short">Adresse 1:</label>
+      <label for="address_line1">Adresse 1:</label>
       <input class="form-control" name="address_line1" id="address_line1" value="<?php if (isset($address_line1)) {echo $address_line1;} else {echo set_value('address_line1');} ?>" />
     </div>
 	
    <div class="form-group">
-      <label for="short">Adresse 2:</label>
+      <label for="address_line2">Adresse 2:</label>
       <input class="form-control" name="address_line2" id="address_line2" value="<?php if (isset($address_line2)) {echo $address_line2;} else {echo set_value('address_line2');} ?>" />
     </div>
 
+   <div class="form-group">
+      <label for="zip">NPA:</label>
+      <input class="form-control" name="zip" id="zip" value="<?php if (isset($zip)) {echo $zip;} else {echo set_value('zip');} ?>" />
+    </div>
+	
+   <div class="form-group">
+      <label for="city">Ville:</label>
+      <input class="form-control" name="city" id="city" value="<?php if (isset($city)) {echo $city;} else {echo set_value('city');} ?>" />
+    </div>
+
+   <div class="form-group">
+      <label for="country">Pays:</label>
+      <input class="form-control" name="country" id="country" value="<?php if (isset($country)) {echo $country;} else {echo set_value('country');} ?>" />
+    </div>
+	
+   <div class="form-group">
+      <label for="tel">Tel:</label>
+      <input class="form-control" name="tel" id="tel" value="<?php if (isset($tel)) {echo $tel;} else {echo set_value('tel');} ?>" />
+    </div>
+
+   <div class="form-group">
+      <label for="email">Mail:</label>
+      <input class="form-control" name="email" id="email" value="<?php if (isset($email)) {echo $email;} else {echo set_value('email');} ?>" />
+    </div>	
+	
     <button type="submit" class="btn btn-primary"><?php echo $this->lang->line('btn_submit'); ?></button>
     <a class="btn btn-primary" href="<?php echo base_url() . "admin/view_suppliers/"; ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
   </form>

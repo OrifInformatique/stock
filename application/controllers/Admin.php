@@ -462,11 +462,25 @@ class Admin extends MY_Controller
         //name: if changed,
         $this->form_validation->set_rules('name', 'Identifiant', 'required', 'Un nom de fournisseur doit être fourni'); // not void
 
+        if (isset($_POST['email'])) {
+          // or valid.
+          $this->form_validation->set_rules('email', 'Mail', 'valid_email', 'Entrez une adresse email valide ou aucune.');
+        }		
+		
         if($this->form_validation->run() === TRUE)
 		{
           foreach($_POST as $forminput => $formoutput) {
-              $spArray[$forminput] = $formoutput;
-          }
+            if ($forminput != "email") {
+				$spArray[$forminput] = $formoutput;
+            } else {
+              if ($formoutput != "") {
+				  echo $formoutput;
+				  $spArray["email"] = $formoutput;
+              } else {
+				  $spArray["email"] = "";
+			  }
+			}
+		  }
 		  
 		  $this->supplier_model->update($id, $spArray);
 
@@ -497,11 +511,23 @@ class Admin extends MY_Controller
         //name: not void
         $this->form_validation->set_rules('name', 'Identifiant', 'required', 'Un nom de fournisseur doit être fourni');
 
+        //email: void
+        if (isset($_POST['email'])) {
+          // or valid
+          $this->form_validation->set_rules('email', 'Mail', 'valid_email', 'Entrez une adresse email valide ou aucune.');
+        }		
+		
         if($this->form_validation->run() === TRUE)
         {
           foreach($_POST as $forminput => $formoutput) {
-              $spArray[$forminput] = $formoutput;
-          }
+            if ($forminput != "email") {
+				$spArray[$forminput] = $formoutput;
+            } else {
+              if ($formoutput != "") {
+				  $spArray["email"] = $formoutput;
+			  }
+			}
+		  }
 
           $this->load->model('supplier_model');
           $this->supplier_model->insert($spArray);
@@ -526,4 +552,102 @@ class Admin extends MY_Controller
 
       $this->display_view("admin/item_groups/list", $output);
     }
+
+    /**
+    * Delete an unused item group
+    */
+    public function delete_item_group($id = NULL, $action = NULL) {		
+      $this->load->model('item_group_model');
+      if (is_null($action)) {
+        $output = get_object_vars($this->item_group_model->get($id));
+        $output["groups"] = $this->item_group_model->get_all();
+        $this->display_view("admin/item_groups/delete", $output);
+      } else {
+        $this->item_group_model->delete($id);
+        redirect("/admin/view_item_groups/");
+      }
+    }
+
+    /**
+    * Modify a group
+    */
+    public function modify_item_group($id = NULL)
+    {
+      $this->load->model('item_group_model');
+
+      if (!empty($_POST)) {
+        // VALIDATION
+
+        //name: if changed,
+        if ($_POST['name'] != get_object_vars($this->item_group_model->get($id))['name']) {
+          $this->form_validation->set_rules('name', 'Identifiant', 'required|callback_unique_groupname', 'Un nom de groupe doit être fourni'); // not void
+        }
+
+        if($this->form_validation->run() === TRUE)
+		{
+          foreach($_POST as $forminput => $formoutput) {
+              $groupArray[$forminput] = $formoutput;
+          }
+		  
+		  $this->item_group_model->update($id, $groupArray);
+
+        redirect("/admin/view_item_groups/");
+        exit();
+      }
+	  
+      // The values of the group are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
+      } else {
+        $output = get_object_vars($this->item_group_model->get($id));
+      }
+
+      $this->load->model('item_group_model');
+      $output = get_object_vars($this->item_group_model->get($id));
+      $output["groups"] = $this->item_group_model->get_all();	  
+	  
+      $this->display_view("admin/item_groups/form", $output);
+    }
+
+    /**
+    * Create a new group
+    */
+    public function new_item_group()
+    {
+      if (!empty($_POST)) {
+        // VALIDATION
+
+        //name: not void
+        $this->form_validation->set_rules('name', 'Identifiant', 'required|callback_unique_groupname', 'Un nom de groupe unique doit être fourni');
+
+        if($this->form_validation->run() === TRUE)
+        {
+          foreach($_POST as $forminput => $formoutput) {
+              $groupArray[$forminput] = $formoutput;
+          }
+
+          $this->load->model('item_group_model');
+          $this->item_group_model->insert($groupArray);
+
+          redirect("/admin/view_item_groups/");
+          exit();
+        }
+	  }
+
+      $this->display_view("admin/item_groups/form");
+    }
+
+    public function unique_groupname($argName) {
+      $this->load->model('item_group_model');
+
+      // Get this group. If it fails, it doesn't exist, so the username is unique!
+      $group = $this->item_group_model->get_by('name', $argName);
+      
+      if(isset($group->item_group_id)) {
+        $this->form_validation->set_message('unique_groupname', 'Cet nom est déjà utilisé');
+        return FALSE;
+      } else {
+        return TRUE;
+      }
+    }
+	
+	
 }
