@@ -393,6 +393,21 @@ class Admin extends MY_Controller
     public function modify_supplier($id = NULL)
     {
       $this->load->model('supplier_model');
+
+      if (!empty($_POST)) {
+        $this->form_validation->set_rules('name', 'Nom', 'required', 'Le fournisseur doit avoir un nom');
+
+        if ($this->form_validation->run() === TRUE)
+        {
+          $this->supplier_model->update($id, $_POST);
+
+          redirect("/admin/view_suppliers/");
+          exit();
+        }
+      } else {
+        $output = get_object_vars($this->supplier_model->get($id));
+      }
+
       $output["suppliers"] = $this->supplier_model->get_all();
 
       $this->display_view("admin/suppliers/form", $output);
@@ -404,9 +419,20 @@ class Admin extends MY_Controller
     public function new_supplier()
     {
       $this->load->model('supplier_model');
-      $output["suppliers"] = $this->supplier_model->get_all();
 
-      $this->display_view("admin/suppliers/form", $output);
+      if (!empty($_POST)) {
+        $this->form_validation->set_rules('name', 'Nom', 'required', 'Le fournisseur doit avoir un nom');
+
+        if ($this->form_validation->run() === TRUE)
+        {
+          $this->supplier_model->insert($_POST);
+
+          redirect("/admin/view_suppliers/");
+          exit();
+        }
+      }
+
+      $this->display_view("admin/suppliers/form");
     }
 
     /**
@@ -426,7 +452,7 @@ class Admin extends MY_Controller
         $this->supplier_model->delete($id);
         
         // redirect the user to the updated table
-        redirect("/admin/view_stocking_places/");
+        redirect("/admin/view_suppliers/");
       }
     }
 
@@ -465,6 +491,23 @@ class Admin extends MY_Controller
       $output["item_groups"] = $this->item_group_model->get_all();
 
       $this->display_view("admin/item_groups/form", $output);
+
+      $this->load->model('item_group_model');
+
+      if (!empty($_POST)) {
+        $this->form_validation->set_rules('short', 'Nom court', 'required', 'Le lieu de stockage doit avoir un nom court');
+        $this->form_validation->set_rules('name', 'Nom long', 'required', 'Le lieu de stockage doit avoir un nom long');
+
+        if ($this->form_validation->run() === TRUE)
+        {
+          $this->item_group_model->insert($_POST);
+
+          redirect("/admin/view_item_groups/");
+          exit();
+        }
+      }
+
+      $this->display_view("admin/item_groups/form");
     }
 
     /**

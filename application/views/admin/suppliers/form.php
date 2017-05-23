@@ -23,13 +23,13 @@ if($update) { ?>
     ?><a class="line-through" href="<?php echo base_url(); ?>admin/view_users"><span class="action">Ajout</span>, </a>
   <select onchange="changeNew()" <?php
     } ?>
-   id="regions" style="border:none;width:317px;"><!--<h1 style="text-align: center"><select id="regions" style="border:none;width:103px;" onchange="changeRegion()">-->
-    <option value="stocking_place">Lieux de stockage</option>
-    <option value="tag">Tags</option>
-    <option value="user">Utilisateurs</option>
+   id="regions" style="border:none;width:232px;">
     <option value="supplier">Fournisseurs</option>
+    <option value="user">Utilisateurs</option>
+    <option value="tag">Tags</option>
+    <option value="stocking_place">Lieux de stockage</option>
     <option value="item_group">Groupes d'objets</option>
-</select><a class="like-normal" href="<?php echo base_url(); ?>admin/">, Administration</a></h1>
+  </select><a class="like-normal" href="<?php echo base_url(); ?>admin/">, Administration</a></h1>
 
   <em><?php echo validation_errors(); if (isset($upload_errors)) {echo $upload_errors;} ?></em>
 <div class="row">
@@ -48,7 +48,7 @@ if($update) { ?>
 </div><br />
 <div class="form-input">
   <label for="name">NPA:</label>
-  <input type="text" class="form-control" name="zip" id="zip" value="<?php if (isset($zip)) {echo $zip;} else {echo set_value('zip');} ?>" />
+  <input type="number" min="1000" class="form-control" name="zip" id="zip" value="<?php if (isset($zip)) {echo $zip;} else {echo set_value('zip');} ?>" />
 </div><br />
 <div class="form-input">
   <label for="name">Ville:</label>
