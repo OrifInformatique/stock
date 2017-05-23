@@ -20,7 +20,7 @@ if($update) { ?>
     <option value="new">Ajout</option>
   </select>, <select onchange="changeRegion()" <?php } 
   else { // This one is for Create 
-    ?><a class="line-through" href="<?php echo base_url(); ?>admin/view_users"><span class="action">Ajout</span>, </a>
+    ?><a class="line-through" href="<?php echo base_url(); ?>admin/view_suppliers"><span class="action">Ajout</span>, </a>
   <select onchange="changeNew()" <?php
     } ?>
    id="regions" style="border:none;width:232px;">

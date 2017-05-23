@@ -20,7 +20,7 @@ if(isset($item_groups)) { ?>
     <option value="new">Ajout</option>
   </select>, <select onchange="changeRegion()" <?php } 
   else { // This one is for Create 
-    ?><a class="line-through" href="<?php echo base_url(); ?>admin/view_users"><span class="action">Ajout</span>, </a>
+    ?><a class="line-through" href="<?php echo base_url(); ?>admin/view_item_groups"><span class="action">Ajout</span>, </a>
   <select onchange="changeNew()" <?php
     } ?>
    id="regions" style="border:none;width:297px;">
