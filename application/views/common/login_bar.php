@@ -13,7 +13,7 @@
         <?php
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?>
           <?php /* Admin part, for admins only (only they see, and are allowed) */
-        if ($_SESSION['user_access'] == 16) { ?><li><a href="<?php echo base_url("admin/"); ?>" ><?php echo $this->lang->line('btn_admin'); ?></a></li><?php /* End of the admin-only part */ } ?>
+        if ($_SESSION['user_access'] >= 8) { ?><li><a href="<?php echo base_url("admin/"); ?>" ><?php echo $this->lang->line('btn_admin'); ?></a></li><?php /* End of the admin-only part */ } ?>
           <li><a href="<?php echo base_url("auth/logout"); ?>" ><?php echo $this->lang->line('btn_logout'); ?></a></li>
         <?php } else { ?>
           <li><a href="<?php echo base_url("auth/login"); ?>" ><?php echo $this->lang->line('btn_login'); ?></a></li>
