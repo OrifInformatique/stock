@@ -477,6 +477,21 @@ class Admin extends MY_Controller
     public function modify_item_group($id = NULL)
     {
       $this->load->model('item_group_model');
+
+      if (!empty($_POST)) {
+        $this->form_validation->set_rules('name', 'Nom', 'required', 'Le groupe d\'objets doit avoir un nom');
+
+        if ($this->form_validation->run() === TRUE)
+        {
+          $this->item_group_model->update($id, $_POST);
+
+          redirect("/admin/view_item_groups/");
+          exit();
+        }
+      } else {
+        $output = get_object_vars($this->item_group_model->get($id));
+      }
+
       $output["item_groups"] = $this->item_group_model->get_all();
 
       $this->display_view("admin/item_groups/form", $output);
@@ -488,15 +503,9 @@ class Admin extends MY_Controller
     public function new_item_group()
     {
       $this->load->model('item_group_model');
-      $output["item_groups"] = $this->item_group_model->get_all();
-
-      $this->display_view("admin/item_groups/form", $output);
-
-      $this->load->model('item_group_model');
 
       if (!empty($_POST)) {
-        $this->form_validation->set_rules('short', 'Nom court', 'required', 'Le lieu de stockage doit avoir un nom court');
-        $this->form_validation->set_rules('name', 'Nom long', 'required', 'Le lieu de stockage doit avoir un nom long');
+        $this->form_validation->set_rules('name', 'Nom', 'required', 'Le groupe d\'objets doit avoir un nom');
 
         if ($this->form_validation->run() === TRUE)
         {

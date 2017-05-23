@@ -23,27 +23,23 @@ if(isset($item_groups)) { ?>
     ?><a class="line-through" href="<?php echo base_url(); ?>admin/view_users"><span class="action">Ajout</span>, </a>
   <select onchange="changeNew()" <?php
     } ?>
-   id="regions" style="border:none;width:317px;"><!--<h1 style="text-align: center"><select id="regions" style="border:none;width:103px;" onchange="changeRegion()">-->
-    <option value="stocking_place">Lieux de stockage</option>
-    <option value="tag">Tags</option>
-    <option value="user">Utilisateurs</option>
-    <option value="supplier">Fournisseurs</option>
+   id="regions" style="border:none;width:297px;">
     <option value="item_group">Groupes d'objets</option>
+    <option value="user">Utilisateurs</option>
+    <option value="tag">Tags</option>
+    <option value="stocking_place">Lieux de stockage</option>
+    <option value="supplier">Fournisseurs</option>
 </select><a class="like-normal" href="<?php echo base_url(); ?>admin/">, Administration</a></h1>
 
   <em><?php echo validation_errors(); if (isset($upload_errors)) {echo $upload_errors;} ?></em>
 <div class="row">
 <form class="container" method="post">
 <div class="form-input">
-  <label for="short">Nom court:</label>
-  <input type="text" class="form-control" name="short" id="short" value="<?php if (isset($short)) {echo $short;} else {echo set_value('short');} ?>" />
-</div>
-<div class="form-input">
-  <label for="name">Nom long:</label>
+  <label for="name">Nom:</label>
   <input type="text" class="form-control" name="name" id="name" value="<?php if (isset($name)) {echo $name;} else {echo set_value('name');} ?>" />
 </div><br />
     <button type="submit" class="btn btn-primary"><?php echo $this->lang->line('btn_submit'); ?></button>
-    <a class="btn btn-primary" href="<?php echo base_url() . "admin/view_stocking_places/"; ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
+    <a class="btn btn-primary" href="<?php echo base_url() . "admin/view_item_groups/"; ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
 </form>
 </div>
 </div>

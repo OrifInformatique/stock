@@ -63,7 +63,7 @@ if($update) { ?>
   <input type="text" class="form-control" name="email" id="email" value="<?php if (isset($email)) {echo $email;} else {echo set_value('email');} ?>" />
 </div><br />
     <button type="submit" class="btn btn-primary"><?php echo $this->lang->line('btn_submit'); ?></button>
-    <a class="btn btn-primary" href="<?php echo base_url() . "admin/view_stocking_places/"; ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
+    <a class="btn btn-primary" href="<?php echo base_url() . "admin/view_suppliers/"; ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
 </form>
 </div>
 </div>

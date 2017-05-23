@@ -7,12 +7,12 @@
     <option value="delete">Suppression</option>
     <option value="modify">Modification</option>
     <option value="new">Ajout</option>
-  </select>, <select onchange="changeRegion()" id="regions" style="border:none;width:317px;">
-    <option value="stocking_place">Lieux de stockage</option>
+  </select>, <select onchange="changeRegion()" id="regions" style="border:none;width:297px">
+    <option value="item_group">Groupes d'objets</option>
     <option value="user">Utilisateurs</option>
     <option value="tag">Tags</option>
+    <option value="stocking_place">Lieux de stockage</option>
     <option value="supplier">Fournisseurs</option>
-    <option value="item_group">Groupes d'objets</option>
   </select><a class="like-normal" href="<?php echo base_url(); ?>admin/">, <span class="word-administration">Administration</span></a></h1>
 
   <div><em>Voulez-vous vraiment supprimer le groupe d'objets <?php echo $name; ?> ?</em></div>
