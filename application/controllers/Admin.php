@@ -44,6 +44,10 @@ class Admin extends MY_Controller
       $this->display_view("admin/users/list", $output);
     }
 
+    /* *********************************************************************************************************
+    USERS
+    ********************************************************************************************************* */
+
     /**
     * Modify a user
     */
@@ -93,7 +97,6 @@ class Admin extends MY_Controller
 			  }
             }
           }
-
           
           $this->user_model->update($id, $userArray);
 
@@ -204,6 +207,10 @@ class Admin extends MY_Controller
       }
     }
 
+    /* *********************************************************************************************************
+    TAGS
+    ********************************************************************************************************* */
+
     /**
     * As the name says, view the tags.
     */
@@ -247,11 +254,8 @@ class Admin extends MY_Controller
 
         if($this->form_validation->run() === TRUE)
 		{
-          foreach($_POST as $forminput => $formoutput) {
-              $tagArray[$forminput] = $formoutput;
-          }
 		  
-		  $this->item_tag_model->update($id, $tagArray);
+		  $this->item_tag_model->update($id, $_POST);
 
         redirect("/admin/view_tags/");
         exit();
@@ -266,6 +270,7 @@ class Admin extends MY_Controller
       $output = get_object_vars($this->item_tag_model->get($id));
       $output["tags"] = $this->item_tag_model->get_all();	  
 	  
+
       $this->display_view("admin/tags/form", $output);
     }
 
@@ -282,12 +287,9 @@ class Admin extends MY_Controller
 
         if($this->form_validation->run() === TRUE)
         {
-          foreach($_POST as $forminput => $formoutput) {
-              $tagArray[$forminput] = $formoutput;
-          }
 
           $this->load->model('item_tag_model');
-          $this->item_tag_model->insert($tagArray);
+          $this->item_tag_model->insert($_POST);
 
           redirect("/admin/view_tags/");
           exit();
@@ -300,7 +302,7 @@ class Admin extends MY_Controller
     public function unique_tagname($argName) {
       $this->load->model('item_tag_model');
 
-      // Get this tag. If it fails, it doesn't exist, so the username is unique!
+      // Get this tag. If it fails, it doesn't exist, so the name is unique!
       $tag = $this->item_tag_model->get_by('name', $argName);
       
       if(isset($tag->item_tag_id)) {
@@ -311,6 +313,28 @@ class Admin extends MY_Controller
       }
     }
 	
+
+    /**
+    * Delete a tag. 
+    * If $action is NULL, a confirmation will be shown.
+    * If it is anything else, the user will be deleted. 
+    */
+    public function delete_tag($id = NULL, $action = NULL) {
+      $this->load->model('item_tag_model');
+      if (is_null($action)) {
+        $output = get_object_vars($this->item_tag_model->get($id));
+        $output["tags"] = $this->item_tag_model->get_all();
+        $this->display_view("admin/tags/delete", $output);
+      } else {
+        $this->item_tag_model->delete($id);
+        redirect("/admin/view_tags/");
+      }
+    }
+
+    /* *********************************************************************************************************
+    STOCKING PLACES
+    ********************************************************************************************************* */
+
     /**
     * As the name says, view the stocking places.
     */
@@ -339,35 +363,23 @@ class Admin extends MY_Controller
 
 
     /**
-    * Modify a stocking_place
+    * As the name says, modify a stocking place, which id is $id
     */
     public function modify_stocking_place($id = NULL)
     {
       $this->load->model('stocking_place_model');
 
       if (!empty($_POST)) {
-        // VALIDATION
+        $this->form_validation->set_rules('short', 'Nom court', 'required', 'Le lieu de stockage doit avoir un nom court');
+        $this->form_validation->set_rules('name', 'Nom long', 'required', 'Le lieu de stockage doit avoir un nom long');
 
-        //name: if changed,
-        if ($_POST['name'] != get_object_vars($this->stocking_place_model->get($id))['name']) {
-          $this->form_validation->set_rules('name', 'Identifiant', 'required|callback_unique_stocking_place', 'Un nom de tag doit être fourni'); // not void
+        if ($this->form_validation->run() === TRUE)
+        {
+          $this->stocking_place_model->update($id, $_POST);
+
+          redirect("/admin/view_stocking_places/");
+          exit();
         }
-		
-		$this->form_validation->set_rules('short', 'court', 'required', 'Un nom court d emplacement doit être fourni');
-
-        if($this->form_validation->run() === TRUE)
-		{
-          foreach($_POST as $forminput => $formoutput) {
-              $spArray[$forminput] = $formoutput;
-          }
-		  
-		  $this->stocking_place_model->update($id, $spArray);
-
-        redirect("/admin/view_stocking_places/");
-        exit();
-      }
-	  
-      // The values of the tag are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
       } else {
         $output = get_object_vars($this->stocking_place_model->get($id));
       }
@@ -376,6 +388,8 @@ class Admin extends MY_Controller
       $output = get_object_vars($this->stocking_place_model->get($id));
       $output["stocking_places"] = $this->stocking_place_model->get_all();	  
 	  
+      $output["stocking_places"] = $this->stocking_place_model->get_all();
+
       $this->display_view("admin/stocking_places/form", $output);
     }
 
@@ -388,26 +402,22 @@ class Admin extends MY_Controller
         // VALIDATION
 
         //name: not void
-        $this->form_validation->set_rules('name', 'Identifiant', 'required|callback_unique_stocking_place', 'Un nom d emplacement unique doit être fourni');
-		$this->form_validation->set_rules('short', 'court', 'required', 'Un nom court d emplacement doit être fourni');
+        $this->form_validation->set_rules('name', 'Identifiant', 'required|callback_unique_stocking_place', 'Un nom d\'emplacement unique doit être fourni');
+		$this->form_validation->set_rules('short', 'court', 'required', 'Un nom court d\'emplacement doit être fourni');
 
-        if($this->form_validation->run() === TRUE)
+
+        if ($this->form_validation->run() === TRUE)
         {
-          foreach($_POST as $forminput => $formoutput) {
-              $spArray[$forminput] = $formoutput;
-          }
-
-          $this->load->model('stocking_place_model');
-          $this->stocking_place_model->insert($spArray);
+          $this->stocking_place_model->insert($_POST);
 
           redirect("/admin/view_stocking_places/");
           exit();
         }
-	  }
+      }
 
       $this->display_view("admin/stocking_places/form");
     }
-
+          
     public function unique_stocking_place($argName) {
       $this->load->model('stocking_place_model');
 
@@ -422,7 +432,29 @@ class Admin extends MY_Controller
       }
     }
 	
-	
+    /**
+    * Delete the stocking place $id. If $action is null, a confirmation will be shown
+    */
+    public function delete_stocking_place($id = NULL, $action = NULL)
+    {
+      $this->load->model('stocking_place_model');
+
+      if (is_null($action)) {
+        $output["stocking_places"] = $this->stocking_place_model->get_all();
+        $output = get_object_vars($this->stocking_place_model->get($id));
+
+        $this->display_view("admin/stocking_places/delete", $output);
+      } else {
+        $this->stocking_place_model->delete($id);
+        redirect("/admin/view_stocking_places/");
+      }
+
+    }
+
+    /* *********************************************************************************************************
+    SUPPLIERS
+    ********************************************************************************************************* */
+          
     /**
     * As the name says, view the suppliers.
     */
@@ -465,34 +497,19 @@ class Admin extends MY_Controller
         if (isset($_POST['email'])) {
           // or valid.
           $this->form_validation->set_rules('email', 'Mail', 'valid_email', 'Entrez une adresse email valide ou aucune.');
-        }		
-		
-        if($this->form_validation->run() === TRUE)
-		{
-          foreach($_POST as $forminput => $formoutput) {
-            if ($forminput != "email") {
-				$spArray[$forminput] = $formoutput;
-            } else {
-              if ($formoutput != "") {
-				  echo $formoutput;
-				  $spArray["email"] = $formoutput;
-              } else {
-				  $spArray["email"] = "";
-			  }
-			}
-		  }
-		  
-		  $this->supplier_model->update($id, $spArray);
+        }
 
-        redirect("/admin/view_suppliers/");
-        exit();
-      }
-	  
-      // The values of the tag are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
+        if ($this->form_validation->run() === TRUE)
+        {
+          $this->supplier_model->update($id, $_POST);
+
+          redirect("/admin/view_suppliers/");
+          exit();
+        }
       } else {
         $output = get_object_vars($this->supplier_model->get($id));
       }
-
+      
       $this->load->model('supplier_model');
       $output = get_object_vars($this->supplier_model->get($id));
       $output["suppliers"] = $this->supplier_model->get_all();	  
@@ -515,33 +532,45 @@ class Admin extends MY_Controller
         if (isset($_POST['email'])) {
           // or valid
           $this->form_validation->set_rules('email', 'Mail', 'valid_email', 'Entrez une adresse email valide ou aucune.');
-        }		
-		
-        if($this->form_validation->run() === TRUE)
-        {
-          foreach($_POST as $forminput => $formoutput) {
-            if ($forminput != "email") {
-				$spArray[$forminput] = $formoutput;
-            } else {
-              if ($formoutput != "") {
-				  $spArray["email"] = $formoutput;
-			  }
-			}
-		  }
+        }
 
-          $this->load->model('supplier_model');
-          $this->supplier_model->insert($spArray);
+        if ($this->form_validation->run() === TRUE)
+        {
+          $this->supplier_model->insert($_POST);
 
           redirect("/admin/view_suppliers/");
           exit();
         }
-	  }
+      }
 
       $this->display_view("admin/suppliers/form");
     }
 
+    /**
+    * As the name says, view the suppliers.
+    */
+    public function delete_supplier($id = NULL, $action = NULL)
+    {
+      $this->load->model('supplier_model');
 
-	
+      if (!isset($action)) {
+        $output = get_object_vars($this->supplier_model->get($id));
+        $output["suppliers"] = $this->supplier_model->get_all();
+
+        $this->display_view("admin/suppliers/delete", $output);
+      } else {
+        // delete it!
+        $this->supplier_model->delete($id);
+        
+        // redirect the user to the updated table
+        redirect("/admin/view_suppliers/");
+      }
+    }
+
+    /* *********************************************************************************************************
+    ITEM GROUPS
+    ********************************************************************************************************* */
+
     /**
     * As the name says, view the item groups.
     */
@@ -554,21 +583,6 @@ class Admin extends MY_Controller
     }
 
     /**
-    * Delete an unused item group
-    */
-    public function delete_item_group($id = NULL, $action = NULL) {		
-      $this->load->model('item_group_model');
-      if (is_null($action)) {
-        $output = get_object_vars($this->item_group_model->get($id));
-        $output["groups"] = $this->item_group_model->get_all();
-        $this->display_view("admin/item_groups/delete", $output);
-      } else {
-        $this->item_group_model->delete($id);
-        redirect("/admin/view_item_groups/");
-      }
-    }
-
-    /**
     * Modify a group
     */
     public function modify_item_group($id = NULL)
@@ -576,34 +590,20 @@ class Admin extends MY_Controller
       $this->load->model('item_group_model');
 
       if (!empty($_POST)) {
-        // VALIDATION
+        $this->form_validation->set_rules('name', 'Nom', 'required', 'Le groupe d\'objets doit avoir un nom');
 
-        //name: if changed,
-        if ($_POST['name'] != get_object_vars($this->item_group_model->get($id))['name']) {
-          $this->form_validation->set_rules('name', 'Identifiant', 'required|callback_unique_groupname', 'Un nom de groupe doit être fourni'); // not void
+        if ($this->form_validation->run() === TRUE)
+        {
+          $this->item_group_model->update($id, $_POST);
+
+          redirect("/admin/view_item_groups/");
+          exit();
         }
-
-        if($this->form_validation->run() === TRUE)
-		{
-          foreach($_POST as $forminput => $formoutput) {
-              $groupArray[$forminput] = $formoutput;
-          }
-		  
-		  $this->item_group_model->update($id, $groupArray);
-
-        redirect("/admin/view_item_groups/");
-        exit();
-      }
-	  
-      // The values of the group are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
       } else {
         $output = get_object_vars($this->item_group_model->get($id));
       }
+      $output["item_groups"] = $this->item_group_model->get_all();
 
-      $this->load->model('item_group_model');
-      $output = get_object_vars($this->item_group_model->get($id));
-      $output["groups"] = $this->item_group_model->get_all();	  
-	  
       $this->display_view("admin/item_groups/form", $output);
     }
 
@@ -612,28 +612,23 @@ class Admin extends MY_Controller
     */
     public function new_item_group()
     {
-      if (!empty($_POST)) {
-        // VALIDATION
+      $this->load->model('item_group_model');
 
-        //name: not void
+      if (!empty($_POST)) {
         $this->form_validation->set_rules('name', 'Identifiant', 'required|callback_unique_groupname', 'Un nom de groupe unique doit être fourni');
 
-        if($this->form_validation->run() === TRUE)
+        if ($this->form_validation->run() === TRUE)
         {
-          foreach($_POST as $forminput => $formoutput) {
-              $groupArray[$forminput] = $formoutput;
-          }
-
-          $this->load->model('item_group_model');
-          $this->item_group_model->insert($groupArray);
+          $this->item_group_model->insert($_POST);
 
           redirect("/admin/view_item_groups/");
           exit();
         }
-	  }
+      }
 
       $this->display_view("admin/item_groups/form");
     }
+
 
     public function unique_groupname($argName) {
       $this->load->model('item_group_model');
@@ -649,5 +644,24 @@ class Admin extends MY_Controller
       }
     }
 	
-	
+    /**
+    * Delete an unused item group
+    */
+    public function delete_item_group($id = NULL, $action = NULL)
+    {
+      $this->load->model('item_group_model');
+
+      if (!isset($action)) {
+        $output = get_object_vars($this->item_group_model->get($id));
+        $output["item_groups"] = $this->item_group_model->get_all();
+
+        $this->display_view("admin/item_groups/delete", $output);
+      } else {
+        // delete it!
+        $this->item_group_model->delete($id);
+        
+        // redirect the user to the updated table
+        redirect("/admin/view_item_groups/");
+      }
+    }
 }
