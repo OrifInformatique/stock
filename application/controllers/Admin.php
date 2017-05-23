@@ -223,21 +223,6 @@ class Admin extends MY_Controller
     }
 
     /**
-    * Delete an unused tag
-    */
-    public function delete_tag($id = NULL, $action = NULL) {		
-      $this->load->model('item_tag_model');
-      if (is_null($action)) {
-        $output = get_object_vars($this->item_tag_model->get($id));
-        $output["tags"] = $this->item_tag_model->get_all();
-        $this->display_view("admin/tags/delete", $output);
-      } else {
-        $this->item_tag_model->delete($id);
-        redirect("/admin/view_tags/");
-      }
-    }
-
-    /**
     * Modify a tag
     */
     public function modify_tag($id = NULL)
@@ -347,22 +332,6 @@ class Admin extends MY_Controller
     }
 
     /**
-    * Delete an unused stocking_place
-    */
-    public function delete_stocking_place($id = NULL, $action = NULL) {		
-      $this->load->model('stocking_place_model');
-      if (is_null($action)) {
-        $output = get_object_vars($this->stocking_place_model->get($id));
-        $output["stocking_places"] = $this->stocking_place_model->get_all();
-        $this->display_view("admin/stocking_places/delete", $output);
-      } else {
-        $this->stocking_place_model->delete($id);
-        redirect("/admin/view_stocking_places/");
-      }
-    }
-
-
-    /**
     * As the name says, modify a stocking place, which id is $id
     */
     public function modify_stocking_place($id = NULL)
@@ -467,21 +436,6 @@ class Admin extends MY_Controller
     }
 
     /**
-    * Delete an unused supplier
-    */
-    public function delete_supplier($id = NULL, $action = NULL) {		
-      $this->load->model('supplier_model');
-      if (is_null($action)) {
-        $output = get_object_vars($this->supplier_model->get($id));
-        $output["suppliers"] = $this->supplier_model->get_all();
-        $this->display_view("admin/suppliers/delete", $output);
-      } else {
-        $this->supplier_model->delete($id);
-        redirect("/admin/view_suppliers/");
-      }
-    }
-
-    /**
     * Modify a supplier
     */
     public function modify_supplier($id = NULL)
@@ -522,6 +476,8 @@ class Admin extends MY_Controller
     */
     public function new_supplier()
     {
+      $this->load->model('supplier_model');
+
       if (!empty($_POST)) {
         // VALIDATION
 
@@ -547,7 +503,7 @@ class Admin extends MY_Controller
     }
 
     /**
-    * As the name says, view the suppliers.
+    * Delete a supplier
     */
     public function delete_supplier($id = NULL, $action = NULL)
     {
