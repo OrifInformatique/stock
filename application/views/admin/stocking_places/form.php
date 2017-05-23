@@ -23,12 +23,13 @@ if(isset($stocking_places)) { ?>
     ?><a class="line-through" href="<?php echo base_url(); ?>admin/view_stocking_places"><span class="action">Ajout</span>, </a>
   <select onchange="changeNew()" <?php
     } ?>
-   id="regions" style="border:none;width:317px;"><!--<h1 style="text-align: center"><select id="regions" style="border:none;width:103px;" onchange="changeRegion()">-->
+   id="regions" style="border:none;width:317px;">
     <option value="stocking_place">Lieux de stockage</option>
     <option value="tag">Tags</option>
     <option value="user">Utilisateurs</option>
     <option value="supplier">Fournisseurs</option>
     <option value="item_group">Groupes d'objets</option>
+
 </select><a class="like-normal" href="<?php echo base_url(); ?>admin/">, Administration</a></h1>
 
   <em><?php echo validation_errors(); if (isset($upload_errors)) {echo $upload_errors;} ?></em>

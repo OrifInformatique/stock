@@ -89,13 +89,13 @@ class Item extends MY_Controller {
           $where2 = "";
 
           if (isset($where['t']))
-          {
+          {  
             $this->load->model('item_tag_link_model');
 
             $temp = $this->item_tag_link_model->get_many_by($where['t']);
-
+			
             // Set the WHERE clause
-            $where2 .= "(";
+            //$where2 .= "(";
 
             // Add all the tags wanted to it
             foreach ($temp as $num)
@@ -104,10 +104,9 @@ class Item extends MY_Controller {
             }
 
             // Delete the initial OR
-            $where2 = substr($where2, 4);
-
+            $where2 = "(".substr($where2, 3);
             $where2 .= ")";
-          }
+		  }
 
           if (isset($where['c']))
           {
@@ -138,10 +137,15 @@ class Item extends MY_Controller {
 
             $where2 .= "(" . $where['s'] . ")";
           }
-
+		  
+		  // Aucun item pour les tags sélectionnés
+		  if (substr($where2,0,2) == "()") {
+			  $where2="(1=2".substr($where2,1);
+		  }
+		  
           $output["items"] = $this->item_model->with('created_by_user')->get_many_by($where2);
         }
-
+		
         $this->display_view('item/list', $output);
     }
 
@@ -183,6 +187,9 @@ class Item extends MY_Controller {
       $this->form_validation->set_rules("name", "Nom de l'item", 'required',
       array('required' => "L'item doit avoir un nom"));
 
+      $this->form_validation->set_rules("inventory_number", "N° d'inventaire", 'required|callback_unique_inventory_nb',
+      array('required' => "L'item doit avoir un numero d'inventaire"));
+	  
       // Get the ID that the new item will receive if it is created now
       $data['item_id'] = $this->item_model->get_future_id();
 
@@ -343,7 +350,16 @@ class Item extends MY_Controller {
 
         if ($this->form_validation->run() === TRUE) {
           //Declarations
-          $loanArray = $_POST;
+		  
+		  $loanArray = $_POST;
+		  
+		  if ($loanArray["planned_return_date"] == 0 || $loanArray["planned_return_date"] == "0000-00-00" || $loanArray["planned_return_date"] == "") {
+			$loanArray["planned_return_date"] = NULL;
+		  }
+		  
+		  if ($loanArray["real_return_date"] == 0 || $loanArray["real_return_date"] == "0000-00-00" || $loanArray["real_return_date"] == "") {
+			$loanArray["real_return_date"] = NULL;
+		  }
 
           // Execute the changes in the item table
           $this->loan_model->update($id, $loanArray);
@@ -433,6 +449,12 @@ class Item extends MY_Controller {
         $this->form_validation->set_rules("name", "Nom de l'item", 'required',
         array('required' => "L'item doit avoir un nom"));
 
+		//username: if changed,
+        if ($_POST['inventory_number'] != get_object_vars($this->item_model->get($id))['inventory_number']) {
+			$this->form_validation->set_rules("inventory_number", "N° d'inventaire", 'callback_unique_inventory_nb|required',
+			array('required' => "L'item doit avoir un numero d'inventaire"));
+		}
+		
         if ($this->form_validation->run() === TRUE) {
           //Declarations
           $itemArray = array();
@@ -491,6 +513,7 @@ class Item extends MY_Controller {
       }
 
       $data['modify'] = true;
+	  $data['item_id'] = $id;
 
       $this->display_view('item/form', $data);
     // Update is not allowed for the non-connected users, which are sent to the connection page
@@ -556,4 +579,19 @@ class Item extends MY_Controller {
     exit();
   }
 	}
+	
+	public function unique_inventory_nb($argNb) {
+      $this->load->model('item_model');
+	  
+      // Get this item. If it fails, it doesn't exist, so the inventory_number is unique!
+      $item = $this->item_model->get_by('inventory_number', $argNb);
+      
+      if(isset($item->item_id)) {
+        $this->form_validation->set_message('unique_inventory_nb', 'Ce numero d inventaire est déjà utilisé');
+        return FALSE;
+      } else {
+        return TRUE;
+      }
+    }
+
 }

@@ -75,11 +75,13 @@ class Item_model extends MY_Model
     * If no image is set, use "no_image.png"
     */
     protected function get_image($item)
-    {
-        if (is_null($item->image))
-        {
-            $item->image = 'no_image.png';
-        }
+    {		
+        if (!is_null($item)) {
+			if (is_null($item->image))
+			{
+				$item->image = 'no_image.png';
+			}
+		}
 
         return $item;
     }
@@ -97,35 +99,37 @@ class Item_model extends MY_Model
     */
     protected function get_warranty_status($item)
     {
-        if (empty($item->buying_date) || empty($item->warranty_duration))
-        {
-            $item->warranty_status = 0;
-        }
-        else
-        {
-            $buying_date = new DateTime($item->buying_date);
-            $current_date = new DateTime("now");
+        if (!is_null($item)) {
+			if (empty($item->buying_date) || empty($item->warranty_duration))
+			{
+				$item->warranty_status = 0;
+			}
+			else
+			{
+				$buying_date = new DateTime($item->buying_date);
+				$current_date = new DateTime("now");
 
-            $time_spent = $buying_date->diff($current_date);
-            $months_spent = ($time_spent->y * 12) + $time_spent->m;
+				$time_spent = $buying_date->diff($current_date);
+				$months_spent = ($time_spent->y * 12) + $time_spent->m;
 
-            $warranty_left = $item->warranty_duration - $months_spent;
+				$warranty_left = $item->warranty_duration - $months_spent;
 
-            if ($warranty_left > 3)
-            {
-                // UNDER WARRANTY
-                $item->warranty_status = 1;
-            }
-            elseif ($warranty_left > 0)
-            {
-                // WARRANTY EXPIRES SOON
-                $item->warranty_status = 2;
-            }
-            else
-            {
-                // WARRANTY EXPIRED
-                $item->warranty_status = 3;
-            }
+				if ($warranty_left > 3)
+				{
+					// UNDER WARRANTY
+					$item->warranty_status = 1;
+				}
+				elseif ($warranty_left > 0)
+				{
+					// WARRANTY EXPIRES SOON
+					$item->warranty_status = 2;
+				}
+				else
+				{
+					// WARRANTY EXPIRED
+					$item->warranty_status = 3;
+				}
+			}
         }
 
         return $item;
@@ -138,14 +142,16 @@ class Item_model extends MY_Model
     */
     protected function get_current_loan($item)
     {
-        $this->load->model('loan_model');
-        $this->load->helper('date');
+        if (!is_null($item)) {
+			$this->load->model('loan_model');
+			$this->load->helper('date');
 
-        $where = "item_id=".$item->item_id." AND ".
-                 "date<='".mysqlDate('now')."' AND ".
-                 "real_return_date IS NULL";
+			$where = "item_id=".$item->item_id." AND ".
+					"date<='".mysqlDate('now')."' AND ".
+					"real_return_date IS NULL";
 
-        $item->current_loan = $this->loan_model->get_by($where);
+			$item->current_loan = $this->loan_model->get_by($where);
+		}
 
         return $item;
     }
@@ -157,24 +163,26 @@ class Item_model extends MY_Model
     */
     protected function get_tags($item)
     {
-        $this->load->model('item_tag_link_model');
+		if (!is_null($item)) {
+			$this->load->model('item_tag_link_model');
 
-        $tag_links = $this->item_tag_link_model->with('item_tag')
+			$tag_links = $this->item_tag_link_model->with('item_tag')
                                                ->get_many_by('item_id', $item->item_id);
 
-        if (!empty($tag_links))
-        {
-            foreach ($tag_links as $tag_link)
-            {
-                $tags_array[$tag_link->item_tag->item_tag_id] = $tag_link->item_tag->name;
-            }
+			if (!empty($tag_links))
+			{
+				foreach ($tag_links as $tag_link)
+				{
+					$tags_array[$tag_link->item_tag->item_tag_id] = $tag_link->item_tag->name;
+				}
 
-            $item->tags = $tags_array;
-        }
-        else
-        {
-            $item->tags = NULL;
-        }
+				$item->tags = $tags_array;
+			}
+			else
+			{
+				$item->tags = NULL;
+			}
+		}
 
         return $item;
     }

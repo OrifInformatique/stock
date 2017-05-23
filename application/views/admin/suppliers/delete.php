@@ -7,6 +7,7 @@
     <option value="delete">Suppression</option>
     <option value="modify">Modification</option>
     <option value="new">Ajout</option>
+
   </select>, <select onchange="changeRegion()" id="regions" style="border:none;width:232px;">
     <option value="supplier">Fournisseurs</option>
     <option value="user">Utilisateurs</option>

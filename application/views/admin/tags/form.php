@@ -29,6 +29,7 @@ if($update_tag) { ?>
     <option value="stocking_place">Lieux de stockage</option>
     <option value="supplier">Fournisseurs</option>
     <option value="item_group">Groupes d'objets</option>
+
 </select><a class="like-normal" href="<?php echo base_url(); ?>admin/">, Administration</a></h1>
 
   <em><?php echo validation_errors(); if (isset($upload_errors)) {echo $upload_errors;} ?></em>
