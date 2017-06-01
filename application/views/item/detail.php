@@ -1,6 +1,16 @@
 <div class="container">
+    <!-- BUTTONS -->
+	<em>
+		<a href="<?php echo base_url(); ?>" class="btn" role="button"><?php echo $this->lang->line('btn_back_to_main'); ?></a>
+		<?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?>
+		<a href="<?php echo base_url('item/modify/'.$item->item_id); ?>" class="btn" role="button"><?php echo $this->lang->line('btn_modify_item'); ?></a>
+		<a href="<?php echo base_url('item/delete/'.$item->item_id); ?>" class="btn" role="button"><?php echo $this->lang->line('btn_delete_item'); ?></a>
+		<?php } ?>
+	</em>
+
     <!-- ITEM NAME AND DESCRIPTION -->
-    <div class="row">
+    <a style="color:inherit;" href="<?php echo base_url('item/view') . '/' .  $item->item_id; ?>">
+	<div class="row">
         <div class="col-md-4"><h3><?php echo $item->inventory_number; ?></h3></div>
         <div class="col-md-7"><h3><?php echo $item->name; ?></h3></div>
         <div class="col-md-1"><h6 class="text-right">ID <?php echo $item->item_id; ?></h6></div>
@@ -8,8 +18,9 @@
     <div class="row">
         <div class="col-md-12"><p><?php echo $item->description; ?></p></div>
     </div>
+	</a>
 
-    <!-- ITEM DETAILS -->
+	<!-- ITEM DETAILS -->
     <div class="row">
         <div class="col-md-12">
             <p class="bg-primary">&nbsp;<?php echo $this->lang->line('text_item_detail'); ?></p>
@@ -61,14 +72,13 @@
             <?php //CHANGE LABEL COLOR BASED ON ITEM CONDITION
             if(!is_null($item->item_condition))
             {
-                if ($item->item_condition_id == 10) {
-                    echo '<span class="label label-success" >';} // ITEM AVAILABLE
-                elseif ($item->item_condition_id == 20) {
-                    echo '<span class="label label-warning" >';} // ITEM LOANED
+								/* Here there is work to do */
+								if ($item->item_condition_id == 10) {
+									echo '<span class="label label-success">';} // ITEM WORKS
                 elseif ($item->item_condition_id == 30) {
-                    echo '<span class="label label-warning" >';} // ITEM DEFECTIVE
+                    echo '<span class="label label-warning">';} // ITEM DEFECTIVE
                 elseif ($item->item_condition_id == 40) {
-                    echo '<span class="label label-danger" >';}  // NO MORE ITEM
+                    echo '<span class="label label-danger">';}  // NO MORE ITEM
                 else {echo '<div>';}
 
                 echo $item->item_condition->name.'</span><br />';
@@ -78,22 +88,24 @@
             <?php if(!is_null($item->stocking_place)){echo $item->stocking_place->name;} ?>
         </div>
         <div class="col-md-4">
-            <label><?php echo $this->lang->line('field_current_loan'); ?> :&nbsp;</label>
-            <?php if(!is_null($item->current_loan)){echo $item->current_loan->item_localisation;} ?><br />
+						<?php if (is_null($item->current_loan)) { ?>
+							<span class="label label-success">Pas de prêt en cours</span>
+            <?php } else { ?>
+							<span class="label label-warning">En prêt</span><br />
+						<label><?php echo $this->lang->line('field_current_loan'); ?> :&nbsp;</label>
+            <?php echo $item->current_loan->item_localisation; ?><br />
 
             <label><?php echo $this->lang->line('field_loan_date'); ?> :&nbsp;</label>
             <?php
-            if(!is_null($item->current_loan)) {
                 if(!empty($item->current_loan->date))
                 {
                     echo nice_date($item->current_loan->date, $this->lang->line('date_format_short'));
                 }
-            }
             ?>
             <br />
 
             <label><?php echo $this->lang->line('field_loan_planned_return'); ?> :&nbsp;</label>
-            <?php 
+            <?php
             if(!is_null($item->current_loan))
             {
                 if(!empty($item->current_loan->planned_return_date))
@@ -102,10 +114,10 @@
                 }
             }
             ?>
-            <br />
+						<?php } ?>
         </div>
         <div class="col-md-3">
-            
+
             <!-- Button to display loans history -->
             <?php
             echo '<a href="'.base_url('/item/loans/'.$item->item_id).'" '.
@@ -113,6 +125,15 @@
                     .$this->lang->line('btn_loans_history').
                  '</a>';
             ?>
+<?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?>
+						<!-- Button to create new loan -->
+						<?php
+            echo '<a href="'.base_url('/item/create-loan/'.$item->item_id).'" '.
+                    'class="btn btn-default"  role="button" >'
+                    .$this->lang->line('btn_create_loan').
+                 '</a>';
+            } ?>
+
         </div>
     </div>
 
@@ -143,7 +164,7 @@
             <label><?php echo $this->lang->line('field_warranty_duration'); ?> :&nbsp;</label>
             <?php if (!empty($item->warranty_duration)) {
                       echo $item->warranty_duration.' '.$this->lang->line('text_months');} ?><br />
-            
+
             <?php //CHANGE LABEL COLOR BASED ON WARRANTY STATUS
             if ($item->warranty_status == 1) {
                 echo '<span class="label label-success" >';} // UNDER WARRANTY

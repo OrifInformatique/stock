@@ -77,11 +77,8 @@ class Auth extends MY_Controller
             foreach ($_SESSION as $key => $value) {
                 unset($_SESSION[$key]);
             }
-
-            redirect('auth/login', 'refresh');
-        
-        } else {
-            redirect('/');
         }
+        
+        redirect('/');
     }
 }

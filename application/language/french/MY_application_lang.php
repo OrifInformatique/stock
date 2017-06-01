@@ -48,18 +48,42 @@ $lang['header_loan_real_return']        = 'Retour effectif';
 $lang['header_loan_localisation']       = 'Lieu du prêt';
 $lang['header_loan_by_user']            = 'Prêté par';
 $lang['header_loan_to_user']            = 'Prêté à';
+$lang['header_tags']                    = 'Tags :';
+$lang['header_conditions']              = 'Conditions :';
+$lang['header_groups']                  = 'Groupes :';
+$lang['header_stocking_places']         = 'Lieux de stockage :';
+
+$lang['header_username']                = 'Identifiant';
+$lang['header_lastname']                = 'Nom';
+$lang['header_firstname']               = 'Prénom';
+$lang['header_email']                   = 'E-mail';
+$lang['header_user_type']               = 'Statut';
+$lang['header_is_active']               = 'Activé';
 
 // Buttons
+$lang['btn_admin']                      = 'Administration';
 $lang['btn_cancel']                     = 'Annuler';
 $lang['btn_login']                      = 'Se connecter';
 $lang['btn_logout']                     = 'Se déconnecter';
 $lang['btn_signup']                     = 'S\'inscrire';
-$lang['btn_linked_doc']                 = 'Voir document...';
-$lang['btn_loans_history']              = 'Historique des prêts...';
+$lang['btn_back_to_main']               = 'Retour à l\'accueil';
+$lang['btn_back_to_object']             = 'Retour à l\'objet';
+$lang['btn_modify_item']                = 'Modifier';
+$lang['btn_delete_item']                = 'Supprimer';
+$lang['btn_linked_doc']                 = 'Voir document…';
+$lang['btn_loans_history']              = 'Historique des prêts…';
+$lang['btn_create_loan']                = 'Ajouter un prêt…';
+$lang['btn_submit']                     = 'Sauvegarder';
+$lang['btn_submit_filters']             = 'Activer les filtres';
+$lang['btn_toggle_filters']             = 'Voir/masquer les filtres';
+$lang['btn_all']                        = 'Tout';
+$lang['btn_none']                       = 'Rien';
 
 // Messages
 $lang['msg_err_invalid_password']       = 'L\'identifiant et le mot de passe ne sont pas valides';
 $lang['msg_err_access_denied']          = 'Accès refusé';
+$lang['msg_no_loan']                    = 'Aucun prêt à afficher';
+$lang['msg_no_item']                    = 'Aucun objet à afficher';
 
 // Other texts
 $lang['text_login']                     = 'Connexion';
@@ -69,6 +93,8 @@ $lang['text_warranty_status']           = [0 => '',
                                            2 => 'Echéance proche',
                                            3 => 'Garantie Expirée'];
 $lang['text_item_detail']               = 'Photo et détail';
+$lang['text_item_condition']            = 'Condition';
 $lang['text_item_loan_status']          = 'Disponibilité et prêts';
 $lang['text_item_buying_warranty']      = 'Achat et garantie';
 $lang['text_item_tags']                 = 'Tags';
+$lang['text_kinds_to_show']             = 'Afficher uniquement les…';

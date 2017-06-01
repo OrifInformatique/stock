@@ -36,7 +36,7 @@
                 <div class="form-group">
                     <div class="col-lg-12 col-sm-12 text-center">
                         <input id="btn_login" name="btn_login" type="submit" class="btn btn-default" value="<?php echo $this->lang->line('btn_login'); ?>" />
-                        <input id="btn_cancel" name="btn_cancel" type="reset" class="btn btn-default" value="<?php echo $this->lang->line('btn_cancel'); ?>" />
+                        <a id="btn_cancel" class="btn btn-default" href="<?php echo base_url(); ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
                     </div>
                 </div>
           </fieldset>

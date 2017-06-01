@@ -1,551 +1,623 @@
-<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
+/**
+ * Authentication System
+ *
+ * @author      Jeffrey Mostroso
+ * @author      Didier Viret
+ * @link        https://github.com/OrifInformatique/stock
+ * @copyright   Copyright (c) 2016, Orif <http://www.orif.ch>
+ */
+class Admin extends MY_Controller
+{
+    /* MY_Controller variables definition */
+    protected $access_level = "8";
 
-/* ********************************************************************************************
- * Admin : Controller to edit user tables and stock tables 
- * 
- * It uses Grocery CRUD to display tables.
- * 
- *********************************************************************************************/
+
+    /**
+    * Constructor
+    */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->load->library('form_validation');
+    }
+
+    /**
+    * Menu for admin privileges
+    */
+    public function index()
+    {
+      $this->display_view("admin/menu");
+    }
+
+    /**
+    * As the name says, view the users.
+    */
+    public function view_users()
+    {
+      $this->load->model('user_model');
+      $this->load->model('user_type_model');
+      $output["users"] = $this->user_model->with("user_type")
+                                          ->get_all();
+
+      $this->display_view("admin/users/list", $output);
+    }
+
+    /* *********************************************************************************************************
+    USERS
+    ********************************************************************************************************* */
+
+    /**
+    * Modify a user
+    */
+    public function modify_user($id = NULL)
+    {
+      $this->load->model('user_model');
+
+      if (!empty($_POST)) {
+        // VALIDATION
+
+        //username: if changed,
+        if ($_POST['username'] != get_object_vars($this->user_model->get($id))['username']) {
+          $this->form_validation->set_rules('username', 'Identifiant', 'required|callback_unique_username', 'Un identifiant unique doit être fourni'); // not void and unique.
+        }
+
+        //email: void
+        if (isset($_POST['email'])) {
+          // or valid.
+          $this->form_validation->set_rules('email', 'Mail', 'valid_email', 'Entrez une adresse email valide ou aucune.');
+        }
+
+        // If the password needs to be modified,
+        if (isset($_POST['pwd'])) {
+          // it needs to be long 6 chars or more and confirmed
+          $this->form_validation->set_rules('pwd', 'Mot de passe', 'min_length[6]', 'Le mot de passe doit faire au moins 6 caractères');
+          $this->form_validation->set_rules('pwdagain', 'Mot de passe', 'matches[pwd]', 'Le mot de passe a été mal confirmé');
+        }
+
+        if($this->form_validation->run() === TRUE)
+        {
+          $userArray["is_active"] = 0;
+
+          foreach($_POST as $forminput => $formoutput) {
+            // Password needs to be hashed first, so it's not the same thing as the other
+            if ($forminput != "pwd" && $forminput != "pwdagain" && $forminput != "is_active" && $forminput != "email") {
+              $userArray[$forminput] = $formoutput;
+            // Do the hash only once…
+            } else if ($forminput == "pwd" && $formoutput != "") {
+              $userArray["password"] = password_hash($formoutput, PASSWORD_DEFAULT);
+            } else if ($forminput == "is_active" && $formoutput == "TRUE") {
+              $userArray["is_active"] = 1;
+            } else if ($forminput == "email") {
+              if ($formoutput != "") {
+				  $userArray["email"] = $formoutput;
+              } else {
+				  $userArray["email"] = "";
+			  }
+            }
+          }
+          
+          $this->user_model->update($id, $userArray);
+
+          redirect("/admin/view_users/");
+          exit();
+        }
+      // The values of the user are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
+      } else {
+        $output = get_object_vars($this->user_model->get($id));
+      }
+
+      $this->load->model('user_model');
+      $this->load->model('user_type_model');
+      $output = get_object_vars($this->user_model->get($id));
+      $output["users"] = $this->user_model->get_all();
+      $output["user_types"] = $this->user_type_model->get_all();
+
+      $this->display_view("admin/users/form", $output);
+    }
+
+    public function unique_username($argUsername) {
+      $this->load->model('user_model');
+
+      // Get this user. If it fails, it doesn't exist, so the username is unique!
+      $user = $this->user_model->get_by('username', $argUsername);
+      
+      if(isset($user->user_id)) {
+        $this->form_validation->set_message('unique_username', 'Cet identifiant est déjà utilisé');
+        return FALSE;
+      } else {
+        return TRUE;
+      }
+    }
+
+    /**
+    * Create a new user
+    */
+    public function new_user()
+    {
+      if (!empty($_POST)) {
+        // VALIDATION
+
+        //username: not void, unique
+        $this->form_validation->set_rules('username', 'Identifiant', 'required|callback_unique_username', 'Un identifiant unique doit être fourni');
+
+        //email: void
+        if (isset($_POST['email'])) {
+          // or valid
+          $this->form_validation->set_rules('email', 'Mail', 'valid_email', 'Entrez une adresse email valide ou aucune.');
+        }
+
+        //Password: 6 chars or more, confirmed
+        $this->form_validation->set_rules('pwd', 'Mot de passe', 'required|min_length[6]', 'Le mot de passe doit faire au moins 6 caractères');
+        $this->form_validation->set_rules('pwdagain', 'Mot de passe', 'matches[pwd]', 'Le mot de passe a été mal confirmé');
+
+        if($this->form_validation->run() === TRUE)
+        {
+          $userArray["is_active"] = 0;
+
+          foreach($_POST as $forminput => $formoutput) {
+            // Password needs to be hashed first, so it's not the same thing as the other
+            if ($forminput != "pwd" && $forminput != "pwdagain" && $forminput != "is_active" && $forminput != "email") {
+              $userArray[$forminput] = $formoutput;
+            // Do the hash only once…
+            } else if ($forminput == "pwd" && $formoutput != "") {
+              $userArray["password"] = password_hash($formoutput, PASSWORD_DEFAULT);
+            } else if ($forminput == "is_active" && $formoutput == "TRUE") {
+              $userArray["is_active"] = 1;
+            } else if ($forminput == "email") {
+              if ($formoutput != "") {
+                $userArray["email"] = $formoutput;
+              }
+            }
+          }
+
+          $this->load->model('user_model');
+          $this->user_model->insert($userArray);
+
+          redirect("/admin/view_users/");
+          exit();
+        }
+      }
+
+      $this->load->model('user_type_model');
+      $output["user_types"] = $this->user_type_model->get_all();
+
+      $this->display_view("admin/users/form", $output);
+    }
+
+    /**
+    * Delete a user. 
+    * If $action is NULL, a confirmation will be shown.
+    * If it is "d", is_active will be set to 0.
+    * If it is anything else, the user will be deleted. 
+    */
+    public function delete_user($id = NULL, $action = NULL) {
+      $this->load->model('user_model');
+      if (is_null($action)) {
+        $output = get_object_vars($this->user_model->get($id));
+        $output["users"] = $this->user_model->get_all();
+        $this->display_view("admin/users/delete", $output);
+      } else if($action == "d") {
+        $this->user_model->update($id, array('is_active' => 0));
+        redirect("/admin/view_users/");
+      } else {
+        $this->user_model->delete($id);
+        redirect("/admin/view_users/");
+      }
+    }
+
+    /* *********************************************************************************************************
+    TAGS
+    ********************************************************************************************************* */
+
+    /**
+    * As the name says, view the tags.
+    */
+    public function view_tags()
+    {
+      $this->load->model('item_tag_model');
+      $output["tags"] = $this->item_tag_model->get_all();
+
+      $this->display_view("admin/tags/list", $output);
+    }
+
+    /**
+    * Modify a tag
+    */
+    public function modify_tag($id = NULL)
+    {
+      $this->load->model('item_tag_model');
+
+      if (!empty($_POST)) {
+        // VALIDATION
+
+        //name: if changed,
+        if ($_POST['name'] != get_object_vars($this->item_tag_model->get($id))['name']) {
+          $this->form_validation->set_rules('name', 'Identifiant', 'required|callback_unique_tagname', 'Un nom de tag doit être fourni'); // not void
+        }
+
+        if($this->form_validation->run() === TRUE)
+		{
+		  
+		  $this->item_tag_model->update($id, $_POST);
+
+        redirect("/admin/view_tags/");
+        exit();
+      }
+	  
+      // The values of the tag are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
+      } else {
+        $output = get_object_vars($this->item_tag_model->get($id));
+      }
+
+      $this->load->model('item_tag_model');
+      $output = get_object_vars($this->item_tag_model->get($id));
+      $output["tags"] = $this->item_tag_model->get_all();	  
+	  
+
+      $this->display_view("admin/tags/form", $output);
+    }
+
+    /**
+    * Create a new tag
+    */
+    public function new_tag()
+    {
+      if (!empty($_POST)) {
+        // VALIDATION
+
+        //name: not void
+        $this->form_validation->set_rules('name', 'Identifiant', 'required|callback_unique_tagname', 'Un nom de tag unique doit être fourni');
+
+        if($this->form_validation->run() === TRUE)
+        {
+
+          $this->load->model('item_tag_model');
+          $this->item_tag_model->insert($_POST);
+
+          redirect("/admin/view_tags/");
+          exit();
+        }
+	  }
+
+      $this->display_view("admin/tags/form");
+    }
+
+    public function unique_tagname($argName) {
+      $this->load->model('item_tag_model');
+
+      // Get this tag. If it fails, it doesn't exist, so the name is unique!
+      $tag = $this->item_tag_model->get_by('name', $argName);
+      
+      if(isset($tag->item_tag_id)) {
+        $this->form_validation->set_message('unique_tagname', 'Cet nom est déjà utilisé');
+        return FALSE;
+      } else {
+        return TRUE;
+      }
+    }
+	
+
+    /**
+    * Delete a tag. 
+    * If $action is NULL, a confirmation will be shown.
+    * If it is anything else, the user will be deleted. 
+    */
+    public function delete_tag($id = NULL, $action = NULL) {
+      $this->load->model('item_tag_model');
+      if (is_null($action)) {
+        $output = get_object_vars($this->item_tag_model->get($id));
+        $output["tags"] = $this->item_tag_model->get_all();
+        $this->display_view("admin/tags/delete", $output);
+      } else {
+        $this->item_tag_model->delete($id);
+        redirect("/admin/view_tags/");
+      }
+    }
+
+    /* *********************************************************************************************************
+    STOCKING PLACES
+    ********************************************************************************************************* */
+
+    /**
+    * As the name says, view the stocking places.
+    */
+    public function view_stocking_places()
+    {
+      $this->load->model('stocking_place_model');
+      $output["stocking_places"] = $this->stocking_place_model->get_all();
+
+      $this->display_view("admin/stocking_places/list", $output);
+    }
+
+    /**
+    * As the name says, modify a stocking place, which id is $id
+    */
+    public function modify_stocking_place($id = NULL)
+    {
+      $this->load->model('stocking_place_model');
+
+      if (!empty($_POST)) {
+        $this->form_validation->set_rules('short', 'Nom court', 'required', 'Le lieu de stockage doit avoir un nom court');
+        $this->form_validation->set_rules('name', 'Nom long', 'required', 'Le lieu de stockage doit avoir un nom long');
+
+        if ($this->form_validation->run() === TRUE)
+        {
+          $this->stocking_place_model->update($id, $_POST);
+
+          redirect("/admin/view_stocking_places/");
+          exit();
+        }
+      } else {
+        $output = get_object_vars($this->stocking_place_model->get($id));
+      }
+
+      $this->load->model('stocking_place_model');
+      $output = get_object_vars($this->stocking_place_model->get($id));
+      $output["stocking_places"] = $this->stocking_place_model->get_all();	  
+	  
+      $output["stocking_places"] = $this->stocking_place_model->get_all();
+
+      $this->display_view("admin/stocking_places/form", $output);
+    }
+
+    /**
+    * Create a new stocking_place
+    */
+    public function new_stocking_place()
+    {
+      if (!empty($_POST)) {
+        // VALIDATION
+
+        //name: not void
+        $this->form_validation->set_rules('name', 'Identifiant', 'required|callback_unique_stocking_place', 'Un nom d\'emplacement unique doit être fourni');
+		$this->form_validation->set_rules('short', 'court', 'required', 'Un nom court d\'emplacement doit être fourni');
 
 
-class Admin extends CI_Controller {
+        if ($this->form_validation->run() === TRUE)
+        {
+          $this->stocking_place_model->insert($_POST);
 
-	public function __construct()
-	{
-		parent::__construct();
+          redirect("/admin/view_stocking_places/");
+          exit();
+        }
+      }
 
-		$this->load->database();
-		$this->load->helper('url');
+      $this->display_view("admin/stocking_places/form");
+    }
+          
+    public function unique_stocking_place($argName) {
+      $this->load->model('stocking_place_model');
 
-		// Loads the Grocery CRUD library
-		$this->load->library('grocery_CRUD');
-	}
+      // Get this sp. If it fails, it doesn't exist, so the username is unique!
+      $sp = $this->stocking_place_model->get_by('name', $argName);
+      
+      if(isset($sp->stocking_place_id)) {
+        $this->form_validation->set_message('unique_stocking_place', 'Cet identifiant est déjà utilisé');
+        return FALSE;
+      } else {
+        return TRUE;
+      }
+    }
 	
-	/* *** Main output with Grocery CRUD support *** */
+    /**
+    * Delete the stocking place $id. If $action is null, a confirmation will be shown
+    */
+    public function delete_stocking_place($id = NULL, $action = NULL)
+    {
+      $this->load->model('stocking_place_model');
 
-	public function _view_output($output = null)
-	{
-		
-		if($this->session->userdata('validated') !== NULL)
-			$output->userdata = $this->session->all_userdata();
-		
-		$this->load->view('admin/crud_header.php',$output);
-		$this->load->view('login_bar.php',$output);
-		$this->load->view('admin/nav',$output);
-		$this->load->view('admin/crud_view',$output);
-		$this->load->view('admin/crud_footer',$output);
-		
-	}
-	
-	/* *** Test if authentified *** */
+      if (is_null($action)) {
+        $output["stocking_places"] = $this->stocking_place_model->get_all();
+        $output = get_object_vars($this->stocking_place_model->get($id));
 
-	private function __check_auth()
-	{
-		if($this->login_model->check_validated())
-		{
-			if($this->login_model->get_access_level()>=10)
-			{
-				return true;
-			}
-		}
-			
-		return false;
-	}
-	
-	/* *** Base *** */
-	
-	public function index()
-	{
-		$this->load->model('login_model');
-		
-		// Get session data
-		$output['userdata'] = $this->session->all_userdata();
+        $this->display_view("admin/stocking_places/delete", $output);
+      } else {
+        $this->stocking_place_model->delete($id);
+        redirect("/admin/view_stocking_places/");
+      }
 
-		if($this->__check_auth())
-		{
-			$this->load->view('login_bar.php',$output);
-			$this->load->view('admin/nav',$output);
-			
-		}
-	}
-	
-	/* ********************************************* Tables Utilisateur **************************************************** */
-	
-	public function user()
-	{
-		$this->load->model('login_model');
-		if($this->__check_auth())
-		{
-			if($this->login_model->get_access_level() >= 10)
-				try{
-					// new object
-					$crud = new grocery_CRUD();
-		
-					// sets table to use
-					$crud->set_table('user');
-					$crud->set_subject('Utilisateur');
-				
-					// callbacks for password editing
-					$crud->callback_edit_field('password_hash', array($this,'__clean_field'));
-	
-					$crud->callback_before_insert(array($this, '__password_user_before_insert'));
-					$crud->callback_before_update(array($this, '__password_user_before_update'));
+    }
 
-					// links foreign keys
-					$crud->set_relation('user_type_id','user_type','name');
-					$crud->set_relation('user_state_id','user_state','name');
-					$crud->set_relation('department_id','department','name');
-			
-					// renders the table in output					
-					$output = $crud->render();
-					
-					// sets some text to determine which table is edited
-					$output->current = 'Utilisateur';
-					
-					// display all
-					$this->_view_output($output);
-					
-		
-				}catch(Exception $e){
-					show_error($e->getMessage().' --- '.$e->getTraceAsString());
-				}
-			else
-			{
-				show_error('L\'utilisateur n\'a pas les privilèges nécessaires.');
-				die();
-			}
-		}
-		else 
-			// if not authentified send back to login
-			redirect('login');
-	}
-	
-	/* *** Callbacks for password encryption *** */
-	
-	function __password_user_before_insert($post_array,$primary_key)
-	{
-		//$post_array['password_hash'] = password_hash($post_array['password_hash'], PASSWORD_DEFAULT);
-	
-		$this->db->insert('user', $post_array);
-	
-		return true;
-	}
-	
-	function __clean_field($value,$primary_key)
-	{
-		$value = '';
-		return '<input type="password" maxlength="24" value="'.$value.'" name="password_hash" style="width:250px">';
-	}
-	
-	function __password_user_before_update($post_array,$primary_key)
-	{
-	
-		$post_array['password_hash'] = password_hash($post_array['password_hash'], PASSWORD_DEFAULT);
-		return $post_array;
-	}
-	
-	/* ******************************************* */
-	
-	public function user_state()
-	{
-		$this->load->model('login_model');
-		if($this->__check_auth())
-		{
-			if($this->login_model->get_access_level() >= 10)
-				try{
-				$crud = new grocery_CRUD();
-	
-				$crud->set_table('user_state');
-				$crud->set_subject('Etat Utilisateur');
-	
-				// Force primary key display
-				$crud->columns('user_state_id', 'name');
-				
-				// Force order
-				$crud->order_by('user_state_id', 'asc');
-					
-				$output = $crud->render();
-					
-				$output->current = 'Etat Utilisateur';
-				
-				$output->current .= '<div style="color:red">';
-				$output->current .= 'Ne pas modifier les ID actif et inactif<br>';
-				$output->current .= '1 : Inactif<br>';
-				$output->current .= '2 : Actif<br>';
-				$output->current .= '</div>';
-	
-				$this->_view_output($output);
-	
-			}catch(Exception $e){
-				show_error($e->getMessage().' --- '.$e->getTraceAsString());
-			}
-			else
-			{
-				show_error('L\'utilisateur n\'a pas les privilèges nécessaires.');
-				die();
-			}
-		}
-		else
-			redirect('login');
-	}
-	
-	public function user_type()
-	{
-		$this->load->model('login_model');
-		if($this->__check_auth())
-		{
-			if($this->login_model->get_access_level() >= 10)
-				try{
-				$crud = new grocery_CRUD();
-	
-				$crud->set_table('user_type');
-				$crud->set_subject('Type Utilisateur');
-	
-					
-				$output = $crud->render();
-					
-				$output->current = 'Type Utilisateur';
-				
-				$output->current .= '<div style="color:red">';
-				$output->current .= 'Un niveau d\'accès 10 correspond aux administrateurs<br>';
-				$output->current .= 'Un niveau d\'accès plus grand que 0 correspond à la lecture/écriture';
-				$output->current .= '</div>';
-	
-				$this->_view_output($output);
-					
-	
-			}catch(Exception $e){
-				show_error($e->getMessage().' --- '.$e->getTraceAsString());
-			}
-			else
-			{
-				show_error('L\'utilisateur n\'a pas les privilèges nécessaires.');
-				die();
-			}
-		}
-		else
-			redirect('login');
-	}
-	
-	public function department()
-	{
-		$this->load->model('login_model');
-		if($this->__check_auth())
-		{
-			if($this->login_model->get_access_level() >= 10)
-				try{
-				$crud = new grocery_CRUD();
-	
-				$crud->set_table('department');
-				$crud->set_subject('Lieu');
-	
-					
-				$output = $crud->render();
-					
-				$output->current = 'Lieu';
-	
-				$this->_view_output($output);
-					
-	
-			}catch(Exception $e){
-				show_error($e->getMessage().' --- '.$e->getTraceAsString());
-			}
-			else
-			{
-				show_error('L\'utilisateur n\'a pas les privilèges nécessaires.');
-				die();
-			}
-		}
-		else
-			redirect('login');
-	}
-	
-	/* ********************************************* Tables du stock **************************************************** */
+    /* *********************************************************************************************************
+    SUPPLIERS
+    ********************************************************************************************************* */
+          
+    /**
+    * As the name says, view the suppliers.
+    */
+    public function view_suppliers()
+    {
+      $this->load->model('supplier_model');
+      $output["suppliers"] = $this->supplier_model->get_all();
 
-	public function item()
-	{
-		$this->load->model('login_model');
-		if($this->__check_auth())
-		{
-			if($this->login_model->get_access_level() >= 10)
-				try{
-				$crud = new grocery_CRUD();
+      $this->display_view("admin/suppliers/list", $output);
+    }
+
+    /**
+    * Modify a supplier
+    */
+    public function modify_supplier($id = NULL)
+    {
+      $this->load->model('supplier_model');
+
+      if (!empty($_POST)) {
+        // VALIDATION
+
+        //name: if changed,
+        $this->form_validation->set_rules('name', 'Identifiant', 'required', 'Un nom de fournisseur doit être fourni'); // not void
+
+        if (isset($_POST['email'])) {
+          // or valid.
+          $this->form_validation->set_rules('email', 'Mail', 'valid_email', 'Entrez une adresse email valide ou aucune.');
+        }
+
+        if ($this->form_validation->run() === TRUE)
+        {
+          $this->supplier_model->update($id, $_POST);
+
+          redirect("/admin/view_suppliers/");
+          exit();
+        }
+      } else {
+        $output = get_object_vars($this->supplier_model->get($id));
+      }
+      
+      $this->load->model('supplier_model');
+      $output = get_object_vars($this->supplier_model->get($id));
+      $output["suppliers"] = $this->supplier_model->get_all();	  
+	  
+      $this->display_view("admin/suppliers/form", $output);
+    }
 	
-				$crud->set_table('item');
-				$crud->set_subject('Article');
-				
-				/* !!!!!!!!!!!!!!!!!!!!!!!!! If case of new item columns, modifiy here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */ 
-				
-				$crud->columns('item_id', 'name', 'description', 'supplier_id', 'supplier_ref', 'buying_price', 'buying_date', 'warranty_duration',
-							'file_number', 'remarks', 'image', 'created_by_user_id', 'created_date', 'modified_by_user_id', 'modified_date',
-							'control_by_user_id', 'control_date', 'stocking_place_id', 'item_state_id');
-				
-				$crud->order_by('item_id', 'desc');
-				
-				$crud->set_relation('supplier_id','supplier','name');
-				$crud->set_relation('created_by_user_id','user','initials');
-				$crud->set_relation('modified_by_user_id','user','initials');
-				$crud->set_relation('control_by_user_id','user','initials');
-				$crud->set_relation('stocking_place_id','stocking_place','name');
-				$crud->set_relation('item_state_id','item_state','name');
+    /**
+    * Create a new supplier
+    */
+    public function new_supplier()
+    {
+      $this->load->model('supplier_model');
+
+      if (!empty($_POST)) {
+        // VALIDATION
+
+        //name: not void
+        $this->form_validation->set_rules('name', 'Identifiant', 'required', 'Un nom de fournisseur doit être fourni');
+
+        //email: void
+        if (isset($_POST['email'])) {
+          // or valid
+          $this->form_validation->set_rules('email', 'Mail', 'valid_email', 'Entrez une adresse email valide ou aucune.');
+        }
+
+        if ($this->form_validation->run() === TRUE)
+        {
+          $this->supplier_model->insert($_POST);
+
+          redirect("/admin/view_suppliers/");
+          exit();
+        }
+      }
+
+      $this->display_view("admin/suppliers/form");
+    }
+
+    /**
+    * Delete a supplier
+    */
+    public function delete_supplier($id = NULL, $action = NULL)
+    {
+      $this->load->model('supplier_model');
+
+      if (!isset($action)) {
+        $output = get_object_vars($this->supplier_model->get($id));
+        $output["suppliers"] = $this->supplier_model->get_all();
+
+        $this->display_view("admin/suppliers/delete", $output);
+      } else {
+        // delete it!
+        $this->supplier_model->delete($id);
+        
+        // redirect the user to the updated table
+        redirect("/admin/view_suppliers/");
+      }
+    }
+
+    /* *********************************************************************************************************
+    ITEM GROUPS
+    ********************************************************************************************************* */
+
+    /**
+    * As the name says, view the item groups.
+    */
+    public function view_item_groups()
+    {
+      $this->load->model('item_group_model');
+      $output["item_groups"] = $this->item_group_model->get_all();
+
+      $this->display_view("admin/item_groups/list", $output);
+    }
+
+    /**
+    * Modify a group
+    */
+    public function modify_item_group($id = NULL)
+    {
+      $this->load->model('item_group_model');
+
+      if (!empty($_POST)) {
+        $this->form_validation->set_rules('name', 'Nom', 'required', 'Le groupe d\'objets doit avoir un nom');
+
+        if ($this->form_validation->run() === TRUE)
+        {
+          $this->item_group_model->update($id, $_POST);
+
+          redirect("/admin/view_item_groups/");
+          exit();
+        }
+      } else {
+        $output = get_object_vars($this->item_group_model->get($id));
+      }
+      $output["item_groups"] = $this->item_group_model->get_all();
+
+      $this->display_view("admin/item_groups/form", $output);
+    }
+
+    /**
+    * Create a new group
+    */
+    public function new_item_group()
+    {
+      $this->load->model('item_group_model');
+
+      if (!empty($_POST)) {
+        $this->form_validation->set_rules('name', 'Identifiant', 'required|callback_unique_groupname', 'Un nom de groupe unique doit être fourni');
+
+        if ($this->form_validation->run() === TRUE)
+        {
+          $this->item_group_model->insert($_POST);
+
+          redirect("/admin/view_item_groups/");
+          exit();
+        }
+      }
+
+      $this->display_view("admin/item_groups/form");
+    }
+
+
+    public function unique_groupname($argName) {
+      $this->load->model('item_group_model');
+
+      // Get this group. If it fails, it doesn't exist, so the username is unique!
+      $group = $this->item_group_model->get_by('name', $argName);
+      
+      if(isset($group->item_group_id)) {
+        $this->form_validation->set_message('unique_groupname', 'Cet nom est déjà utilisé');
+        return FALSE;
+      } else {
+        return TRUE;
+      }
+    }
 	
-					
-				$output = $crud->render();
-					
-				$output->current = 'Article';
-	
-				$this->_view_output($output);
-					
-	
-			}catch(Exception $e){
-				show_error($e->getMessage().' --- '.$e->getTraceAsString());
-			}
-			else
-			{
-				show_error('L\'utilisateur n\'a pas les privilèges nécessaires.');
-				die();
-			}
-		}
-		else
-			redirect('login');
-	}
-	
-	public function item_state()
-	{
-		$this->load->model('login_model');
-		if($this->__check_auth())
-		{
-			if($this->login_model->get_access_level() >= 10)
-				try{
-				$crud = new grocery_CRUD();
-	
-				$crud->set_table('item_state');
-				$crud->set_subject('Etat Article');
-	
-					
-				$output = $crud->render();
-					
-				$output->current = 'Etat Article';
-	
-				$this->_view_output($output);
-					
-	
-			}catch(Exception $e){
-				show_error($e->getMessage().' --- '.$e->getTraceAsString());
-			}
-			else
-			{
-				show_error('L\'utilisateur n\'a pas les privilèges nécessaires.');
-				die();
-			}
-		}
-		else
-			redirect('login');
-	}
-	
-	public function item_tag()
-	{
-		$this->load->model('login_model');
-		if($this->__check_auth())
-		{
-			if($this->login_model->get_access_level() >= 10)
-				try{
-				$crud = new grocery_CRUD();
-	
-				$crud->set_table('item_tag');
-				$crud->set_subject('Tag Article');
-	
-					
-				$output = $crud->render();
-					
-				$output->current = 'Tag Article';
-	
-				$this->_view_output($output);
-					
-	
-			}catch(Exception $e){
-				show_error($e->getMessage().' --- '.$e->getTraceAsString());
-			}
-			else
-			{
-				show_error('L\'utilisateur n\'a pas les privilèges nécessaires.');
-				die();
-			}
-		}
-		else
-			redirect('login');
-	}
-	
-	public function item_tag_link()
-	{
-		$this->load->model('login_model');
-		if($this->__check_auth())
-		{
-			if($this->login_model->get_access_level() >= 10)
-				try{
-				$crud = new grocery_CRUD();
-	
-				$crud->set_table('item_tag_link');
-				$crud->set_subject('Lien Tag Article');
-	
-				$crud->set_relation('item_id','item','name');
-				$crud->set_relation('item_tag_id','item_tag','name');
-					
-				$output = $crud->render();
-					
-				$output->current = 'Lien Tag Article';
-	
-				$this->_view_output($output);
-					
-	
-			}catch(Exception $e){
-				show_error($e->getMessage().' --- '.$e->getTraceAsString());
-			}
-			else
-			{
-				show_error('L\'utilisateur n\'a pas les privilèges nécessaires.');
-				die();
-			}
-		}
-		else
-			redirect('login');
-	}
-	
-	public function stocking_place()
-	{
-		$this->load->model('login_model');
-		if($this->__check_auth())
-		{
-			if($this->login_model->get_access_level() >= 10)
-				try{
-				$crud = new grocery_CRUD();
-	
-				$crud->set_table('stocking_place');
-				$crud->set_subject('Emplacement stockage');
-					
-				$output = $crud->render();
-					
-				$output->current = 'Emplacement stockage';
-	
-				$this->_view_output($output);
-					
-	
-			}catch(Exception $e){
-				show_error($e->getMessage().' --- '.$e->getTraceAsString());
-			}
-			else
-			{
-				show_error('L\'utilisateur n\'a pas les privilèges nécessaires.');
-				die();
-			}
-		}
-		else
-			redirect('login');
-	}
-	
-	public function supplier()
-	{
-		$this->load->model('login_model');
-		if($this->__check_auth())
-		{
-			if($this->login_model->get_access_level() >= 10)
-				try{
-				$crud = new grocery_CRUD();
-	
-				$crud->set_table('supplier');
-				$crud->set_subject('Fournisseur');
-	
-					
-				$output = $crud->render();
-					
-				$output->current = 'Fournisseur';
-	
-				$this->_view_output($output);
-					
-	
-			}catch(Exception $e){
-				show_error($e->getMessage().' --- '.$e->getTraceAsString());
-			}
-			else
-			{
-				show_error('L\'utilisateur n\'a pas les privilèges nécessaires.');
-				die();
-			}
-		}
-		else
-			redirect('login');
-	}
-	
-	public function loan()
-	{
-		$this->load->model('login_model');
-		if($this->__check_auth())
-		{
-			if($this->login_model->get_access_level() >= 10)
-				try{
-				$crud = new grocery_CRUD();
-	
-				$crud->set_table('loan');
-				$crud->set_subject('Prets');
-	
-				$crud->set_relation('item_id','item','name');
-				$crud->set_relation('loan_by_user_id','user','initials');
-				$crud->set_relation('loan_to_user_id','user','initials');
-					
-				$output = $crud->render();
-					
-				$output->current = 'Prets';
-	
-				$this->_view_output($output);
-					
-	
-			}catch(Exception $e){
-				show_error($e->getMessage().' --- '.$e->getTraceAsString());
-			}
-			else
-			{
-				show_error('L\'utilisateur n\'a pas les privilèges nécessaires.');
-				die();
-			}
-		}
-		else
-			redirect('login');
-	}
-	
-	// Standard prototype for new tables
-	
-	public function __proto()
-	{
-		$this->load->model('login_model');
-		if($this->__check_auth())
-		{
-			if($this->login_model->get_access_level() >= 10)
-				try{
-				$crud = new grocery_CRUD();
-	
-				$crud->set_table('user');
-				$crud->set_subject('Utilisateur');
-	
-					
-				$output = $crud->render();
-					
-				$output->current = 'User';
-	
-				$this->_view_output($output);
-					
-	
-			}catch(Exception $e){
-				show_error($e->getMessage().' --- '.$e->getTraceAsString());
-			}
-			else
-			{
-				show_error('L\'utilisateur n\'a pas les privilèges nécessaires.');
-				die();
-			}
-		}
-		else
-			redirect('login');
-	}
-	
-	
+    /**
+    * Delete an unused item group
+    */
+    public function delete_item_group($id = NULL, $action = NULL)
+    {
+      $this->load->model('item_group_model');
+
+      if (!isset($action)) {
+        $output = get_object_vars($this->item_group_model->get($id));
+        $output["item_groups"] = $this->item_group_model->get_all();
+
+        $this->display_view("admin/item_groups/delete", $output);
+      } else {
+        // delete it!
+        $this->item_group_model->delete($id);
+        
+        // redirect the user to the updated table
+        redirect("/admin/view_item_groups/");
+      }
+    }
 }

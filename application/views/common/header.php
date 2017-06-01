@@ -7,23 +7,46 @@
     <!-- Copied from Bootstrap model (http://getbootstrap.com/getting-started/) -->
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
-    <title>
-    <?php
+    <title><?php
         if (is_null($title) || $title == '') {
             echo $this->lang->line('page_prefix');
         } else {
             echo $this->lang->line('page_prefix').' - '.$title;
         }
-    ?>
-    </title>
+    ?></title>
 
-    <!-- Custom styles -->
-    <!-- <link rel="stylesheet" href="<?php echo base_url("assets/css/style_stock.css"); ?>" /> -->
-    <link rel="shortcut icon" href="<?php echo base_url("assets/css/images/favicon.ico"); ?>" type="image/x-icon" />
-
+    <!-- Icon -->
+    <link rel="shortcut icon" href="<?php echo base_url("assets/images/favicon.ico"); ?>" type="image/x-icon" />
 
     <!-- Bootstrap styles -->
-    <link rel="stylesheet" href="<?php echo base_url("assets/css/bootstrap.css"); ?>" />
+	<link rel="stylesheet" href="<?php echo base_url("assets/css/bootstrap.css"); ?>" />
+
+    <!-- Custom styles -->
+    <style>
+        h1 select {border:none;}
+
+        a.line-through {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        a.line-through:hover span {
+            text-decoration: line-through;
+        }
+
+        a.like-normal {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        div.link-admin {
+            padding: 5px 0;
+        }
+
+        label {
+            display: block;
+        }
+    </style>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
