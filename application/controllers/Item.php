@@ -168,8 +168,8 @@ class Item extends MY_Controller {
                                  ->with('item_condition')
                                  ->with('item_group')
                                  ->get($id);
-
-		$output['item'] = $item;
+		
+    $output['item'] = $item;
 
 		$this->display_view('item/detail', $output);
 	}
@@ -189,9 +189,6 @@ class Item extends MY_Controller {
 
       $this->form_validation->set_rules("inventory_number", "N° d'inventaire", 'required|callback_unique_inventory_nb',
       array('required' => "L'item doit avoir un numero d'inventaire"));
-	  
-      // Get the ID that the new item will receive if it is created now
-      $data['item_id'] = $this->item_model->get_future_id();
 
       $data['upload_errors'] = "";
       if (isset($_POST['photo'])) {
@@ -235,15 +232,18 @@ class Item extends MY_Controller {
         $itemArray["created_by_user_id"] = $_SESSION['user_id'];
 
         $this->item_model->insert($itemArray);
+        $item_id = $this->db->insert_id();
 
         foreach ($linkArray as $tag) {
-          $this->item_tag_link_model->insert(array("item_tag_id" => $tag, "item_id" => ($data['item_id'])));
+          $this->item_tag_link_model->insert(array("item_tag_id" => $tag, "item_id" => ($item_id)));
         }
 
-        header("Location: " . base_url() . "item/view/" . $data['item_id']);
+        header("Location: " . base_url() . "item/view/" . $item_id);
         exit();
+
+      // Display form to complete it
       } else {
-        // Load the options
+        // Load the comboboxes options
     		$this->load->model('stocking_place_model');
     		$data['stocking_places'] = $this->stocking_place_model->get_all();
     		$this->load->model('supplier_model');
@@ -252,13 +252,14 @@ class Item extends MY_Controller {
     		$data['item_groups'] = $this->item_group_model->get_all();
         $this->load->model('item_condition_model');
         $data['condishes'] = $this->item_condition_model->get_all();
+        
         // Load the tags
         $this->load->model('item_tag_model');
-
     		$data['item_tags'] = $this->item_tag_model->get_all();
 
     		$this->display_view('item/form', $data);
       }
+
     // Creation is not allowed for the non-connected users, which are sent to the connection page
     } else {
       header("Location: " . base_url() . "auth/login");
