@@ -9,6 +9,6 @@
 
 	<div class="btn-group">
 	<a href="<?php echo base_url().uri_string()."/confirmed";?>" target="_parent" class="btn btn-success">Oui</a>
-	<a href="<?php echo base_url().'item/view/'.$id;?>" target="_parent" class="btn btn-danger">Non</a>
+	<a href="javascript:window.history.back()" target="_parent" class="btn btn-danger">Non</a>
 	</div>
 </div>

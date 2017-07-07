@@ -191,10 +191,10 @@ class Item extends MY_Controller {
       array('required' => "L'item doit avoir un numero d'inventaire"));
 
       $data['upload_errors'] = "";
-      if (isset($_POST['photo'])) {
+      if (isset($_FILES)) {
         // IMAGE UPLOADING
-        //$config['upload_path']          = './uploads/images/';
-        $config['upload_path']          = 'C:\\wamp64\\www\\stock\\uploads\\images\\'; //TOUJOURS INVALIDE
+        $config['upload_path']          = './uploads/images/';
+        //$config['upload_path']          = 'C:\\wamp64\\www\\stock\\uploads\\images\\'; //TOUJOURS INVALIDE
         $config['allowed_types']        = 'gif|jpg|png';
         $config['max_size']             = 100;
         $config['max_width']            = 550;
@@ -214,7 +214,7 @@ class Item extends MY_Controller {
 
       // If there is no problem with the form (including the image)
       if ($this->form_validation->run() === TRUE && !isset($upload_failed)) {
-        $itemArray = array();
+        //$itemArray = array();
 
         $linkArray = array();
 
@@ -237,7 +237,6 @@ class Item extends MY_Controller {
         foreach ($linkArray as $tag) {
           $this->item_tag_link_model->insert(array("item_tag_id" => $tag, "item_id" => ($item_id)));
         }
-
         header("Location: " . base_url() . "item/view/" . $item_id);
         exit();
 
@@ -255,15 +254,16 @@ class Item extends MY_Controller {
         
         // Load the tags
         $this->load->model('item_tag_model');
-    		$data['item_tags'] = $this->item_tag_model->get_all();
+    	$data['item_tags'] = $this->item_tag_model->get_all();
 
-    		$this->display_view('item/form', $data);
+    		
+     	$this->display_view('item/form', $data);
       }
 
     // Creation is not allowed for the non-connected users, which are sent to the connection page
-    } else {
-      header("Location: " . base_url() . "auth/login");
-      exit();
+     } else {
+       header("Location: " . base_url() . "auth/login");
+       exit();
     }
   }
 
@@ -492,7 +492,6 @@ class Item extends MY_Controller {
 
           // Execute the changes in the item table
           $this->item_model->update($id, $itemArray);
-
           redirect("/item/view/" . $id);
           exit();
         } else {
@@ -552,7 +551,7 @@ class Item extends MY_Controller {
       header("Location: " . base_url() . "auth/login");
       exit();
     }
-	}
+  }
 
 	public function delete_loan($id, $command = NULL)
 	{

@@ -33,22 +33,22 @@ if(isset($users)) { ?>
   <form class="container" method="post">
    <div class="form-group">
       <label for="username">Identifiant :</label>
-      <input class="form-control" name="username" id="username" value="<?php if (isset($username)) {echo $username;} else {echo set_value('username');} ?>" />
+      <input class="form-control" name="username" id="username" value="<?php if (isset($username)) {echo set_value('username',$username);} else {echo set_value('username');} ?>" />
     </div>
 
     <div class="form-group">
       <label for="lastname">Nom :</label>
-      <input class="form-control" name="lastname" id="lastname" value="<?php if (isset($lastname)) {echo $lastname;} else {echo set_value('lastname');} ?>" />
+      <input class="form-control" name="lastname" id="lastname" value="<?php if (isset($lastname)) {echo set_value('lastname',$lastname);} else {echo set_value('lastname');} ?>" />
     </div>
 
     <div class="form-group">
       <label for="firstname">Prénom :</label>
-      <input class="form-control" name="firstname" id="firstname" value="<?php if (isset($firstname)) {echo $firstname;} else {echo set_value('firstname');} ?>" />
+      <input class="form-control" name="firstname" id="firstname" value="<?php if (isset($firstname)) {echo set_value('firstname',$firstname);} else {echo set_value('firstname');} ?>" />
     </div>
 
     <div class="form-group">
       <label for="email">E-mail :</label>
-      <input class="form-control" name="email" id="email" value="<?php if (isset($email)) {echo $email;} else {echo set_value('email');} ?>" type="email" />
+      <input class="form-control" name="email" id="email" value="<?php if (isset($email)) {echo set_value('email',$email);} else {echo set_value('email');} ?>" type="email" />
     </div>
 
     <div class="form-group"><label for="user_type_id">Statut :</label>

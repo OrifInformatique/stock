@@ -7,13 +7,13 @@
         <div class="col-md-4"><h3>
             <input type="text" name="inventory_number"
                     placeholder="Numéro d'inventaire"
-                    value="<?php if(isset($inventory_number)) {echo $inventory_number;} else {echo set_value('inventory_number');} ?>" />
+                    value="<?php if(isset($inventory_number)) {echo set_value('inventory_number',$inventory_number);} else {echo set_value('inventory_number');} ?>" />
         </h3></div>
         <div class="col-md-7"><h3>
             <input type="text"
                     name="name"
                     placeholder="Nom de l'objet"
-                    value="<?php if(isset($name)) {echo $name;} else {echo set_value('name');} ?>" />
+                    value="<?php if(isset($name)) {echo set_value('name',$name);} else {echo set_value('name');} ?>" />
         </h3></div>
         <div class="col-md-1"><h6 class="text-right">ID <?php if (isset($item_id)) {echo $item_id;} ?></h6></div>
     </div>
@@ -23,7 +23,7 @@
                     class="form-control"
                     name="description"
                     placeholder="Description de l'objet"
-                    value="<?php if(isset($description)) {echo $description;} else {echo set_value('description');} ?>" />
+                    value="<?php if(isset($description)) {echo set_value('description',$description);} else {echo set_value('description');} ?>" />
         </p></div>
     </div>
 
@@ -54,12 +54,12 @@
                 </div>
                 <div class="col-md-8">
                     <label for="serial_number"><?php echo $this->lang->line('field_serial_number'); ?> :&nbsp;</label>
-                    <input type="text" id="serial_number" name="serial_number" value="<?php if(isset($buying_price)) {echo $buying_price;} else {echo set_value('buying_price');} ?>" />
+                    <input type="text" id="serial_number" name="serial_number" value="<?php if(isset($buying_price)) {echo set_value('buying_price',$buying_price);} else {echo set_value('buying_price');} ?>" />
                 </div>
             </div>
 
             <label for="remarks"><?php echo $this->lang->line('field_remarks'); ?></label>
-            <p><textarea id="remarks" name="remarks" value="<?php if(isset($remarks)) {echo $remarks;} else {echo set_value('remarks');} ?>"></textarea></p>
+            <p><textarea id="remarks" name="remarks"><?php if(isset($remarks)) {echo set_value('remarks',$remarks);} else {echo set_value('remarks');} ?></textarea></p>
 
             <!-- Button to display linked file -->
             <?php
@@ -128,18 +128,18 @@
 				} ?>
             </select><br />
             <label for="supplier_ref"><?php echo $this->lang->line('field_supplier_ref'); ?> :&nbsp;</label>
-            <input type="text" id="supplier_ref" name="supplier_ref" value="<?php if(isset($supplier_ref)) {echo $supplier_ref;} else {echo set_value('supplier_ref');} ?>" />
+            <input type="text" id="supplier_ref" name="supplier_ref" value="<?php if(isset($supplier_ref)) {echo set_value('supplier_ref',$supplier_ref);} else {echo set_value('supplier_ref');} ?>" />
         </div>
         <div class="col-md-4">
             <label for="buying_price"><?php echo $this->lang->line('field_buying_price'); ?> :&nbsp;</label>
-            <input type="number" id="buying_price" name="buying_price" min="0" step="0.05" value="<?php if(isset($buying_price)) {echo $buying_price;} else {echo set_value('buying_price');} ?><?php echo set_value('buying_price'); ?>" /><br />
+            <input type="number" id="buying_price" name="buying_price" min="0" step="0.05" value="<?php if(isset($buying_price)) {echo set_value('buying_price',$buying_price);} else {echo set_value('buying_price');} ?><?php echo set_value('buying_price'); ?>" /><br />
 
             <label for="buying_date"><?php echo $this->lang->line('field_buying_date'); ?> :&nbsp;</label>
-            <input type="date" id="buying_date" name="buying_date" value="<?php if(isset($buying_date)) {echo $buying_date;} else {echo set_value('buying_date', date('Y-m-d'));} ?>" onblur="change_warranty()" /><br />
+            <input type="date" id="buying_date" name="buying_date" value="<?php if(isset($buying_date)) {echo set_value('buying_date',$buying_date);} else {echo set_value('buying_date', date('Y-m-d'));} ?>" onblur="change_warranty()" /><br />
         </div>
         <div class="col-md-4">
             <label for="warranty_duration"><?php echo $this->lang->line('field_warranty_duration'); ?> :&nbsp;</label>
-            <input type="number" id="warranty_duration" name="warranty_duration" min="0" max="1000" value="<?php if(isset($warranty_duration)) {echo $warranty_duration;} else {echo set_value('warranty_duration');} ?>" onblur="change_warranty()" /> mois<br />
+            <input type="number" id="warranty_duration" name="warranty_duration" min="0" max="1000" value="<?php if(isset($warranty_duration)) {echo set_value('warranty_duration',$warranty_duration);} else {echo set_value('warranty_duration');} ?>" onblur="change_warranty()" /> mois<br />
 
             <span class="label label-success" id="garantie">Sous garantie</span>
         </div>

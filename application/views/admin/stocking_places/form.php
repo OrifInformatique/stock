@@ -37,11 +37,11 @@ if(isset($stocking_places)) { ?>
 <form class="container" method="post">
 <div class="form-input">
   <label for="short">Nom court:</label>
-  <input type="text" class="form-control" name="short" id="short" value="<?php if (isset($short)) {echo $short;} else {echo set_value('short');} ?>" />
+  <input type="text" class="form-control" name="short" id="short" value="<?php if (isset($short)) {echo set_value('short',$short);} else {echo set_value('short');} ?>" />
 </div>
 <div class="form-input">
   <label for="name">Nom long:</label>
-  <input type="text" class="form-control" name="name" id="name" value="<?php if (isset($name)) {echo $name;} else {echo set_value('name');} ?>" />
+  <input type="text" class="form-control" name="name" id="name" value="<?php if (isset($name)) {echo set_value('name',$name);} else {echo set_value('name');} ?>" />
 </div><br />
     <button type="submit" class="btn btn-primary"><?php echo $this->lang->line('btn_submit'); ?></button>
     <a class="btn btn-primary" href="<?php echo base_url() . "admin/view_stocking_places/"; ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
