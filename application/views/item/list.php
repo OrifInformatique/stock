@@ -9,7 +9,7 @@ if (!empty($_GET)) {
 }
    ?>" id="filters" method="get">
 
-   <!-- TAGS -->
+   <!-- TAGS FILTER -->
 
    <div class="col-md-12">
      <i><?php echo $this->lang->line('header_tags'); ?></i><br />
@@ -27,7 +27,7 @@ if (!empty($_GET)) {
  <button type="button" onclick="$('[data-tag]').attr('checked', false)"><?php echo $this->lang->line('btn_none'); ?></button>
    </div>
 
-   <!-- CONDITIONS -->
+   <!-- CONDITIONS FILTER -->
 
    <div class="col-md-12">
     <i><?php echo $this->lang->line('header_conditions'); ?></i><br />
@@ -45,7 +45,7 @@ if (!empty($_GET)) {
     <button type="button" onclick="$('[data-condition]').attr('checked', false)"><?php echo $this->lang->line('btn_none'); ?></button>
       </div>
 
-    <!-- GROUPS -->
+    <!-- GROUPS FILTER -->
 
     <div class="col-md-12">
      <i><?php echo $this->lang->line('header_groups'); ?></i><br />
@@ -63,7 +63,7 @@ if (!empty($_GET)) {
      <button type="button" onclick="$('[data-group]').attr('checked', false)"><?php echo $this->lang->line('btn_none'); ?></button>
        </div>
 
-     <!-- STOCKING PLACES -->
+     <!-- STOCKING PLACES FILTER -->
 
      <div class="col-md-12">
       <i><?php echo $this->lang->line('header_stocking_places'); ?></i><br />
@@ -82,6 +82,11 @@ if (!empty($_GET)) {
         </div>
     <button type="submit"><strong><?php echo $this->lang->line('btn_submit_filters'); ?></strong></button>
   </form>
+
+  <!-- BUTTON FOR NEW ITEM -->
+  <a href="<?php echo base_url(); ?>item/create/" class="btn btn-primary">Nouveau…</a>
+
+  <!-- LIST OF ITEMS -->
 <?php if(empty($items)) { ?>
   <em><?php echo $this->lang->line('msg_no_item'); ?></em>
 <?php } else { ?>
@@ -116,7 +121,6 @@ if (!empty($_GET)) {
     </tbody>
   </table>
 <?php } ?>
-<a href="<?php echo base_url(); ?>item/create/" class="btn btn-primary">Nouveau…</a>
 </div>
 </div>
 </div>
