@@ -259,7 +259,8 @@ COMMIT;
 -- -----------------------------------------------------
 START TRANSACTION;
 USE `stock`;
-INSERT INTO `stock`.`user` (`user_id`, `lastname`, `firstname`, `username`, `password`, `email`, `created_date`, `user_type_id`, `is_active`) VALUES (1, 'Orif', 'Informatique', 'orif', '$2y$10$MnRW5O.3LSHmoTSFA2YA9OWy0zNGInULQ5dsKVjxmhtmNZYNVa222', NULL, '2016-02-16 00:00:00', 2, 1);
+INSERT INTO `stock`.`user` (`user_id`, `lastname`, `firstname`, `username`, `password`, `email`, `user_type_id`, `is_active`) VALUES (1, 'Orif', 'invité', 'orif', '$2y$10$MnRW5O.3LSHmoTSFA2YA9OWy0zNGInULQ5dsKVjxmhtmNZYNVa222', NULL, 1, 1);
+INSERT INTO `stock`.`user` (`user_id`, `lastname`, `firstname`, `username`, `password`, `email`, `user_type_id`, `is_active`) VALUES (2, 'Orif', 'administrateur', 'admin', '$2y$10$MnRW5O.3LSHmoTSFA2YA9OWy0zNGInULQ5dsKVjxmhtmNZYNVa222', NULL, 5, 1);
 
 COMMIT;
 

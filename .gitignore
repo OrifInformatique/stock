@@ -51,5 +51,9 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# Some config files
+# =========================
+index.php
 application/config/config.php
 application/config/database.php

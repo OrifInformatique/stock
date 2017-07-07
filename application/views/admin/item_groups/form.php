@@ -36,7 +36,7 @@ if(isset($item_groups)) { ?>
 <form class="container" method="post">
 <div class="form-input">
   <label for="name">Nom:</label>
-  <input type="text" class="form-control" name="name" id="name" value="<?php if (isset($name)) {echo $name;} else {echo set_value('name');} ?>" />
+  <input type="text" class="form-control" name="name" id="name" value="<?php if (isset($name)) {echo set_value('name',$name);} else {echo set_value('name');} ?>" />
 </div><br />
     <button type="submit" class="btn btn-primary"><?php echo $this->lang->line('btn_submit'); ?></button>
     <a class="btn btn-primary" href="<?php echo base_url() . "admin/view_item_groups/"; ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>

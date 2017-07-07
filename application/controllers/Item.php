@@ -168,8 +168,8 @@ class Item extends MY_Controller {
                                  ->with('item_condition')
                                  ->with('item_group')
                                  ->get($id);
-
-		$output['item'] = $item;
+		
+    $output['item'] = $item;
 
 		$this->display_view('item/detail', $output);
 	}
@@ -189,36 +189,34 @@ class Item extends MY_Controller {
 
       $this->form_validation->set_rules("inventory_number", "N° d'inventaire", 'required|callback_unique_inventory_nb',
       array('required' => "L'item doit avoir un numero d'inventaire"));
-	  
-      // Get the ID that the new item will receive if it is created now
-      $data['item_id'] = $this->item_model->get_future_id();
 
       $data['upload_errors'] = "";
-      if (isset($_POST['photo'])) {
-        // IMAGE UPLOADING
-        //$config['upload_path']          = './uploads/images/';
-        $config['upload_path']          = 'C:\\wamp64\\www\\stock\\uploads\\images\\'; //TOUJOURS INVALIDE
-        $config['allowed_types']        = 'gif|jpg|png';
-        $config['max_size']             = 100;
-        $config['max_width']            = 550;
-        $config['max_height']           = 550;
-
-        $this->load->library('upload');
-        $this->upload->initialize($config);
-
-        if ($this->upload->do_upload('photo'))
-        {
-          $itemArray['image'] = $this->upload->data('file_name');
-        } else {
-          $data['upload_errors'] = $this->upload->display_errors();
-          $upload_failed = TRUE;
-        }
-      }
-
+      
       // If there is no problem with the form (including the image)
       if ($this->form_validation->run() === TRUE && !isset($upload_failed)) {
-        $itemArray = array();
+        //$itemArray = array();
 
+      	if (isset($_FILES)) {
+      		// IMAGE UPLOADING
+      		$config['upload_path']          = './uploads/images/';
+      		//$config['upload_path']          = 'C:\\wamp64\\www\\stock\\uploads\\images\\'; //TOUJOURS INVALIDE
+      		$config['allowed_types']        = 'gif|jpg|png';
+      		$config['max_size']             = 100;
+      		$config['max_width']            = 550;
+      		$config['max_height']           = 550;
+      		
+      		$this->load->library('upload');
+      		$this->upload->initialize($config);
+      		
+      		if ($this->upload->do_upload('photo'))
+      		{
+      			$itemArray['image'] = $this->upload->data('file_name');
+      		} else {
+      			$data['upload_errors'] = $this->upload->display_errors();
+      			$upload_failed = TRUE;
+      		}
+      	}
+      	
         $linkArray = array();
 
         $this->load->model('item_tag_link_model');
@@ -235,15 +233,17 @@ class Item extends MY_Controller {
         $itemArray["created_by_user_id"] = $_SESSION['user_id'];
 
         $this->item_model->insert($itemArray);
+        $item_id = $this->db->insert_id();
 
         foreach ($linkArray as $tag) {
-          $this->item_tag_link_model->insert(array("item_tag_id" => $tag, "item_id" => ($data['item_id'])));
+          $this->item_tag_link_model->insert(array("item_tag_id" => $tag, "item_id" => ($item_id)));
         }
-
-        header("Location: " . base_url() . "item/view/" . $data['item_id']);
+        header("Location: " . base_url() . "item/view/" . $item_id);
         exit();
+
+      // Display form to complete it
       } else {
-        // Load the options
+        // Load the comboboxes options
     		$this->load->model('stocking_place_model');
     		$data['stocking_places'] = $this->stocking_place_model->get_all();
     		$this->load->model('supplier_model');
@@ -252,17 +252,19 @@ class Item extends MY_Controller {
     		$data['item_groups'] = $this->item_group_model->get_all();
         $this->load->model('item_condition_model');
         $data['condishes'] = $this->item_condition_model->get_all();
+        
         // Load the tags
         $this->load->model('item_tag_model');
+    	$data['item_tags'] = $this->item_tag_model->get_all();
 
-    		$data['item_tags'] = $this->item_tag_model->get_all();
-
-    		$this->display_view('item/form', $data);
+    		
+     	$this->display_view('item/form', $data);
       }
+
     // Creation is not allowed for the non-connected users, which are sent to the connection page
-    } else {
-      header("Location: " . base_url() . "auth/login");
-      exit();
+     } else {
+       header("Location: " . base_url() . "auth/login");
+       exit();
     }
   }
 
@@ -491,7 +493,6 @@ class Item extends MY_Controller {
 
           // Execute the changes in the item table
           $this->item_model->update($id, $itemArray);
-
           redirect("/item/view/" . $id);
           exit();
         } else {
@@ -551,7 +552,7 @@ class Item extends MY_Controller {
       header("Location: " . base_url() . "auth/login");
       exit();
     }
-	}
+  }
 
 	public function delete_loan($id, $command = NULL)
 	{
