@@ -191,31 +191,32 @@ class Item extends MY_Controller {
       array('required' => "L'item doit avoir un numero d'inventaire"));
 
       $data['upload_errors'] = "";
-      if (isset($_FILES)) {
-        // IMAGE UPLOADING
-        $config['upload_path']          = './uploads/images/';
-        //$config['upload_path']          = 'C:\\wamp64\\www\\stock\\uploads\\images\\'; //TOUJOURS INVALIDE
-        $config['allowed_types']        = 'gif|jpg|png';
-        $config['max_size']             = 100;
-        $config['max_width']            = 550;
-        $config['max_height']           = 550;
-
-        $this->load->library('upload');
-        $this->upload->initialize($config);
-
-        if ($this->upload->do_upload('photo'))
-        {
-          $itemArray['image'] = $this->upload->data('file_name');
-        } else {
-          $data['upload_errors'] = $this->upload->display_errors();
-          $upload_failed = TRUE;
-        }
-      }
-
+      
       // If there is no problem with the form (including the image)
       if ($this->form_validation->run() === TRUE && !isset($upload_failed)) {
         //$itemArray = array();
 
+      	if (isset($_FILES)) {
+      		// IMAGE UPLOADING
+      		$config['upload_path']          = './uploads/images/';
+      		//$config['upload_path']          = 'C:\\wamp64\\www\\stock\\uploads\\images\\'; //TOUJOURS INVALIDE
+      		$config['allowed_types']        = 'gif|jpg|png';
+      		$config['max_size']             = 100;
+      		$config['max_width']            = 550;
+      		$config['max_height']           = 550;
+      		
+      		$this->load->library('upload');
+      		$this->upload->initialize($config);
+      		
+      		if ($this->upload->do_upload('photo'))
+      		{
+      			$itemArray['image'] = $this->upload->data('file_name');
+      		} else {
+      			$data['upload_errors'] = $this->upload->display_errors();
+      			$upload_failed = TRUE;
+      		}
+      	}
+      	
         $linkArray = array();
 
         $this->load->model('item_tag_link_model');

@@ -1,7 +1,6 @@
 <em><?php echo validation_errors(); if (isset($upload_errors)) {echo $upload_errors;} ?></em>
 
 <form class="container" method="post" enctype="multipart/form-data">
-    
     <!-- ITEM NAME AND DESCRIPTION -->
     <div class="row">
         <div class="col-md-4"><h3>
@@ -54,7 +53,7 @@
                 </div>
                 <div class="col-md-8">
                     <label for="serial_number"><?php echo $this->lang->line('field_serial_number'); ?> :&nbsp;</label>
-                    <input type="text" id="serial_number" name="serial_number" value="<?php if(isset($buying_price)) {echo set_value('buying_price',$buying_price);} else {echo set_value('buying_price');} ?>" />
+                    <input type="text" id="serial_number" name="serial_number" value="<?php if(isset($serial_number)) {echo set_value('serial_number',$serial_number);} else {echo set_value('serial_number');} ?>" />
                 </div>
             </div>
 
