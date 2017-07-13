@@ -26,14 +26,14 @@
       <?php foreach ($suppliers as $supplier) { ?>
 		    <tr>
           <td>
-            <a href="<?php echo base_url('/admin/modify_supplier').'/'.$supplier->supplier_id ?>" style="display:block"><?php echo $supplier->name; ?></a>
+            <a href="<?php echo base_url('/admin/modify_supplier').'/'.$supplier->supplier_id ?>" style="display:block"><?php echo html_escape($supplier->name); ?></a>
           </td>
-          <td><?php echo $supplier->address_line1; ?></td>
-          <td><?php echo $supplier->address_line2; ?></td>
-          <td><?php echo $supplier->zip; ?></td>
-          <td><?php echo $supplier->city; ?></td>
-          <td><?php echo $supplier->country; ?></td>
-          <td><?php echo $supplier->tel; ?></td>
+          <td><?php echo html_escape($supplier->address_line1); ?></td>
+          <td><?php echo html_escape($supplier->address_line2); ?></td>
+          <td><?php echo html_escape($supplier->zip); ?></td>
+          <td><?php echo html_escape($supplier->city); ?></td>
+          <td><?php echo html_escape($supplier->country); ?></td>
+          <td><?php echo html_escape($supplier->tel); ?></td>
           <td>
             <?php echo $supplier->email; ?>
             <a href="<?php echo base_url('/admin/delete_supplier').'/'.$supplier->supplier_id ?>"

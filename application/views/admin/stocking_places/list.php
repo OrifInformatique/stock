@@ -20,10 +20,10 @@
       <?php foreach ($stocking_places as $stocking_place) { ?>
       <tr>
           <td>
-            <a href="<?php echo base_url('/admin/modify_stocking_place').'/'.$stocking_place->stocking_place_id ?>" style="display:block"><?php echo $stocking_place->short; ?></a>
+            <a href="<?php echo base_url('/admin/modify_stocking_place').'/'.$stocking_place->stocking_place_id ?>" style="display:block"><?php echo html_escape($stocking_place->short); ?></a>
           </td>
           <td>
-            <?php echo $stocking_place->name; ?>
+            <?php echo html_escape($stocking_place->name); ?>
             <a href="<?php echo base_url('/admin/delete_stocking_place').'/'.$stocking_place->stocking_place_id ?>"
               class="close" title="Supprimer le lieu">×</a>
           </td>

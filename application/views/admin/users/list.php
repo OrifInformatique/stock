@@ -24,10 +24,10 @@
       <?php foreach ($users as $user) { ?>
 		  <tr>
           <td>
-            <a href="<?php echo base_url('/admin/modify_user').'/'.$user->user_id ?>" style="display:block"><?php echo $user->username; ?></a>
+            <a href="<?php echo base_url('/admin/modify_user').'/'.$user->user_id ?>" style="display:block"><?php echo html_escape($user->username); ?></a>
           </td>
-          <td><?php echo $user->lastname; ?></td>
-          <td><?php echo $user->firstname; ?></td>
+          <td><?php echo html_escape($user->lastname); ?></td>
+          <td><?php echo html_escape($user->firstname); ?></td>
           <td><?php echo $user->email; ?></td>
           <td><?php echo $user->user_type->name; ?></td>
           <td>

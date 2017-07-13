@@ -103,17 +103,17 @@ if (!empty($_GET)) {
       <?php foreach ($items as $item) { ?>
 		  <tr>
           <td>
-            <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo $item->inventory_number; ?></a>
+            <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo html_escape($item->inventory_number); ?></a>
           </td>
           <td>
-            <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo $item->name; ?></a>
+            <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo html_escape($item->name); ?></a>
           </td>
-            <td><?php echo $item->description; ?></td>
+            <td><?php echo html_escape($item->description); ?></td>
           <td><?php
           if (is_null($item->created_by_user_id)) {
             echo "<i>Anonymous</i>";
           } else {
-            echo $item->created_by_user->username;
+            echo html_escape($item->created_by_user->username);
           }
           if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?><a href="<?php echo base_url('/item/delete').'/'.$item->item_id ?>" class="close" title="Supprimer l'objet">×</a><?php } ?></td>
           </tr>
