@@ -69,52 +69,40 @@
             <p class="bg-primary">&nbsp;<?php echo html_escape($this->lang->line('text_item_loan_status')); ?></p>
         </div>
         <div class="col-md-4">
-            <?php //CHANGE LABEL COLOR BASED ON ITEM CONDITION
-            if(!is_null($item->item_condition))
-            {
-								/* Here there is work to do */
-								if ($item->item_condition_id == 10) {
-									echo '<span class="label label-success">';} // ITEM WORKS
-                elseif ($item->item_condition_id == 30) {
-                    echo '<span class="label label-warning">';} // ITEM DEFECTIVE
-                elseif ($item->item_condition_id == 40) {
-                    echo '<span class="label label-danger">';}  // NO MORE ITEM
-                else {echo '<div>';}
-
-                echo $item->item_condition->name.'</span><br />';
-            } ?>
+            <?php
+                //LABEL WITH COLOR BASED ON ITEM CONDITION
+                if(!is_null($item->item_condition))
+                {
+                    echo $item->item_condition->bootstrap_label.'<br />';
+                }
+            ?>
 
             <label><?php echo html_escape($this->lang->line('field_stocking_place')); ?> :</label>
             <?php if(!is_null($item->stocking_place)){echo html_escape($item->stocking_place->name);} ?>
         </div>
         <div class="col-md-4">
-						<?php if (is_null($item->current_loan)) { ?>
-							<span class="label label-success">Pas de prêt en cours</span>
-            <?php } else { ?>
-							<span class="label label-warning">En prêt</span><br />
-						<label><?php echo html_escape($this->lang->line('field_current_loan')); ?> :&nbsp;</label>
-            <?php echo html_escape($item->current_loan->item_localisation); ?><br />
+            <?php echo $item->loan_bootstrap_label.'<br />'; ?>
+			<?php if (!is_null($item->current_loan)) { ?>
+				<label><?php echo html_escape($this->lang->line('field_current_loan')); ?> :&nbsp;</label>
+                <?php echo html_escape($item->current_loan->item_localisation); ?><br />
 
-            <label><?php echo $this->lang->line('field_loan_date'); ?> :&nbsp;</label>
-            <?php
-                if(!empty($item->current_loan->date))
-                {
-                    echo nice_date($item->current_loan->date, $this->lang->line('date_format_short'));
-                }
-            ?>
-            <br />
+                <label><?php echo $this->lang->line('field_loan_date'); ?> :&nbsp;</label>
+                <?php
+                    if(!empty($item->current_loan->date))
+                    {
+                        echo nice_date($item->current_loan->date, $this->lang->line('date_format_short'));
+                    }
+                ?>
+                <br />
 
-            <label><?php echo $this->lang->line('field_loan_planned_return'); ?> :&nbsp;</label>
-            <?php
-            if(!is_null($item->current_loan))
-            {
-                if(!empty($item->current_loan->planned_return_date))
-                {
-                    echo nice_date($item->current_loan->planned_return_date, $this->lang->line('date_format_short'));
-                }
-            }
-            ?>
-						<?php } ?>
+                <label><?php echo $this->lang->line('field_loan_planned_return'); ?> :&nbsp;</label>
+                <?php
+                    if(!empty($item->current_loan->planned_return_date))
+                    {
+                        echo nice_date($item->current_loan->planned_return_date, $this->lang->line('date_format_short'));
+                    }
+                ?>
+			<?php } ?>
         </div>
         <div class="col-md-3">
 

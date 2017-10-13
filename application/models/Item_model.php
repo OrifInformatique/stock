@@ -40,21 +40,6 @@ class Item_model extends MY_Model
 	 */
 	public function get_future_id()
 	{
-		/*$query = "SELECT `AUTO_INCREMENT`";
-		$query .= "FROM  `INFORMATION_SCHEMA.TABLES`";
-		$query .= "WHERE TABLE_SCHEMA = `stock`";
-		$query .= "AND   TABLE_NAME   = `item`";*/
-		/*
-		$this->db->select('AUTO_INCREMENT');
-		$this->db->where('TABLE_SCHEMA', 'stock');
-		$this->db->where('TABLE_NAME', 'item');
-		$temp = $this->db->get('INFORMATION_SCHEMA.TABLES');
-
-		foreach ($temp as $row)
-		{
-			$value = $row;
-		}*/
-
 		$connection = mysqli_connect("localhost","root","");
 			$result = mysqli_query($connection, "SHOW TABLE STATUS FROM `stock` LIKE 'item'");
 		mysqli_close($connection);
@@ -66,10 +51,6 @@ class Item_model extends MY_Model
 
 		return $value;
 	}
-
-  /**
-  *
-  */
 
     /**
     * If no image is set, use "no_image.png"
@@ -137,8 +118,10 @@ class Item_model extends MY_Model
 
     /**
     * Get current loan related to this item, if one exists
+    * Also return a loan_bootstrap_label with color depending of loan status
     *
-    * Attribute name : current_loan (NULL if item is currently not loaned)
+    * Attributes names : current_loan (NULL if item is currently not loaned)
+    *                    loan_bootstrap_label (color depending of loan status)
     */
     protected function get_current_loan($item)
     {
@@ -147,10 +130,19 @@ class Item_model extends MY_Model
 			$this->load->helper('date');
 
 			$where = "item_id=".$item->item_id." AND ".
-					"date<='".mysqlDate('now')."' AND ".
-					"real_return_date IS NULL";
+					 "date<='".mysqlDate('now')."' AND ".
+					 "real_return_date IS NULL";
 
 			$item->current_loan = $this->loan_model->get_by($where);
+
+			if (is_null($item->current_loan)) {
+				// ITEM IS NOT LOANED
+				$bootstrap_label = '<span class="label label-success">'.html_escape($this->lang->line('lbl_loan_status_not_loaned')).'</span>';
+			} else {
+				// ITEM IS LOANED
+				$bootstrap_label = '<span class="label label-warning">'.html_escape($this->lang->line('lbl_loan_status_loaned')).'</span>';
+			}
+			$item->loan_bootstrap_label = $bootstrap_label;
 		}
 
         return $item;
