@@ -1,4 +1,4 @@
-<div class="container">
+<div id="item_detail" class="container">
     <!-- BUTTONS -->
 	<em>
 		<a href="<?php echo base_url(); ?>" class="btn" role="button"><?php echo $this->lang->line('btn_back_to_main'); ?></a>

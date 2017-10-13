@@ -37,6 +37,7 @@ $lang['field_warranty_duration']        = 'Durée de la garantie';
 $lang['field_tags']                     = 'Tags';
 
 // List headers
+$lang['header_picture']                 = 'Photo';
 $lang['header_inventory_nb']            = 'No d\'inventaire';
 $lang['header_item_name']               = 'Objet';
 $lang['header_item_description']        = 'Description';

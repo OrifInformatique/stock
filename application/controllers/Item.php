@@ -46,24 +46,6 @@ class Item extends MY_Controller {
 
         // If options are set
         } else {
-          /*$this->load->model('item_tag_link_model');
-          // Convert $_GET to SQL/MY_Model
-          //->where
-
-          // Set the WHERE clause
-          $where = "";
-
-          // Add all the tags wanted to it
-          foreach ($_GET as $num)
-          {
-            $where .= " OR item_tag_id = " . $num;
-          }
-
-          // Delete the initial OR
-          $where = substr($where, 4);
-          $output['where'] = $where;
-
-          $output['items'] = $this->item_model->with('item_tag_links')->get_many_by($where);*/
 
           // FIRST PART
 

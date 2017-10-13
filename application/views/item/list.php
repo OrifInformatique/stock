@@ -87,15 +87,16 @@ if (!empty($_GET)) {
   <a href="<?php echo base_url(); ?>item/create/" class="btn btn-primary">Nouveau…</a>
 
   <!-- LIST OF ITEMS -->
-<?php if(empty($items)) { ?>
-  <em><?php echo $this->lang->line('msg_no_item'); ?></em>
-<?php } else { ?>
+  <?php if(empty($items)) { ?>
+    <em><?php echo $this->lang->line('msg_no_item'); ?></em>
+  <?php } else { ?>
   <table class="table table-striped table-hover">
     <thead>
       <tr>
-        <th><?php echo $this->lang->line('header_inventory_nb'); ?></th>
+        <th><?php echo $this->lang->line('header_picture'); ?></th>
         <th><?php echo $this->lang->line('header_item_name'); ?></th>
         <th><?php echo $this->lang->line('header_item_description'); ?></th>
+        <th><?php echo $this->lang->line('header_inventory_nb'); ?></th>
         <th><?php echo $this->lang->line('header_item_created_by'); ?></th>
       </tr>
     </thead>
@@ -103,12 +104,19 @@ if (!empty($_GET)) {
       <?php foreach ($items as $item) { ?>
 		  <tr>
           <td>
-            <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo html_escape($item->inventory_number); ?></a>
+            <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block">
+              <img src="<?php echo base_url('uploads/images/'.$item->image); ?>"
+                   width="100px"
+                   alt="<?php echo $this->lang->line('field_image'); ?>" />
+            </a>
           </td>
           <td>
             <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo html_escape($item->name); ?></a>
           </td>
-            <td><?php echo html_escape($item->description); ?></td>
+          <td><?php echo html_escape($item->description); ?></td>
+          <td>
+            <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo html_escape($item->inventory_number); ?></a>
+          </td>
           <td><?php
           if (is_null($item->created_by_user_id)) {
             echo "<i>Anonymous</i>";
