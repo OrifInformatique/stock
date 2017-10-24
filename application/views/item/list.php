@@ -111,7 +111,7 @@ if (!empty($_GET)) {
             </a>
           </td>
           <td>
-            <?php echo $item->loan_bootstrap_label.'<br />'.$item->item_condition->bootstrap_label ?>
+            <?php echo $item->item_condition->bootstrap_label.'<br />'.$item->loan_bootstrap_label ?>
           </td>
           <td>
             <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo html_escape($item->name); ?></a>
