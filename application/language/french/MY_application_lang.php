@@ -37,6 +37,8 @@ $lang['field_warranty_duration']        = 'Durée de la garantie';
 $lang['field_tags']                     = 'Tags';
 
 // List headers
+$lang['header_picture']                 = 'Photo';
+$lang['header_status']                  = 'Disponibilité';
 $lang['header_inventory_nb']            = 'No d\'inventaire';
 $lang['header_item_name']               = 'Objet';
 $lang['header_item_description']        = 'Description';
@@ -84,6 +86,10 @@ $lang['msg_err_invalid_password']       = 'L\'identifiant et le mot de passe ne 
 $lang['msg_err_access_denied']          = 'Accès refusé';
 $lang['msg_no_loan']                    = 'Aucun prêt à afficher';
 $lang['msg_no_item']                    = 'Aucun objet à afficher';
+
+// Bootstrap labels
+$lang['lbl_loan_status_loaned']         = 'En prêt';
+$lang['lbl_loan_status_not_loaned']     = 'Pas de prêt en cours';
 
 // Other texts
 $lang['text_login']                     = 'Connexion';

@@ -12,7 +12,7 @@
   <?php foreach ($item_groups as $item_group) {
 
     ?>
-  <tr><td><a href="<?php echo base_url(); ?>admin/modify_item_group/<?php echo $item_group->item_group_id; ?>"><?php echo $item_group->name; ?></a>
+  <tr><td><a href="<?php echo base_url(); ?>admin/modify_item_group/<?php echo $item_group->item_group_id; ?>"><?php echo html_escape($item_group->name); ?></a>
   <a href="<?php echo base_url(); ?>admin/delete_item_group/<?php echo $item_group->item_group_id; ?>" class="close">×</a></td></tr>
   <?php } ?></tbody></table><a href="<?php echo base_url(); ?>admin/new_item_group/" class="btn btn-primary">Nouveau…</a>
 </div>

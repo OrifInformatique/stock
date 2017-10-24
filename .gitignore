@@ -57,3 +57,8 @@ $RECYCLE.BIN/
 index.php
 application/config/config.php
 application/config/database.php
+
+# Items linked images and files
+# =========================
+uploads/files/*
+uploads/images/*

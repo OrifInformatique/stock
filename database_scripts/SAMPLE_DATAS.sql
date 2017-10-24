@@ -1,3 +1,82 @@
+-- -----------------------------------------------------
+-- Data for table `stock`.`user_type`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `stock`;
+INSERT INTO `stock`.`user_type` (`user_type_id`, `name`, `access_level`) VALUES (1, 'Invite', 1);
+INSERT INTO `stock`.`user_type` (`user_type_id`, `name`, `access_level`) VALUES (2, 'Observation', 2);
+INSERT INTO `stock`.`user_type` (`user_type_id`, `name`, `access_level`) VALUES (3, 'Formation', 4);
+INSERT INTO `stock`.`user_type` (`user_type_id`, `name`, `access_level`) VALUES (4, 'MSP', 8);
+INSERT INTO `stock`.`user_type` (`user_type_id`, `name`, `access_level`) VALUES (5, 'Administrateur', 16);
+
+COMMIT;
+
+
+-- -----------------------------------------------------
+-- Data for table `stock`.`user`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `stock`;
+INSERT INTO `stock`.`user` (`user_id`, `lastname`, `firstname`, `username`, `password`, `email`, `user_type_id`, `is_active`) VALUES (1, 'Orif', 'invité', 'orif', '$2y$10$MnRW5O.3LSHmoTSFA2YA9OWy0zNGInULQ5dsKVjxmhtmNZYNVa222', NULL, 1, 1);
+INSERT INTO `stock`.`user` (`user_id`, `lastname`, `firstname`, `username`, `password`, `email`, `user_type_id`, `is_active`) VALUES (2, 'Orif', 'administrateur', 'admin', '$2y$10$MnRW5O.3LSHmoTSFA2YA9OWy0zNGInULQ5dsKVjxmhtmNZYNVa222', NULL, 5, 1);
+
+COMMIT;
+
+
+-- -----------------------------------------------------
+-- Data for table `stock`.`stocking_place`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `stock`;
+INSERT INTO `stock`.`stocking_place` (`stocking_place_id`, `name`, `short`) VALUES (1, 'Salle Info', 'INFO');
+INSERT INTO `stock`.`stocking_place` (`stocking_place_id`, `name`, `short`) VALUES (2, 'Atelier1', 'AT01');
+INSERT INTO `stock`.`stocking_place` (`stocking_place_id`, `name`, `short`) VALUES (3, 'Atelier2', 'AT02');
+
+COMMIT;
+
+
+-- -----------------------------------------------------
+-- Data for table `stock`.`item_condition`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `stock`;
+INSERT INTO `stock`.`item_condition` (`item_condition_id`, `name`) VALUES (10, 'Fonctionnel');
+INSERT INTO `stock`.`item_condition` (`item_condition_id`, `name`) VALUES (30, 'Défectueux');
+INSERT INTO `stock`.`item_condition` (`item_condition_id`, `name`) VALUES (40, 'Plus disponible');
+
+COMMIT;
+
+
+-- -----------------------------------------------------
+-- Data for table `stock`.`item_group`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `stock`;
+INSERT INTO `stock`.`item_group` (`item_group_id`, `name`) VALUES (1, 'Observation');
+INSERT INTO `stock`.`item_group` (`item_group_id`, `name`) VALUES (2, 'Formation');
+INSERT INTO `stock`.`item_group` (`item_group_id`, `name`) VALUES (3, 'Moyens auxiliaires');
+INSERT INTO `stock`.`item_group` (`item_group_id`, `name`) VALUES (4, 'Matériel de prêt');
+
+COMMIT;
+
+
+-- -----------------------------------------------------
+-- Data for table `stock`.`item_tag`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `stock`;
+INSERT INTO `stock`.`item_tag` (`item_tag_id`, `name`) VALUES (1, 'Ordinateur');
+INSERT INTO `stock`.`item_tag` (`item_tag_id`, `name`) VALUES (2, 'Souris');
+INSERT INTO `stock`.`item_tag` (`item_tag_id`, `name`) VALUES (3, 'Clavier');
+INSERT INTO `stock`.`item_tag` (`item_tag_id`, `name`) VALUES (4, 'Lecteur');
+INSERT INTO `stock`.`item_tag` (`item_tag_id`, `name`) VALUES (5, 'Périphérique de saisie');
+INSERT INTO `stock`.`item_tag` (`item_tag_id`, `name`) VALUES (6, 'Imprimante');
+INSERT INTO `stock`.`item_tag` (`item_tag_id`, `name`) VALUES (7, 'Scanner');
+INSERT INTO `stock`.`item_tag` (`item_tag_id`, `name`) VALUES (8, 'Ecran');
+
+COMMIT;
+
+
 USE `stock` ;
 
 -- SUPPLIERS -------------------------------------------------------------------
