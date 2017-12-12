@@ -35,13 +35,11 @@ class Auth extends MY_Controller
         $username = $this->input->post('username');
         $password = $this->input->post('password');
 
-
         if ($this->form_validation->run() == true) {
             // Fields validation passed
 
             if ($this->user_model->check_password($username, $password)) {
                 // Login success
-
                 $user = $this->user_model->with('user_type')
                                          ->get_by('username', $username);
 
@@ -51,13 +49,11 @@ class Auth extends MY_Controller
                 $_SESSION['user_access'] = (int)$user->user_type->access_level;
                 $_SESSION['logged_in'] = (bool)true;
 
-                // Set message and redirect
-                $this->session->set_flashdata('message', 'user login ok');
-                redirect('item');
+                // Display item's list
+                redirect('/item');
 
             } else {
                 // Login failed
-
                 $this->session->set_flashdata('message', '<div class="alert alert-danger text-center">'.$this->lang->line('msg_err_invalid_password').'</div>');
             }
         }
