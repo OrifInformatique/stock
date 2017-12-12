@@ -1,10 +1,11 @@
 <div id="item_detail" class="container">
     <!-- BUTTONS -->
 	<em>
-		<a href="<?php echo base_url(); ?>" class="btn" role="button"><?php echo $this->lang->line('btn_back_to_main'); ?></a>
+		<a href="<?php if (isset($_SESSION['items_list_url'])) {echo $_SESSION['items_list_url'];} else {echo base_url('/item');} ?>"
+           class="btn btn-primary" role="button"><?php echo $this->lang->line('btn_back_to_list'); ?></a>
 		<?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?>
-		<a href="<?php echo base_url('item/modify/'.$item->item_id); ?>" class="btn" role="button"><?php echo $this->lang->line('btn_modify_item'); ?></a>
-		<a href="<?php echo base_url('item/delete/'.$item->item_id); ?>" class="btn" role="button"><?php echo $this->lang->line('btn_delete_item'); ?></a>
+		<a href="<?php echo base_url('item/modify/'.$item->item_id); ?>" class="btn btn-warning" role="button"><?php echo $this->lang->line('btn_modify_item'); ?></a>
+		<a href="<?php echo base_url('item/delete/'.$item->item_id); ?>" class="btn btn-danger" role="button"><?php echo $this->lang->line('btn_delete_item'); ?></a>
 		<?php } ?>
 	</em>
 

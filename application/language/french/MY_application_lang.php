@@ -8,7 +8,7 @@
  */
 
 // Application name
-$lang['app_title']                      = 'Gestion de stock';
+$lang['app_title']                      = 'Section informatique<br />Gestion de stock';
 
 // Page titles
 $lang['page_prefix']                    = 'Stock';
@@ -69,6 +69,7 @@ $lang['btn_login']                      = 'Se connecter';
 $lang['btn_logout']                     = 'Se déconnecter';
 $lang['btn_signup']                     = 'S\'inscrire';
 $lang['btn_back_to_main']               = 'Retour à l\'accueil';
+$lang['btn_back_to_list']               = 'Retour à la liste';
 $lang['btn_back_to_object']             = 'Retour à l\'objet';
 $lang['btn_modify_item']                = 'Modifier';
 $lang['btn_delete_item']                = 'Supprimer';

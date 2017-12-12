@@ -38,6 +38,13 @@ class Item extends MY_Controller {
       $this->load->model('stocking_place_model');
       $output['stocking_places'] = $this->stocking_place_model->get_all();
 
+        // Store URL to make possible to come back later (from item detail for example)
+        if (isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING'])) {
+          $_SESSION['items_list_url'] = current_url().'?'.$_SERVER['QUERY_STRING'];
+        } else {
+          $_SESSION['items_list_url'] = current_url();
+        }
+
         // If no options are set
         if (empty($_GET)) {
 
@@ -128,7 +135,7 @@ class Item extends MY_Controller {
 		  
           $output["items"] = $this->item_model->with('created_by_user')->with('item_condition')->get_many_by($where2);
         }
-		
+
         $this->display_view('item/list', $output);
     }
 
