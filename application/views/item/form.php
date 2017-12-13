@@ -1,20 +1,35 @@
-<em><?php echo validation_errors(); if (isset($upload_errors)) {echo $upload_errors;} ?></em>
-
 <form class="container" method="post" enctype="multipart/form-data">
+    <!-- BUTTONS -->
+    <div>
+        <button type="submit" class="btn btn-success"><?php echo $this->lang->line('btn_submit'); ?></button>
+        <a class="btn btn-danger" href="<?php echo base_url(); if(isset($modify)) {echo "item/view/" . $item_id;} ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
+    </div>
+
+    <!-- ERROR MESSAGES -->
+    <?php
+    if (!empty(validation_errors()) || !empty($upload_errors)) {
+        echo '<div class="alert alert-danger">'.validation_errors();
+        if (isset($upload_errors)) {
+            echo $upload_errors;
+        } 
+        echo '</div>';
+    }
+    ?>
+
     <!-- ITEM NAME AND DESCRIPTION -->
     <div class="row">
-        <div class="col-md-4"><h3>
-            <input type="text" name="inventory_number"
-                    placeholder="Numéro d'inventaire"
-                    value="<?php if(isset($inventory_number)) {echo set_value('inventory_number',$inventory_number);} else {echo set_value('inventory_number');} ?>" />
-        </h3></div>
-        <div class="col-md-7"><h3>
+        <div class="col-md-8"><h3>
             <input type="text"
-                    name="name"
-                    placeholder="Nom de l'objet"
-                    value="<?php if(isset($name)) {echo set_value('name',$name);} else {echo set_value('name');} ?>" />
+                   name="name"
+                   placeholder="<?php echo $this->lang->line('field_item_name') ?>"
+                   value="<?php if(isset($name)) {echo set_value('name',$name);} else {echo set_value('name');} ?>" />
         </h3></div>
-        <div class="col-md-1"><h6 class="text-right">ID <?php if (isset($item_id)) {echo $item_id;} ?></h6></div>
+        <div class="col-md-4 text-right"><h4>
+            <?php echo $this->lang->line('field_inventory_number_abr').' : ' ?>
+            <input type="text" name="inventory_number"
+                   placeholder="<?php echo $this->lang->line('field_inventory_number') ?>"
+                   value="<?php if(isset($inventory_number)) {echo set_value('inventory_number',$inventory_number);} else {echo set_value('inventory_number');} ?>" />
+        </h4></div>
     </div>
     <div class="row">
         <div class="col-md-12"><p>
@@ -27,29 +42,33 @@
     </div>
 
     <!-- ITEM DETAILS -->
+    <?php var_dump($item_groups) ?>
     <div class="row">
         <div class="col-md-12">
             <p class="bg-primary">&nbsp;<?php echo $this->lang->line('text_item_detail'); ?></p>
         </div>
         <div class="col-md-4">
-            Ajoutez une image (hauteur et largeur max. 550px):
+            <p><?php echo $this->lang->line('field_image_upload'); ?></p>
 			<input type="file" name="photo" accept="image/*" />
+            <?php if (isset($image) && $image!='') { ?>
+                <img src="<?php echo base_url('uploads/images/'.$image); ?>"
+                     width="100%"
+                     alt="<?php echo $this->lang->line('field_image'); ?>" />
+            <?php } ?>
         </div>
         <div class="col-md-8">
             <div class="row">
                 <div class="col-md-4">
                     <label><?php echo $this->lang->line('field_group'); ?> :&nbsp;</label>
-                    <select name="item_group_id">
-                        <?php foreach ($item_groups as $item_group) {
-                            ?><option value="<?php echo $item_group->item_group_id; ?>"<?php
-
-                                // If an item_group is allready defined, select it
-                                if (isset($item_group_id) && $item_group_id == $item_group->item_group_id) {
-                                    echo " selected";}?> ><?php
-                                echo $item_group->name;
-                            ?></option>
-                        <?php } 
-                    ?></select>
+                    <?php
+                    if (isset($_POST['item_group_id'])) {
+                        echo form_dropdown('item_group_id', $item_groups, $_POST['item_group_id']);
+                    } elseif (isset($item_group_id)) {
+                        echo form_dropdown('item_group_id', $item_groups, $item_group_id);
+                    } else {
+                        echo form_dropdown('item_group_id', $item_groups);
+                    }
+                    ?>
                 </div>
                 <div class="col-md-8">
                     <label for="serial_number"><?php echo $this->lang->line('field_serial_number'); ?> :&nbsp;</label>
@@ -58,7 +77,7 @@
             </div>
 
             <label for="remarks"><?php echo $this->lang->line('field_remarks'); ?></label>
-            <p><textarea id="remarks" name="remarks"><?php if(isset($remarks)) {echo set_value('remarks',$remarks);} else {echo set_value('remarks');} ?></textarea></p>
+            <textarea id="remarks" name="remarks"><?php if(isset($remarks)) {echo set_value('remarks',$remarks);} else {echo set_value('remarks');} ?></textarea>
 
             <!-- Button to display linked file -->
             <?php
@@ -165,9 +184,6 @@
 			<?php } ?>
         </div>
     </div>
-
-	<button type="submit" class="btn btn-primary"><?php echo $this->lang->line('btn_submit'); ?></button>
-    <a class="btn btn-primary" href="<?php echo base_url(); if(isset($modify)) {echo "item/view/" . $item_id;} ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
 </form>
 
 <script>

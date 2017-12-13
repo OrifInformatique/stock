@@ -1,25 +1,26 @@
 <div id="item_detail" class="container">
     <!-- BUTTONS -->
-	<em>
-		<a href="<?php if (isset($_SESSION['items_list_url'])) {echo $_SESSION['items_list_url'];} else {echo base_url('/item');} ?>"
-           class="btn btn-primary" role="button"><?php echo $this->lang->line('btn_back_to_list'); ?></a>
-		<?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?>
-		<a href="<?php echo base_url('item/modify/'.$item->item_id); ?>" class="btn btn-warning" role="button"><?php echo $this->lang->line('btn_modify_item'); ?></a>
-		<a href="<?php echo base_url('item/delete/'.$item->item_id); ?>" class="btn btn-danger" role="button"><?php echo $this->lang->line('btn_delete_item'); ?></a>
-		<?php } ?>
-	</em>
+	<a href="<?php if (isset($_SESSION['items_list_url'])) {echo $_SESSION['items_list_url'];} else {echo base_url('/item');} ?>"
+       class="btn btn-primary" role="button"><?php echo $this->lang->line('btn_back_to_list'); ?></a>
+
+    <!-- *** ADMIN *** -->
+	<?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?>
+    	<a href="<?php echo base_url('item/modify/'.$item->item_id); ?>" class="btn btn-warning" role="button"><?php echo $this->lang->line('btn_modify'); ?></a>
+    	<a href="<?php echo base_url('item/delete/'.$item->item_id); ?>" class="btn btn-danger" role="button"><?php echo $this->lang->line('btn_delete'); ?></a>
+	<?php } ?>
+    <!-- *** END OF ADMIN *** -->
 
     <!-- ITEM NAME AND DESCRIPTION -->
-    <a style="color:inherit;" href="<?php echo base_url('item/view') . '/' .  $item->item_id; ?>">
 	<div class="row">
-        <div class="col-md-4"><h3><?php echo html_escape($item->inventory_number); ?></h3></div>
-        <div class="col-md-7"><h3><?php echo html_escape($item->name); ?></h3></div>
-        <div class="col-md-1"><h6 class="text-right">ID <?php echo $item->item_id; ?></h6></div>
+        <div class="col-md-8"><h3><?php echo html_escape($item->name); ?></h3></div>
+        <div class="col-md-4">
+            <h4 class="text-right"><?php echo $this->lang->line('field_inventory_number_abr').' : '.html_escape($item->inventory_number); ?></h4>
+        </div>
     </div>
     <div class="row">
-        <div class="col-md-12"><p><?php echo html_escape($item->description); ?></p></div>
+        <div class="col-md-8"><p><?php echo html_escape($item->description); ?></p></div>
+        <div class="col-md-4"></div>
     </div>
-	</a>
 
 	<!-- ITEM DETAILS -->
     <div class="row">

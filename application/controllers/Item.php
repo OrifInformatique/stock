@@ -171,49 +171,40 @@ class Item extends MY_Controller {
   {
     // Check if this is allowed
     if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
-      // Test input
-      $this->load->library('form_validation');
 
-      $this->form_validation->set_rules("name", "Nom de l'item", 'required',
-      array('required' => "L'item doit avoir un nom"));
-
-      $this->form_validation->set_rules("inventory_number", "N° d'inventaire", 'required|callback_unique_inventory_nb',
-      array('required' => "L'item doit avoir un numero d'inventaire"));
+      $this->set_validation_rules();
 
       $data['upload_errors'] = "";
-      
-      // If there is no problem with the form (including the image)
-      if ($this->form_validation->run() === TRUE && !isset($upload_failed)) {
-        //$itemArray = array();
+      if (isset($_FILES['photo'])) {
+        // IMAGE UPLOADING
+        $config['upload_path']          = './uploads/images/';
+        $config['allowed_types']        = 'gif|jpg|png';
+        $config['max_size']             = 100;
+        $config['max_width']            = 550;
+        $config['max_height']           = 550;
+        
+        $this->load->library('upload');
+        $this->upload->initialize($config);
+        
+        if ($this->upload->do_upload('photo'))
+        {
+          $itemArray['image'] = $this->upload->data('file_name');
+        } else {
+          $data['upload_errors'] = $this->upload->display_errors();
+          $upload_failed = TRUE;
+        }
+      }
 
-      	if (isset($_FILES)) {
-      		// IMAGE UPLOADING
-      		$config['upload_path']          = './uploads/images/';
-      		//$config['upload_path']          = 'C:\\wamp64\\www\\stock\\uploads\\images\\'; //TOUJOURS INVALIDE
-      		$config['allowed_types']        = 'gif|jpg|png';
-      		$config['max_size']             = 100;
-      		$config['max_width']            = 550;
-      		$config['max_height']           = 550;
-      		
-      		$this->load->library('upload');
-      		$this->upload->initialize($config);
-      		
-      		if ($this->upload->do_upload('photo'))
-      		{
-      			$itemArray['image'] = $this->upload->data('file_name');
-      		} else {
-      			$data['upload_errors'] = $this->upload->display_errors();
-      			$upload_failed = TRUE;
-      		}
-      	}
-      	
+      if ($this->form_validation->run() === TRUE && !isset($upload_failed)) {
+        // No error, save item
+
         $linkArray = array();
 
         $this->load->model('item_tag_link_model');
 
         foreach($_POST as $key => $value) {
           if (substr($key, 0, 3) == "tag") {
-            // Stock link to be created when the item will exist
+            // Stock links to be created when the item will exist
             $linkArray[] = $value;
           } else {
             $itemArray[$key] = $value;
@@ -228,33 +219,40 @@ class Item extends MY_Controller {
         foreach ($linkArray as $tag) {
           $this->item_tag_link_model->insert(array("item_tag_id" => $tag, "item_id" => ($item_id)));
         }
-        header("Location: " . base_url() . "item/view/" . $item_id);
-        exit();
+        redirect("item/view/" . $item_id);
 
-      // Display form to complete it
       } else {
+        // Remember checked tags to display them checked again
+        foreach($_POST as $key => $value) {
+          // If it is a tag
+          if (substr($key, 0, 3) == "tag") {
+            // put it in the data array
+            $tag_link = new stdClass();
+            $tag_link->item_tag_id = substr($key, 3);
+            $data['tag_links'][] = (object) $tag_link;
+          }
+        }
+
         // Load the comboboxes options
     		$this->load->model('stocking_place_model');
     		$data['stocking_places'] = $this->stocking_place_model->get_all();
     		$this->load->model('supplier_model');
     		$data['suppliers'] = $this->supplier_model->get_all();
     		$this->load->model('item_group_model');
-    		$data['item_groups'] = $this->item_group_model->get_all();
+    		$data['item_groups'] = $this->item_group_model->dropdown('name');
         $this->load->model('item_condition_model');
         $data['condishes'] = $this->item_condition_model->get_all();
         
         // Load the tags
         $this->load->model('item_tag_model');
-    	$data['item_tags'] = $this->item_tag_model->get_all();
+        $data['item_tags'] = $this->item_tag_model->get_all();
 
-    		
-     	$this->display_view('item/form', $data);
+        $this->display_view('item/form', $data);
       }
 
-    // Creation is not allowed for the non-connected users, which are sent to the connection page
-     } else {
-       header("Location: " . base_url() . "auth/login");
-       exit();
+    } else {
+      // Access is not allowed
+      redirect("auth/login");
     }
   }
 
@@ -408,11 +406,11 @@ class Item extends MY_Controller {
 
 	public function modify($id)
 	{
-    // Check if this is allowed
+    // Check if access is allowed
     if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
       $this->load->model('item_tag_link_model');
 
-      // If there is no submit,
+      // If there is no submit
       if (empty($_POST))
       {
         // get the data from the item with this id,
@@ -421,31 +419,8 @@ class Item extends MY_Controller {
         // including its tags
         $data['tag_links'] = $this->item_tag_link_model->get_many_by("item_id", $id);
 
-        // Load the tags
-        $this->load->model('item_tag_model');
-        $data['item_tags'] = $this->item_tag_model->get_all();
-
-        // Load the options
-        $this->load->model('stocking_place_model');
-        $data['stocking_places'] = $this->stocking_place_model->get_all();
-        $this->load->model('supplier_model');
-        $data['suppliers'] = $this->supplier_model->get_all();
-        $this->load->model('item_group_model');
-        $data['item_groups'] = $this->item_group_model->get_all();
-        $this->load->model('item_condition_model');
-        $data['condishes'] = $this->item_condition_model->get_all();
       } else {
-        // Test input
-        $this->load->library('form_validation');
-
-        $this->form_validation->set_rules("name", "Nom de l'item", 'required',
-        array('required' => "L'item doit avoir un nom"));
-
-		//username: if changed,
-        if ($_POST['inventory_number'] != get_object_vars($this->item_model->get($id))['inventory_number']) {
-			$this->form_validation->set_rules("inventory_number", "N° d'inventaire", 'callback_unique_inventory_nb|required',
-			array('required' => "L'item doit avoir un numero d'inventaire"));
-		}
+        $this->set_validation_rules($id);
 		
         if ($this->form_validation->run() === TRUE) {
           //Declarations
@@ -474,7 +449,6 @@ class Item extends MY_Controller {
             if (substr($key, 0, 3) == "tag") {
               // put it in the array for tags.
               $this->item_tag_link_model->insert(array("item_tag_id" => $value, "item_id" => $id));
-            // Otherwise,
             } else {
               // put it in th array for item properties.
               $itemArray[$key] = $value;
@@ -484,33 +458,43 @@ class Item extends MY_Controller {
           // Execute the changes in the item table
           $this->item_model->update($id, $itemArray);
           redirect("/item/view/" . $id);
-          exit();
+
         } else {
-          // Load the options
-      		$this->load->model('stocking_place_model');
-      		$data['stocking_places'] = $this->stocking_place_model->get_all();
-      		$this->load->model('supplier_model');
-      		$data['suppliers'] = $this->supplier_model->get_all();
-      		$this->load->model('item_group_model');
-      		$data['item_groups'] = $this->item_group_model->get_all();
-          $this->load->model('item_condition_model');
-          $data['condishes'] = $this->item_condition_model->get_all();
-
-          // Load the tags
-          $this->load->model('item_tag_model');
-
-      		$data['item_tags'] = $this->item_tag_model->get_all();
-      	}
+          // Remember checked tags to display them checked again
+          foreach($_POST as $key => $value) {
+            // If it is a tag, since their keys are tag1, tag2, …
+            if (substr($key, 0, 3) == "tag") {
+              // put it in the data array
+              $tag_link = new stdClass();
+              $tag_link->item_tag_id = substr($key, 3);
+              $data['tag_links'][] = (object) $tag_link;
+            }
+          }
+        }
       }
 
       $data['modify'] = true;
-	  $data['item_id'] = $id;
+      $data['item_id'] = $id;
+
+      // Load the options
+      $this->load->model('stocking_place_model');
+      $data['stocking_places'] = $this->stocking_place_model->get_all();
+      $this->load->model('supplier_model');
+      $data['suppliers'] = $this->supplier_model->get_all();
+      $this->load->model('item_group_model');
+      $data['item_groups'] = $this->item_group_model->dropdown('name');
+      $this->load->model('item_condition_model');
+      $data['condishes'] = $this->item_condition_model->get_all();
+
+      // Load the tags
+      $this->load->model('item_tag_model');
+      $data['item_tags'] = $this->item_tag_model->get_all();
 
       $this->display_view('item/form', $data);
-    // Update is not allowed for the non-connected users, which are sent to the connection page
+    
     } else {
-      header("Location: " . base_url() . "auth/login");
-      exit();
+      // Update is not allowed
+      redirect("auth/login");
     }
 	}
 
@@ -571,18 +555,21 @@ class Item extends MY_Controller {
   }
 	}
 	
-	public function unique_inventory_nb($argNb) {
-      $this->load->model('item_model');
-	  
-      // Get this item. If it fails, it doesn't exist, so the inventory_number is unique!
-      $item = $this->item_model->get_by('inventory_number', $argNb);
-      
-      if(isset($item->item_id)) {
-        $this->form_validation->set_message('unique_inventory_nb', 'Ce numero d inventaire est déjà utilisé');
-        return FALSE;
-      } else {
-        return TRUE;
-      }
-    }
+  /**
+  * Set validation rules for create and update form
+  **/
+  private function set_validation_rules($id = NULL) {
+    $this->load->library('form_validation');
 
+    $this->form_validation->set_rules("name", $this->lang->line('field_item_name'), 'required');
+
+    // If new item or if inventory_number has been changed, check if it's unique
+    if (is_null($id) || $_POST['inventory_number'] != $this->item_model->get($id)->inventory_number) {
+      $this->form_validation->set_rules("inventory_number", $this->lang->line('field_inventory_number'),
+        'required|is_unique[item.inventory_number]',
+        array('is_unique' => $this->lang->line('msg_err_inventory_used')));
+    } else {
+      $this->form_validation->set_rules("inventory_number", $this->lang->line('field_inventory_number'), 'required');
+    }
+  }
 }
