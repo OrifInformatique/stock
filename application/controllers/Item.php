@@ -175,13 +175,13 @@ class Item extends MY_Controller {
       $this->set_validation_rules();
 
       $data['upload_errors'] = "";
-      if (isset($_FILES['photo'])) {
+      if (isset($_FILES['photo']) && $_FILES['photo']['name']!='') {
         // IMAGE UPLOADING
         $config['upload_path']          = './uploads/images/';
         $config['allowed_types']        = 'gif|jpg|png';
-        $config['max_size']             = 100;
-        $config['max_width']            = 550;
-        $config['max_height']           = 550;
+        $config['max_size']             = 2048;
+        $config['max_width']            = 360;
+        $config['max_height']           = 360;
         
         $this->load->library('upload');
         $this->upload->initialize($config);
@@ -194,8 +194,28 @@ class Item extends MY_Controller {
           $upload_failed = TRUE;
         }
       }
-
-      if ($this->form_validation->run() === TRUE && !isset($upload_failed)) {
+      if (isset($_FILES['linked_file']) && $_FILES['linked_file']['name']!='') {
+        
+        // LINKED FILE UPLOADING
+        $config['upload_path']          = './uploads/files/';
+        $config['allowed_types']        = 'pdf|doc|docx';
+        $config['max_size']             = 2048;
+        $config['max_width']            = 0;
+        $config['max_height']           = 0;
+        
+        $this->load->library('upload');
+        $this->upload->initialize($config);
+        
+        if ($this->upload->do_upload('linked_file'))
+        {
+          $itemArray['linked_file'] = $this->upload->data('file_name');
+        } else {
+          $data['upload_errors'] = $this->upload->display_errors();
+          $upload_failed = TRUE;
+        }
+      }
+      
+      if ($this->form_validation->run() == TRUE && $upload_failed!=TRUE) {
         // No error, save item
 
         $linkArray = array();
@@ -421,25 +441,49 @@ class Item extends MY_Controller {
 
       } else {
         $this->set_validation_rules($id);
-		
-        if ($this->form_validation->run() === TRUE) {
-          //Declarations
-          $itemArray = array();
 
+        $data['upload_errors'] = "";
+        if (isset($_FILES['photo']) && $_FILES['photo']['name']!='') {
           // IMAGE UPLOADING
-          $config['upload_path']          = "./uploads/images/";
+          $config['upload_path']          = './uploads/images/';
           $config['allowed_types']        = 'gif|jpg|png';
-          $config['max_size']             = 100;
-          $config['max_width']            = 550;
-          $config['max_height']           = 550;
-
+          $config['max_size']             = 2048;
+          $config['max_width']            = 360;
+          $config['max_height']           = 360;
+          
           $this->load->library('upload');
           $this->upload->initialize($config);
-
+          
           if ($this->upload->do_upload('photo'))
           {
             $itemArray['image'] = $this->upload->data('file_name');
+          } else {
+            $data['upload_errors'] = $this->upload->display_errors();
+            $upload_failed = TRUE;
           }
+        }
+        if (isset($_FILES['linked_file']) && $_FILES['linked_file']['name']!='') {
+          
+          // LINKED FILE UPLOADING
+          $config['upload_path']          = './uploads/files/';
+          $config['allowed_types']        = 'pdf|doc|docx';
+          $config['max_size']             = 2048;
+          $config['max_width']            = 0;
+          $config['max_height']           = 0;
+          
+          $this->load->library('upload');
+          $this->upload->initialize($config);
+          
+          if ($this->upload->do_upload('linked_file'))
+          {
+            $itemArray['linked_file'] = $this->upload->data('file_name');
+          } else {
+            $data['upload_errors'] = $this->upload->display_errors();
+            $upload_failed = TRUE;
+          }
+        }
+		
+        if ($this->form_validation->run() == TRUE && $upload_failed!=TRUE) {
 
           // Delete ALL the tags for this object
           $this->item_tag_link_model->delete_by(array('item_id' => $id));

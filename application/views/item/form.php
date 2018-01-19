@@ -1,6 +1,6 @@
 <form class="container" method="post" enctype="multipart/form-data">
     <!-- BUTTONS -->
-    <div>
+    <div class="form-group">
         <button type="submit" class="btn btn-success"><?php echo $this->lang->line('btn_submit'); ?></button>
         <a class="btn btn-danger" href="<?php echo base_url(); if(isset($modify)) {echo "item/view/" . $item_id;} ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
     </div>
@@ -17,68 +17,73 @@
     ?>
 
     <!-- ITEM NAME AND DESCRIPTION -->
-    <div class="row">
-        <div class="col-md-8"><h3>
-            <input type="text"
-                   name="name"
-                   placeholder="<?php echo $this->lang->line('field_item_name') ?>"
-                   value="<?php if(isset($name)) {echo set_value('name',$name);} else {echo set_value('name');} ?>" />
-        </h3></div>
-        <div class="col-md-4 text-right"><h4>
-            <?php echo $this->lang->line('field_inventory_number_abr').' : ' ?>
-            <input type="text" name="inventory_number"
-                   placeholder="<?php echo $this->lang->line('field_inventory_number') ?>"
-                   value="<?php if(isset($inventory_number)) {echo set_value('inventory_number',$inventory_number);} else {echo set_value('inventory_number');} ?>" />
-        </h4></div>
-    </div>
-    <div class="row">
-        <div class="col-md-12"><p>
-            <input type="text"
-                    class="form-control"
-                    name="description"
-                    placeholder="Description de l'objet"
+    <div class="form-row">
+        <div class="form-group col-md-8">
+            <input type="text" class="form-control" name="name"
+                    placeholder="<?php echo $this->lang->line('field_item_name') ?>"
+                    value="<?php if(isset($name)) {echo set_value('name',$name);} else {echo set_value('name');} ?>" />
+        </div>
+        <div class="form-group col-md-4 text-right">
+            <input type="text" class="form-control" name="inventory_number"
+                    placeholder="<?php echo $this->lang->line('field_inventory_number') ?>"
+                    value="<?php if(isset($inventory_number)) {echo set_value('inventory_number',$inventory_number);} else {echo set_value('inventory_number');} ?>" />
+        </div>
+        <div class="form-group col-md-12">
+            <input type="text" class="form-control" name="description"
+                    placeholder="<?php echo $this->lang->line('field_item_description') ?>"
                     value="<?php if(isset($description)) {echo set_value('description',$description);} else {echo set_value('description');} ?>" />
-        </p></div>
+        </div>
     </div>
 
     <!-- ITEM DETAILS -->
-    <?php var_dump($item_groups) ?>
-    <div class="row">
+    <div class="form-row">
         <div class="col-md-12">
             <p class="bg-primary">&nbsp;<?php echo $this->lang->line('text_item_detail'); ?></p>
         </div>
-        <div class="col-md-4">
-            <p><?php echo $this->lang->line('field_image_upload'); ?></p>
-			<input type="file" name="photo" accept="image/*" />
+        <div class="form-group col-md-4">
+            <label for="photo"><?php echo $this->lang->line('field_image_upload'); ?></label>
+			<input type="file" name="photo" accept="image/*" class="form-control-file" />
             <?php if (isset($image) && $image!='') { ?>
                 <img src="<?php echo base_url('uploads/images/'.$image); ?>"
                      width="100%"
                      alt="<?php echo $this->lang->line('field_image'); ?>" />
             <?php } ?>
         </div>
-        <div class="col-md-8">
-            <div class="row">
-                <div class="col-md-4">
+        <div class="form-group col-md-8">
+            <div class="form-row">
+                <div class="form-group col-md-4">
                     <label><?php echo $this->lang->line('field_group'); ?> :&nbsp;</label>
                     <?php
                     if (isset($_POST['item_group_id'])) {
-                        echo form_dropdown('item_group_id', $item_groups, $_POST['item_group_id']);
+                        // A group has allready been selected, keep it selected
+                        echo form_dropdown('item_group_id', $item_groups, $_POST['item_group_id'], 'class="form-control"');
                     } elseif (isset($item_group_id)) {
-                        echo form_dropdown('item_group_id', $item_groups, $item_group_id);
+                        // The item exists, get its group and select it
+                        echo form_dropdown('item_group_id', $item_groups, $item_group_id, 'class="form-control"');
                     } else {
-                        echo form_dropdown('item_group_id', $item_groups);
+                        // No group selected
+                        echo form_dropdown('item_group_id', $item_groups, '', 'class="form-control"');
                     }
                     ?>
                 </div>
-                <div class="col-md-8">
+                <div class="form-group col-md-8">
                     <label for="serial_number"><?php echo $this->lang->line('field_serial_number'); ?> :&nbsp;</label>
-                    <input type="text" id="serial_number" name="serial_number" value="<?php if(isset($serial_number)) {echo set_value('serial_number',$serial_number);} else {echo set_value('serial_number');} ?>" />
+                    <input type="text" id="serial_number" name="serial_number" class="form-control"
+                            value="<?php if(isset($serial_number)) {echo set_value('serial_number',$serial_number);} else {echo set_value('serial_number');} ?>" />
                 </div>
             </div>
-
-            <label for="remarks"><?php echo $this->lang->line('field_remarks'); ?></label>
-            <textarea id="remarks" name="remarks"><?php if(isset($remarks)) {echo set_value('remarks',$remarks);} else {echo set_value('remarks');} ?></textarea>
-
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="remarks"><?php echo $this->lang->line('field_remarks'); ?></label>
+                    <textarea id="remarks" name="remarks" class="form-control">
+                        <?php if(isset($remarks)) {echo set_value('remarks',$remarks);} else {echo set_value('remarks');} ?>
+                    </textarea>
+                </div>
+            </div>
+            <div class="form-group col-md-12">
+                <label for="linked_file"><?php echo $this->lang->line('field_linked_file_upload'); ?></label>
+                <input type="file" name="linked_file" accept=".pdf, .doc, .docx" class="form-control-file" />
+            </div>
             <!-- Button to display linked file -->
             <?php
             /*if (!empty($item->linked_file)) {
