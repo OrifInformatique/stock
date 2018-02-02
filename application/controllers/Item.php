@@ -48,7 +48,7 @@ class Item extends MY_Controller {
         // If no options are set
         if (empty($_GET)) {
 
-          $output['items'] = $this->item_model->with('created_by_user')
+          $output['items'] = $this->item_model->with('stocking_place')
                                               ->with('item_condition')
                                               ->get_all();
 
@@ -133,7 +133,9 @@ class Item extends MY_Controller {
 			  $where2="(1=2".substr($where2,1);
 		  }
 		  
-          $output["items"] = $this->item_model->with('created_by_user')->with('item_condition')->get_many_by($where2);
+          $output["items"] = $this->item_model->with('stocking_place')
+                                              ->with('item_condition')
+                                              ->get_many_by($where2);
         }
 
         $this->display_view('item/list', $output);

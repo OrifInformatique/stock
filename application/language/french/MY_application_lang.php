@@ -45,9 +45,9 @@ $lang['field_tags']                     = 'Tags';
 // List headers
 $lang['header_picture']                 = 'Photo';
 $lang['header_status']                  = 'Disponibilité';
+$lang['header_serial_nb']               = 'No de série';
 $lang['header_inventory_nb']            = 'No d\'inventaire';
 $lang['header_item_name']               = 'Objet';
-$lang['header_item_description']        = 'Description';
 $lang['header_item_created_by']         = 'Créé par';
 
 $lang['header_loan_date']               = 'Prêté le';
@@ -59,6 +59,7 @@ $lang['header_loan_to_user']            = 'Prêté à';
 $lang['header_tags']                    = 'Tags :';
 $lang['header_conditions']              = 'Conditions :';
 $lang['header_groups']                  = 'Groupes :';
+$lang['header_stocking_place']          = 'Lieu de stockage';
 $lang['header_stocking_places']         = 'Lieux de stockage :';
 
 $lang['header_username']                = 'Identifiant';

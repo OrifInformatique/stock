@@ -96,8 +96,13 @@ if (!empty($_GET)) {
         <th><?php echo html_escape($this->lang->line('header_picture')); ?></th>
         <th><?php echo html_escape($this->lang->line('header_status')); ?></th>
         <th><?php echo html_escape($this->lang->line('header_item_name')); ?></th>
-        <th><?php echo html_escape($this->lang->line('header_item_description')); ?></th>
-        <th><?php echo html_escape($this->lang->line('header_inventory_nb')); ?></th>
+        <th nowrap><?php echo html_escape($this->lang->line('header_stocking_place')); ?></th>
+        <th nowrap>
+        <?php
+          echo html_escape($this->lang->line('header_inventory_nb'));
+          echo '<br />'.html_escape($this->lang->line('header_serial_nb'));
+        ?>
+        </th>
       </tr>
     </thead>
     <tbody>
@@ -111,14 +116,22 @@ if (!empty($_GET)) {
             </a>
           </td>
           <td>
-            <?php echo $item->item_condition->bootstrap_label.'<br />'.$item->loan_bootstrap_label ?>
+            <?php
+              echo $item->item_condition->bootstrap_label;
+              echo '<br />'.$item->loan_bootstrap_label;
+              if (!is_null($item->current_loan)) {
+                echo '<br /><h6>'.$item->current_loan->item_localisation.'</h6>';
+              }
+            ?>
           </td>
           <td>
             <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo html_escape($item->name); ?></a>
+            <h6><?php echo html_escape($item->description); ?></h6>
           </td>
-          <td><?php echo html_escape($item->description); ?></td>
+          <td><?php echo html_escape($item->stocking_place->name); ?></td>
           <td>
             <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo html_escape($item->inventory_number); ?></a>
+            <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo html_escape($item->serial_number); ?></a>
           </td>
           <td><?php
             if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?>
