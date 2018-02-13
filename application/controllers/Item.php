@@ -9,12 +9,12 @@
 
 class Item extends MY_Controller {
 
-    /* MY_Controller variables definition */
-    protected $access_level = "*";
+  /* MY_Controller variables definition */
+  protected $access_level = "*";
 
-    /**
-    * Constructor
-    */
+  /**
+  * Constructor
+  */
 	public function __construct()
 	{
 			parent::__construct();
@@ -26,77 +26,71 @@ class Item extends MY_Controller {
     * Display items list
     */
 	public function index()
-    {
-      $output['title'] = $this->lang->line('page_item_list');
+  {
+    $output['title'] = $this->lang->line('page_item_list');
 
-      $this->load->model('item_tag_model');
-      $output['item_tags'] = $this->item_tag_model->get_all();
-      $this->load->model('item_condition_model');
-      $output['item_conditions'] = $this->item_condition_model->get_all();
-      $this->load->model('item_group_model');
-      $output['item_groups'] = $this->item_group_model->get_all();
-      $this->load->model('stocking_place_model');
-      $output['stocking_places'] = $this->stocking_place_model->get_all();
+    // Load list of elements to display as filters
+    $this->load->model('item_tag_model');
+    $output['item_tags'] = $this->item_tag_model->dropdown('name');
+    $this->load->model('item_condition_model');
+    $output['item_conditions'] = $this->item_condition_model->get_all();
+    $this->load->model('item_group_model');
+    $output['item_groups'] = $this->item_group_model->get_all();
+    $this->load->model('stocking_place_model');
+    $output['stocking_places'] = $this->stocking_place_model->get_all();
 
-        // Store URL to make possible to come back later (from item detail for example)
-        if (isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING'])) {
-          $_SESSION['items_list_url'] = current_url().'?'.$_SERVER['QUERY_STRING'];
-        } else {
-          $_SESSION['items_list_url'] = current_url();
-        }
+    // Store URL to make possible to come back later (from item detail for example)
+    if (isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING'])) {
+      $_SESSION['items_list_url'] = current_url().'?'.$_SERVER['QUERY_STRING'];
+    } else {
+      $_SESSION['items_list_url'] = current_url();
+    }
 
-        // If no options are set
-        if (empty($_GET)) {
 
-          $output['items'] = $this->item_model->with('stocking_place')
-                                              ->with('item_condition')
-                                              ->get_all();
+    /*********************
+    ** ITEM TAGS FILTER
+    **********************/
+    $where_itemTagsFilter = '';
 
-        // If options are set
-        } else {
+    if (isset($_GET['t'])) {
+      // Get a list of item_tag_link elements
+      $this->load->model('item_tag_link_model');
+      $item_tags_selection = $_GET['t'];
 
-          // FIRST PART
+      $where_itemTagLinks = '';
+      foreach ($item_tags_selection as $item_tag) {
+        $where_itemTagLinks .= 'item_tag_id='.$item_tag.' OR ';
+      }
+      // Remove the last " OR "
+      $where_itemTagLinks = substr($where_itemTagLinks, 0, -4);
 
-          $column = array(
-            "t" => "item_tag_id",
-            "c" => "item_condition_id",
-            "g" => "item_group_id",
-            "s" => "stocking_place_id");
+      $item_tag_links = $this->item_tag_link_model->get_many_by($where_itemTagLinks);
+      
 
-          // Checkbox classification
+      // Prepare WHERE close for all corresponding items
+      $where_itemTagsFilter .= '(';
+      foreach ($item_tag_links as $item_tag_link) {
+        $where_itemTagsFilter .= 'item_id='.$item_tag_link->item_id.' OR ';
+      }
+      // Remove the last " OR "
+      $where_itemTagsFilter = substr($where_itemTagsFilter, 0, -4);
+      $where_itemTagsFilter .= ')';
+      
 
-          foreach ($_GET as $key => $num)
-          {
-            $cat = $key[0];
-            if (isset($where[$cat]))
-            {
-              $where[$cat] .= " OR " . $column[$cat] . " = " . $num;
-            } else {
-              $where[$cat] = $column[$cat] . " = " . $num;
-            }
-          }
+      // Send back the tags selection to keep them selected
+      $output['item_tags_selection'] = $item_tags_selection;
 
+    } else {
+      // No tags selected for filtering
+      $output['item_tags_selection'] = '';
+    }
+
+
+/*********************
+** TODO : ADD OTHER FILTERS
+**********************/
+/*
           $where2 = "";
-
-          if (isset($where['t']))
-          {  
-            $this->load->model('item_tag_link_model');
-
-            $temp = $this->item_tag_link_model->get_many_by($where['t']);
-			
-            // Set the WHERE clause
-            //$where2 .= "(";
-
-            // Add all the tags wanted to it
-            foreach ($temp as $num)
-            {
-              $where2 .= " OR item_id = " . $num->item_id;
-            }
-
-            // Delete the initial OR
-            $where2 = "(".substr($where2, 3);
-            $where2 .= ")";
-		  }
 
           if (isset($where['c']))
           {
@@ -127,19 +121,19 @@ class Item extends MY_Controller {
 
             $where2 .= "(" . $where['s'] . ")";
           }
-		  
-		  // Aucun item pour les tags sélectionnés
-		  if (substr($where2,0,2) == "()") {
-			  $where2="(1=2".substr($where2,1);
-		  }
-		  
-          $output["items"] = $this->item_model->with('stocking_place')
-                                              ->with('item_condition')
-                                              ->get_many_by($where2);
-        }
+*/
 
-        $this->display_view('item/list', $output);
-    }
+    /*********************
+    ** GROUP ALL FILTERS AND GET ITEMS
+    **********************/
+	  $where_itemsFilters = $where_itemTagsFilter;
+
+    $output["items"] = $this->item_model->with('stocking_place')
+                                        ->with('item_condition')
+                                        ->get_many_by($where_itemsFilters);
+
+    $this->display_view('item/list', $output);
+  }
 
 	/**
     * Display details of one single item

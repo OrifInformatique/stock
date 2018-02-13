@@ -56,7 +56,6 @@ $lang['header_loan_real_return']        = 'Retour effectif';
 $lang['header_loan_localisation']       = 'Lieu du prêt';
 $lang['header_loan_by_user']            = 'Prêté par';
 $lang['header_loan_to_user']            = 'Prêté à';
-$lang['header_tags']                    = 'Tags :';
 $lang['header_conditions']              = 'Conditions :';
 $lang['header_groups']                  = 'Groupes :';
 $lang['header_stocking_place']          = 'Lieu de stockage';
@@ -85,7 +84,6 @@ $lang['btn_linked_doc']                 = 'Voir document…';
 $lang['btn_loans_history']              = 'Historique des prêts…';
 $lang['btn_create_loan']                = 'Ajouter un prêt…';
 $lang['btn_submit_filters']             = 'Activer les filtres';
-$lang['btn_toggle_filters']             = 'Voir/masquer les filtres';
 $lang['btn_all']                        = 'Tout';
 $lang['btn_none']                       = 'Rien';
 
