@@ -23,3 +23,17 @@ div.link-admin {
 label {
     display: block;
 }
+
+/* Classes to add a standard margin to an element */
+.top-margin {
+	margin-top: 10px;
+}
+.right-margin {
+	margin-right: 10px;
+}
+.bottom-margin {
+	margin-bottom: 10px;
+}
+.left-margin {
+	margin-left: 10px;
+}

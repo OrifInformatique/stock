@@ -172,7 +172,7 @@
     <!-- ITEM TAGS -->
     <div class="row">
         <div class="col-md-12">
-            <p class="bg-primary">&nbsp;<?php echo $this->lang->line('text_item_tags'); ?></p>
+            <p class="bg-primary">&nbsp;<?php echo $this->lang->line('field_tags'); ?></p>
         </div>
         <div class="col-md-12">
             <?php
