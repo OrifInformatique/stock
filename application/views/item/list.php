@@ -1,91 +1,82 @@
 <div class="container">
+
+<!-- *** ADMIN *** -->
+<?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?>
+<div class="row bottom-margin">
+  <!-- Button for new item -->
+  <a href="<?php echo base_url(); ?>item/create/" class="btn btn-success"><?php echo html_escape($this->lang->line('btn_new')); ?></a>
+</div>
+<?php } ?>
+<!-- *** END OF ADMIN *** -->
+
 <div class="row">
-<div class="col-lg-12 col-sm-12">
-  <button class="btn" type="button" data-toggle="collapse" data-target="#filters"><?php echo html_escape($this->lang->line('btn_toggle_filters')); ?></button>
-  <form class="collapse<?php
-// If filters were set, show the form
-if (!empty($_GET)) {
-  echo " in";
-}
-   ?>" id="filters" method="get">
+  <!-- FILTERS FORM -->
+  <form id="filters" method="get">
+    <p class="bg-primary">&nbsp;<?php echo html_escape($this->lang->line('text_search_filters')); ?></p>
 
-   <!-- TAGS FILTER -->
+    <!-- TEXT FILTER -->
+    <div class="col-sm-12">
+    <?php
+      echo form_label($this->lang->line('field_text_search'),
+                      'item_conditions-multiselect');
+      echo form_input('ts', $text_search_content, 
+                      'id="text_search" class="form-control"
+                      placeholder="'.$this->lang->line('field_no_filter').'"');
+    ?>
+    </div>
 
-   <div class="col-md-12">
-     <i><?php html_escape($this->lang->line('header_tags')); ?></i><br />
- <?php foreach ($item_tags as $item_tag) { ?>
- <label class="checkbox-inline"><input data-tag="a" type="checkbox" name="t<?php echo $item_tag->item_tag_id; ?>" value="<?php echo $item_tag->item_tag_id; ?>"
-   <?php
-       if (isset($_GET['t' . $item_tag->item_tag_id]))
-       {
-         echo 'checked';
-       }
-   ?> />
- <?php echo $item_tag->name; ?></label>
- <?php } ?>
- <button type="button" onclick="$('[data-tag]').attr('checked', false);$('[data-tag]').click()"><?php echo html_escape($this->lang->line('btn_all')); ?></button>
- <button type="button" onclick="$('[data-tag]').attr('checked', false)"><?php echo html_escape($this->lang->line('btn_none')); ?></button>
-   </div>
-
-   <!-- CONDITIONS FILTER -->
-
-   <div class="col-md-12">
-    <i><?php html_escape($this->lang->line('header_conditions')); ?></i><br />
-    <?php foreach ($item_conditions as $item_condition) { ?>
-    <label class="checkbox-inline"><input data-condition="a" type="checkbox" name="c<?php echo $item_condition->item_condition_id; ?>" value="<?php echo $item_condition->item_condition_id; ?>"
-      <?php
-          if (isset($_GET['c' . $item_condition->item_condition_id]))
-          {
-            echo 'checked';
-          }
-      ?> />
-    <?php echo $item_condition->name; ?></label>
-    <?php } ?>
-    <button type="button" onclick="$('[data-condition]').attr('checked', false);$('[data-condition]').click()"><?php echo html_escape($this->lang->line('btn_all')); ?></button>
-    <button type="button" onclick="$('[data-condition]').attr('checked', false)"><?php echo html_escape($this->lang->line('btn_none')); ?></button>
-      </div>
+    <!-- CONDITIONS FILTER -->
+    <div class="col-sm-4 col-sm-push-8 top-margin">
+    <?php
+      echo form_label($this->lang->line('field_item_condition'),
+                      'item_conditions-multiselect');
+      echo form_dropdown('c[]', $item_conditions, $item_conditions_selection,
+                         'id="item_conditions-multiselect" multiple="multiple"');
+    ?>
+    </div>
 
     <!-- GROUPS FILTER -->
+    <div class="col-sm-4 col-sm-pull-4 top-margin">
+    <?php
+      echo form_label($this->lang->line('field_group'),
+                      'item_groups-multiselect');
+      echo form_dropdown('g[]', $item_groups, $item_groups_selection,
+                         'id="item_groups-multiselect" multiple="multiple"');
+    ?>
+    </div>
 
-    <div class="col-md-12">
-     <i><?php html_escape($this->lang->line('header_groups')); ?></i><br />
-     <?php foreach ($item_groups as $item_group) { ?>
-     <label class="checkbox-inline"><input data-group="a" type="checkbox" name="g<?php echo $item_group->item_group_id; ?>" value="<?php echo $item_group->item_group_id; ?>"
-       <?php
-           if (isset($_GET['g' . $item_group->item_group_id]))
-           {
-             echo 'checked';
-           }
-       ?> />
-     <?php echo $item_group->name; ?></label>
-     <?php } ?>
-     <button type="button" onclick="$('[data-group]').attr('checked', false);$('[data-group]').click()"><?php echo html_escape($this->lang->line('btn_all')); ?></button>
-     <button type="button" onclick="$('[data-group]').attr('checked', false)"><?php echo html_escape($this->lang->line('btn_none')); ?></button>
-       </div>
+    <!-- STOCKING PLACES FILTER -->
+    <div class="col-sm-4 col-sm-pull-4 top-margin">
+    <?php
+      echo form_label($this->lang->line('field_stocking_place'),
+                      'stocking_places-multiselect');
+      echo form_dropdown('s[]', $stocking_places, $stocking_places_selection,
+                         'id="stocking_places-multiselect" multiple="multiple"');
+    ?>
+    </div>
 
-     <!-- STOCKING PLACES FILTER -->
+    <!-- TAGS FILTER -->
+    <div class="col-sm-12 top-margin">
+    <?php
+      echo form_label($this->lang->line('field_tags'),
+                      'item_conditions-multiselect');
+      echo form_dropdown('t[]', $item_tags, $item_tags_selection,
+                         'id="item_tags-multiselect" multiple="multiple"');
+    ?>
+    </div>
 
-     <div class="col-md-12">
-      <i><?php echo html_escape($this->lang->line('header_stocking_places')); ?></i><br />
-      <?php foreach ($stocking_places as $stocking_place) { ?>
-      <label class="checkbox-inline"><input data-place="a" type="checkbox" name="s<?php echo $stocking_place->stocking_place_id; ?>" value="<?php echo $stocking_place->stocking_place_id; ?>"
-        <?php
-            if (isset($_GET['s' . $stocking_place->stocking_place_id]))
-            {
-              echo 'checked';
-            }
-        ?> />
-      <?php echo $stocking_place->name; ?></label>
-      <?php } ?>
-      <button type="button" onclick="$('[data-place]').attr('checked', false);$('[data-place]').click()"><?php echo html_escape($this->lang->line('btn_all')); ?></button>
-      <button type="button" onclick="$('[data-place]').attr('checked', false)"><?php echo html_escape($this->lang->line('btn_none')); ?></button>
-        </div>
-    <button type="submit"><strong><?php echo html_escape($this->lang->line('btn_submit_filters')); ?></strong></button>
+    <!-- BUTTON TO APPLY FILTERS -->
+    <div class="col-sm-3 col-xs-6">
+      <button type="submit" class="btn btn-primary top-margin"><?php echo html_escape($this->lang->line('btn_submit_filters')); ?></button>
+    </div>
+    <div class="col-sm-3 col-xs-6">
+      <a href="<?php echo base_url(); ?>item" class="btn btn-default top-margin"><?php echo html_escape($this->lang->line('btn_remove_filters')); ?></a>
+    </div>
   </form>
-
-  <!-- BUTTON FOR NEW ITEM -->
-  <a href="<?php echo base_url(); ?>item/create/" class="btn btn-primary">Nouveau…</a>
-
+  <!-- END OF FILTERS -->
+</div>
+<div class="row top-margin">
+  
   <!-- LIST OF ITEMS -->
   <?php if(empty($items)) { ?>
     <em><?php html_escape($this->lang->line('msg_no_item')); ?></em>
@@ -142,7 +133,36 @@ if (!empty($_GET)) {
       <?php } ?>
     </tbody>
   </table>
-<?php } ?>
+  <?php } ?>
 </div>
 </div>
-</div>
+
+<!-- Initialize the Bootstrap Multiselect plugin: -->
+<script type="text/javascript">
+    $(document).ready(function() {
+      var no_filter = "<?php
+                        echo html_escape($this->lang->line('field_no_filter'));
+                      ?>";
+
+      $('#item_tags-multiselect').multiselect({
+        nonSelectedText: no_filter,
+        buttonWidth: '100%',
+        numberDisplayed: 10
+      });
+      $('#item_conditions-multiselect').multiselect({
+        nonSelectedText: no_filter,
+        buttonWidth: '100%',
+        numberDisplayed: 5
+      });
+      $('#item_groups-multiselect').multiselect({
+        nonSelectedText: no_filter,
+        buttonWidth: '100%',
+        numberDisplayed: 5
+      });
+      $('#stocking_places-multiselect').multiselect({
+        nonSelectedText: no_filter,
+        buttonWidth: '100%',
+        numberDisplayed: 5
+      });
+    });
+</script>

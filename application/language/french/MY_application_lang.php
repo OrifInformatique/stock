@@ -28,6 +28,7 @@ $lang['field_inventory_number']         = 'Numéro d\'inventaire';
 $lang['field_inventory_number_abr']     = 'No inventaire';
 $lang['field_item_name']            	= 'Nom de l\'objet';
 $lang['field_item_description']         = 'Description de l\'objet';
+$lang['field_item_condition']           = 'État de l\'objet';
 $lang['field_image']                    = 'Photo de l\'objet';
 $lang['field_image_upload']				= 'Ajoutez une image<br />(hauteur et largeur max. 360px)';
 $lang['field_linked_file_upload']		= 'Ajoutez un fichier joint<br />(un seul fichier possible, pdf ou Word, max. 2Mo)';
@@ -40,7 +41,9 @@ $lang['field_supplier_ref']             = 'Réf. fournisseur';
 $lang['field_buying_price']             = 'Prix d\'achat';
 $lang['field_buying_date']              = 'Date d\'achat';
 $lang['field_warranty_duration']        = 'Durée de la garantie';
-$lang['field_tags']                     = 'Tags';
+$lang['field_tags']                     = 'Type d\'objet';
+$lang['field_text_search']              = 'Nom, description, No inventaire, No série';
+$lang['field_no_filter']                = 'Aucun filtre';
 
 // List headers
 $lang['header_picture']                 = 'Photo';
@@ -56,11 +59,9 @@ $lang['header_loan_real_return']        = 'Retour effectif';
 $lang['header_loan_localisation']       = 'Lieu du prêt';
 $lang['header_loan_by_user']            = 'Prêté par';
 $lang['header_loan_to_user']            = 'Prêté à';
-$lang['header_tags']                    = 'Tags :';
-$lang['header_conditions']              = 'Conditions :';
-$lang['header_groups']                  = 'Groupes :';
+$lang['header_groups']                  = 'Groupes';
 $lang['header_stocking_place']          = 'Lieu de stockage';
-$lang['header_stocking_places']         = 'Lieux de stockage :';
+$lang['header_stocking_places']         = 'Lieux de stockage';
 
 $lang['header_username']                = 'Identifiant';
 $lang['header_lastname']                = 'Nom';
@@ -72,6 +73,7 @@ $lang['header_is_active']               = 'Activé';
 // Buttons
 $lang['btn_admin']                      = 'Administration';
 $lang['btn_cancel']                     = 'Annuler';
+$lang['btn_new']                		= 'Nouveau';
 $lang['btn_modify']                		= 'Modifier';
 $lang['btn_delete']                		= 'Supprimer';
 $lang['btn_submit']                     = 'Sauvegarder';
@@ -85,7 +87,7 @@ $lang['btn_linked_doc']                 = 'Voir document…';
 $lang['btn_loans_history']              = 'Historique des prêts…';
 $lang['btn_create_loan']                = 'Ajouter un prêt…';
 $lang['btn_submit_filters']             = 'Activer les filtres';
-$lang['btn_toggle_filters']             = 'Voir/masquer les filtres';
+$lang['btn_remove_filters']             = 'Supprimer les filtres';
 $lang['btn_all']                        = 'Tout';
 $lang['btn_none']                       = 'Rien';
 
@@ -111,5 +113,6 @@ $lang['text_item_detail']               = 'Photo et détail';
 $lang['text_item_condition']            = 'Condition';
 $lang['text_item_loan_status']          = 'Disponibilité et prêts';
 $lang['text_item_buying_warranty']      = 'Achat et garantie';
-$lang['text_item_tags']                 = 'Tags';
+$lang['text_search_filters']            = 'Filtres de recherche';
+$lang['text_filtered_items_list']       = 'Liste des objets correspondants';
 $lang['text_kinds_to_show']             = 'Afficher uniquement les…';
