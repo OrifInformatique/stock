@@ -14,63 +14,70 @@
   <form id="filters" method="get">
     <p class="bg-primary">&nbsp;<?php echo html_escape($this->lang->line('text_search_filters')); ?></p>
 
-    <!-- TEXT FILTER -->
-    <div class="col-sm-12">
-    <?php
-      echo form_label($this->lang->line('field_text_search'),
-                      'item_conditions-multiselect');
-      echo form_input('ts', $text_search_content, 
-                      'id="text_search" class="form-control"
-                      placeholder="'.$this->lang->line('field_no_filter').'"');
-    ?>
+    <div class="row">
+      <!-- TEXT FILTER -->
+      <div class="col-sm-8 top-margin">
+      <?php
+        echo form_label($this->lang->line('field_text_search'),
+                        'item_conditions-multiselect');
+        echo form_input('ts', $text_search_content, 
+                        'id="text_search" class="form-control"
+                        placeholder="'.$this->lang->line('field_no_filter').'"');
+      ?>
+      </div>
+
+      <!-- CONDITIONS FILTER -->
+      <div class="col-sm-4 top-margin">
+      <?php
+        echo form_label($this->lang->line('field_item_condition'),
+                        'item_conditions-multiselect');
+        echo form_dropdown('c[]', $item_conditions, $item_conditions_selection,
+                           'id="item_conditions-multiselect" multiple="multiple"');
+      ?>
+      </div>
     </div>
 
-    <!-- CONDITIONS FILTER -->
-    <div class="col-sm-4 col-sm-push-8 top-margin">
-    <?php
-      echo form_label($this->lang->line('field_item_condition'),
-                      'item_conditions-multiselect');
-      echo form_dropdown('c[]', $item_conditions, $item_conditions_selection,
-                         'id="item_conditions-multiselect" multiple="multiple"');
-    ?>
+    <div class="row">
+      <!-- TAGS FILTER -->
+      <div class="col-sm-8 top-margin">
+      <?php
+        echo form_label($this->lang->line('field_tags'),
+                        'item_conditions-multiselect');
+        echo form_dropdown('t[]', $item_tags, $item_tags_selection,
+                           'id="item_tags-multiselect" multiple="multiple"');
+      ?>
+      </div>
+
+      <!-- GROUPS FILTER -->
+      <div class="col-sm-4 top-margin">
+      <?php
+        echo form_label($this->lang->line('field_group'),
+                        'item_groups-multiselect');
+        echo form_dropdown('g[]', $item_groups, $item_groups_selection,
+                           'id="item_groups-multiselect" multiple="multiple"');
+      ?>
+      </div>
     </div>
 
-    <!-- GROUPS FILTER -->
-    <div class="col-sm-4 col-sm-pull-4 top-margin">
-    <?php
-      echo form_label($this->lang->line('field_group'),
-                      'item_groups-multiselect');
-      echo form_dropdown('g[]', $item_groups, $item_groups_selection,
-                         'id="item_groups-multiselect" multiple="multiple"');
-    ?>
-    </div>
+    <div class="row">
 
-    <!-- STOCKING PLACES FILTER -->
-    <div class="col-sm-4 col-sm-pull-4 top-margin">
-    <?php
-      echo form_label($this->lang->line('field_stocking_place'),
-                      'stocking_places-multiselect');
-      echo form_dropdown('s[]', $stocking_places, $stocking_places_selection,
-                         'id="stocking_places-multiselect" multiple="multiple"');
-    ?>
-    </div>
+      <!-- STOCKING PLACES FILTER -->
+      <div class="col-sm-4 col-sm-push-8 top-margin">
+      <?php
+        echo form_label($this->lang->line('field_stocking_place'),
+                        'stocking_places-multiselect');
+        echo form_dropdown('s[]', $stocking_places, $stocking_places_selection,
+                           'id="stocking_places-multiselect" multiple="multiple"');
+      ?>
+      </div>
 
-    <!-- TAGS FILTER -->
-    <div class="col-sm-12 top-margin">
-    <?php
-      echo form_label($this->lang->line('field_tags'),
-                      'item_conditions-multiselect');
-      echo form_dropdown('t[]', $item_tags, $item_tags_selection,
-                         'id="item_tags-multiselect" multiple="multiple"');
-    ?>
-    </div>
-
-    <!-- BUTTON TO APPLY FILTERS -->
-    <div class="col-sm-3 col-xs-6">
-      <button type="submit" class="btn btn-primary top-margin"><?php echo html_escape($this->lang->line('btn_submit_filters')); ?></button>
-    </div>
-    <div class="col-sm-3 col-xs-6">
-      <a href="<?php echo base_url(); ?>item" class="btn btn-default top-margin"><?php echo html_escape($this->lang->line('btn_remove_filters')); ?></a>
+      <!-- BUTTON TO APPLY FILTERS -->
+      <div class="col-sm-2 col-sm-pull-4 col-xs-6 top-margin">
+        <button type="submit" class="btn btn-primary top-margin"><?php echo html_escape($this->lang->line('btn_submit_filters')); ?></button>
+      </div>
+      <div class="col-sm-2 col-sm-pull-4 col-xs-6 top-margin">
+        <a href="<?php echo base_url(); ?>item" class="btn btn-default top-margin"><?php echo html_escape($this->lang->line('btn_remove_filters')); ?></a>
+      </div>
     </div>
   </form>
   <!-- END OF FILTERS -->
