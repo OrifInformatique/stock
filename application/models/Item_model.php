@@ -20,11 +20,12 @@ class Item_model extends MY_Model
                                                     'model' => 'user_model'],
                              'checked_by_user' => ['primary_key' => 'checked_by_user_id',
                                                    'model' => 'user_model']];
-    protected $has_many = ['item_tag_links', 'loans'];
+    protected $has_many = ['item_tag_links', 'loans', 'inventory_controls'];
 
     /* MY_Model callback methods */
     protected $after_get = ['get_image', 'get_warranty_status',
-                            'get_current_loan', 'get_tags'];
+                            'get_current_loan', 'get_last_inventory_control',
+                            'get_tags'];
 
 
     /**
@@ -143,6 +144,39 @@ class Item_model extends MY_Model
 				$bootstrap_label = '<span class="label label-warning">'.html_escape($this->lang->line('lbl_loan_status_loaned')).'</span>';
 			}
 			$item->loan_bootstrap_label = $bootstrap_label;
+		}
+
+        return $item;
+    }
+
+    /**
+    * Get the last inventory control related to this item, if one exists
+    *
+    * Attributes names : last_inventory_control (NULL if none)
+    */
+    protected function get_last_inventory_control($item)
+    {
+        if (!is_null($item)) {
+			$this->load->model('inventory_control_model');
+
+			$where = "item_id=".$item->item_id;
+
+			$inventory_controls = $this->inventory_control_model->with('controller')
+																->get_many_by($where);
+			$last_control = NULL;
+
+			if (!is_null($inventory_controls)){
+				foreach ($inventory_controls as $control) {
+					// Select the last control (biggest date)
+					if (is_null($last_control)) {
+						$last_control = $control;
+					} elseif ($control->date > $last_control->date) {
+						$last_control = $control;
+					}
+				}
+			}
+
+			$item->last_inventory_control = $last_control;
 		}
 
         return $item;

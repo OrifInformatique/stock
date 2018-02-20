@@ -12,7 +12,8 @@ class Item extends MY_Controller {
   /* MY_Controller variables definition */
   protected $access_level = "*";
 
-  /**
+
+  /****************************************************************************
   * Constructor
   */
 	public function __construct()
@@ -22,8 +23,9 @@ class Item extends MY_Controller {
       $this->load->model('loan_model');
 	}
 
-	/**
-    * Display items list
+
+	/****************************************************************************
+    * Display items list, with filtering
     */
 	public function index()
   {
@@ -281,7 +283,8 @@ class Item extends MY_Controller {
 		$this->display_view('item/detail', $output);
 	}
 
-  /**
+
+  /****************************************************************************
    * Add a new item
    */
 	public function create()
@@ -393,156 +396,12 @@ class Item extends MY_Controller {
     }
   }
 
-  /**
-  * Create loan for one given item
-  *
-  * @param $id : the item concerned
-  */
-  public function create_loan($id = NULL)
+
+  /****************************************************************************
+   * Modify an existing item
+   */
+  public function modify($id)
   {
-    // Check if this is allowed
-    if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
-      if (empty($id))
-      {
-          // No item specified, display items list
-          redirect('/item');
-      }
-
-      // Get item object and related loans
-      $item = $this->item_model->get($id);
-      $loans = $this->loan_model->with('loan_by_user')
-                                ->with('loan_to_user')
-                                ->get_many_by('item_id', $item->item_id);
-
-      $data['item'] = $item;
-      $data['loans'] = $loans;
-      $data['item_id'] = $id;
-
-      // Test input
-      $this->load->library('form_validation');
-
-      $this->form_validation->set_rules("date", "Date du prêt", 'required',
-      array('required' => "La date du prêt doit être fournie"));
-
-      if ($this->form_validation->run() === TRUE) {
-        $loanArray = $_POST;
-
-        if ($loanArray["planned_return_date"] == 0 || $loanArray["planned_return_date"] == "0000-00-00" || $loanArray["planned_return_date"] == "")
-        {
-          $loanArray["planned_return_date"] = NULL;
-        }
-
-        if ($loanArray["real_return_date"] == 0 || $loanArray["real_return_date"] == "0000-00-00" || $loanArray["real_return_date"] == "")
-        {
-          $loanArray["real_return_date"] = NULL;
-        }
-
-        $loanArray["item_id"] = $id;
-
-        // For now, loans are from and for Orif
-        $loanArray["loan_to_user_id"] = $loanArray["loan_by_user_id"] = 1;
-
-        $this->loan_model->insert($loanArray);
-
-        header("Location: " . base_url() . "item/loans/" . $id);
-        exit();
-      } else {
-        $this->display_view('item/loan_form', $data);
-      }
-    // Creation is not allowed for the non-connected users, which are sent to the connection page
-    } else {
-      header("Location: " . base_url() . "auth/login");
-      exit();
-    }
-  }
-
-  /**
-  * Modify some loan
-  *
-  * @param $id : the loan
-  */
-  public function modify_loan($id = NULL)
-  {
-    // Check if this is allowed
-    if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
-      // get the data from the loan with this id (to fill the form or to get the concerned item)
-      $data = get_object_vars($this->loan_model->get($id));
-
-      if (!empty($_POST)) {
-        // test input
-        $this->load->library('form_validation');
-
-        $this->form_validation->set_rules("date", "Date du prêt", 'required',
-        array('required' => "La date du prêt doit être fournie"));
-
-        if ($this->form_validation->run() === TRUE) {
-          //Declarations
-		  
-		  $loanArray = $_POST;
-		  
-		  if ($loanArray["planned_return_date"] == 0 || $loanArray["planned_return_date"] == "0000-00-00" || $loanArray["planned_return_date"] == "") {
-			$loanArray["planned_return_date"] = NULL;
-		  }
-		  
-		  if ($loanArray["real_return_date"] == 0 || $loanArray["real_return_date"] == "0000-00-00" || $loanArray["real_return_date"] == "") {
-			$loanArray["real_return_date"] = NULL;
-		  }
-
-          // Execute the changes in the item table
-          $this->loan_model->update($id, $loanArray);
-
-          redirect("/item/loans/" . $data["item_id"]);
-          exit();
-        } else {
-          // Load the options
-      		$this->load->model('stocking_place_model');
-      		$data['stocking_places'] = $this->stocking_place_model->get_all();
-      		$this->load->model('supplier_model');
-      		$data['suppliers'] = $this->supplier_model->get_all();
-      		$this->load->model('item_group_model');
-      		$data['item_groups'] = $this->item_group_model->get_all();
-
-          // Load the tags
-          $this->load->model('item_tag_model');
-
-      		$data['item_tags'] = $this->item_tag_model->get_all();
-      	}
-      }
-      $this->display_view('item/loan_form', $data);
-    // Update is not allowed for the non-connected users, which are sent to the connection page
-    } else {
-      header("Location: " . base_url() . "auth/login");
-      exit();
-    }
-  }
-
-  /**
-  * Display loans list for one given item
-  *
-  * @param $id : the item concerned
-  */
-  public function loans($id = NULL)
-  {
-    if (empty($id))
-    {
-        // No item specified, display items list
-        redirect('/item');
-    }
-
-    // Get item object and related loans
-    $item = $this->item_model->get($id);
-    $loans = $this->loan_model->with('loan_by_user')
-                              ->with('loan_to_user')
-                              ->get_many_by('item_id', $item->item_id);
-
-    $output['item'] = $item;
-    $output['loans'] = $loans;
-
-    $this->display_view('item/loans', $output);
-  }
-
-	public function modify($id)
-	{
     // Check if access is allowed
     if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
       $this->load->model('item_tag_link_model');
@@ -599,7 +458,7 @@ class Item extends MY_Controller {
             $upload_failed = TRUE;
           }
         }
-		
+    
         if ($this->form_validation->run() == TRUE && $upload_failed!=TRUE) {
 
           // Delete ALL the tags for this object
@@ -657,18 +516,22 @@ class Item extends MY_Controller {
       // Update is not allowed
       redirect("auth/login");
     }
-	}
+  }
 
-	public function delete($id, $command = NULL)
-	{
+
+  /****************************************************************************
+   * Delete an item
+   */
+  public function delete($id, $command = NULL)
+  {
     // Check if this is allowed
     if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
       if (empty($command))
       {
         $data['db'] = 'item';
-    		$data['id'] = $id;
+        $data['id'] = $id;
 
-    		$this->display_view('item/confirm_delete', $data);
+        $this->display_view('item/confirm_delete', $data);
       } else {
         $this->load->model("item_model");
         $this->load->model("loan_model");
@@ -682,13 +545,249 @@ class Item extends MY_Controller {
 
         redirect('/item');
       }
-    // Delete is not allowed for the non-connected users, which are sent to the connection page
+    
     } else {
-      header("Location: " . base_url() . "auth/login");
-      exit();
+      // Access is not allowed
+      redirect("auth/login");
     }
   }
 
+
+  /****************************************************************************
+  * Create inventory control for one given item
+  *
+  * @param $id : the item concerned
+  */
+  public function create_inventory_control($id = NULL)
+  {
+    // Check if this is allowed
+    if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+      if (empty($id))
+      {
+          // No item specified, display items list
+          redirect('/item');
+      }
+
+      $this->load->model('user_model');
+      $this->load->model('inventory_control_model');
+
+      $data['item'] = $this->item_model->get($id);
+      $data['controller'] = $this->user_model->get($_SESSION['user_id']);
+      
+      if (isset($_POST['date']) && $_POST['date'] != '') {
+        $data['date'] = $_POST['date'];
+      }
+      else {
+        $data['date'] = date('Y-m-d');
+      }
+
+      if (isset($_POST['remarks'])) {
+        $data['remarks'] = $_POST['remarks'];
+      }
+      else
+      {
+        $data['remarks'] = '';
+      }
+
+      if (isset($_POST['submit'])) {
+        $inventory_control->item_id = $id;
+        $inventory_control->controller_id = $_SESSION['user_id'];
+        $inventory_control->date = $data['date'];
+        $inventory_control->remarks = $data['remarks'];
+
+        $this->inventory_control_model->insert($inventory_control);
+        redirect("item/view/".$id);
+      }
+      else {
+        $this->display_view('inventory_control/form', $data);
+      }
+
+    } else {
+      // Access is not allowed
+      redirect("auth/login");
+    }
+  }
+
+
+  /****************************************************************************
+  * Display inventory controls list for one given item
+  *
+  * @param $id : the item concerned
+  */
+  public function inventory_controls($id = NULL)
+  {
+    if (empty($id))
+    {
+        // No item specified, display items list
+        redirect('/item');
+    }
+
+    // Get item object with related inventory controls
+    $output['item'] = $this->item_model->get($id);
+    $output['inventory_controls'] = $this->inventory_control_model->with('controller')
+                                                         ->get_many_by('item_id='.$id);
+
+    $this->display_view('inventory_control/list', $output);
+  }
+
+
+  /****************************************************************************
+  * Create loan for one given item
+  *
+  * @param $id : the item concerned
+  */
+  public function create_loan($id = NULL)
+  {
+    // Check if this is allowed
+    if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+      if (empty($id))
+      {
+          // No item specified, display items list
+          redirect('/item');
+      }
+
+      // Get item object and related loans
+      $item = $this->item_model->get($id);
+      $loans = $this->loan_model->with('loan_by_user')
+                                ->with('loan_to_user')
+                                ->get_many_by('item_id', $item->item_id);
+
+      $data['item'] = $item;
+      $data['loans'] = $loans;
+      $data['item_id'] = $id;
+
+      // Test input
+      $this->load->library('form_validation');
+
+      $this->form_validation->set_rules("date", "Date du prêt", 'required',
+      array('required' => "La date du prêt doit être fournie"));
+
+      if ($this->form_validation->run() === TRUE) {
+        $loanArray = $_POST;
+
+        if ($loanArray["planned_return_date"] == 0 || $loanArray["planned_return_date"] == "0000-00-00" || $loanArray["planned_return_date"] == "")
+        {
+          $loanArray["planned_return_date"] = NULL;
+        }
+
+        if ($loanArray["real_return_date"] == 0 || $loanArray["real_return_date"] == "0000-00-00" || $loanArray["real_return_date"] == "")
+        {
+          $loanArray["real_return_date"] = NULL;
+        }
+
+        $loanArray["item_id"] = $id;
+
+        // For now, loans are from and for Orif
+        $loanArray["loan_to_user_id"] = $loanArray["loan_by_user_id"] = 1;
+
+        $this->loan_model->insert($loanArray);
+
+        header("Location: " . base_url() . "item/loans/" . $id);
+        exit();
+
+      } else {
+        $this->display_view('item/loan_form', $data);
+      }
+
+    } else {
+      // Access is not allowed
+      redirect("auth/login");
+    }
+  }
+
+
+  /****************************************************************************
+  * Modify some loan
+  *
+  * @param $id : the loan
+  */
+  public function modify_loan($id = NULL)
+  {
+    // Check if this is allowed
+    if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+      // get the data from the loan with this id (to fill the form or to get the concerned item)
+      $data = get_object_vars($this->loan_model->get($id));
+
+      if (!empty($_POST)) {
+        // test input
+        $this->load->library('form_validation');
+
+        $this->form_validation->set_rules("date", "Date du prêt", 'required',
+        array('required' => "La date du prêt doit être fournie"));
+
+        if ($this->form_validation->run() === TRUE) {
+          //Declarations
+		  
+		  $loanArray = $_POST;
+		  
+		  if ($loanArray["planned_return_date"] == 0 || $loanArray["planned_return_date"] == "0000-00-00" || $loanArray["planned_return_date"] == "") {
+			$loanArray["planned_return_date"] = NULL;
+		  }
+		  
+		  if ($loanArray["real_return_date"] == 0 || $loanArray["real_return_date"] == "0000-00-00" || $loanArray["real_return_date"] == "") {
+			$loanArray["real_return_date"] = NULL;
+		  }
+
+          // Execute the changes in the item table
+          $this->loan_model->update($id, $loanArray);
+
+          redirect("/item/loans/" . $data["item_id"]);
+          exit();
+        } else {
+          // Load the options
+      		$this->load->model('stocking_place_model');
+      		$data['stocking_places'] = $this->stocking_place_model->get_all();
+      		$this->load->model('supplier_model');
+      		$data['suppliers'] = $this->supplier_model->get_all();
+      		$this->load->model('item_group_model');
+      		$data['item_groups'] = $this->item_group_model->get_all();
+
+          // Load the tags
+          $this->load->model('item_tag_model');
+
+      		$data['item_tags'] = $this->item_tag_model->get_all();
+      	}
+      }
+      $this->display_view('item/loan_form', $data);
+
+    } else {
+      // Access is not allowed
+      redirect("auth/login");
+    }
+  }
+
+
+  /****************************************************************************
+  * Display loans list for one given item
+  *
+  * @param $id : the item concerned
+  */
+  public function loans($id = NULL)
+  {
+    if (empty($id))
+    {
+        // No item specified, display items list
+        redirect('/item');
+    }
+
+    // Get item object and related loans
+    $item = $this->item_model->get($id);
+    $loans = $this->loan_model->with('loan_by_user')
+                              ->with('loan_to_user')
+                              ->get_many_by('item_id', $item->item_id);
+
+    $output['item'] = $item;
+    $output['loans'] = $loans;
+
+    $this->display_view('item/loans', $output);
+  }
+
+
+  /****************************************************************************
+  * Delete a loan
+  *
+  * @param $id : the loan
+  */
 	public function delete_loan($id, $command = NULL)
 	{
     // Check if this is allowed
@@ -709,14 +808,15 @@ class Item extends MY_Controller {
 
         redirect("/item/loans/" . $data["item_id"]);
       }
-  // Delete is not allowed for the non-connected users, which are sent to the connection page
-  } else {
-    header("Location: " . base_url() . "auth/login");
-    exit();
-  }
+    
+    } else {
+      // Access is not allowed
+      redirect("auth/login");
+    }
 	}
 	
-  /**
+
+  /****************************************************************************
   * Set validation rules for create and update form
   **/
   private function set_validation_rules($id = NULL) {
