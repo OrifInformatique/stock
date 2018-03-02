@@ -54,7 +54,6 @@ label {
 
 /* Resizing select */
 select {
-  background: #00000011;
   text-align: right;
 
   word-wrap: break-word;      /* IE */
