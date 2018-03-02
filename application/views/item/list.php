@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container" style="overflow-x: hidden;">
 
 <!-- *** ADMIN *** -->
 <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?>
@@ -72,17 +72,15 @@
       </div>
 
       <!-- BUTTON TO APPLY FILTERS -->
-      <div class="col-sm-2 col-sm-pull-4 col-xs-6 top-margin">
+      <div class="col-sm-6 col-sm-pull-4 col-xs-12 top-margin xs-center">
         <button type="submit" class="btn btn-primary top-margin"><?php echo html_escape($this->lang->line('btn_submit_filters')); ?></button>
-      </div>
-      <div class="col-sm-2 col-sm-pull-4 col-xs-6 top-margin">
         <a href="<?php echo base_url(); ?>item" class="btn btn-default top-margin"><?php echo html_escape($this->lang->line('btn_remove_filters')); ?></a>
       </div>
     </div>
   </form>
   <!-- END OF FILTERS -->
 </div>
-<div class="row top-margin">
+<div class="top-margin table-responsive">
   
   <!-- LIST OF ITEMS -->
   <?php if(empty($items)) { ?>
