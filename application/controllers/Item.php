@@ -686,7 +686,7 @@ class Item extends MY_Controller {
         exit();
 
       } else {
-        $this->display_view('item/loan_form', $data);
+        $this->display_view('loan/form', $data);
       }
 
     } else {
@@ -748,7 +748,7 @@ class Item extends MY_Controller {
       		$data['item_tags'] = $this->item_tag_model->get_all();
       	}
       }
-      $this->display_view('item/loan_form', $data);
+      $this->display_view('loan/form', $data);
 
     } else {
       // Access is not allowed
@@ -779,7 +779,7 @@ class Item extends MY_Controller {
     $output['item'] = $item;
     $output['loans'] = $loans;
 
-    $this->display_view('item/loans', $output);
+    $this->display_view('loan/list', $output);
   }
 
 
