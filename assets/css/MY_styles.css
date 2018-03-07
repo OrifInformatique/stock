@@ -37,3 +37,29 @@ label {
 .left-margin {
 	margin-left: 10px;
 }
+
+/* Added for mobile resizing */
+@media (max-width: 769px) {
+    h1 {
+        font-size: 25px;
+    }
+    .xs-center{
+        text-align: center;
+    }
+    .xs-right{
+        text-align: right;
+    }
+}
+
+
+/* Resizing select */
+select {
+  text-align: right;
+
+  word-wrap: break-word;      /* IE */
+  white-space: -moz-pre-wrap; /* Firefox */
+  white-space: pre-wrap;      /* other browsers */
+
+  max-width:calc(100% - 10px); /* -7px = size for comma */
+  display:inline-block
+}

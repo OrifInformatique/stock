@@ -71,6 +71,7 @@
             <p class="bg-primary">&nbsp;<?php echo html_escape($this->lang->line('text_item_loan_status')); ?></p>
         </div>
         <div class="col-md-4">
+            <!-- Item condition -->
             <?php
                 //LABEL WITH COLOR BASED ON ITEM CONDITION
                 if(!is_null($item->item_condition))
@@ -79,8 +80,38 @@
                 }
             ?>
 
+            <!-- Stocking place -->
             <label><?php echo html_escape($this->lang->line('field_stocking_place')); ?> :</label>
             <?php if(!is_null($item->stocking_place)){echo html_escape($item->stocking_place->name);} ?>
+
+            <!-- Inventory control -->
+            <label><?php echo html_escape($this->lang->line('field_last_inventory_control')); ?> :</label>
+            <?php
+                if(!is_null($item->last_inventory_control)) {
+                    echo nice_date($item->last_inventory_control->date,
+                                   $this->lang->line('date_format_short'));
+                    echo ', '.html_escape($item->last_inventory_control->controller->username);
+                    if(!is_null($item->last_inventory_control->remarks)) {
+                        echo '</br >'.html_escape($item->last_inventory_control->remarks);
+                    }
+                } else {
+                    echo html_escape($this->lang->line('text_none'));
+                }
+
+                // Button for controls history
+                echo '<br /><a href="'.base_url('/item/inventory_controls/'.$item->item_id).
+                     '" class="btn btn-default"  role="button" >'.
+                     $this->lang->line('btn_inventory_control_history').'</a>';
+
+                // Button to create new inventory control
+                if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { 
+                    echo '<a href="'.base_url('/item/create_inventory_control/'.$item->item_id).
+                         '" class="btn btn-primary"  role="button" >'.
+                         $this->lang->line('btn_create_inventory_control').'</a>';
+                }
+            ?>
+
+
         </div>
         <div class="col-md-4">
             <?php echo $item->loan_bootstrap_label.'<br />'; ?>
@@ -115,15 +146,15 @@
                     .$this->lang->line('btn_loans_history').
                  '</a>';
             ?>
-<?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?>
-						<!-- Button to create new loan -->
-						<?php
-            echo '<a href="'.base_url('/item/create-loan/'.$item->item_id).'" '.
-                    'class="btn btn-default"  role="button" >'
-                    .$this->lang->line('btn_create_loan').
-                 '</a>';
-            } ?>
 
+            <!-- Button to create new loan -->
+            <?php
+                if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { 
+                    echo '<a href="'.base_url('/item/create-loan/'.$item->item_id).'" '.
+                         'class="btn btn-primary"  role="button" >'.
+                         $this->lang->line('btn_create_loan').'</a>';
+                }
+            ?>
         </div>
     </div>
 
