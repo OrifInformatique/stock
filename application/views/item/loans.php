@@ -20,8 +20,7 @@
 	<?php if(empty($loans)) { ?>
 	<em style="font-size:1.5em;" class="text-warning"><?php echo $this->lang->line('msg_no_loan'); ?></em>
 	<?php } else { ?>
-	<div class="row">
-        <div class="col-lg-12 col-sm-12">
+        <div class="col-lg-12 col-sm-12 table-responsive">
             <table class="table table-striped table-hover">
                 <thead>
                     <tr>
@@ -51,7 +50,6 @@
                 </tbody>
             </table>
         </div>
-    </div>
 	<?php } ?>
 <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?>
 	<a href="<?php echo base_url(); ?>item/create-loan/<?php echo $item->item_id; ?>" class="btn btn-primary">Nouveau…</a>

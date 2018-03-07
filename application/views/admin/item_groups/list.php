@@ -1,5 +1,5 @@
 <div class="container">
-  <h1>
+  <h1 class="xs-right">
     <select id="regions" onchange="changeRegion()">
       <option value="item_group">Groupes d'objets</option>
       <option value="user">Utilisateurs</option>
