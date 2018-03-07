@@ -1,8 +1,8 @@
 <div class="container">
-	<!-- BUTTONS --><?php $item_page = base_url('item/view') . '/' .  $item->item_id; ?>
-	<em>
-		<a href="<?php echo $item_page; ?>" class="btn" role="button"><?php echo $this->lang->line('btn_back_to_object'); ?></a>
-	</em>
+    <?php $item_page = base_url('item/view/').$item->item_id; ?>
+	
+    <!-- BUTTONS -->
+	<a href="<?php echo $item_page ?>" class="btn btn-primary" role="button"><?php echo $this->lang->line('btn_back_to_object'); ?></a>
 
     <!-- ITEM NAME AND DESCRIPTION -->
 	<a style="color:inherit;" href="<?php echo $item_page; ?>">
