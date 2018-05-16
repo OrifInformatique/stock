@@ -129,8 +129,10 @@
             <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo html_escape($item->inventory_number); ?></a>
             <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo html_escape($item->serial_number); ?></a>
           </td>
-          <td><?php
-            if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?>
+          <td>
+            <!-- DELETE ACCESS RESTRICTED FOR ADMINISTRATORS ONLY -->
+            <?php
+            if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= ACCESS_LVL_ADMIN) { ?>
               <a href="<?php echo base_url('/item/delete').'/'.$item->item_id ?>" class="close" title="Supprimer l'objet">×</a>
             <?php } ?>
           </td>

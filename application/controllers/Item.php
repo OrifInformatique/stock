@@ -521,11 +521,12 @@ class Item extends MY_Controller {
 
   /****************************************************************************
    * Delete an item
+   * ACCESS RESTRICTED FOR ADMINISTRATORS ONLY
    */
   public function delete($id, $command = NULL)
   {
     // Check if this is allowed
-    if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+    if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= ACCESS_LVL_ADMIN) {
       if (empty($command))
       {
         $data['db'] = 'item';
@@ -785,13 +786,14 @@ class Item extends MY_Controller {
 
   /****************************************************************************
   * Delete a loan
+  * ACCESS RESTRICTED FOR ADMINISTRATORS ONLY
   *
   * @param $id : the loan
   */
 	public function delete_loan($id, $command = NULL)
 	{
     // Check if this is allowed
-    if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+    if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= ACCESS_LVL_ADMIN) {
       if (empty($command))
       {
     		$data['db'] = 'loan';

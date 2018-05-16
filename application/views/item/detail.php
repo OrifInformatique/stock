@@ -6,7 +6,9 @@
     <!-- *** ADMIN *** -->
 	<?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?>
     	<a href="<?php echo base_url('item/modify/'.$item->item_id); ?>" class="btn btn-warning" role="button"><?php echo $this->lang->line('btn_modify'); ?></a>
-    	<a href="<?php echo base_url('item/delete/'.$item->item_id); ?>" class="btn btn-danger" role="button"><?php echo $this->lang->line('btn_delete'); ?></a>
+        <?php if($_SESSION['user_access'] >= ACCESS_LVL_ADMIN) { ?>
+    	   <a href="<?php echo base_url('item/delete/'.$item->item_id); ?>" class="btn btn-danger" role="button"><?php echo $this->lang->line('btn_delete'); ?></a>
+        <?php } ?>
 	<?php } ?>
     <!-- *** END OF ADMIN *** -->
 
