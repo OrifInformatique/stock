@@ -237,6 +237,11 @@ class Admin extends MY_Controller
           $this->form_validation->set_rules('name', 'Identifiant', 'required|callback_unique_tagname', 'Un nom de tag doit être fourni'); // not void
         }
 
+        //short_name: if changed,
+        if ($_POST['short_name'] != get_object_vars($this->item_tag_model->get($id))['short_name']) {
+          $this->form_validation->set_rules('short_name', 'Abrévation', 'required|callback_unique_tagshort', 'Une abrévation doit être fourni'); // not void
+        }
+        
         if($this->form_validation->run() === TRUE)
 		{
 		  
@@ -269,6 +274,9 @@ class Admin extends MY_Controller
 
         //name: not void
         $this->form_validation->set_rules('name', 'Identifiant', 'required|callback_unique_tagname', 'Un nom de tag unique doit être fourni');
+        
+        //short_name: not void
+        $this->form_validation->set_rules('short_name', 'Abrévation', 'required|callback_unique_tagshort', 'Une abrévation unique doit être fourni');
 
         if($this->form_validation->run() === TRUE)
         {
@@ -298,7 +306,20 @@ class Admin extends MY_Controller
       }
     }
 	
+    public function unique_tagshort($argShort) {
+      $this->load->model('item_tag_model');
 
+      // Get this tag. If it fails, it doesn't exist, so the name is unique!
+      $tag = $this->item_tag_model->get_by('short_name', $argShort);
+      
+      if(isset($tag->item_tag_id)) {
+        $this->form_validation->set_message('unique_tagshort', 'Cette abrévation est déjà utilisé');
+        return FALSE;
+      } else {
+        return TRUE;
+      }
+    }
+    
     /**
     * Delete a tag. 
     * If $action is NULL, a confirmation will be shown.
@@ -547,6 +568,7 @@ class Admin extends MY_Controller
 
       if (!empty($_POST)) {
         $this->form_validation->set_rules('name', 'Nom', 'required', 'Le groupe d\'objets doit avoir un nom');
+        $this->form_validation->set_rules('short_name', 'Abrévation', 'required', 'Le groupe d\'objets doit avoir une abrévation');
 
         if ($this->form_validation->run() === TRUE)
         {
@@ -572,6 +594,7 @@ class Admin extends MY_Controller
 
       if (!empty($_POST)) {
         $this->form_validation->set_rules('name', 'Identifiant', 'required|callback_unique_groupname', 'Un nom de groupe unique doit être fourni');
+        $this->form_validation->set_rules('short_name', 'Abrévation', 'required|callback_unique_groupshort', 'Une abrévation de groupe unique doit être fourni');
 
         if ($this->form_validation->run() === TRUE)
         {
@@ -594,6 +617,20 @@ class Admin extends MY_Controller
       
       if(isset($group->item_group_id)) {
         $this->form_validation->set_message('unique_groupname', 'Cet nom est déjà utilisé');
+        return FALSE;
+      } else {
+        return TRUE;
+      }
+    }
+    
+    public function unique_groupshort($argShort) {
+      $this->load->model('item_group_model');
+
+      // Get this group. If it fails, it doesn't exist, so the username is unique!
+      $group = $this->item_group_model->get_by('short_name', $argShort);
+      
+      if(isset($group->item_group_id)) {
+        $this->form_validation->set_message('unique_groupname', 'Cette abrévation est déjà utilisé');
         return FALSE;
       } else {
         return TRUE;
