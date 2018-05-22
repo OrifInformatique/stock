@@ -10,16 +10,22 @@
     </a>
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12" >
       <div class="nav nav-pills" style="margin-top:20px;">
-        <?php
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?>
-          <?php /* Admin part, for admins only (only they see, and are allowed) */
-        if ($_SESSION['user_access'] >= 8) { ?><a href="<?php echo base_url("admin/"); ?>" ><?php echo $this->lang->line('btn_admin'); ?></a><br /><?php /* End of the admin-only part */ } ?>
+        <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?>
+          
+          <!-- ADMIN ACCESS ONLY -->
+          <?php if ($_SESSION['user_access'] >= ACCESS_LVL_MSP) { ?>
+              <a href="<?php echo base_url("admin/"); ?>" ><?php echo $this->lang->line('btn_admin'); ?></a><br />
+          <?php } ?>
+          <!-- END OF ADMIN ACCESS -->
+
+          <!-- Logged in, display a "logout" button -->
           <a href="<?php echo base_url("auth/logout"); ?>" ><?php echo $this->lang->line('btn_logout'); ?></a>
+
         <?php } else { ?>
+          <!-- Not logged in, display a "login" button -->
           <a href="<?php echo base_url("auth/login"); ?>" ><?php echo $this->lang->line('btn_login'); ?></a>
         <?php } ?>
       </div>
-
     </div>
   </div>
 </div>
