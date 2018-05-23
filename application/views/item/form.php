@@ -78,9 +78,10 @@
             <div class="form-row">
                 <div class="form-group col-md-12">
                     <label for="remarks"><?php echo $this->lang->line('field_remarks'); ?></label>
-                    <textarea id="remarks" name="remarks" class="form-control">
-                        <?php if(isset($remarks)) {echo set_value('remarks',$remarks);} else {echo set_value('remarks');} ?>
-                    </textarea>
+                    <textarea id="remarks" name="remarks" class="form-control"><?php
+                        // Don't move the <php> markups or they will be white spaces in textarea
+                        if(isset($remarks)) {echo set_value('remarks',$remarks);} else {echo set_value('remarks');} 
+                    ?></textarea>
                 </div>
             </div>
             <div class="form-group col-md-12">
