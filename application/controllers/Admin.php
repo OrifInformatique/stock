@@ -10,7 +10,7 @@
 class Admin extends MY_Controller
 {
     /* MY_Controller variables definition */
-    protected $access_level = "8";
+    protected $access_level = ACCESS_LVL_MSP;
 
 
     /**
@@ -242,14 +242,12 @@ class Admin extends MY_Controller
           $this->form_validation->set_rules('short_name', 'Abrévation', 'required|callback_unique_tagshort', $this->lang->line('msg_err_abbreviation')); // not void
         }
         
-        if($this->form_validation->run() === TRUE)
-		{
-		  
-		  $this->item_tag_model->update($id, $_POST);
+        if($this->form_validation->run() === TRUE) {
+		      $this->item_tag_model->update($id, $_POST);
 
-        redirect("/admin/view_tags/");
-        exit();
-      }
+          redirect("/admin/view_tags/");
+          exit();
+        }
 	  
       // The values of the tag are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
       } else {
@@ -322,16 +320,21 @@ class Admin extends MY_Controller
     
     /**
     * Delete a tag. 
-    * If $action is NULL, a confirmation will be shown.
-    * If it is anything else, the user will be deleted. 
+    * If $action is NULL, a confirmation will be shown. If it is anything else, the tag will be deleted.
     */
     public function delete_tag($id = NULL, $action = NULL) {
       $this->load->model('item_tag_model');
+      $this->load->model('item_tag_link_model');
+
       if (is_null($action)) {
+        // Display a message to confirm the action
         $output = get_object_vars($this->item_tag_model->get($id));
         $output["tags"] = $this->item_tag_model->get_all();
         $this->display_view("admin/tags/delete", $output);
+      
       } else {
+        // Action confirmed : delete links and delete tag
+        $this->item_tag_link_model->delete_by('item_tag_id='.$id);
         $this->item_tag_model->delete($id);
         redirect("/admin/view_tags/");
       }
@@ -570,8 +573,7 @@ class Admin extends MY_Controller
         $this->form_validation->set_rules('name', 'Nom', 'required', $this->lang->line('msg_err_item_group_needed'));
         $this->form_validation->set_rules('short_name', 'Abrévation', 'required', $this->lang->line('msg_err_item_group_short'));
 
-        if ($this->form_validation->run() === TRUE)
-        {
+        if ($this->form_validation->run() === TRUE) {
           $this->item_group_model->update($id, $_POST);
 
           redirect("/admin/view_item_groups/");
@@ -580,8 +582,8 @@ class Admin extends MY_Controller
       } else {
         $output = get_object_vars($this->item_group_model->get($id));
       }
+      
       $output["item_groups"] = $this->item_group_model->get_all();
-
       $this->display_view("admin/item_groups/form", $output);
     }
 
