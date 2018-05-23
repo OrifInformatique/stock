@@ -374,12 +374,16 @@ class Item extends MY_Controller {
         }
 
         // Load the comboboxes options
-    		$this->load->model('stocking_place_model');
-    		$data['stocking_places'] = $this->stocking_place_model->get_all();
-    		$this->load->model('supplier_model');
-    		$data['suppliers'] = $this->supplier_model->get_all();
-    		$this->load->model('item_group_model');
-    		$data['item_groups'] = $this->item_group_model->dropdown('name');
+        $this->load->model('stocking_place_model');
+        $data['stocking_places'] = $this->stocking_place_model->get_all();
+        $this->load->model('supplier_model');
+        $data['suppliers'] = $this->supplier_model->get_all();
+        $this->load->model('item_group_model');
+        $data['item_groups_name'] = $this->item_group_model->dropdown('name');
+                
+        // Load item groups
+        $data['item_groups'] = $this->item_group_model->get_all();
+        
         $this->load->model('item_condition_model');
         $data['condishes'] = $this->item_condition_model->get_all();
         
@@ -502,10 +506,13 @@ class Item extends MY_Controller {
       $this->load->model('supplier_model');
       $data['suppliers'] = $this->supplier_model->get_all();
       $this->load->model('item_group_model');
-      $data['item_groups'] = $this->item_group_model->dropdown('name');
+      $data['item_groups_name'] = $this->item_group_model->dropdown('name');
       $this->load->model('item_condition_model');
       $data['condishes'] = $this->item_condition_model->get_all();
 
+      // Load item groups
+      $data['item_groups'] = $this->item_group_model->get_all();
+    
       // Load the tags
       $this->load->model('item_tag_model');
       $data['item_tags'] = $this->item_tag_model->get_all();

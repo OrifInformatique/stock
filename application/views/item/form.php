@@ -22,9 +22,12 @@
             <input type="text" class="form-control" name="name"
                     placeholder="<?php echo $this->lang->line('field_item_name') ?>"
                     value="<?php if(isset($name)) {echo set_value('name',$name);} else {echo set_value('name');} ?>" />
+            <input type="hidden" id="id" name="id" value="<?php if(isset($item_id)) {echo $item_id;} else { echo $this->item_model->get_future_id();} ?>">
         </div>
         <div class="form-group col-md-4 text-right">
-            <input type="text" class="form-control" name="inventory_number"
+            <input type="button" class="form-control btn btn-primary col-md-3" name="inventory_number_button"
+                   value="Générer un N° d'inventaire" onclick="createInventoryNo()">
+            <input type="text" class="form-control col-md-9" name="inventory_number" id="inventory_number"
                     placeholder="<?php echo $this->lang->line('field_inventory_number') ?>"
                     value="<?php if(isset($inventory_number)) {echo set_value('inventory_number',$inventory_number);} else {echo set_value('inventory_number');} ?>" />
         </div>
@@ -56,13 +59,13 @@
                     <?php
                     if (isset($_POST['item_group_id'])) {
                         // A group has allready been selected, keep it selected
-                        echo form_dropdown('item_group_id', $item_groups, $_POST['item_group_id'], 'class="form-control"');
+                        echo form_dropdown('item_group_id', $item_groups_name, $_POST['item_group_id'], 'class="form-control" id="item_group_id"');
                     } elseif (isset($item_group_id)) {
                         // The item exists, get its group and select it
-                        echo form_dropdown('item_group_id', $item_groups, $item_group_id, 'class="form-control"');
+                        echo form_dropdown('item_group_id', $item_groups_name, $item_group_id, 'class="form-control" id="item_group_id"');
                     } else {
                         // No group selected
-                        echo form_dropdown('item_group_id', $item_groups, '', 'class="form-control"');
+                        echo form_dropdown('item_group_id', $item_groups_name, '', 'class="form-control" id="item_group_id"');
                     }
                     ?>
                 </div>
@@ -190,7 +193,6 @@
         </div>
     </div>
 </form>
-
 <script>
 function change_warranty()
 {
@@ -224,5 +226,57 @@ function change_warranty()
 		span_garantie.innerHTML = "<?php echo $this->lang->line('text_warranty_status')[3]; ?>";
 		span_garantie.class = "label label-danger";
 	}
+}
+
+function createInventoryNo(){
+    
+    var objectGroupField = document.getElementById('item_group_id');
+    var objectGroups = [<?php 
+        $array = "";
+        foreach($item_groups as $item_group){
+            $array .= "\"".$item_group->short_name."\",";
+        }; 
+        
+        echo $array;
+        ?>];
+    var tagField =  getFirstSelectedTag();
+    var tags = [<?php 
+        $array = "";
+        foreach($item_tags as $item_tag){
+            $array .= "\"".$item_tag->short_name."\",";
+        }; 
+        
+        echo $array;
+        ?>];
+    var date = new Date().getFullYear();
+    var id = document.getElementById('id').value;
+    var inventoryNumberField = document.getElementById('inventory_number');
+    var inventoryNumber = "";  
+    
+    date = date.toString().slice(2,4);
+    id = id.toString();
+    for(var i = id.length;i < 4; i++){
+        id = "0" + id;
+    }
+    
+    // Check if any tag has been selected
+    if(tagField !== null){
+        inventoryNumber = objectGroups[objectGroupField.value-1] + tags[tagField] + date + "." + id;
+        inventoryNumberField.value = inventoryNumber;
+    }
+}
+
+function getFirstSelectedTag(){
+    var tags = document.getElementsByClassName('checkbox-inline');
+    var firstFoundIndex = null;
+    
+    for(var i = 0;i < tags.length;i++){
+        if(tags[i].firstChild.checked === true){
+            firstFoundIndex = i;
+            break;
+        }
+    }
+    
+    return firstFoundIndex;
 }
 </script>
