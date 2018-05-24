@@ -248,7 +248,8 @@ function createInventoryNo(){
         
         echo $array;
         ?>];
-    var date = new Date().getFullYear();
+    var buyingDateField = document.getElementById('buying_date');
+    var date = new Date(buyingDateField.value).getFullYear();
     var id = document.getElementById('id').value;
     var inventoryNumberField = document.getElementById('inventory_number');
     var inventoryNumber = "";  
