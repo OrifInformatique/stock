@@ -22,7 +22,6 @@
             <input type="text" class="form-control" name="name"
                     placeholder="<?php echo $this->lang->line('field_item_name') ?>"
                     value="<?php if(isset($name)) {echo set_value('name',$name);} else {echo set_value('name');} ?>" />
-            <input type="hidden" id="id" name="id" value="<?php if(isset($item_id)) {echo $item_id;} else { echo $this->item_model->get_future_id();} ?>">
         </div>
         <div class="form-group col-md-4 text-right">
             <input type="button" class="form-control btn btn-primary col-md-3" name="inventory_number_button"
@@ -231,6 +230,7 @@ function change_warranty()
 function createInventoryNo(){
     
     var objectGroupField = document.getElementById('item_group_id');
+    
     var objectGroups = [<?php 
         $array = "";
         foreach($item_groups as $item_group){
@@ -250,7 +250,7 @@ function createInventoryNo(){
         ?>];
     var buyingDateField = document.getElementById('buying_date');
     var date = new Date(buyingDateField.value).getFullYear();
-    var id = document.getElementById('id').value;
+    var id = <?php echo $item_id ?>;
     var inventoryNumberField = document.getElementById('inventory_number');
     var inventoryNumber = "";  
     

@@ -391,6 +391,8 @@ class Item extends MY_Controller {
         $this->load->model('item_tag_model');
         $data['item_tags'] = $this->item_tag_model->get_all();
 
+        $data['item_id'] = $this->item_model->get_future_id();
+
         $this->display_view('item/form', $data);
       }
 
