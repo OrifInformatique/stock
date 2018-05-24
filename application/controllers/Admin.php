@@ -570,8 +570,8 @@ class Admin extends MY_Controller
       $this->load->model('item_group_model');
 
       if (!empty($_POST)) {
-        $this->form_validation->set_rules('name', 'Nom', 'required', $this->lang->line('msg_err_item_group_needed'));
-        $this->form_validation->set_rules('short_name', 'Abrévation', 'required', $this->lang->line('msg_err_item_group_short'));
+        $this->form_validation->set_rules('name', 'Nom', 'required|callback_unique_groupname', $this->lang->line('msg_err_item_group_needed'));
+        $this->form_validation->set_rules('short_name', 'Abrévation', 'required|callback_unique_groupshort', $this->lang->line('msg_err_item_group_short'));
 
         if ($this->form_validation->run() === TRUE) {
           $this->item_group_model->update($id, $_POST);
@@ -632,7 +632,7 @@ class Admin extends MY_Controller
       $group = $this->item_group_model->get_by('short_name', $argShort);
       
       if(isset($group->item_group_id)) {
-        $this->form_validation->set_message('unique_groupname', $this->lang->line('msg_err_unique_shortname'));
+        $this->form_validation->set_message('unique_groupshort', $this->lang->line('msg_err_unique_shortname'));
         return FALSE;
       } else {
         return TRUE;
