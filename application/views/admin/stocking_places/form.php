@@ -59,11 +59,11 @@
     <div class="row">
       <form class="container" method="post">
         <div class="form-input">
-          <label for="short">Nom court:</label>
+          <label for="short"><?php echo $this->lang->line('field_short_name') ?></label>
           <input type="text" class="form-control" name="short" id="short" value="<?php if (isset($short)) {echo set_value('short',$short);} else {echo set_value('short');} ?>" />
         </div>
         <div class="form-input">
-          <label for="name">Nom long:</label>
+          <label for="name"><?php echo $this->lang->line('field_long_name') ?></label>
           <input type="text" class="form-control" name="name" id="name" value="<?php if (isset($name)) {echo set_value('name',$name);} else {echo set_value('name');} ?>" />
         </div>
         <br />

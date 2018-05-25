@@ -253,6 +253,9 @@ function createInventoryNo(){
     var inventoryNumber = "";  
     
     date = date.toString().slice(2,4);
+    if(date == "N"){
+        date = "00";
+    }
     id = id.toString();
     for(var i = id.length;i < 4; i++){
         id = "0" + id;

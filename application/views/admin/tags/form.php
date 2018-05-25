@@ -43,13 +43,13 @@
       <div class="form-input row">
         <div class="col-sm-3">
             <label for="short_name">
-            <?php if ($update_tag) { ?>Entrer la nouvelle abrévation :<?php } else { ?>Entrer le nom de la nouvelle abrévation:<?php } ?>
+            <?php echo $this->lang->line('field_abbreviation') ?>
             </label>
             <input type="text" maxlength="3" class="form-control" name="short_name" id="short_name" value="<?php if (isset($short_name)) {echo set_value('short_name',$short_name);} else {echo set_value('short_name');} ?>" />
         </div>
         <div class="col-sm-9">
             <label for="name">
-            <?php if ($update_tag) { ?>Entrer le nouveau nom:<?php } else { ?>Entrer le nom du nouveau tag:<?php } ?>
+            <?php echo $this->lang->line('field_tag') ?>
             </label>
             <input type="text" class="form-control" name="name" id="name" value="<?php if (isset($name)) {echo set_value('name',$name);} else {echo set_value('name');} ?>" />
         </div>

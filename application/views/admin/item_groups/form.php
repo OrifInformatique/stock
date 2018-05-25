@@ -53,11 +53,11 @@
       <form class="container" method="post">
         <div class="form-input row">
             <div class="col-sm-3">
-                <label for="short_name">Abrévation:</label>
+                <label for="short_name"><?php echo $this->lang->line('field_abbreviation') ?></label>
                 <input type="text" maxlength="2" class="form-control" name="short_name" id="short_name" value="<?php if (isset($short_name)) {echo set_value('short_name',$short_name);} else {echo set_value('short_name');} ?>" />
             </div>
             <div class="col-sm-9">
-                <label for="name">Nom:</label>
+                <label for="name"><?php echo $this->lang->line('field_surname') ?></label>
                 <input type="text" class="form-control" name="name" id="name" value="<?php if (isset($name)) {echo set_value('name',$name);} else {echo set_value('name');} ?>" />
             </div>
         </div>
