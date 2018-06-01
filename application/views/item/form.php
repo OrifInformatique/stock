@@ -23,12 +23,13 @@
                     placeholder="<?php echo $this->lang->line('field_item_name') ?>"
                     value="<?php if(isset($name)) {echo set_value('name',$name);} else {echo set_value('name');} ?>" />
         </div>
-        <div class="form-group col-md-4 text-right">
+        <div class="form-group col-md-4 text-right row">
             <input type="button" class="form-control btn btn-primary col-md-3" name="inventory_number_button"
                    value="Générer un N° d'inventaire" onclick="createInventoryNo()">
-            <input type="text" class="form-control col-md-9" name="inventory_number" id="inventory_number"
+            <input type="text" class="form-control col-md-6" name="inventory_number" id="inventory_number"
                     placeholder="<?php echo $this->lang->line('field_inventory_number') ?>"
                     value="<?php if(isset($inventory_number)) {echo set_value('inventory_number',$inventory_number);} else {echo set_value('inventory_number');} ?>" />
+            <input type="text" id="id" name="id" class="form-control col-md-3" value="<?php if(isset($id)) {echo set_value('id',$id);} else {echo set_value('id');} ?>" disabled>
         </div>
         <div class="form-group col-md-12">
             <input type="text" class="form-control" name="description"
@@ -190,6 +191,12 @@
         </div>
     </div>
 </form>
+<pre>
+    <?php 
+        var_dump($_POST);
+        var_dump($this->input->post());
+    ?>
+</pre>
 <script>
 function change_warranty()
 {
@@ -248,6 +255,7 @@ function createInventoryNo(){
         ?>];
     var buyingDateField = document.getElementById('buying_date');
     var date = new Date(buyingDateField.value).getFullYear();
+    var idField = document.getElementById('id');
     var id = <?php echo $item_id ?>;
     var inventoryNumberField = document.getElementById('inventory_number');
     var inventoryNumber = "";  
@@ -263,8 +271,9 @@ function createInventoryNo(){
     
     // Check if any tag has been selected
     if(tagField !== null){
-        inventoryNumber = objectGroups[objectGroupField.value-1] + tags[tagField] + date + "." + id;
+        inventoryNumber = objectGroups[objectGroupField.value-1] + tags[tagField] + date;
         inventoryNumberField.value = inventoryNumber;
+        idField.value = "." + id;
     }
 }
 
