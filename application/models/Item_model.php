@@ -23,7 +23,8 @@ class Item_model extends MY_Model
     protected $has_many = ['item_tag_links', 'loans', 'inventory_controls'];
 
     /* MY_Model callback methods */
-    protected $after_get = ['get_image', 'get_warranty_status',
+    protected $after_get = ['get_inventory_id', 'get_inventory_number_complete', 
+    						'get_image', 'get_warranty_status',
                             'get_current_loan', 'get_last_inventory_control',
                             'get_tags'];
 
@@ -51,6 +52,43 @@ class Item_model extends MY_Model
 		}
 
 		return $value;
+	}
+
+	/*
+	 * Returns the seconde part of inventory number : The ID with leading "0"
+	 */
+	public function get_inventory_id($item)
+	{
+		$inventory_id = "";
+
+		if (!is_null($item)) {
+			$inventory_id = $item->item_id;
+
+	    	for( $i = strlen($inventory_id) ; $i < INVENTORY_NUMBER_CHARS; $i++) {
+	        	$inventory_id = "0".$inventory_id;
+	        }
+
+	        $inventory_id = ".".$inventory_id;
+    	}
+
+    	$item->inventory_id = $inventory_id;
+    	return $item;
+	}
+
+	/*
+	 * Returns the complete inventory number,
+	 * concatenation of inventory_number and inventory_id.
+	 */
+	public function get_inventory_number_complete($item)
+	{
+		$inventory_number_complete = "";
+
+		if (!is_null($item)) {
+			$inventory_number_complete = $item->inventory_number.$item->inventory_id;
+    	}
+
+    	$item->inventory_number_complete = $inventory_number_complete;
+    	return $item;
 	}
 
     /**

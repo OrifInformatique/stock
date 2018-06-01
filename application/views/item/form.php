@@ -25,11 +25,15 @@
         </div>
         <div class="form-group col-md-4 text-right row">
             <input type="button" class="form-control btn btn-primary col-md-3" name="inventory_number_button"
-                   value="Générer un N° d'inventaire" onclick="createInventoryNo()">
-            <input type="text" class="form-control col-md-6" name="inventory_number" id="inventory_number"
-                    placeholder="<?php echo $this->lang->line('field_inventory_number') ?>"
-                    value="<?php if(isset($inventory_number)) {echo set_value('inventory_number',$inventory_number);} else {echo set_value('inventory_number');} ?>" />
-            <input type="text" id="id" name="id" class="form-control col-md-3" value="<?php if(isset($id)) {echo set_value('id',$id);} else {echo set_value('id');} ?>" disabled>
+                   value="<?php echo $this->lang->line('btn_generate_inventory_nb') ?>" onclick="createInventoryNo()">
+            <input type="text" class="form-control col-md-6" name="inventory_number"
+                   id="inventory_number"
+                   placeholder="<?php echo $this->lang->line('field_inventory_number') ?>"
+                   value="<?php if(isset($inventory_number)) {echo set_value('inventory_number',$inventory_number);} else {echo set_value('inventory_number');} ?>" />
+            <input type="text" class="form-control col-md-3" name="inventory_id"
+                   id="inventory_id"
+                   value="<?php if(isset($inventory_id)) {echo set_value('inventory_id',$inventory_id);} else {echo set_value('inventory_id');} ?>"
+                    disabled />
         </div>
         <div class="form-group col-md-12">
             <input type="text" class="form-control" name="description"
@@ -81,25 +85,12 @@
                     <textarea id="remarks" name="remarks" class="form-control"><?php if(isset($remarks)) {echo set_value('remarks',$remarks);} else {echo set_value('remarks');} ?></textarea>
                 </div>
             </div>
+
+            <!-- Button to display linked file -->
             <div class="form-group col-md-12">
                 <label for="linked_file"><?php echo $this->lang->line('field_linked_file_upload'); ?></label>
                 <input type="file" name="linked_file" accept=".pdf, .doc, .docx" class="form-control-file" />
             </div>
-            <!-- Button to display linked file -->
-            <?php
-            /*if (!empty($item->linked_file)) {
-                echo '<a href="'.base_url('uploads/files/'.$item->linked_file).'" '.
-                        'class="btn btn-default"  role="button" >'
-                        .$this->lang->line('btn_linked_doc').
-                     '</a>';
-            }
-            else {
-                echo '<a href="#" '.
-                     'class="btn btn-default disabled"  role="button" >'
-                         .$this->lang->line('btn_linked_doc').
-                     '</a>';
-            }*/
-            ?>
         </div>
     </div>
 
@@ -175,28 +166,28 @@
             <p class="bg-primary">&nbsp;<?php echo $this->lang->line('text_item_tags'); ?></p>
         </div>
         <div class="col-md-12">
-			<?php foreach ($item_tags as $item_tag) { 
-                ?><label class="checkbox-inline"><input type="checkbox" name="tag<?php echo $item_tag->item_tag_id; ?>" value="<?php echo $item_tag->item_tag_id; ?>" <?php
-                if (isset($tag_links)) {
-                    foreach ($tag_links as $tag_link) {
-                        if ($tag_link->item_tag_id == $item_tag->item_tag_id){
-                            echo 'checked';
+			<?php foreach ($item_tags as $item_tag) { ?>
+                <label class="checkbox-inline">
+                    <input class="tag-checkbox" type="checkbox" name="tag<?php echo $item_tag->item_tag_id; ?>" value="<?php echo $item_tag->item_tag_id; ?>"
+                        <?php
+                        // Check the checkbox if tag is assigned to this item
+                        if (isset($tag_links)) {
+                            foreach ($tag_links as $tag_link) {
+                                if ($tag_link->item_tag_id == $item_tag->item_tag_id){
+                                    echo 'checked';
+                                }
+                            }
                         }
-                    }
-                }
-                ?> /><?php
+                        ?>
+                    />
 
-                echo $item_tag->name; ?></label>
+                    <?php echo $item_tag->name; ?>
+                </label>
 			<?php } ?>
         </div>
     </div>
 </form>
-<pre>
-    <?php 
-        var_dump($_POST);
-        var_dump($this->input->post());
-    ?>
-</pre>
+
 <script>
 function change_warranty()
 {
@@ -244,50 +235,53 @@ function createInventoryNo(){
         
         echo $array;
         ?>];
-    var tagField =  getFirstSelectedTag();
-    var tags = [<?php 
-        $array = "";
-        foreach($item_tags as $item_tag){
-            $array .= "\"".$item_tag->short_name."\",";
-        }; 
-        
-        echo $array;
-        ?>];
+
+    var tagShortName = getFirstTagShortName();
     var buyingDateField = document.getElementById('buying_date');
     var date = new Date(buyingDateField.value).getFullYear();
-    var idField = document.getElementById('id');
-    var id = <?php echo $item_id ?>;
     var inventoryNumberField = document.getElementById('inventory_number');
-    var inventoryNumber = "";  
+    var inventoryNumber = "";
+    var inventoryIdField = document.getElementById('inventory_id');
     
     date = date.toString().slice(2,4);
     if(date == "N"){
         date = "00";
     }
-    id = id.toString();
-    for(var i = id.length;i < 4; i++){
-        id = "0" + id;
-    }
     
-    // Check if any tag has been selected
-    if(tagField !== null){
-        inventoryNumber = objectGroups[objectGroupField.value-1] + tags[tagField] + date;
-        inventoryNumberField.value = inventoryNumber;
-        idField.value = "." + id;
+    inventoryNumber = objectGroups[objectGroupField.value-1] + tagShortName + date;
+    inventoryNumberField.value = inventoryNumber;
+
+    // If inventory_id field is empty, complete it
+    if (inventoryIdField.value == "") {
+        id = <?php echo $item_id ?>;
+        id = id.toString();
+        for(var i = id.length;i < <?php echo INVENTORY_NUMBER_CHARS ?>; i++){
+            id = "0" + id;
+        }
+        id = "." + id;
+
+        inventoryIdField.value = id;
     }
 }
 
-function getFirstSelectedTag(){
-    var tags = document.getElementsByClassName('checkbox-inline');
-    var firstFoundIndex = null;
+function getFirstTagShortName(){
+    var tags = document.getElementsByClassName('tag-checkbox');
+    var firstTagShortName = "";
+
+    // Get an array with every tags shortnames
+    var tagsShortNames = [<?php 
+                            foreach($item_tags as $item_tag){
+                                echo "\"".$item_tag->short_name."\",";
+                            }; 
+                        ?>];
     
     for(var i = 0;i < tags.length;i++){
-        if(tags[i].firstChild.checked === true){
-            firstFoundIndex = i;
+        if(tags[i].checked === true){
+            firstTagShortName = tagsShortNames[i];
             break;
         }
     }
     
-    return firstFoundIndex;
+    return firstTagShortName;
 }
 </script>
