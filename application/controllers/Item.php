@@ -686,8 +686,8 @@ class Item extends MY_Controller {
 
         $loanArray["item_id"] = $id;
 
-        // For now, loans are from and for Orif
-        $loanArray["loan_to_user_id"] = $loanArray["loan_by_user_id"] = 1;
+        $loanArray["loan_to_user_id"] = null;
+        $loanArray["loan_by_user_id"] = $this->session->user_id;
 
         $this->loan_model->insert($loanArray);
 
