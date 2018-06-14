@@ -39,8 +39,10 @@
 			<span class="word-administration">Administration</span>
 		</a>
 	</h1>
-
-	<em>
+        <?php
+            if (!empty(validation_errors()) || !empty($upload_errors)) {
+        ?>
+	<div class="alert alert-danger">
 		<?php 
 		echo validation_errors();
 		if (isset($upload_errors)) 
@@ -48,7 +50,8 @@
 				echo $upload_errors;
 			} 
 		?>
-	</em>
+	</div>
+            <?php } ?>
 	<form method="post">
 		<div class="form-group">
 			<label for="username"><?php echo $this->lang->line('field_username') ?></label>

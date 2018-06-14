@@ -48,7 +48,11 @@
       </select>,
       <a class="like-normal" href="<?php echo base_url(); ?>admin/">Administration</a>
   </h1>
-  <em><?php echo validation_errors(); if (isset($upload_errors)) {echo $upload_errors;} ?></em>
+<?php
+    if (!empty(validation_errors()) || !empty($upload_errors)) {
+?>
+  <div class="alert alert-danger"><?php echo validation_errors(); if (isset($upload_errors)) {echo $upload_errors;} ?></div>
+<?php } ?>
     <div class="row">
       <form class="container" method="post">
         <div class="form-input row">
