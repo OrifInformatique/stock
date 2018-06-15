@@ -279,7 +279,6 @@ class Item extends MY_Controller {
                                  ->get($id);
 		
     $output['item'] = $item;
-
 		$this->display_view('item/detail', $output);
 	}
 
@@ -390,6 +389,8 @@ class Item extends MY_Controller {
         // Load the tags
         $this->load->model('item_tag_model');
         $data['item_tags'] = $this->item_tag_model->get_all();
+
+        $data['item_id'] = $this->item_model->get_future_id();
 
         $this->display_view('item/form', $data);
       }
@@ -685,8 +686,8 @@ class Item extends MY_Controller {
 
         $loanArray["item_id"] = $id;
 
-        // For now, loans are from and for Orif
-        $loanArray["loan_to_user_id"] = $loanArray["loan_by_user_id"] = 1;
+        $loanArray["loan_to_user_id"] = null;
+        $loanArray["loan_by_user_id"] = $this->session->user_id;
 
         $this->loan_model->insert($loanArray);
 
@@ -833,13 +834,6 @@ class Item extends MY_Controller {
 
     $this->form_validation->set_rules("name", $this->lang->line('field_item_name'), 'required');
 
-    // If new item or if inventory_number has been changed, check if it's unique
-    if (is_null($id) || $_POST['inventory_number'] != $this->item_model->get($id)->inventory_number) {
-      $this->form_validation->set_rules("inventory_number", $this->lang->line('field_inventory_number'),
-        'required|is_unique[item.inventory_number]',
-        array('is_unique' => $this->lang->line('msg_err_inventory_used')));
-    } else {
-      $this->form_validation->set_rules("inventory_number", $this->lang->line('field_inventory_number'), 'required');
-    }
+    $this->form_validation->set_rules("inventory_number", $this->lang->line('field_inventory_number'), 'required');
   }
 }

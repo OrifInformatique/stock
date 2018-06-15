@@ -40,8 +40,8 @@
                         <td><?php echo $loan->real_return_date; ?></td>
                         <td><?php echo $loan->item_localisation; ?></td>
                         <td><?php echo $loan->loan_by_user->username; ?></td>
-                        <td><?php echo $loan->loan_to_user->lastname.' '.
-                                       $loan->loan_to_user->firstname; ?>
+                        <td><?php if(isset($loan->loan_to_user)){ echo $loan->loan_to_user->lastname.' '.
+                        $loan->loan_to_user->firstname;} ?>
 
                         <!-- DELETE ACCESS RESTRICTED FOR ADMINISTRATORS ONLY -->
 						<?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= ACCESS_LVL_ADMIN) { ?>

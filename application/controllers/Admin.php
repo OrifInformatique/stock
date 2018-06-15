@@ -60,20 +60,20 @@ class Admin extends MY_Controller
 
         //username: if changed,
         if ($_POST['username'] != get_object_vars($this->user_model->get($id))['username']) {
-          $this->form_validation->set_rules('username', 'Identifiant', 'required|callback_unique_username', $this->lang->line('msg_id_needed')); // not void and unique.
+          $this->form_validation->set_rules('username', $this->lang->line('field_username'), 'required|callback_unique_username', $this->lang->line('msg_id_needed')); // not void and unique.
         }
 
         //email: void
         if (isset($_POST['email'])) {
           // or valid.
-          $this->form_validation->set_rules('email', 'Mail', 'valid_email', $this->lang->line('msg_err_email'));
+          $this->form_validation->set_rules('email', $this->lang->line('field_mail'), 'valid_email', $this->lang->line('msg_err_email'));
         }
 
         // If the password needs to be modified,
         if (isset($_POST['pwd'])) {
           // it needs to be long 6 chars or more and confirmed
-          $this->form_validation->set_rules('pwd', 'Mot de passe', 'min_length[6]', $this->lang->line('msg_err_pwd_length'));
-          $this->form_validation->set_rules('pwdagain', 'Mot de passe', 'matches[pwd]', $this->lang->line('msg_err_pwg_wrong'));
+          $this->form_validation->set_rules('pwd', $this->lang->line('field_password'), 'min_length[6]', $this->lang->line('msg_err_pwd_length'));
+          $this->form_validation->set_rules('pwdagain', $this->lang->line('field_password'), 'matches[pwd]', $this->lang->line('msg_err_pwg_wrong'));
         }
 
         if($this->form_validation->run() === TRUE)
@@ -140,17 +140,17 @@ class Admin extends MY_Controller
         // VALIDATION
 
         //username: not void, unique
-        $this->form_validation->set_rules('username', 'Identifiant', 'required|callback_unique_username', $this->lang->line('msg_err_id_needed'));
+        $this->form_validation->set_rules('username', $this->lang->line('field_username'), 'required|callback_unique_username', $this->lang->line('msg_err_id_needed'));
 
         //email: void
         if (isset($_POST['email'])) {
           // or valid
-          $this->form_validation->set_rules('email', 'Mail', 'valid_email', $this->lang->line('msg_err_email'));
+          $this->form_validation->set_rules('email', $this->lang->line('field_mail'), 'valid_email', $this->lang->line('msg_err_email'));
         }
 
         //Password: 6 chars or more, confirmed
-        $this->form_validation->set_rules('pwd', 'Mot de passe', 'required|min_length[6]', $this->lang->line('msg_err_pwd_length'));
-        $this->form_validation->set_rules('pwdagain', 'Mot de passe', 'matches[pwd]', $this->lang->line('msg_err_pwg_wrong'));
+        $this->form_validation->set_rules('pwd', $this->lang->line('field_password'), 'required|min_length[6]', $this->lang->line('msg_err_pwd_length'));
+        $this->form_validation->set_rules('pwdagain', $this->lang->line('field_password'), 'matches[pwd]', $this->lang->line('msg_err_pwg_wrong'));
 
         if($this->form_validation->run() === TRUE)
         {
@@ -234,12 +234,12 @@ class Admin extends MY_Controller
 
         //name: if changed,
         if ($_POST['name'] != get_object_vars($this->item_tag_model->get($id))['name']) {
-          $this->form_validation->set_rules('name', 'Identifiant', 'required|callback_unique_tagname', $this->lang->line('msg_err_tag_name_needed')); // not void
+          $this->form_validation->set_rules('name', $this->lang->line('field_username'), 'required|callback_unique_tagname', $this->lang->line('msg_err_tag_name_needed')); // not void
         }
 
         //short_name: if changed,
         if ($_POST['short_name'] != get_object_vars($this->item_tag_model->get($id))['short_name']) {
-          $this->form_validation->set_rules('short_name', 'Abrévation', 'required|callback_unique_tagshort', $this->lang->line('msg_err_abbreviation')); // not void
+          $this->form_validation->set_rules('short_name', $this->lang->line('field_abbreviation'), 'required|callback_unique_tagshort', $this->lang->line('msg_err_abbreviation')); // not void
         }
         
         if($this->form_validation->run() === TRUE) {
@@ -271,10 +271,10 @@ class Admin extends MY_Controller
         // VALIDATION
 
         //name: not void
-        $this->form_validation->set_rules('name', 'Identifiant', 'required|callback_unique_tagname', $this->lang->line('msg_err_tag_name_needed'));
+        $this->form_validation->set_rules('name', $this->lang->line('field_username'), 'required|callback_unique_tagname', $this->lang->line('msg_err_tag_name_needed'));
         
         //short_name: not void
-        $this->form_validation->set_rules('short_name', 'Abrévation', 'required|callback_unique_tagshort', $this->lang->line('msg_err_abbreviation'));
+        $this->form_validation->set_rules('short_name', $this->lang->line('field_abbreviation'), 'required|callback_unique_tagshort', $this->lang->line('msg_err_abbreviation'));
 
         if($this->form_validation->run() === TRUE)
         {
@@ -363,8 +363,8 @@ class Admin extends MY_Controller
       $this->load->model('stocking_place_model');
 
       if (!empty($_POST)) {
-        $this->form_validation->set_rules('short', 'Nom court', 'required', $this->lang->line('msg_storage_short_needed'));
-        $this->form_validation->set_rules('name', 'Nom long', 'required', $this->lang->line('msg_err_storage_long_needed'));
+        $this->form_validation->set_rules('short', $this->lang->line('field_short_name'), 'required', $this->lang->line('msg_storage_short_needed'));
+        $this->form_validation->set_rules('name', $this->lang->line('field_long_name'), 'required', $this->lang->line('msg_err_storage_long_needed'));
 
         if ($this->form_validation->run() === TRUE)
         {
@@ -395,8 +395,8 @@ class Admin extends MY_Controller
         // VALIDATION
 
         //name: not void
-        $this->form_validation->set_rules('name', 'Identifiant', 'required|callback_unique_stocking_place', $this->lang->line('msg_err_unique_stocking_needed'));
-		$this->form_validation->set_rules('short', 'court', 'required', $this->lang->line('msg_err_unique_stocking_short'));
+        $this->form_validation->set_rules('name', $this->lang->line('field_username'), 'required|callback_unique_stocking_place', $this->lang->line('msg_err_unique_stocking_needed'));
+		$this->form_validation->set_rules('short', $this->lang->line('field_short'), 'required', $this->lang->line('msg_err_unique_stocking_short'));
 
 
         if ($this->form_validation->run() === TRUE)
@@ -470,11 +470,11 @@ class Admin extends MY_Controller
         // VALIDATION
 
         //name: if changed,
-        $this->form_validation->set_rules('name', 'Identifiant', 'required', $this->lang->line('msg_err_supplier_needed')); // not void
+        $this->form_validation->set_rules('name', $this->lang->line('field_username'), 'required', $this->lang->line('msg_err_supplier_needed')); // not void
 
         if (isset($_POST['email'])) {
           // or valid.
-          $this->form_validation->set_rules('email', 'Mail', 'valid_email', $this->lang->line('msg_err_email'));
+          $this->form_validation->set_rules('email', $this->lang->line('field_mail'), 'valid_email', $this->lang->line('msg_err_email'));
         }
 
         if ($this->form_validation->run() === TRUE)
@@ -506,12 +506,12 @@ class Admin extends MY_Controller
         // VALIDATION
 
         //name: not void
-        $this->form_validation->set_rules('name', 'Identifiant', 'required', $this->lang->line('msg_err_supplier_needed'));
+        $this->form_validation->set_rules('name', $this->lang->line('field_username'), 'required', $this->lang->line('msg_err_supplier_needed'));
 
         //email: void
         if (isset($_POST['email'])) {
           // or valid
-          $this->form_validation->set_rules('email', 'Mail', 'valid_email', $this->lang->line('msg_err_email'));
+          $this->form_validation->set_rules('email', $this->lang->line('field_mail'), 'valid_email', $this->lang->line('msg_err_email'));
         }
 
         if ($this->form_validation->run() === TRUE)
@@ -570,8 +570,8 @@ class Admin extends MY_Controller
       $this->load->model('item_group_model');
 
       if (!empty($_POST)) {
-        $this->form_validation->set_rules('name', 'Nom', 'required', $this->lang->line('msg_err_item_group_needed'));
-        $this->form_validation->set_rules('short_name', 'Abrévation', 'required', $this->lang->line('msg_err_item_group_short'));
+        $this->form_validation->set_rules('name', $this->lang->line('field_name'), 'required|callback_unique_groupname', $this->lang->line('msg_err_item_group_needed'));
+        $this->form_validation->set_rules('short_name', $this->lang->line('field_abbreviation'), 'required|callback_unique_groupshort', $this->lang->line('msg_err_item_group_short'));
 
         if ($this->form_validation->run() === TRUE) {
           $this->item_group_model->update($id, $_POST);
@@ -595,8 +595,8 @@ class Admin extends MY_Controller
       $this->load->model('item_group_model');
 
       if (!empty($_POST)) {
-        $this->form_validation->set_rules('name', 'Identifiant', 'required|callback_unique_groupname', $this->lang->line('msg_err_unique_groupname'));
-        $this->form_validation->set_rules('short_name', 'Abrévation', 'required|callback_unique_groupshort', $this->lang->line('msg_err_unique_groupshort'));
+        $this->form_validation->set_rules('name', $this->lang->line('field_username'), 'required|callback_unique_groupname', $this->lang->line('msg_err_unique_groupname'));
+        $this->form_validation->set_rules('short_name', $this->lang->line('field_abbreviation'), 'required|callback_unique_groupshort', $this->lang->line('msg_err_unique_groupshort'));
 
         if ($this->form_validation->run() === TRUE)
         {
@@ -632,7 +632,7 @@ class Admin extends MY_Controller
       $group = $this->item_group_model->get_by('short_name', $argShort);
       
       if(isset($group->item_group_id)) {
-        $this->form_validation->set_message('unique_groupname', $this->lang->line('msg_err_unique_shortname'));
+        $this->form_validation->set_message('unique_groupshort', $this->lang->line('msg_err_unique_shortname'));
         return FALSE;
       } else {
         return TRUE;
