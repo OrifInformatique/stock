@@ -18,6 +18,7 @@
           <tr>
             <td>
               <a href="<?php echo base_url(); ?>admin/modify_tag/<?php echo $tag->item_tag_id; ?>"><?php echo html_escape($tag->name); ?></a>
+              <span class=".text-center"><?php echo html_escape($tag->short_name); ?></span>
               <a href="<?php echo base_url(); ?>admin/delete_tag/<?php echo $tag->item_tag_id; ?>" class="close">×</a>
             </td>
           </tr>

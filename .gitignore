@@ -62,3 +62,6 @@ application/config/database.php
 # =========================
 uploads/files/*
 uploads/images/*
+/nbproject/private/
+nbproject/project.properties
+nbproject/project.xml

@@ -21,6 +21,7 @@
           <tr>
             <td>
               <a href="<?php echo base_url(); ?>admin/modify_item_group/<?php echo $item_group->item_group_id; ?>"><?php echo html_escape($item_group->name); ?></a>
+              <span class=".text-center"><?php echo html_escape($item_group->short_name); ?></span>
               <a href="<?php echo base_url(); ?>admin/delete_item_group/<?php echo $item_group->item_group_id; ?>" class="close">×</a>
             </td>
           </tr>
