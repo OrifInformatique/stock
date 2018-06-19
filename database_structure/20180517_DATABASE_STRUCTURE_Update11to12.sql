@@ -22,6 +22,11 @@ ALTER TABLE `item_tag` ADD `short_name` VARCHAR(3) NULL AFTER `name`;
 --
 ALTER TABLE `item_group` ADD `short_name` VARCHAR(2) NULL AFTER `name`;
 
+--
+-- Autorize null value in loan_to_user_id field
+--
+ALTER TABLE `loan` CHANGE `loan_to_user_id` `loan_to_user_id` INT(11) NULL;
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
