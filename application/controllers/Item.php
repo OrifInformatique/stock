@@ -59,12 +59,18 @@ class Item extends MY_Controller {
     if (isset($_GET['ts'])) {
       $text_search_content = $_GET['ts'];
 
+      // Getting the inventory_number and the item_id as separate variables (separate at '.')
+      $inventory_id = explode('.',$text_search_content);
+      $inventory_number = $inventory_id[0];
+      $item_id = isset($inventory_id[1])?$inventory_id[1]:$inventory_id[0]; // If there is no '.', both variableshave the same values then
+      
       // Prepare WHERE clause
       $where_textSearchFilter .= '(';
       $where_textSearchFilter .=
         "name LIKE '%".$text_search_content."%' "
        ."OR description LIKE '%".$text_search_content."%' "
-       ."OR inventory_number LIKE '%".$text_search_content."%' "
+       ."OR inventory_number LIKE '%".$inventory_number."%' "
+       ."OR item_id = ".intval($item_id)." "
        ."OR serial_number LIKE '%".$text_search_content."%'";
       $where_textSearchFilter .= ')';
       
@@ -254,7 +260,7 @@ class Item extends MY_Controller {
                                           ->with('item_condition')
                                           ->get_many_by($where_itemsFilters);
     }
-
+    
     $this->display_view('item/list', $output);
   }
 
