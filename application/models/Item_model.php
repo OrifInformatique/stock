@@ -251,9 +251,243 @@ class Item_model extends MY_Model
         return $item;
     }
     
-    protected function search_filter($get){
-        $output = array();
-        
-        return $output;
+    /**
+     * Searching item(s) on the database depending on filters
+     * @param array ($_GET) $get The arrays of filters
+     * @return array The array of item(s) found
+     */
+    function search_filter($get){
+        $output['title'] = $this->lang->line('page_item_list');
+
+        // Load list of elements to display as filters
+        $this->load->model('item_tag_model');
+        $output['item_tags'] = $this->item_tag_model->dropdown('name');
+        $this->load->model('item_condition_model');
+        $output['item_conditions'] = $this->item_condition_model->dropdown('name');
+        $this->load->model('item_group_model');
+        $output['item_groups'] = $this->item_group_model->dropdown('name');
+        $this->load->model('stocking_place_model');
+        $output['stocking_places'] = $this->stocking_place_model->dropdown('name');
+
+        // Store URL to make possible to come back later (from item detail for example)
+        if (isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING'])) {
+          $_SESSION['items_list_url'] = current_url().'?'.$_SERVER['QUERY_STRING'];
+        } else {
+          $_SESSION['items_list_url'] = current_url();
+        }
+
+        // Initialize a global WHERE clause for filtering
+        $where_itemsFilters = '';
+
+        /*********************
+        ** TEXT SEARCH FILTER
+        **********************/
+        $where_textSearchFilter = '';
+
+        if (isset($get['ts'])) {
+          $text_search_content = $get['ts'];
+
+          // Getting the inventory_number and the item_id as separate variables (separate at '.')
+          $inventory_id = explode('.',$text_search_content);
+          $inventory_number = $inventory_id[0];
+          $item_id = isset($inventory_id[1])?$inventory_id[1]:$inventory_id[0]; // If there is no '.', both variableshave the same values then
+
+          // Prepare WHERE clause
+          $where_textSearchFilter .= '(';
+          $where_textSearchFilter .=
+            "name LIKE '%".$text_search_content."%' "
+           ."OR description LIKE '%".$text_search_content."%' "
+           .($inventory_number  != ""?"OR inventory_number LIKE '%".$inventory_number."%' ":"") // If $inventory_number is empty, don't filter on invenotry_number (it will return *all* the items)
+           ."OR item_id = ".intval($item_id)." "
+           ."OR serial_number LIKE '%".$text_search_content."%'";
+          $where_textSearchFilter .= ')';
+
+          // Add this part of WHERE clause to the global WHERE clause
+          if ($where_itemsFilters != '')
+          {
+            // Add new filter after existing filters
+            $where_itemsFilters .= ' AND ';
+          }
+          $where_itemsFilters .= $where_textSearchFilter;
+
+          // Send back the text search to keep it in input field
+          $output['text_search_content'] = $text_search_content;
+
+        } else {
+          // No text submited for filtering
+          $output['text_search_content'] = '';
+        }
+
+        /*********************
+        ** ITEM CONDITION FILTER
+        ** Default filtering for "functional" items
+        **********************/
+        $FUNCTIONAL_ITEM_CONDITION_ID = 10;
+        $where_itemConditionFilter = '';
+
+        if (isset($get['c'])) {
+          $item_conditions_selection = $get['c'];
+
+          // Prepare WHERE clause
+          $where_itemConditionFilter .= '(';
+          foreach ($item_conditions_selection as $item_condition_id) {
+            $where_itemConditionFilter .= 'item_condition_id='.$item_condition_id.' OR ';
+          }
+          // Remove the last " OR "
+          $where_itemConditionFilter = substr($where_itemConditionFilter, 0, -4);
+          $where_itemConditionFilter .= ')';
+
+          // Add this part of WHERE clause to the global WHERE clause
+          if ($where_itemsFilters != '')
+          {
+            // Add new filter after existing filters
+            $where_itemsFilters .= ' AND ';
+          }
+          $where_itemsFilters .= $where_itemConditionFilter;
+
+          // Send back the conditions selection to keep them selected
+          $output['item_conditions_selection'] = $item_conditions_selection;
+
+        } else {
+          // No condition selected for filtering, default filtering for "functional" items
+          if ($where_itemsFilters != '')
+          {
+            // Add new filter after existing filters
+            $where_itemsFilters .= ' AND ';
+          }
+          $where_itemsFilters .= '(item_condition_id='.$FUNCTIONAL_ITEM_CONDITION_ID.')';
+
+          // Send back the "functional" condition selection
+          $output['item_conditions_selection'] = [$FUNCTIONAL_ITEM_CONDITION_ID];
+        }
+
+        /*********************
+        ** ITEM GROUP FILTER
+        **********************/
+        $where_itemGroupFilter = '';
+
+        if (isset($get['g'])) {
+          $item_groups_selection = $get['g'];
+
+          // Prepare WHERE clause
+          $where_itemGroupFilter .= '(';
+          foreach ($item_groups_selection as $item_group_id) {
+            $where_itemGroupFilter .= 'item_group_id='.$item_group_id.' OR ';
+          }
+          // Remove the last " OR "
+          $where_itemGroupFilter = substr($where_itemGroupFilter, 0, -4);
+          $where_itemGroupFilter .= ')';
+
+          // Add this part of WHERE clause to the global WHERE clause
+          if ($where_itemsFilters != '')
+          {
+            // Add new filter after existing filters
+            $where_itemsFilters .= ' AND ';
+          }
+          $where_itemsFilters .= $where_itemGroupFilter;
+
+          // Send back the groups selection to keep them selected
+          $output['item_groups_selection'] = $item_groups_selection;
+
+        } else {
+          // No group selected for filtering
+          $output['item_groups_selection'] = '';
+        }
+
+        /*********************
+        ** STOCKING PLACE FILTER
+        **********************/
+        $where_stockingPlaceFilter = '';
+
+        if (isset($get['s'])) {
+          $stocking_places_selection = $get['s'];
+
+          // Prepare WHERE clause
+          $where_stockingPlaceFilter .= '(';
+          foreach ($stocking_places_selection as $stocking_place_id) {
+            $where_stockingPlaceFilter .= 'stocking_place_id='.$stocking_place_id.' OR ';
+          }
+          // Remove the last " OR "
+          $where_stockingPlaceFilter = substr($where_stockingPlaceFilter, 0, -4);
+          $where_stockingPlaceFilter .= ')';
+
+          // Add this part of WHERE clause to the global WHERE clause
+          if ($where_itemsFilters != '')
+          {
+            // Add new filter after existing filters
+            $where_itemsFilters .= ' AND ';
+          }
+          $where_itemsFilters .= $where_stockingPlaceFilter;
+
+          // Send back the stocking places selection to keep them selected
+          $output['stocking_places_selection'] = $stocking_places_selection;
+
+        } else {
+          // No stocking place selected for filtering
+          $output['stocking_places_selection'] = '';
+        }
+
+        /*********************
+        ** ITEM TAGS FILTER
+        **********************/
+        $where_itemTagsFilter = '';
+
+        if (isset($get['t'])) {
+          // Get a list of item_tag_link elements
+          $this->load->model('item_tag_link_model');
+          $item_tags_selection = $get['t'];
+
+          $where_itemTagLinks = '';
+          foreach ($item_tags_selection as $item_tag) {
+            $where_itemTagLinks .= 'item_tag_id='.$item_tag.' OR ';
+          }
+          // Remove the last " OR "
+          $where_itemTagLinks = substr($where_itemTagLinks, 0, -4);
+
+          $item_tag_links = $this->item_tag_link_model->get_many_by($where_itemTagLinks);
+
+
+          // Prepare WHERE clause for all corresponding items
+          $where_itemTagsFilter .= '(';
+          foreach ($item_tag_links as $item_tag_link) {
+            $where_itemTagsFilter .= 'item_id='.$item_tag_link->item_id.' OR ';
+          }
+          // Remove the last " OR "
+          $where_itemTagsFilter = substr($where_itemTagsFilter, 0, -4);
+          $where_itemTagsFilter .= ')';
+
+          // Add this part of WHERE clause to the global WHERE clause
+          if ($where_itemsFilters != '')
+          {
+            // Add new filter after existing filters
+            $where_itemsFilters .= ' AND ';
+          }
+          $where_itemsFilters .= $where_itemTagsFilter;
+
+          // Send back the tags selection to keep them selected
+          $output['item_tags_selection'] = $item_tags_selection;
+
+        } else {
+          // No tags selected for filtering
+          $output['item_tags_selection'] = '';
+        }
+
+
+        /*********************
+        ** GET FILTERED ITEMS
+        **********************/
+        if ($where_itemsFilters == '')
+        {
+          // No filter, get all items
+          $output["items"] = $this->with('stocking_place')
+                                              ->with('item_condition')
+                                              ->get_all();
+        } else {
+          // Get filtered items
+          $output["items"] = $this->with('stocking_place')
+                                              ->with('item_condition')
+                                              ->get_many_by($where_itemsFilters);
+        }
+            return $output;
     }
 }
