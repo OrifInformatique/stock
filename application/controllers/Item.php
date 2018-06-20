@@ -69,7 +69,7 @@ class Item extends MY_Controller {
       $where_textSearchFilter .=
         "name LIKE '%".$text_search_content."%' "
        ."OR description LIKE '%".$text_search_content."%' "
-       ."OR inventory_number LIKE '%".$inventory_number."%' "
+       .($inventory_number  != ""?"OR inventory_number LIKE '%".$inventory_number."%' ":"") // If $inventory_number is empty, don't filter on invenotry_number (it will return *all* the items)
        ."OR item_id = ".intval($item_id)." "
        ."OR serial_number LIKE '%".$text_search_content."%'";
       $where_textSearchFilter .= ')';
