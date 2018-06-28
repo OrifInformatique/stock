@@ -131,7 +131,6 @@ $lang['msg_err_storage_short_needed']   = 'Le lieu de stockage doit avoir un nom
 $lang['msg_err_supplier_needed']        = 'Un nom de fournisseur doit être fourni';
 $lang['msg_err_tag_name_needed']        = 'Un nom de tag doit être fourni';
 $lang['msg_err_unique_groupname']       = 'Un nom de groupe unique doit être fourni';
-$lang['msg_err_unique_groupshort']      = 'Une abréviation de groupe unique doit être fournie';
 $lang['msg_err_unique_shortname']       = 'Cette abréviation est déjà utilisée';
 $lang['msg_err_unique_stocking_needed'] = 'Un nom d\'emplacement unique doit être fourni';
 $lang['msg_err_unique_stocking_short']  = 'Un nom court d\'emplacement doit être fourni';

@@ -566,8 +566,8 @@ class Admin extends MY_Controller
       $this->load->model('item_group_model');
 
       if (!empty($_POST)) {
-        $this->form_validation->set_rules('name', $this->lang->line('field_name'), 'required|callback_unique_groupname', $this->lang->line('msg_err_item_group_needed'));
-        $this->form_validation->set_rules('short_name', $this->lang->line('field_abbreviation'), 'required|callback_unique_shortname', $this->lang->line('msg_err_item_group_short'));
+        $this->form_validation->set_rules('name', $this->lang->line('field_name'), "required|callback_unique_groupname[$id]", $this->lang->line('msg_err_item_group_needed'));
+        $this->form_validation->set_rules('short_name', $this->lang->line('field_abbreviation'), "required|callback_unique_groupshort[$id]", $this->lang->line('msg_err_item_group_short'));
 
         if ($this->form_validation->run() === TRUE) {
           $this->item_group_model->update($id, $_POST);
@@ -592,7 +592,7 @@ class Admin extends MY_Controller
 
       if (!empty($_POST)) {
         $this->form_validation->set_rules('name', $this->lang->line('field_username'), 'required|callback_unique_groupname', $this->lang->line('msg_err_unique_groupname'));
-        $this->form_validation->set_rules('short_name', $this->lang->line('field_abbreviation'), 'required|callback_unique_groupshort', $this->lang->line('msg_err_unique_groupshort'));
+        $this->form_validation->set_rules('short_name', $this->lang->line('field_abbreviation'), 'required|callback_unique_groupshort', $this->lang->line('msg_err_unique_shortname'));
 
         if ($this->form_validation->run() === TRUE)
         {
@@ -606,35 +606,13 @@ class Admin extends MY_Controller
       $this->display_view("admin/item_groups/form");
     }
 
-    public function unique_group_short_name($argName, $argShort){
-        $this->load->model('item_group_model');
-        
-        $groupName = $this->item_group_model->get_by('name',$argName);
-        $shortName = $this->item_group_model->get_by('short_name',$argShort);
-        
-        if(isset($groupName->item_group_id) && isset($groupName->item_group_id)){
-            
-            if(isset($groupName->item_group_id) && $groupName->name == $argName){
-                $this->form_validation->set_message('unique_groupname',$this->lang->line('msg_err_username_used'));
-                return FALSE;
-            }
-            
-            if(isset($shortName->item_group_id) && $shortName->short_name == $argShort){
-                $this->form_validation->set_message('unique_groupshort',$this->lang->line('msg_err_unique_shortname'));
-                return FALSE;
-            }
-        }else{
-            return TRUE;
-        }
-    }
-
-    public function unique_groupname($argName) {
+    public function unique_groupname($newName, $groupID) {
       $this->load->model('item_group_model');
 
-      // Get this group. If it fails, it doesn't exist, so the username is unique!
-      $group = $this->item_group_model->get_by('name', $argName);
+      // Search if another group has the same name
+      $group = $this->item_group_model->get_by('name', $newName);
       
-      if(isset($group->item_group_id)) {
+      if(isset($group->item_group_id) && $group->item_group_id != $groupID) {
         $this->form_validation->set_message('unique_groupname', $this->lang->line('msg_err_username_used'));
         return FALSE;
       } else {
@@ -642,13 +620,13 @@ class Admin extends MY_Controller
       }
     }
     
-    public function unique_groupshort($argShort) {
+    public function unique_groupshort($newShortName, $groupID) {
       $this->load->model('item_group_model');
 
-      // Get this group. If it fails, it doesn't exist, so the username is unique!
-      $group = $this->item_group_model->get_by('short_name', $argShort);
+      // Search if another group has the same short name
+      $group = $this->item_group_model->get_by('short_name', $newShortName);
       
-      if(isset($group->item_group_id)) {
+      if(isset($group->item_group_id) && $group->item_group_id != $groupID) {
         $this->form_validation->set_message('unique_groupshort', $this->lang->line('msg_err_unique_shortname'));
         return FALSE;
       } else {
