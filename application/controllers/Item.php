@@ -29,9 +29,29 @@ class Item extends MY_Controller {
     */
 	public function index()
   {
+    // Store URL to make possible to come back later (from item detail for example)
+    if (isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING'])) {
+      $_SESSION['items_list_url'] = current_url().'?'.$_SERVER['QUERY_STRING'];
+    } else {
+      $_SESSION['items_list_url'] = current_url();
+    }
+
     // Getting item(s) through filtered search on the database
-    $output = $this->item_model->search_filter($_GET);
-    
+    $output = $this->item_model->get_filtered($_GET);
+
+    // Add page title
+    $output['title'] = $this->lang->line('page_item_list');
+
+    // Load list of elements to display as filters
+    $this->load->model('item_tag_model');
+    $output['item_tags'] = $this->item_tag_model->dropdown('name');
+    $this->load->model('item_condition_model');
+    $output['item_conditions'] = $this->item_condition_model->dropdown('name');
+    $this->load->model('item_group_model');
+    $output['item_groups'] = $this->item_group_model->dropdown('name');
+    $this->load->model('stocking_place_model');
+    $output['stocking_places'] = $this->stocking_place_model->dropdown('name');
+
     $this->display_view('item/list', $output);
   }
 
