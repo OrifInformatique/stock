@@ -35,11 +35,15 @@ class Auth extends MY_Controller
         $username = $this->input->post('username');
         $password = $this->input->post('password');
         
-        // Keeping in memory the last page in user's history so we can redirect they later
-        if($_SERVER["HTTP_REFERER"] != current_url()){
-            $_SESSION["before_login_page"] = $_SERVER["HTTP_REFERER"];
+        // Keeping in memory the last page in user's history so we can redirect there later
+        if(isset($_SERVER["HTTP_REFERER"])) {
+            if($_SERVER["HTTP_REFERER"] != current_url()){
+                $_SESSION["before_login_page"] = $_SERVER["HTTP_REFERER"];
+            }
+        } else {
+            $_SESSION["before_login_page"] = base_url();
         }
-        // Recovering the last page in user's history so we can redirect they if they login
+        // Recovering the last page in user's history so we can redirect there after login
         $redirect_url = $_SESSION["before_login_page"];
         
         if ($this->form_validation->run() == true) {
@@ -56,7 +60,7 @@ class Auth extends MY_Controller
                 $_SESSION['user_access'] = (int)$user->user_type->access_level;
                 $_SESSION['logged_in'] = (bool)true;
 
-                // Send the user back to thier's last page
+                // Send the user back to his last page
                 redirect($redirect_url);
                 exit();
 
