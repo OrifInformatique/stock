@@ -34,7 +34,14 @@ class Auth extends MY_Controller
     {
         $username = $this->input->post('username');
         $password = $this->input->post('password');
-
+        
+        // Keeping in memory the last page in user's history so we can redirect they later
+        if($_SERVER["HTTP_REFERER"] != current_url()){
+            $_SESSION["before_login_page"] = $_SERVER["HTTP_REFERER"];
+        }
+        // Recovering the last page in user's history so we can redirect they if they login
+        $redirect_url = $_SESSION["before_login_page"];
+        
         if ($this->form_validation->run() == true) {
             // Fields validation passed
 
@@ -49,15 +56,16 @@ class Auth extends MY_Controller
                 $_SESSION['user_access'] = (int)$user->user_type->access_level;
                 $_SESSION['logged_in'] = (bool)true;
 
-                // Display item's list
-                redirect('/item');
+                // Send the user back to thier's last page
+                redirect($redirect_url);
+                exit();
 
             } else {
                 // Login failed
                 $this->session->set_flashdata('message', '<div class="alert alert-danger text-center">'.$this->lang->line('msg_err_invalid_password').'</div>');
             }
         }
-
+        
         // Display login page
         $this->display_view('login_view');
     }

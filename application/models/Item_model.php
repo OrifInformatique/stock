@@ -488,6 +488,6 @@ class Item_model extends MY_Model
                                               ->with('item_condition')
                                               ->get_many_by($where_itemsFilters);
         }
-            return $output;
+        return $output;
     }
 }

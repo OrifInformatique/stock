@@ -376,10 +376,6 @@ class Admin extends MY_Controller
       } else {
         $output = get_object_vars($this->stocking_place_model->get($id));
       }
-
-      $this->load->model('stocking_place_model');
-      $output = get_object_vars($this->stocking_place_model->get($id));
-      $output["stocking_places"] = $this->stocking_place_model->get_all();	  
 	  
       $output["stocking_places"] = $this->stocking_place_model->get_all();
 
@@ -571,7 +567,7 @@ class Admin extends MY_Controller
 
       if (!empty($_POST)) {
         $this->form_validation->set_rules('name', $this->lang->line('field_name'), 'required|callback_unique_groupname', $this->lang->line('msg_err_item_group_needed'));
-        $this->form_validation->set_rules('short_name', $this->lang->line('field_abbreviation'), 'required|callback_unique_groupshort', $this->lang->line('msg_err_item_group_short'));
+        $this->form_validation->set_rules('short_name', $this->lang->line('field_abbreviation'), 'required|callback_unique_shortname', $this->lang->line('msg_err_item_group_short'));
 
         if ($this->form_validation->run() === TRUE) {
           $this->item_group_model->update($id, $_POST);
@@ -610,6 +606,27 @@ class Admin extends MY_Controller
       $this->display_view("admin/item_groups/form");
     }
 
+    public function unique_group_short_name($argName, $argShort){
+        $this->load->model('item_group_model');
+        
+        $groupName = $this->item_group_model->get_by('name',$argName);
+        $shortName = $this->item_group_model->get_by('short_name',$argShort);
+        
+        if(isset($groupName->item_group_id) && isset($groupName->item_group_id)){
+            
+            if(isset($groupName->item_group_id) && $groupName->name == $argName){
+                $this->form_validation->set_message('unique_groupname',$this->lang->line('msg_err_username_used'));
+                return FALSE;
+            }
+            
+            if(isset($shortName->item_group_id) && $shortName->short_name == $argShort){
+                $this->form_validation->set_message('unique_groupshort',$this->lang->line('msg_err_unique_shortname'));
+                return FALSE;
+            }
+        }else{
+            return TRUE;
+        }
+    }
 
     public function unique_groupname($argName) {
       $this->load->model('item_group_model');
