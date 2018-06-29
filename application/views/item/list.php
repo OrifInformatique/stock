@@ -18,11 +18,10 @@
       <!-- TEXT FILTER -->
       <div class="col-sm-8 top-margin">
       <?php
-        echo form_label($this->lang->line('field_text_search'),
-                        'item_conditions-multiselect');
-        echo form_input('ts', $text_search_content, 
+        echo form_label($this->lang->line('field_text_search'), 'text_search');
+        echo form_input('ts', $ts, 
                         'id="text_search" class="form-control"
-                        placeholder="'.$this->lang->line('field_no_filter').'"');
+                         placeholder="'.$this->lang->line('field_no_filter').'"');
       ?>
       </div>
 
@@ -31,7 +30,7 @@
       <?php
         echo form_label($this->lang->line('field_item_condition'),
                         'item_conditions-multiselect');
-        echo form_dropdown('c[]', $item_conditions, $item_conditions_selection,
+        echo form_dropdown('c[]', $item_conditions, $c,
                            'id="item_conditions-multiselect" multiple="multiple"');
       ?>
       </div>
@@ -43,7 +42,7 @@
       <?php
         echo form_label($this->lang->line('field_tags'),
                         'item_conditions-multiselect');
-        echo form_dropdown('t[]', $item_tags, $item_tags_selection,
+        echo form_dropdown('t[]', $item_tags, $t,
                            'id="item_tags-multiselect" multiple="multiple"');
       ?>
       </div>
@@ -53,7 +52,7 @@
       <?php
         echo form_label($this->lang->line('field_group'),
                         'item_groups-multiselect');
-        echo form_dropdown('g[]', $item_groups, $item_groups_selection,
+        echo form_dropdown('g[]', $item_groups, $g,
                            'id="item_groups-multiselect" multiple="multiple"');
       ?>
       </div>
@@ -66,7 +65,7 @@
       <?php
         echo form_label($this->lang->line('field_stocking_place'),
                         'stocking_places-multiselect');
-        echo form_dropdown('s[]', $stocking_places, $stocking_places_selection,
+        echo form_dropdown('s[]', $stocking_places, $s,
                            'id="stocking_places-multiselect" multiple="multiple"');
       ?>
       </div>
