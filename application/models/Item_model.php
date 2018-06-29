@@ -282,6 +282,10 @@ class Item_model extends MY_Model
             for ($i = 0; $i < (count($inventory_exploded) - 1); $i++) {
               $inventory_number .= $inventory_exploded[$i];
             }
+
+          } else {
+            // The item ID is probably not in the search text.
+            $inventory_number = $text_search_content;
           }
 
           // Prepare WHERE clause
@@ -293,7 +297,7 @@ class Item_model extends MY_Model
 
           if (isset($item_id)) {
             $where_textSearchFilter .= "OR item_id = ".$item_id." ";
-            if (isset($inventory_number)) {
+            if (isset($inventory_number) && $inventory_number != '') {
               $where_textSearchFilter .= "OR inventory_number LIKE '%".$inventory_number."%' ";
             }
           } else {
