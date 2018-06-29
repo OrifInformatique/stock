@@ -251,7 +251,7 @@ function createInventoryNo(){
         date = "00";
     }
     
-    inventoryNumber = objectGroups[objectGroupField.value-1] + tagShortName + date;
+    inventoryNumber = <?php echo '"'.INVENTORY_PREFIX.'."' ?> + objectGroups[objectGroupField.value-1] + tagShortName + date;
     inventoryNumberField.value = inventoryNumber;
 
     // If inventory_id field is empty, complete it
