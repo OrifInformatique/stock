@@ -363,8 +363,8 @@ class Admin extends MY_Controller
       $this->load->model('stocking_place_model');
 
       if (!empty($_POST)) {
-        $this->form_validation->set_rules('short', $this->lang->line('field_short_name'), 'required', $this->lang->line('msg_storage_short_needed'));
-        $this->form_validation->set_rules('name', $this->lang->line('field_long_name'), 'required', $this->lang->line('msg_err_storage_long_needed'));
+        $this->form_validation->set_rules('short', $this->lang->line('field_short_name'), "required|callback_unique_stocking_short[$id]", $this->lang->line('msg_storage_short_needed'));
+        $this->form_validation->set_rules('name', $this->lang->line('field_long_name'), "required|callback_unique_stocking_name[$id]", $this->lang->line('msg_err_storage_long_needed'));
 
         if ($this->form_validation->run() === TRUE)
         {
@@ -376,7 +376,7 @@ class Admin extends MY_Controller
       } else {
         $output = get_object_vars($this->stocking_place_model->get($id));
       }
-	  
+      $output = get_object_vars($this->stocking_place_model->get($id));
       $output["stocking_places"] = $this->stocking_place_model->get_all();
 
       $this->display_view("admin/stocking_places/form", $output);
@@ -391,8 +391,8 @@ class Admin extends MY_Controller
         // VALIDATION
 
         //name: not void
-        $this->form_validation->set_rules('name', $this->lang->line('field_username'), 'required|callback_unique_stocking_place', $this->lang->line('msg_err_unique_stocking_needed'));
-		$this->form_validation->set_rules('short', $this->lang->line('field_short'), 'required', $this->lang->line('msg_err_unique_stocking_short'));
+        $this->form_validation->set_rules('name', $this->lang->line('field_username'), 'required|callback_unique_stocking_name', $this->lang->line('msg_err_stocking_needed'));
+		$this->form_validation->set_rules('short', $this->lang->line('field_short'), 'required|callback_unique_stocking_short', $this->lang->line('msg_err_stocking_short'));
 
 
         if ($this->form_validation->run() === TRUE)
@@ -407,20 +407,34 @@ class Admin extends MY_Controller
       $this->display_view("admin/stocking_places/form");
     }
           
-    public function unique_stocking_place($argName) {
+    public function unique_stocking_name($newName, $groupID) {
       $this->load->model('stocking_place_model');
 
-      // Get this sp. If it fails, it doesn't exist, so the username is unique!
-      $sp = $this->stocking_place_model->get_by('name', $argName);
+      // Search if another group has the same name
+      $group = $this->stocking_place_model->get_by('name', $newName);
       
-      if(isset($sp->stocking_place_id)) {
-        $this->form_validation->set_message('unique_stocking_place', $this->lang->line('msg_err_id_used'));
+      if(isset($group->stocking_place_id) && $group->stocking_place_id != $groupID) {
+        $this->form_validation->set_message('unique_stocking_name', $this->lang->line('msg_err_stocking_unique'));
         return FALSE;
       } else {
         return TRUE;
       }
     }
 	
+    public function unique_stocking_short($newShort, $groupID) {
+      $this->load->model('stocking_place_model');
+
+      // Search if another group has the same name
+      $group = $this->stocking_place_model->get_by('name', $newShort);
+      
+      if(isset($group->stocking_place_id) && $group->stocking_place_id != $groupID) {
+        $this->form_validation->set_message('unique_stocking_short', $this->lang->line('msg_err_stocking_short_unique'));
+        return FALSE;
+      } else {
+        return TRUE;
+      }
+    }
+    
     /**
     * Delete the stocking place $id. If $action is null, a confirmation will be shown
     */
@@ -466,7 +480,7 @@ class Admin extends MY_Controller
         // VALIDATION
 
         //name: if changed,
-        $this->form_validation->set_rules('name', $this->lang->line('field_username'), 'required', $this->lang->line('msg_err_supplier_needed')); // not void
+        $this->form_validation->set_rules('name', $this->lang->line('field_username'), "required|callback_unique_supplier[$id]", $this->lang->line('msg_err_supplier_needed')); // not void
 
         if (isset($_POST['email'])) {
           // or valid.
@@ -484,7 +498,6 @@ class Admin extends MY_Controller
         $output = get_object_vars($this->supplier_model->get($id));
       }
       
-      $this->load->model('supplier_model');
       $output = get_object_vars($this->supplier_model->get($id));
       $output["suppliers"] = $this->supplier_model->get_all();	  
 	  
@@ -502,7 +515,7 @@ class Admin extends MY_Controller
         // VALIDATION
 
         //name: not void
-        $this->form_validation->set_rules('name', $this->lang->line('field_username'), 'required', $this->lang->line('msg_err_supplier_needed'));
+        $this->form_validation->set_rules('name', $this->lang->line('field_username'), 'required|callback_unique_supplier', $this->lang->line('msg_err_supplier_needed'));
 
         //email: void
         if (isset($_POST['email'])) {
@@ -543,6 +556,20 @@ class Admin extends MY_Controller
       }
     }
 
+    public function unique_supplier($newName, $groupID) {
+      $this->load->model('supplier_model');
+
+      // Search if another group has the same name
+      $group = $this->supplier_model->get_by('name', $newName);
+      
+      if(isset($group->supplier_id) && $group->supplier_id != $groupID) {
+        $this->form_validation->set_message('unique_supplier', $this->lang->line('msg_err_supplier_unique'));
+        return FALSE;
+      } else {
+        return TRUE;
+      }
+    }
+    
     /* *********************************************************************************************************
     ITEM GROUPS
     ********************************************************************************************************* */
