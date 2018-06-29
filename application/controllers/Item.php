@@ -36,8 +36,33 @@ class Item extends MY_Controller {
       $_SESSION['items_list_url'] = current_url();
     }
 
-    // Getting item(s) through filtered search on the database
-    $output = $this->item_model->get_filtered($_GET);
+    // Get user's search filters and add default values
+    $filters = $_GET;
+    if (!isset($filters['c'])) {
+      // No condition selected for filtering, default filtering for "functional" items
+      $filters['c'] = array(FUNCTIONAL_ITEM_CONDITION_ID);
+    }
+
+    // Get item(s) through filtered search on the database
+    $output['items'] = $this->item_model->get_filtered($filters);
+
+    // Prepare search filters values to send to the view
+    $output = array_merge($output, $filters);
+    if (!isset($output["ts"])) {
+      $output["ts"] = '';
+    }
+    if (!isset($output["c"])) {
+      $output["c"] = '';
+    }
+    if (!isset($output["g"])) {
+      $output["g"] = '';
+    }
+    if (!isset($output["s"])) {
+      $output["s"] = '';
+    }
+    if (!isset($output["t"])) {
+      $output["t"] = '';
+    }
 
     // Add page title
     $output['title'] = $this->lang->line('page_item_list');
@@ -68,12 +93,12 @@ class Item extends MY_Controller {
 			redirect('/item');
 		}
 
-        // Get item object and related objects
-        $item = $this->item_model->with('supplier')
-                                 ->with('stocking_place')
-                                 ->with('item_condition')
-                                 ->with('item_group')
-                                 ->get($id);
+    // Get item object and related objects
+    $item = $this->item_model->with('supplier')
+                             ->with('stocking_place')
+                             ->with('item_condition')
+                             ->with('item_group')
+                             ->get($id);
 		
     $output['item'] = $item;
 		$this->display_view('item/detail', $output);

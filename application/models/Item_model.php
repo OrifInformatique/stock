@@ -280,6 +280,9 @@ class Item_model extends MY_Model
             // The other part(s) compose the inventory_number
             $inventory_number = '';
             for ($i = 0; $i < (count($inventory_exploded) - 1); $i++) {
+              if ($i > 0) {
+                $inventory_number .= '.';
+              }
               $inventory_number .= $inventory_exploded[$i];
             }
 
@@ -296,9 +299,10 @@ class Item_model extends MY_Model
             ."OR serial_number LIKE '%".$text_search_content."%' ";
 
           if (isset($item_id)) {
-            $where_textSearchFilter .= "OR item_id = ".$item_id." ";
             if (isset($inventory_number) && $inventory_number != '') {
-              $where_textSearchFilter .= "OR inventory_number LIKE '%".$inventory_number."%' ";
+              $where_textSearchFilter .= "OR (item_id = ".$item_id." AND inventory_number LIKE '%".$inventory_number."%') ";
+            } else {
+              $where_textSearchFilter .= "OR item_id = ".$item_id." ";
             }
           } else {
             $where_textSearchFilter .= "OR inventory_number LIKE '%".$text_search_content."%' ";
@@ -313,20 +317,12 @@ class Item_model extends MY_Model
             $where_itemsFilters .= ' AND ';
           }
           $where_itemsFilters .= $where_textSearchFilter;
-
-          // Send back the text search to keep it in input field
-          $output['text_search_content'] = $text_search_content;
-
-        } else {
-          // No text submited for filtering
-          $output['text_search_content'] = '';
         }
 
         /*********************
         ** ITEM CONDITION FILTER
         ** Default filtering for "functional" items
         **********************/
-        $FUNCTIONAL_ITEM_CONDITION_ID = 10;
         $where_itemConditionFilter = '';
 
         if (isset($filters['c'])) {
@@ -348,21 +344,6 @@ class Item_model extends MY_Model
             $where_itemsFilters .= ' AND ';
           }
           $where_itemsFilters .= $where_itemConditionFilter;
-
-          // Send back the conditions selection to keep them selected
-          $output['item_conditions_selection'] = $item_conditions_selection;
-
-        } else {
-          // No condition selected for filtering, default filtering for "functional" items
-          if ($where_itemsFilters != '')
-          {
-            // Add new filter after existing filters
-            $where_itemsFilters .= ' AND ';
-          }
-          $where_itemsFilters .= '(item_condition_id='.$FUNCTIONAL_ITEM_CONDITION_ID.')';
-
-          // Send back the "functional" condition selection
-          $output['item_conditions_selection'] = [$FUNCTIONAL_ITEM_CONDITION_ID];
         }
 
         /*********************
@@ -389,13 +370,6 @@ class Item_model extends MY_Model
             $where_itemsFilters .= ' AND ';
           }
           $where_itemsFilters .= $where_itemGroupFilter;
-
-          // Send back the groups selection to keep them selected
-          $output['item_groups_selection'] = $item_groups_selection;
-
-        } else {
-          // No group selected for filtering
-          $output['item_groups_selection'] = '';
         }
 
         /*********************
@@ -422,13 +396,6 @@ class Item_model extends MY_Model
             $where_itemsFilters .= ' AND ';
           }
           $where_itemsFilters .= $where_stockingPlaceFilter;
-
-          // Send back the stocking places selection to keep them selected
-          $output['stocking_places_selection'] = $stocking_places_selection;
-
-        } else {
-          // No stocking place selected for filtering
-          $output['stocking_places_selection'] = '';
         }
 
         /*********************
@@ -467,13 +434,6 @@ class Item_model extends MY_Model
             $where_itemsFilters .= ' AND ';
           }
           $where_itemsFilters .= $where_itemTagsFilter;
-
-          // Send back the tags selection to keep them selected
-          $output['item_tags_selection'] = $item_tags_selection;
-
-        } else {
-          // No tags selected for filtering
-          $output['item_tags_selection'] = '';
         }
 
 
@@ -483,15 +443,15 @@ class Item_model extends MY_Model
         if ($where_itemsFilters == '')
         {
           // No filter, get all items
-          $output["items"] = $this->with('stocking_place')
-                                              ->with('item_condition')
-                                              ->get_all();
+          $items = $this->with('stocking_place')
+                        ->with('item_condition')
+                        ->get_all();
         } else {
           // Get filtered items
-          $output["items"] = $this->with('stocking_place')
-                                              ->with('item_condition')
-                                              ->get_many_by($where_itemsFilters);
+          $items = $this->with('stocking_place')
+                        ->with('item_condition')
+                        ->get_many_by($where_itemsFilters);
         }
-            return $output;
+        return $items;
     }
 }
