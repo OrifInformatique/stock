@@ -307,7 +307,6 @@ class Item_model extends MY_Model
           } else {
             $where_textSearchFilter .= "OR inventory_number LIKE '%".$text_search_content."%' ";
           }
-
           $where_textSearchFilter .= ')';
 
           // Add this part of WHERE clause to the global WHERE clause
@@ -376,7 +375,6 @@ class Item_model extends MY_Model
         ** STOCKING PLACE FILTER
         **********************/
         $where_stockingPlaceFilter = '';
-
         if (isset($filters['s'])) {
           $stocking_places_selection = $filters['s'];
 
