@@ -233,20 +233,16 @@ class Admin extends MY_Controller
         // VALIDATION
 
         //name: if changed,
-        if ($_POST['name'] != get_object_vars($this->item_tag_model->get($id))['name']) {
           $this->form_validation->set_rules('name', $this->lang->line('field_username'), "required|callback_unique_tagname[$id]", $this->lang->line('msg_err_tag_name_needed')); // not void
-        }
-
+        
         //short_name: if changed,
-        if ($_POST['short_name'] != get_object_vars($this->item_tag_model->get($id))['short_name']) {
           $this->form_validation->set_rules('short_name', $this->lang->line('field_abbreviation'), "required|callback_unique_tagshort[$id]", $this->lang->line('msg_err_abbreviation')); // not void
-        }
         
         if($this->form_validation->run() === TRUE) {
-		      $this->item_tag_model->update($id, $_POST);
-
-          redirect("/admin/view_tags/");
-          exit();
+            $this->item_tag_model->update($id, $_POST);
+            
+            redirect("/admin/view_tags/");
+            exit();
         }
 	  
       // The values of the tag are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
