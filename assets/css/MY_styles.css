@@ -24,6 +24,11 @@ label {
     display: block;
 }
 
+/* Class for main inputs in forms */
+.input-bold {
+  font-weight: bold;
+}
+
 /* Classes to add a standard margin to an element */
 .top-margin {
 	margin-top: 10px;
@@ -49,17 +54,4 @@ label {
     .xs-right{
         text-align: right;
     }
-}
-
-
-/* Resizing select */
-select {
-  text-align: right;
-
-  word-wrap: break-word;      /* IE */
-  white-space: -moz-pre-wrap; /* Firefox */
-  white-space: pre-wrap;      /* other browsers */
-
-  max-width:calc(100% - 10px); /* -7px = size for comma */
-  display:inline-block
 }
