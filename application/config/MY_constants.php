@@ -23,7 +23,15 @@ define('ACCESS_LVL_ADMIN', 16);
 
 /*
 |--------------------------------------------------------------------------
-| Inventory number size
+| Inventory number
 |--------------------------------------------------------------------------
 */
-define('INVENTORY_NUMBER_CHARS', 4);
+define('INVENTORY_PREFIX', 'ORP');		 // first part of inventory number (Orif site prefix)
+define('INVENTORY_NUMBER_CHARS', 4); // number of chars in the ID part (to add leading zeros)
+
+/*
+|--------------------------------------------------------------------------
+| ID of the "functional" item condition
+|--------------------------------------------------------------------------
+*/
+define('FUNCTIONAL_ITEM_CONDITION_ID', 10);

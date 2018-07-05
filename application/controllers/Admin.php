@@ -60,7 +60,7 @@ class Admin extends MY_Controller
 
         //username: if changed,
         if ($_POST['username'] != get_object_vars($this->user_model->get($id))['username']) {
-          $this->form_validation->set_rules('username', $this->lang->line('field_username'), 'required|callback_unique_username', $this->lang->line('msg_id_needed')); // not void and unique.
+          $this->form_validation->set_rules('username', $this->lang->line('field_username'), "required|callback_unique_username[$id]", $this->lang->line('msg_id_needed')); // not void and unique.
         }
 
         //email: void
@@ -117,13 +117,13 @@ class Admin extends MY_Controller
       $this->display_view("admin/users/form", $output);
     }
 
-    public function unique_username($argUsername) {
+    public function unique_username($newUsername, $userID) {
       $this->load->model('user_model');
 
       // Get this user. If it fails, it doesn't exist, so the username is unique!
-      $user = $this->user_model->get_by('username', $argUsername);
+      $user = $this->user_model->get_by('username', $newUsername);
       
-      if(isset($user->user_id)) {
+      if(isset($user->user_id) && $user->user_id != $userID) {
         $this->form_validation->set_message('unique_username', $this->lang->line('msg_err_id_used'));
         return FALSE;
       } else {
@@ -233,20 +233,16 @@ class Admin extends MY_Controller
         // VALIDATION
 
         //name: if changed,
-        if ($_POST['name'] != get_object_vars($this->item_tag_model->get($id))['name']) {
-          $this->form_validation->set_rules('name', $this->lang->line('field_username'), 'required|callback_unique_tagname', $this->lang->line('msg_err_tag_name_needed')); // not void
-        }
-
+          $this->form_validation->set_rules('name', $this->lang->line('field_username'), "required|callback_unique_tagname[$id]", $this->lang->line('msg_err_tag_name_needed')); // not void
+        
         //short_name: if changed,
-        if ($_POST['short_name'] != get_object_vars($this->item_tag_model->get($id))['short_name']) {
-          $this->form_validation->set_rules('short_name', $this->lang->line('field_abbreviation'), 'required|callback_unique_tagshort', $this->lang->line('msg_err_abbreviation')); // not void
-        }
+          $this->form_validation->set_rules('short_name', $this->lang->line('field_abbreviation'), "required|callback_unique_tagshort[$id]", $this->lang->line('msg_err_abbreviation')); // not void
         
         if($this->form_validation->run() === TRUE) {
-		      $this->item_tag_model->update($id, $_POST);
-
-          redirect("/admin/view_tags/");
-          exit();
+            $this->item_tag_model->update($id, $_POST);
+            
+            redirect("/admin/view_tags/");
+            exit();
         }
 	  
       // The values of the tag are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
@@ -290,13 +286,13 @@ class Admin extends MY_Controller
       $this->display_view("admin/tags/form");
     }
 
-    public function unique_tagname($argName) {
+    public function unique_tagname($newName, $tagID) {
       $this->load->model('item_tag_model');
 
       // Get this tag. If it fails, it doesn't exist, so the name is unique!
-      $tag = $this->item_tag_model->get_by('name', $argName);
+      $tag = $this->item_tag_model->get_by('name', $newName);
       
-      if(isset($tag->item_tag_id)) {
+      if(isset($tag->item_tag_id) && $tag->item_tag_id != $tagID) {
         $this->form_validation->set_message('unique_tagname', $this->lang->line('msg_err_username_used'));
         return FALSE;
       } else {
@@ -304,14 +300,14 @@ class Admin extends MY_Controller
       }
     }
 	
-    public function unique_tagshort($argShort) {
+    public function unique_tagshort($newShort, $tagID) {
       $this->load->model('item_tag_model');
 
       // Get this tag. If it fails, it doesn't exist, so the name is unique!
-      $tag = $this->item_tag_model->get_by('short_name', $argShort);
+      $tag = $this->item_tag_model->get_by('short_name', $newShort);
       
-      if(isset($tag->item_tag_id)) {
-        $this->form_validation->set_message('unique_tagshort', $this->lang->line('msg_err_abbreviation'));
+      if(isset($tag->item_tag_id) && $tag->item_tag_id != $tagID) {
+        $this->form_validation->set_message('unique_tagshort', $this->lang->line('msg_err_unique_shortname'));
         return FALSE;
       } else {
         return TRUE;
@@ -363,8 +359,8 @@ class Admin extends MY_Controller
       $this->load->model('stocking_place_model');
 
       if (!empty($_POST)) {
-        $this->form_validation->set_rules('short', $this->lang->line('field_short_name'), 'required', $this->lang->line('msg_storage_short_needed'));
-        $this->form_validation->set_rules('name', $this->lang->line('field_long_name'), 'required', $this->lang->line('msg_err_storage_long_needed'));
+        $this->form_validation->set_rules('short', $this->lang->line('field_short_name'), "required|callback_unique_stocking_short[$id]", $this->lang->line('msg_storage_short_needed'));
+        $this->form_validation->set_rules('name', $this->lang->line('field_long_name'), "required|callback_unique_stocking_name[$id]", $this->lang->line('msg_err_storage_long_needed'));
 
         if ($this->form_validation->run() === TRUE)
         {
@@ -376,11 +372,7 @@ class Admin extends MY_Controller
       } else {
         $output = get_object_vars($this->stocking_place_model->get($id));
       }
-
-      $this->load->model('stocking_place_model');
       $output = get_object_vars($this->stocking_place_model->get($id));
-      $output["stocking_places"] = $this->stocking_place_model->get_all();	  
-	  
       $output["stocking_places"] = $this->stocking_place_model->get_all();
 
       $this->display_view("admin/stocking_places/form", $output);
@@ -395,8 +387,8 @@ class Admin extends MY_Controller
         // VALIDATION
 
         //name: not void
-        $this->form_validation->set_rules('name', $this->lang->line('field_username'), 'required|callback_unique_stocking_place', $this->lang->line('msg_err_unique_stocking_needed'));
-		$this->form_validation->set_rules('short', $this->lang->line('field_short'), 'required', $this->lang->line('msg_err_unique_stocking_short'));
+        $this->form_validation->set_rules('name', $this->lang->line('field_username'), 'required|callback_unique_stocking_name', $this->lang->line('msg_err_stocking_needed'));
+		$this->form_validation->set_rules('short', $this->lang->line('field_short'), 'required|callback_unique_stocking_short', $this->lang->line('msg_err_stocking_short'));
 
 
         if ($this->form_validation->run() === TRUE)
@@ -411,20 +403,34 @@ class Admin extends MY_Controller
       $this->display_view("admin/stocking_places/form");
     }
           
-    public function unique_stocking_place($argName) {
+    public function unique_stocking_name($newName, $stockID) {
       $this->load->model('stocking_place_model');
 
-      // Get this sp. If it fails, it doesn't exist, so the username is unique!
-      $sp = $this->stocking_place_model->get_by('name', $argName);
+      // Search if another group has the same name
+      $group = $this->stocking_place_model->get_by('name', $newName);
       
-      if(isset($sp->stocking_place_id)) {
-        $this->form_validation->set_message('unique_stocking_place', $this->lang->line('msg_err_id_used'));
+      if(isset($group->stocking_place_id) && $group->stocking_place_id != $stockID) {
+        $this->form_validation->set_message('unique_stocking_name', $this->lang->line('msg_err_stocking_unique'));
         return FALSE;
       } else {
         return TRUE;
       }
     }
 	
+    public function unique_stocking_short($newShort, $stockID) {
+      $this->load->model('stocking_place_model');
+
+      // Search if another group has the same name
+      $group = $this->stocking_place_model->get_by('name', $newShort);
+      
+      if(isset($group->stocking_place_id) && $group->stocking_place_id != $stockID) {
+        $this->form_validation->set_message('unique_stocking_short', $this->lang->line('msg_err_stocking_short_unique'));
+        return FALSE;
+      } else {
+        return TRUE;
+      }
+    }
+    
     /**
     * Delete the stocking place $id. If $action is null, a confirmation will be shown
     */
@@ -470,7 +476,7 @@ class Admin extends MY_Controller
         // VALIDATION
 
         //name: if changed,
-        $this->form_validation->set_rules('name', $this->lang->line('field_username'), 'required', $this->lang->line('msg_err_supplier_needed')); // not void
+        $this->form_validation->set_rules('name', $this->lang->line('field_username'), "required|callback_unique_supplier[$id]", $this->lang->line('msg_err_supplier_needed')); // not void
 
         if (isset($_POST['email'])) {
           // or valid.
@@ -488,7 +494,6 @@ class Admin extends MY_Controller
         $output = get_object_vars($this->supplier_model->get($id));
       }
       
-      $this->load->model('supplier_model');
       $output = get_object_vars($this->supplier_model->get($id));
       $output["suppliers"] = $this->supplier_model->get_all();	  
 	  
@@ -506,7 +511,7 @@ class Admin extends MY_Controller
         // VALIDATION
 
         //name: not void
-        $this->form_validation->set_rules('name', $this->lang->line('field_username'), 'required', $this->lang->line('msg_err_supplier_needed'));
+        $this->form_validation->set_rules('name', $this->lang->line('field_username'), 'required|callback_unique_supplier', $this->lang->line('msg_err_supplier_needed'));
 
         //email: void
         if (isset($_POST['email'])) {
@@ -547,6 +552,20 @@ class Admin extends MY_Controller
       }
     }
 
+    public function unique_supplier($newName, $supplierID) {
+      $this->load->model('supplier_model');
+
+      // Search if another group has the same name
+      $group = $this->supplier_model->get_by('name', $newName);
+      
+      if(isset($group->supplier_id) && $group->supplier_id != $supplierID) {
+        $this->form_validation->set_message('unique_supplier', $this->lang->line('msg_err_supplier_unique'));
+        return FALSE;
+      } else {
+        return TRUE;
+      }
+    }
+    
     /* *********************************************************************************************************
     ITEM GROUPS
     ********************************************************************************************************* */
@@ -570,8 +589,8 @@ class Admin extends MY_Controller
       $this->load->model('item_group_model');
 
       if (!empty($_POST)) {
-        $this->form_validation->set_rules('name', $this->lang->line('field_name'), 'required|callback_unique_groupname', $this->lang->line('msg_err_item_group_needed'));
-        $this->form_validation->set_rules('short_name', $this->lang->line('field_abbreviation'), 'required|callback_unique_groupshort', $this->lang->line('msg_err_item_group_short'));
+        $this->form_validation->set_rules('name', $this->lang->line('field_name'), "required|callback_unique_groupname[$id]", $this->lang->line('msg_err_item_group_needed'));
+        $this->form_validation->set_rules('short_name', $this->lang->line('field_abbreviation'), "required|callback_unique_groupshort[$id]", $this->lang->line('msg_err_item_group_short'));
 
         if ($this->form_validation->run() === TRUE) {
           $this->item_group_model->update($id, $_POST);
@@ -596,7 +615,7 @@ class Admin extends MY_Controller
 
       if (!empty($_POST)) {
         $this->form_validation->set_rules('name', $this->lang->line('field_username'), 'required|callback_unique_groupname', $this->lang->line('msg_err_unique_groupname'));
-        $this->form_validation->set_rules('short_name', $this->lang->line('field_abbreviation'), 'required|callback_unique_groupshort', $this->lang->line('msg_err_unique_groupshort'));
+        $this->form_validation->set_rules('short_name', $this->lang->line('field_abbreviation'), 'required|callback_unique_groupshort', $this->lang->line('msg_err_unique_shortname'));
 
         if ($this->form_validation->run() === TRUE)
         {
@@ -610,14 +629,13 @@ class Admin extends MY_Controller
       $this->display_view("admin/item_groups/form");
     }
 
-
-    public function unique_groupname($argName) {
+    public function unique_groupname($newName, $groupID) {
       $this->load->model('item_group_model');
 
-      // Get this group. If it fails, it doesn't exist, so the username is unique!
-      $group = $this->item_group_model->get_by('name', $argName);
+      // Search if another group has the same name
+      $group = $this->item_group_model->get_by('name', $newName);
       
-      if(isset($group->item_group_id)) {
+      if(isset($group->item_group_id) && $group->item_group_id != $groupID) {
         $this->form_validation->set_message('unique_groupname', $this->lang->line('msg_err_username_used'));
         return FALSE;
       } else {
@@ -625,13 +643,13 @@ class Admin extends MY_Controller
       }
     }
     
-    public function unique_groupshort($argShort) {
+    public function unique_groupshort($newShortName, $groupID) {
       $this->load->model('item_group_model');
 
-      // Get this group. If it fails, it doesn't exist, so the username is unique!
-      $group = $this->item_group_model->get_by('short_name', $argShort);
+      // Search if another group has the same short name
+      $group = $this->item_group_model->get_by('short_name', $newShortName);
       
-      if(isset($group->item_group_id)) {
+      if(isset($group->item_group_id) && $group->item_group_id != $groupID) {
         $this->form_validation->set_message('unique_groupshort', $this->lang->line('msg_err_unique_shortname'));
         return FALSE;
       } else {
