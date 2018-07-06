@@ -141,6 +141,15 @@
   </table>
   <?php } ?>
 </div>
+<ul class="pagination">
+    <li <?= $current_page==1?"class=\"disabled\"":"";?>><a href="<?= base_url()?>">&laquo;</a></li>
+    <?php 
+        for($i = 1; $i <= $nb_pages; $i++){
+            ?><li <?=$current_page==$i?"class=\"active\"":"";?>><a href="<?= base_url()?>item/index/<?=$i?>"><?=$i?></a></li><?php
+        }
+    ?>
+    <li <?= $current_page==$nb_pages?"class=\"disabled\"":"";?>><a href="<?= base_url()?>item/index/<?=$nb_pages?>">&raquo;</a></li>
+</ul>
 </div>
 
 <!-- Initialize the Bootstrap Multiselect plugin: -->

@@ -27,7 +27,7 @@ class Item extends MY_Controller {
 	/****************************************************************************
     * Display items list, with filtering
     */
-	public function index()
+	public function index($page = 1)
   {
     // Store URL to make possible to come back later (from item detail for example)
     if (isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING'])) {
@@ -44,7 +44,7 @@ class Item extends MY_Controller {
     }
 
     // Get item(s) through filtered search on the database
-    $output['items'] = $this->item_model->get_filtered($filters);
+    $output['items'] = $this->item_model->get_filtered($filters,$page-1);
 
     // Prepare search filters values to send to the view
     $output = array_merge($output, $filters);
@@ -77,6 +77,10 @@ class Item extends MY_Controller {
     $this->load->model('stocking_place_model');
     $output['stocking_places'] = $this->stocking_place_model->dropdown('name');
 
+    // Get the number of pages and the current page
+    $output['nb_pages'] =  (int) ceil($this->item_model->count_all() / ITEMS_BY_PAGE);
+    $output['current_page'] = $page;
+    
     $this->display_view('item/list', $output);
   }
 

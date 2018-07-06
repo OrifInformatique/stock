@@ -254,9 +254,10 @@ class Item_model extends MY_Model
     /**
      * Searching item(s) in the database depending on filters
      * @param array $filters The array of filters
+     * @param int pageOffset The
      * @return The array of item(s) found
      */
-    function get_filtered($filters){
+    function get_filtered($filters,$pageOffset){
 
         // Initialize a global WHERE clause for filtering
         $where_itemsFilters = '';
@@ -443,11 +444,13 @@ class Item_model extends MY_Model
           // No filter, get all items
           $items = $this->with('stocking_place')
                         ->with('item_condition')
+                        ->limit(ITEMS_BY_PAGE)
                         ->get_all();
         } else {
           // Get filtered items
           $items = $this->with('stocking_place')
                         ->with('item_condition')
+                        ->limit(ITEMS_BY_PAGE,$pageOffset * 25)
                         ->get_many_by($where_itemsFilters);
         }
         return $items;
