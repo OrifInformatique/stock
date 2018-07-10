@@ -450,7 +450,7 @@ class Item_model extends MY_Model
           // Get filtered items
           $items = $this->with('stocking_place')
                         ->with('item_condition')
-                        ->limit(ITEMS_BY_PAGE,$pageOffset * 25)
+                        ->limit(ITEMS_BY_PAGE,$pageOffset * ITEMS_BY_PAGE)
                         ->get_many_by($where_itemsFilters);
         }
         return $items;
