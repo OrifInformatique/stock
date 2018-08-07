@@ -11,7 +11,7 @@
 
 <div class="row">
   <!-- FILTERS FORM -->
-  <form id="filters" method="get">
+  <form id="filters" method="get" action="<?=base_url("item/index/1")?>">
     <p class="bg-primary">&nbsp;<?php echo html_escape($this->lang->line('text_search_filters')); ?></p>
 
     <div class="row">
@@ -142,14 +142,15 @@
   <?php } ?>
 </div>
 <ul class="pagination">
-    <li <?= $current_page==1?"class=\"disabled\"":"";?>><a href="<?= base_url()?>">&laquo;</a></li>
+    <li <?= $current_page==1?"class=\"disabled\"":"";?>><a href="<?= $current_page!=1?base_url():"#"?>">&laquo;</a></li>
     <?php 
         for($i = 1; $i <= $nb_pages; $i++){
             ?><li <?=$current_page==$i?"class=\"active\"":"";?>><a href="<?= base_url("item/index/$i")?>"><?=$i?></a></li><?php
         }
     ?>
-    <li <?= $current_page==$nb_pages?"class=\"disabled\"":"";?>><a href="<?= base_url("item/index/$nb_pages")?>">&raquo;</a></li>
+    <li <?= $current_page==$nb_pages?"class=\"disabled\"":"";?>><a href="<?= $current_page!=$nb_pages?base_url("item/index/$nb_pages"):"#"?>">&raquo;</a></li>
 </ul>
+<div><?=$pagination?></div>
 </div>
 
 <!-- Initialize the Bootstrap Multiselect plugin: -->

@@ -81,6 +81,20 @@ class Item extends MY_Controller {
     $output['nb_pages'] =  (int) ceil($this->item_model->count_all() / ITEMS_BY_PAGE);
     $output['current_page'] = $page;
     
+    // Creating the pagination
+    $this->load->library('pagination');
+
+    $config['base_url'] = base_url('/item/index/');
+    $config['total_rows'] = $this->item_model->count_all();
+    $config['per_page'] = ITEMS_BY_PAGE;
+    $config["uri_segment"] = 3;
+    $config['use_page_numbers'] = TRUE;
+    $config['reuse_query_string'] = TRUE;
+    
+    $this->pagination->initialize($config);
+
+    $output['pagination'] = $this->pagination->create_links();
+    
     $this->display_view('item/list', $output);
   }
 
