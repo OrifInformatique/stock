@@ -41,4 +41,4 @@ define('FUNCTIONAL_ITEM_CONDITION_ID', 10);
  | Number of items show by page
  |-------------------------------------------------------------------------
  */
-define('ITEMS_BY_PAGE',25);
+define('ITEMS_PER_PAGE',25);
