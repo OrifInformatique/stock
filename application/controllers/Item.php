@@ -45,7 +45,7 @@ class Item extends MY_Controller {
 
     // Get item(s) through filtered search on the database
     $output['items'] = $this->item_model->get_filtered($filters,$page-1);
-
+    
     // Prepare search filters values to send to the view
     $output = array_merge($output, $filters);
     if (!isset($output["ts"])) {
@@ -76,17 +76,13 @@ class Item extends MY_Controller {
     $output['item_groups'] = $this->item_group_model->dropdown('name');
     $this->load->model('stocking_place_model');
     $output['stocking_places'] = $this->stocking_place_model->dropdown('name');
-
-    // Get the number of pages and the current page
-    $output['nb_pages'] =  (int) ceil($this->item_model->count_all() / ITEMS_BY_PAGE);
-    $output['current_page'] = $page;
     
     // Creating the pagination
     $this->load->library('pagination');
 
     $config['base_url'] = base_url('/item/index/');
-    $config['total_rows'] = $this->item_model->count_all();
-    $config['per_page'] = ITEMS_BY_PAGE;
+    $config['total_rows'] = count($output["items"]);
+    $config['per_page'] = ITEMS_PER_PAGE;
     $config['use_page_numbers'] = TRUE;
     $config['reuse_query_string'] = TRUE;
     
@@ -113,6 +109,8 @@ class Item extends MY_Controller {
     $this->pagination->initialize($config);
 
     $output['pagination'] = $this->pagination->create_links();
+    
+    // Sending the data to the View
     
     $this->display_view('item/list', $output);
   }
