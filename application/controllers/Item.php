@@ -87,9 +87,28 @@ class Item extends MY_Controller {
     $config['base_url'] = base_url('/item/index/');
     $config['total_rows'] = $this->item_model->count_all();
     $config['per_page'] = ITEMS_BY_PAGE;
-    $config["uri_segment"] = 3;
     $config['use_page_numbers'] = TRUE;
     $config['reuse_query_string'] = TRUE;
+    
+    $config['full_tag_open'] = '<ul class="pagination">';
+    $config['full_tag_close'] = '</ul>';
+    
+    $config['first_link'] = '&laquo;';
+    $config['first_tag_open'] = '<li>';
+    $config['first_tag_close'] = '</li>';
+    
+    $config['last_link'] = '&raquo;';
+    $config['last_tag_open'] = '<li>';
+    $config['last_tag_close'] = '</li>';
+    
+    $config['next_link'] = FALSE;
+    $config['prev_link'] = FALSE;
+    
+    $config['cur_tag_open'] = '<li class="active"><a>';
+    $config['cur_tag_close'] = '</li></a>';
+    
+    $config['num_tag_open'] = '<li>';
+    $config['num_tag_close'] = '</li>';
     
     $this->pagination->initialize($config);
 
