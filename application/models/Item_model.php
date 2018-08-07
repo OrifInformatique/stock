@@ -444,13 +444,13 @@ class Item_model extends MY_Model
           // No filter, get all items
           $items = $this->with('stocking_place')
                         ->with('item_condition')
-                        ->limit(ITEMS_BY_PAGE)
+                        ->limit(ITEMS_PER_PAGE)
                         ->get_all();
         } else {
           // Get filtered items
           $items = $this->with('stocking_place')
                         ->with('item_condition')
-                        ->limit(ITEMS_BY_PAGE,$pageOffset * ITEMS_BY_PAGE)
+                        ->limit(ITEMS_PER_PAGE,$pageOffset * ITEMS_PER_PAGE)
                         ->get_many_by($where_itemsFilters);
         }
         return $items;
