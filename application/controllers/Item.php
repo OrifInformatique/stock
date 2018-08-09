@@ -526,6 +526,9 @@ class Item extends MY_Controller {
     }
   }
 
+  public function list_inventory_control(){
+      $this->display_view("item/list_inventory_control");
+  }
 
   /****************************************************************************
   * Modify some loan

@@ -5,6 +5,7 @@
 <div class="row bottom-margin">
   <!-- Button for new item -->
   <a href="<?php echo base_url(); ?>item/create/" class="btn btn-success"><?php echo html_escape($this->lang->line('btn_new')); ?></a>
+  <a href="<?php echo base_url(); ?>item/list_inventory_control" class="btn btn-default"><?php echo html_escape($this->lang->line('btn_list_inventory_control')); ?></a>
 </div>
 <?php } ?>
 <!-- *** END OF ADMIN *** -->

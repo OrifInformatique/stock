@@ -107,6 +107,7 @@ $lang['btn_back_to_object']             = 'Retour à l\'objet';
 $lang['btn_linked_doc']                 = 'Voir document';
 $lang['btn_create_inventory_control']   = 'Nouveau contrôle';
 $lang['btn_inventory_control_history']  = 'Historique contrôles';
+$lang['btn_list_inventory_control']     = 'Liste des contrôles d\'inventaire';
 $lang['btn_loans_history']              = 'Historique des prêts';
 $lang['btn_create_loan']                = 'Ajouter un prêt';
 $lang['btn_submit_filters']             = 'Appliquer les filtres';
