@@ -42,12 +42,10 @@ class Item_model extends MY_Model
 	 */
 	public function get_future_id()
 	{
-		$query = $this->db->query("SHOW TABLE STATUS FROM `stock` LIKE 'item'");
+		$query = $this->db->query("SHOW TABLE STATUS LIKE 'item'");
 
-		foreach ($query->result() as $row)
-		{
-			$value = $row->Auto_increment;
-		}
+    $row = $query->row(0);
+    $value = $row->Auto_increment;
 
 		return $value;
 	}
