@@ -452,4 +452,8 @@ class Item_model extends MY_Model
         }
         return $items;
     }
+    
+    public function add_inventory_control($item_id,$user_id,$date,$remark){
+        
+    }
 }

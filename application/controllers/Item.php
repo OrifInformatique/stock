@@ -64,9 +64,6 @@ class Item extends MY_Controller {
       $output["t"] = '';
     }
 
-    // Add page title
-    $output['title'] = $this->lang->line('page_item_list');
-
     // Load list of elements to display as filters
     $this->load->model('item_tag_model');
     $output['item_tags'] = $this->item_tag_model->dropdown('name');
@@ -525,11 +522,60 @@ class Item extends MY_Controller {
       redirect("auth/login");
     }
   }
-
+  /**
+   * Show the list of the items with the possibility to filter stocking places and item conditions,
+   * as well as adding inventory control to all selected items.
+   */
   public function list_inventory_control(){
-      $this->display_view("item/list_inventory_control");
+    // Store URL to make possible to come back later (from item detail for example)
+    if (isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING'])) {
+      $_SESSION['items_list_url'] = current_url().'?'.$_SERVER['QUERY_STRING'];
+    } else {
+      $_SESSION['items_list_url'] = current_url();
+    }
+    
+    // Get user's search filters and add default values
+    $filters = $_GET;
+    if (!isset($filters['c'])) {
+      // No condition selected for filtering, default filtering for "functional" items
+      $filters['c'] = array(FUNCTIONAL_ITEM_CONDITION_ID);
+    }
+    
+    if (!isset($output["c"])) {
+      $output["c"] = '';
+    }
+    if (!isset($output["s"])) {
+      $output["s"] = '';
+    }
+
+    // Get item(s) through filtered search on the database
+    $output['items'] = $this->item_model->get_filtered($filters);
+
+    // Prepare search filters values to send to the view
+    $output = array_merge($output, $filters);
+      
+    $this->load->model('item_condition_model');
+    $output['item_conditions'] = $this->item_condition_model->dropdown('name');
+    $this->load->model('stocking_place_model');
+    $output['stocking_places'] = $this->stocking_place_model->dropdown('name');
+    
+    $this->display_view("item/list_inventory_control",$output);
   }
 
+  public function create_multiple_inventory_controls(){
+      
+      $items_id = $_REQUEST["i"];
+      $user_id = $_SESSION["user_id"];
+      $date = date("Y-m-d");
+      $remark = $_REQUEST["remarks"];
+      
+      foreach($items_id as $item_id){
+          $this->item_model->add_inventory_control($item_id,$user_id,$date,$remark);
+      }
+      
+      redirect('/item');
+  }
+  
   /****************************************************************************
   * Modify some loan
   *

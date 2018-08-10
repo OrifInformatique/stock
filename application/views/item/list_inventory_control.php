@@ -1,3 +1,124 @@
-<div>
-    <h1>Test</h1>
+<div class="container">
+    <div class="row">
+        <h1>Contrôle inventaire</h1>
+        <form id="filters" method="get">
+            <p class="bg-primary">&nbsp;<?php echo html_escape($this->lang->line('text_search_filters')); ?></p>
+            <div class="row">
+                <!-- STOCKING PLACES FILTER -->
+                <div class="col-sm-6 top-margin">
+                <?php
+                  echo form_label($this->lang->line('field_stocking_place'),
+                                  'stocking_places-multiselect');
+                  echo form_dropdown('s[]', $stocking_places, $s,
+                                     'id="stocking_places-multiselect" multiple="multiple"');
+                ?>
+                </div>
+
+                <!-- CONDITIONS FILTER -->
+                <div class="col-sm-6 top-margin">
+                <?php
+                  echo form_label($this->lang->line('field_item_condition'),
+                                  'item_conditions-multiselect');
+                  echo form_dropdown('c[]', $item_conditions, $c,
+                                     'id="item_conditions-multiselect" multiple="multiple"');
+                ?>
+                </div>
+                <div class="col-sm-12 top-margin xs-center bottom-margin">
+                    <button type="submit" class="btn btn-primary top-margin"><?php echo html_escape($this->lang->line('btn_submit_filters')); ?></button>
+                    <a href="<?php echo base_url('item/list_inventory_control'); ?>" class="btn btn-default top-margin"><?php echo html_escape($this->lang->line('btn_remove_filters')); ?></a>
+              </div>
+            </div>
+        </form>
+    </div>
+    <div class="top-margin table-responsive row">
+        <form id="add_inventory_controls" method="post" action="<?=base_url('item/create_multiple_inventory_controls')?>">
+                <p class="bg-primary">&nbsp;<?php echo html_escape($this->lang->line('text_add_inventory_controls')); ?></p>
+                <div class="row">
+                    <div class="col-sm-12 top-margin">
+                        <label for="remarks">
+                        <?php echo $this->lang->line('field_remarks').' : '; ?>
+                        </label>
+                        <input class="form-control" name="remarks"/>
+                        <button type="submit" name="submit" class="btn btn-success top-margin">
+                        <?php echo $this->lang->line('btn_save'); ?>
+                        </button>
+                    </div>
+                </div>
+            <!-- LIST OF ITEMS -->
+            <?php if(empty($items)) { ?>
+              <em><?php html_escape($this->lang->line('msg_no_item')); ?></em>
+            <?php } else { ?>
+            <table class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>&nbsp;</th>
+                  <th><?php echo html_escape($this->lang->line('header_picture')); ?></th>
+                  <th><?php echo html_escape($this->lang->line('header_status')); ?></th>
+                  <th><?php echo html_escape($this->lang->line('header_item_name')); ?></th>
+                  <th nowrap><?php echo html_escape($this->lang->line('header_stocking_place')); ?></th>
+                  <th nowrap>
+                  <?php
+                    echo html_escape($this->lang->line('header_inventory_nb'));
+                    echo '<br />'.html_escape($this->lang->line('header_serial_nb'));
+                  ?>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php foreach ($items as $item) { ?>
+                 <tr>
+                     <td>
+                            <input type="checkbox" name="i[]" value="<?=$item->item_id;?>">
+                     </td>
+                    <td>
+                      <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block">
+                        <img src="<?php echo base_url('uploads/images/'.$item->image); ?>"
+                             width="100px"
+                             alt="<?php html_escape($this->lang->line('field_image')); ?>" />
+                      </a>
+                    </td>
+                    <td>
+                      <?php
+                        echo $item->item_condition->bootstrap_label;
+                        echo '<br />'.$item->loan_bootstrap_label;
+                        if (!is_null($item->current_loan)) {
+                          echo '<br /><h6>'.$item->current_loan->item_localisation.'</h6>';
+                        }
+                      ?>
+                    </td>
+                    <td>
+                      <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo html_escape($item->name); ?></a>
+                      <h6><?php echo html_escape($item->description); ?></h6>
+                    </td>
+                    <td><?php echo html_escape($item->stocking_place->name); ?></td>
+                    <td>
+                      <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo html_escape($item->inventory_number_complete); ?></a>
+                      <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo html_escape($item->serial_number); ?></a>
+                    </td>
+                  </tr>
+                <?php } ?>
+              </tbody>
+            </table>
+            <?php } ?>
+        </form>
+    </div>
 </div>
+<!-- Initialize the Bootstrap Multiselect plugin: -->
+<script type="text/javascript">
+    $(document).ready(function() {
+      var no_filter = "<?php
+                        echo html_escape($this->lang->line('field_no_filter'));
+                      ?>";
+
+      $('#item_conditions-multiselect').multiselect({
+        nonSelectedText: no_filter,
+        buttonWidth: '100%',
+        numberDisplayed: 5
+      });
+      $('#stocking_places-multiselect').multiselect({
+        nonSelectedText: no_filter,
+        buttonWidth: '100%',
+        numberDisplayed: 5
+      });
+    });
+</script>

@@ -161,5 +161,6 @@ $lang['text_item_loan_status']          = 'Disponibilité et prêts';
 $lang['text_item_buying_warranty']      = 'Achat et garantie';
 $lang['text_item_tags']      			= 'Type d\'objet';
 $lang['text_search_filters']            = 'Filtres de recherche';
+$lang['text_add_inventory_controls']    = 'Ajouter des contrôles d\'inventaire';
 $lang['text_filtered_items_list']       = 'Liste des objets correspondants';
 $lang['text_kinds_to_show']             = 'Afficher uniquement les…';
