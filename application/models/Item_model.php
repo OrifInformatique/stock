@@ -42,13 +42,11 @@ class Item_model extends MY_Model
 	 */
 	public function get_future_id()
 	{
-		$connection = mysqli_connect("localhost","root","");
-			$result = mysqli_query($connection, "SHOW TABLE STATUS FROM `stock` LIKE 'item'");
-		mysqli_close($connection);
+		$query = $this->db->query("SHOW TABLE STATUS FROM `stock` LIKE 'item'");
 
-		while ($row = mysqli_fetch_array($result))
+		foreach ($query->result() as $row)
 		{
-			$value = $row['Auto_increment'];
+			$value = $row->Auto_increment;
 		}
 
 		return $value;
