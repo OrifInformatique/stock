@@ -454,6 +454,33 @@ class Item_model extends MY_Model
     }
     
     public function add_inventory_control($item_id,$user_id,$date,$remark){
+        // Checking if a item has been send to the method
+        if($item_id != '' || !is_null($item_id)){
         
+            // Checking given data
+            if($user_id == '' || is_null($user_id)){
+                $user_id = $_SESSION["user_id"];
+            }
+            
+            if($date == ''|| is_null($date)){
+                $date = date("Y-m-d");
+            }
+            
+            if($remark == ''  || is_null($remark)){
+                $remark = '';
+            }
+            
+            // Regrouping data
+            $inventory_control = array();
+            $inventory_control['item_id'] = $item_id;
+            $inventory_control['controller_id'] = $user_id;
+            $inventory_control['date'] = $date;
+            $inventory_control['remarks'] = $remark;
+            
+            // Adding data to the database
+            $this->load->model('inventory_control_model');
+            
+            $this->inventory_control_model->insert($inventory_control);
+        }
     }
 }

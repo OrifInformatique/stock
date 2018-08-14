@@ -30,20 +30,20 @@
             </div>
         </form>
     </div>
-    <div class="top-margin table-responsive row">
+    <div class="top-margin row">
         <form id="add_inventory_controls" method="post" action="<?=base_url('item/create_multiple_inventory_controls')?>">
-                <p class="bg-primary">&nbsp;<?php echo html_escape($this->lang->line('text_add_inventory_controls')); ?></p>
-                <div class="row">
-                    <div class="col-sm-12 top-margin">
-                        <label for="remarks">
-                        <?php echo $this->lang->line('field_remarks').' : '; ?>
-                        </label>
-                        <input class="form-control" name="remarks"/>
-                        <button type="submit" name="submit" class="btn btn-success top-margin">
-                        <?php echo $this->lang->line('btn_save'); ?>
-                        </button>
-                    </div>
+            <p class="bg-primary">&nbsp;<?php echo html_escape($this->lang->line('text_add_inventory_controls')); ?></p>
+            <div class="row">
+                <div class="col-sm-12 top-margin">
+                    <label for="remarks">
+                    <?php echo $this->lang->line('field_remarks').' : '; ?>
+                    </label>
+                    <input class="form-control" name="remarks"/>
+                    <button type="submit" name="submit" class="btn btn-success top-margin">
+                    <?php echo $this->lang->line('btn_save'); ?>
+                    </button>
                 </div>
+            </div>
             <!-- LIST OF ITEMS -->
             <?php if(empty($items)) { ?>
               <em><?php html_escape($this->lang->line('msg_no_item')); ?></em>

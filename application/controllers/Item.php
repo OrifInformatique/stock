@@ -565,8 +565,8 @@ class Item extends MY_Controller {
   public function create_multiple_inventory_controls(){
       
       $items_id = $_REQUEST["i"];
-      $user_id = $_SESSION["user_id"];
-      $date = date("Y-m-d");
+      //$user_id = $_SESSION["user_id"];
+      //$date = date("Y-m-d");
       $remark = $_REQUEST["remarks"];
       
       foreach($items_id as $item_id){
