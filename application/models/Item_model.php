@@ -453,11 +453,20 @@ class Item_model extends MY_Model
         return $items;
     }
     
+    /**
+     * Add a inventory control with dynamic current user id and date.
+     * @param int $item_id The item controlled id, do nothing if empty
+     * @param int $user_id The id of the user who did the control, the logged user per default
+     * @param date $date The inventory control's date, current date per default
+     * @param string $remark The inventory control's remark, empty per default
+     */
     public function add_inventory_control($item_id,$user_id,$date,$remark){
         // Checking if a item has been send to the method
         if($item_id != '' || !is_null($item_id)){
         
-            // Checking given data
+            // Checking given data and using default value if needed
+            // Since it's impossible to pass a superglobal array or a method to a argument,
+            // we have to do it here.
             if($user_id == '' || is_null($user_id)){
                 $user_id = $_SESSION["user_id"];
             }
@@ -466,7 +475,7 @@ class Item_model extends MY_Model
                 $date = date("Y-m-d");
             }
             
-            if($remark == ''  || is_null($remark)){
+            if(is_null($remark)){
                 $remark = '';
             }
             
