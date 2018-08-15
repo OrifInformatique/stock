@@ -44,7 +44,7 @@ class Item extends MY_Controller {
     }
 
     // Get item(s) through filtered search on the database
-    $output['items'] = $this->item_model->get_filtered($filters,$page-1);
+    $output['items'] = $this->item_model->get_filtered($filters);
     
     // Prepare search filters values to send to the view
     $output = array_merge($output, $filters);
@@ -77,7 +77,7 @@ class Item extends MY_Controller {
     $this->load->model('stocking_place_model');
     $output['stocking_places'] = $this->stocking_place_model->dropdown('name');
     
-    // Creating the pagination
+    // Create the pagination
     $this->load->library('pagination');
 
     $config['base_url'] = base_url('/item/index/');
@@ -102,6 +102,7 @@ class Item extends MY_Controller {
     
     $config['cur_tag_open'] = '<li class="active"><a>';
     $config['cur_tag_close'] = '</li></a>';
+    $config['num_links'] = 5;
     
     $config['num_tag_open'] = '<li>';
     $config['num_tag_close'] = '</li>';
@@ -109,9 +110,11 @@ class Item extends MY_Controller {
     $this->pagination->initialize($config);
 
     $output['pagination'] = $this->pagination->create_links();
+
+    // Keep only the slice of items corresponding to the current page
+    $output["items"] = array_slice($output["items"], ($page-1)*ITEMS_PER_PAGE, ITEMS_PER_PAGE);
     
-    // Sending the data to the View
-    
+    // Send the data to the View
     $this->display_view('item/list', $output);
   }
 
