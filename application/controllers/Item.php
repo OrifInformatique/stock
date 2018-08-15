@@ -45,7 +45,7 @@ class Item extends MY_Controller {
 
     // Get item(s) through filtered search on the database
     $output['items'] = $this->item_model->get_filtered($filters);
-    
+
     // Prepare search filters values to send to the view
     $output = array_merge($output, $filters);
     if (!isset($output["ts"])) {
