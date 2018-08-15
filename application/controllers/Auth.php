@@ -89,4 +89,8 @@ class Auth extends MY_Controller
         
         redirect('/');
     }
+    
+    public function change_password(){
+        $this->display_view('password_form');
+    }
 }
