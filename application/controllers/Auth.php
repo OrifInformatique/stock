@@ -91,6 +91,43 @@ class Auth extends MY_Controller
     }
     
     public function change_password(){
+        $username = $this->input->post('username');
+        $old_password = $this->input->post('old_password');
+        $new_password = $this->input->post('new_password');
+        $confirm_password = $this->input->post('check_password');
+        
+        // Keeping in memory the last page in user's history so we can redirect there later
+        if(isset($_SERVER["HTTP_REFERER"])) {
+            if($_SERVER["HTTP_REFERER"] != current_url()){
+                $_SESSION["before_login_page"] = $_SERVER["HTTP_REFERER"];
+            }
+        } else {
+            $_SESSION["before_login_page"] = base_url();
+        }
+        // Recovering the last page in user's history so we can redirect there after login
+        $redirect_url = $_SESSION["before_login_page"];
+        
+        if ($this->form_validation->run() == true) {
+            // Fields validation passed
+
+            if ($this->user_model->check_password($username, $old_password)) {
+                
+                if($new_password == $confirm_password){
+                    // Send the user back to his last page
+                    redirect($redirect_url);
+                    exit();
+                }else{
+                    // The new password hasn't been confirmed
+                    $this->session->set_flashdata('message', '<div class="alert alert-danger text-center">'.$this->lang->line('msg_err_invalid_password').'</div>');
+                }
+
+            } else {
+                // Login failed
+                $this->session->set_flashdata('message', '<div class="alert alert-danger text-center">'.$this->lang->line('msg_err_invalid_password').'</div>');
+            }
+        }
+        
+        // Displaying the form
         $this->display_view('password_form');
     }
 }
