@@ -36,10 +36,8 @@ class Auth extends MY_Controller
         $password = $this->input->post('password');
         
         // Keeping in memory the last page in user's history so we can redirect there later
-        if(isset($_SERVER["HTTP_REFERER"])) {
-            if($_SERVER["HTTP_REFERER"] != current_url()){
+        if(isset($_SERVER["HTTP_REFERER"]) && $_SERVER["HTTP_REFERER"] != current_url()){
                 $_SESSION["before_login_page"] = $_SERVER["HTTP_REFERER"];
-            }
         } else {
             $_SESSION["before_login_page"] = base_url();
         }
@@ -91,10 +89,10 @@ class Auth extends MY_Controller
     }
     
     public function change_password(){
-        $username = $this->input->post('username');
+        $username = $_SESSION["username"];
         $old_password = $this->input->post('old_password');
         $new_password = $this->input->post('new_password');
-        $confirm_password = $this->input->post('check_password');
+        $confirm_password = $this->input->post('confirm_password');
         
         // Keeping in memory the last page in user's history so we can redirect there later
         if(isset($_SERVER["HTTP_REFERER"])) {
@@ -113,17 +111,20 @@ class Auth extends MY_Controller
             if ($this->user_model->check_password($username, $old_password)) {
                 
                 if($new_password == $confirm_password){
+                    // Change password
+                    $this->user_model->update('user',array('password' => password_hash($new_password, PASSWORD_DEFAULT)),array('username' => $username));
+                    
                     // Send the user back to his last page
                     redirect($redirect_url);
                     exit();
                 }else{
                     // The new password hasn't been confirmed
-                    $this->session->set_flashdata('message', '<div class="alert alert-danger text-center">'.$this->lang->line('msg_err_invalid_password').'</div>');
+                    $this->session->set_flashdata('message', '<div class="alert alert-danger text-center">'.$this->lang->line('msg_err_invalid_new_password').'</div>');
                 }
 
             } else {
-                // Login failed
-                $this->session->set_flashdata('message', '<div class="alert alert-danger text-center">'.$this->lang->line('msg_err_invalid_password').'</div>');
+                // The old password is wrong
+                $this->session->set_flashdata('message', '<div class="alert alert-danger text-center">'.$this->lang->line('msg_err_invalid_old_password').'</div>');
             }
         }
         

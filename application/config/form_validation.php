@@ -23,3 +23,22 @@ $config ['auth/login'] =
             'rules' => 'trim|required|min_length[6]|max_length[72]'
         ]
     ];
+
+$config ['auth/change_password'] =
+    [
+        [
+            'field' => 'old_password',
+            'label' => 'lang:field_new_password',
+            'rules' => 'trim|required'
+        ],
+        [
+            'field' => 'new_password',
+            'label' => 'lang:field_old_password',
+            'rules' => 'trim|required|min_length[6]|max_length[72]'
+        ],
+        [
+            'field' => 'confirm_password',
+            'label' => 'lang:field_password_confirm',
+            'rules' => 'trim|required|min_length[6]|max_length[72]'
+        ]
+    ];
