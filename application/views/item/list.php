@@ -11,7 +11,7 @@
 
 <div class="row">
   <!-- FILTERS FORM -->
-  <form id="filters" method="get">
+  <form id="filters" method="get" action="<?=base_url("item/index/1")?>">
     <p class="bg-primary">&nbsp;<?php echo html_escape($this->lang->line('text_search_filters')); ?></p>
 
     <div class="row">
@@ -79,6 +79,7 @@
   </form>
   <!-- END OF FILTERS -->
 </div>
+<div id="pagination_top"><?=$pagination?></div>
 <div class="top-margin table-responsive">
   
   <!-- LIST OF ITEMS -->
@@ -141,6 +142,7 @@
   </table>
   <?php } ?>
 </div>
+<div id="pagination_bottom"><?=$pagination?></div>
 </div>
 
 <!-- Initialize the Bootstrap Multiselect plugin: -->

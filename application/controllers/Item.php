@@ -27,7 +27,7 @@ class Item extends MY_Controller {
 	/****************************************************************************
     * Display items list, with filtering
     */
-	public function index()
+	public function index($page = 1)
   {
     // Store URL to make possible to come back later (from item detail for example)
     if (isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING'])) {
@@ -76,7 +76,45 @@ class Item extends MY_Controller {
     $output['item_groups'] = $this->item_group_model->dropdown('name');
     $this->load->model('stocking_place_model');
     $output['stocking_places'] = $this->stocking_place_model->dropdown('name');
+    
+    // Create the pagination
+    $this->load->library('pagination');
 
+    $config['base_url'] = base_url('/item/index/');
+    $config['total_rows'] = count($output["items"]);
+    $config['per_page'] = ITEMS_PER_PAGE;
+    $config['use_page_numbers'] = TRUE;
+    $config['reuse_query_string'] = TRUE;
+    
+    $config['full_tag_open'] = '<ul class="pagination">';
+    $config['full_tag_close'] = '</ul>';
+    
+    $config['first_link'] = '&laquo;';
+    $config['first_tag_open'] = '<li>';
+    $config['first_tag_close'] = '</li>';
+    
+    $config['last_link'] = '&raquo;';
+    $config['last_tag_open'] = '<li>';
+    $config['last_tag_close'] = '</li>';
+    
+    $config['next_link'] = FALSE;
+    $config['prev_link'] = FALSE;
+    
+    $config['cur_tag_open'] = '<li class="active"><a>';
+    $config['cur_tag_close'] = '</li></a>';
+    $config['num_links'] = 5;
+    
+    $config['num_tag_open'] = '<li>';
+    $config['num_tag_close'] = '</li>';
+    
+    $this->pagination->initialize($config);
+
+    $output['pagination'] = $this->pagination->create_links();
+
+    // Keep only the slice of items corresponding to the current page
+    $output["items"] = array_slice($output["items"], ($page-1)*ITEMS_PER_PAGE, ITEMS_PER_PAGE);
+    
+    // Send the data to the View
     $this->display_view('item/list', $output);
   }
 

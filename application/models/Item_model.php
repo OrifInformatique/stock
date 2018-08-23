@@ -250,7 +250,11 @@ class Item_model extends MY_Model
     /**
      * Searching item(s) in the database depending on filters
      * @param array $filters The array of filters
+<<<<<<< HEAD
+     * @return An array of corresponding items
+=======
      * @return The array of item(s) found
+>>>>>>> master
      */
     function get_filtered($filters){
 
@@ -446,6 +450,7 @@ class Item_model extends MY_Model
                         ->with('item_condition')
                         ->get_many_by($where_itemsFilters);
         }
+        
         return $items;
     }
 }
