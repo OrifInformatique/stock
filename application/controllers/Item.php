@@ -125,9 +125,14 @@ class Item extends MY_Controller {
     */
 	public function view($id = NULL)
 	{
-		if (empty($id))
+    		//Check for allowed id
+    		$this->db->select_max('item_id');
+    		$query = $this->db->get('item');
+    		$row = $query->result_array();
+    		$id_max = $row[0]['item_id'];
+    		if (empty($id) || $id < 0 || $id > $id_max)
 		{
-      // No item specified, display items list
+      // No item found, display items list
 			redirect('/item');
 		}
 
