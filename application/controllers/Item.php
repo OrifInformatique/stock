@@ -46,14 +46,20 @@ class Item extends MY_Controller {
     // Get item(s) through filtered search on the database
     $output['items'] = $this->item_model->get_filtered($filters);
 
-    //Sorts output depending on the user's choice
+    //Sort output depending on the user's choice
     $sortValue = "name";
     $asc = true;
-    if(array_key_exists("sortinValue", $_SESSION)){
+    //Verify the existence of the key in _SESSION so there is no null
+    if(array_key_exists("sortingValue", $_SESSION)){
       $sortValue = $_SESSION['sortingValue'];
+      //To prevent errors, verify that the sort value is a key in the array
+      if(!array_key_exists($sortValue, $output['items'])){
+        //Default to name if the key cannot be found
+        $sortValue = "name";
+      }
     }
     if(array_key_exists("asc", $_SESSION)){
-      $asc = ($_SESSION['asc'] === "true");
+      $asc = !($_SESSION['asc'] === "false");
     }
     $output['items'] = $this->sortBySubValue($output['items'], $sortValue, $asc);
 
