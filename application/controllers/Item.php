@@ -46,6 +46,17 @@ class Item extends MY_Controller {
     // Get item(s) through filtered search on the database
     $output['items'] = $this->item_model->get_filtered($filters);
 
+    //Sorts output depending on the user's choice
+    $sortValue = "name";
+    $asc = true;
+    if(array_key_exists("sortinValue", $_SESSION)){
+      $sortValue = $_SESSION['sortingValue'];
+    }
+    if(array_key_exists("asc", $_SESSION)){
+      $asc = ($_SESSION['asc'] === "true");
+    }
+    $output['items'] = $this->sortBySubValue($output['items'], $sortValue, $asc);
+
     // Prepare search filters values to send to the view
     $output = array_merge($output, $filters);
     if (!isset($output["ts"])) {
@@ -695,5 +706,33 @@ class Item extends MY_Controller {
     $this->form_validation->set_rules("name", $this->lang->line('field_item_name'), 'required');
 
     $this->form_validation->set_rules("inventory_number", $this->lang->line('field_inventory_number'), 'required');
+  }
+
+  /**
+   * Sorts an array through a subarray's value
+   * @author Pigalev Pavel on StackOverflow
+   *
+   * @param array $array - Array to sort
+   * @param string $value - Key of the value to sort by, will make errors if invalid (ex: "ssssss");
+   * @param bool $asc - ASC (true) or DESC (false) sorting
+   * @param bool $preserveKeys - No idea what it does, if you do replace this part
+   * @return array - Sorted array
+   * */
+  private function sortBySubValue($array, $value, $asc = true, $preserveKeys = false)
+  {
+    if (is_object(reset($array))) {
+        $preserveKeys ? uasort($array, function ($a, $b) use ($value, $asc) {
+            return $a->{$value} == $b->{$value} ? 0 : ($a->{$value} <=> $b->{$value}) * ($asc ? 1 : -1);
+        }) : usort($array, function ($a, $b) use ($value, $asc) {
+            return $a->{$value} == $b->{$value} ? 0 : ($a->{$value} <=> $b->{$value}) * ($asc ? 1 : -1);
+        });
+    } else {
+        $preserveKeys ? uasort($array, function ($a, $b) use ($value, $asc) {
+            return $a[$value] == $b[$value] ? 0 : ($a[$value] <=> $b[$value]) * ($asc ? 1 : -1);
+        }) : usort($array, function ($a, $b) use ($value, $asc) {
+            return $a[$value] == $b[$value] ? 0 : ($a[$value] <=> $b[$value]) * ($asc ? 1 : -1);
+        });
+    }
+    return $array;
   }
 }
