@@ -121,8 +121,8 @@ $lang['btn_generate_inventory_nb']	= 'Générer un No d\'inventaire';
 // Messages
 $lang['msg_err_abbreviation']           = 'Une abréviation doit être fournie';
 $lang['msg_err_invalid_password']       = 'L\'identifiant et le mot de passe ne sont pas valides';
-$lang['msg_err_invalid_new_password']   = 'Le nouveau mot de passe n\'a pas été confirmé ';
-$lang['msg_err_invalid_old_password']   = 'Veuillez réinscrire l\'ancient mot de passe';
+$lang['msg_err_invalid_new_password']   = 'Le nouveau mot de passe et la confirmation ne correspondent pas';
+$lang['msg_err_invalid_old_password']   = 'L\'ancien mot de passe n\'est pas valide';
 $lang['msg_err_access_denied']          = 'Accès refusé';
 $lang['msg_err_email']                  = 'Entrez une adresse email valide ou laisser vide';
 $lang['msg_err_id_needed']              = 'Un identifiant unique doit être fourni';
