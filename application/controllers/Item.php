@@ -57,9 +57,15 @@ class Item extends MY_Controller {
         //Default to name if the key cannot be found
         $sortValue = "name";
       }
+    }else{
+      //Default to sorting with name
+      $_SESSION['sortingValue'] = "name";
     }
     if(array_key_exists("asc", $_SESSION)){
       $asc = !($_SESSION['asc'] === "false");
+    }else{
+      //Default to ascendant order
+      $_SESSION['asc'] = "true";
     }
     $output['items'] = $this->sortBySubValue($output['items'], $sortValue, $asc);
 
