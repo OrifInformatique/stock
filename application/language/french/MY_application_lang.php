@@ -122,6 +122,7 @@ $lang['msg_err_access_denied']          = 'Accès refusé';
 $lang['msg_err_email']                  = 'Entrez une adresse email valide ou laisser vide';
 $lang['msg_err_id_needed']              = 'Un identifiant unique doit être fourni';
 $lang['msg_err_id_used']                = 'Cet identifiant est déjà utilisé';
+$lang['msg_err_id_inexisting']          = 'Aucun objet avec cet identifiant n\'a été trouvé';
 $lang['msg_err_item_group_needed']      = 'Le groupe d\'objets doit avoir un nom';
 $lang['msg_err_item_group_short']       = 'Le groupe d\'objets doit avoir une abréviation';
 $lang['msg_err_pwd_length']             = 'Le mot de passe doit faire au moins 6 caractères';

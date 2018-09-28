@@ -125,12 +125,8 @@ class Item extends MY_Controller {
     */
 	public function view($id = NULL)
 	{
-    		//Check for allowed id
-    		$this->db->select_max('item_id');
-    		$query = $this->db->get('item');
-    		$row = $query->result_array();
-    		$id_max = $row[0]['item_id'];
-    		if (empty($id) || $id < 0 || $id > $id_max)
+    		
+    		if (is_null($id))
 		{
       // No item found, display items list
 			redirect('/item');
@@ -143,8 +139,12 @@ class Item extends MY_Controller {
                              ->with('item_group')
                              ->get($id);
 		
-    $output['item'] = $item;
-		$this->display_view('item/detail', $output);
+    if(!is_null($item)){
+      $output['item'] = $item;
+      $this->display_view('item/detail', $output);
+    }else{
+      $this->display_view('errors/application/invalid_id');
+    }
 	}
 
 
