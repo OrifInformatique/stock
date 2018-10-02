@@ -17,10 +17,12 @@
                 <span class="text-danger"><?php echo form_error('confirm_password'); ?></span>
             </div>
             <div>
-                <input id="btn_login" name="btn_login" type="submit" class="btn btn-default" value="<?php echo $this->lang->line('btn_change_password'); ?>" />
-                <a id="btn_cancel" class="btn btn-default" href="<?php echo base_url(); ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
+                <input id="btn_change_password" name="btn_login" type="submit" class="btn btn-success" value="<?php echo $this->lang->line('btn_change_password'); ?>" />
+                <a id="btn_cancel" class="btn btn-danger" href="<?php echo base_url(); ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
             </div>
         </form>
         <?php echo $this->session->flashdata('message'); ?>
     </div>
 </div>
+<?=
+var_dump($_SESSION)?>

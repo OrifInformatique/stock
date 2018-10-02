@@ -108,27 +108,18 @@ class Auth extends MY_Controller
             // Recovering the last page in user's history so we can redirect there after login
             $redirect_url = $_SESSION["before_login_page"];
 
+            $this->form_validation->set_rules('old_password', 'lang:field_old_password', 'trim|required|min_length[6]|max_length[72]|callback_old_password_check['.$_SESSION['username'].']', array('old_password_check' => $this->lang->line('msg_err_invalid_old_password')));
+            $this->form_validation->set_rules('new_password', 'lang:field_new_password', 'trim|required|min_length[6]|max_length[72]');
+            $this->form_validation->set_rules('confirm_password', 'lang:field_password_confirm', 'trim|required|min_length[6]|max_length[72]|matches[new_password]');
+            
             if ($this->form_validation->run() == true) {
-                // Fields validation passed
+                
+                $this->load->model('user_model');
+                $this->user_model->update($_SESSION['user_id'], array("password" => password_hash($new_password, PASSWORD_DEFAULT)));
 
-                if ($this->user_model->check_password($username, $old_password)) {
-
-                    if($new_password == $confirm_password){
-                        // Change password
-                        $this->db->update('user',array('password' => password_hash($new_password, PASSWORD_DEFAULT)),array('username' => $username));
-
-                        // Send the user back to his last page
-                        redirect($redirect_url);
-                        exit();
-                    }else{
-                        // The new password hasn't been confirmed
-                        $this->session->set_flashdata('message', '<div class="alert alert-danger text-center">'.$this->lang->line('msg_err_invalid_new_password').'</div>');
-                    }
-
-                } else {
-                    // The old password is wrong
-                    $this->session->set_flashdata('message', '<div class="alert alert-danger text-center">'.$this->lang->line('msg_err_invalid_old_password').'</div>');
-                }
+                // Send the user back to his last page
+                redirect($redirect_url);
+                exit();
             }
 
             // Displaying the form
@@ -136,6 +127,14 @@ class Auth extends MY_Controller
         } else {
             // Access is not allowed
             redirect("auth/login");
+        }
+    }
+    
+    public function old_password_check($pwd,$user){
+        if($this->user_model->check_password($user, $pwd)){
+            return TRUE;
+        }else{
+            return FALSE;
         }
     }
 }
