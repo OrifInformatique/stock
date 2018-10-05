@@ -64,6 +64,18 @@ $lang['field_warranty_duration']        = 'Durée de la garantie (en mois)';
 $lang['field_tags']                     = 'Type d\'objet';
 $lang['field_text_search']              = 'Nom, description, No inventaire, No série';
 $lang['field_no_filter']                = 'Aucun filtre';
+$lang['field_sort_order']               = 'Trier par';
+$lang['field_sort_order_asc']           = 'Trier de façon';
+
+// Sorting labels
+$lang['sort_order_name']                = 'Nom';
+$lang['sort_order_desc']                = 'Description';
+$lang['sort_order_price']               = 'Prix d\'achat';
+$lang['sort_order_date']                = 'Date d\'achat';
+$lang['sort_order_stocking_place_id']   = 'Lieu de stockage';
+
+$lang['sort_order_asc']                 = 'Ascendante';
+$lang['sort_order_desc']                = 'Descendante';
 
 // List headers
 $lang['header_picture']                 = 'Photo';

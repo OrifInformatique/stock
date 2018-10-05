@@ -57,7 +57,27 @@
       ?>
       </div>
     </div>
-
+    
+    <div class="row">
+        <!-- SORTING -->
+      <div class="col-sm-8 top-margin">
+      <?php
+        echo form_label($this->lang->line('field_sort_order'),
+                        'sort_order');
+        echo form_dropdown('o[]', $sort_order, $o,
+                           'id="sort_order"');
+      ?>
+      </div>
+      <!-- SORTING ORDER -->
+      <div class="col-sm-4 top-margin">
+      <?php
+        echo form_label($this->lang->line('field_sort_order_asc'),
+                        'sort_asc');
+        echo form_dropdown('ot[]', $sort_order_asc, $ot,
+                           'id="sort_asc"');
+      ?>
+    </div>
+    </div>
     <div class="row">
 
       <!-- STOCKING PLACES FILTER -->
@@ -69,6 +89,7 @@
                            'id="stocking_places-multiselect" multiple="multiple"');
       ?>
       </div>
+
 
       <!-- BUTTON TO APPLY FILTERS -->
       <div class="col-sm-6 col-sm-pull-4 col-xs-12 top-margin xs-center">
@@ -168,6 +189,16 @@
         numberDisplayed: 5
       });
       $('#stocking_places-multiselect').multiselect({
+        nonSelectedText: no_filter,
+        buttonWidth: '100%',
+        numberDisplayed: 5
+      });
+      $('#sort_order').multiselect({
+        nonSelectedText: no_filter,
+        buttonWidth: '100%',
+        numberDisplayed: 5
+      });
+      $('#sort_asc').multiselect({
         nonSelectedText: no_filter,
         buttonWidth: '100%',
         numberDisplayed: 5

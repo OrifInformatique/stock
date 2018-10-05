@@ -49,23 +49,31 @@ class Item extends MY_Controller {
     //Sort output depending on the user's choice
     $sortValue = "name";
     $asc = true;
-    //Verify the existence of the key in _SESSION so there is no null
-    if(array_key_exists("sortingValue", $_SESSION)){
-      $sortValue = $_SESSION['sortingValue'];
-      //To prevent errors, verify that the sort value is a key in the array
-      if(!array_key_exists($sortValue, $output['items'])){
-        //Default to name if the key cannot be found
-        $sortValue = "name";
+    //Verify the existence of the key in filters so there is no null
+    if(array_key_exists("o", $filters)){
+      switch ($filters['o'][0]) {
+        case 1:
+          $sortValue = "description";
+          break;
+        case 2:
+          $sortValue = "buying_price";
+          break;
+        case 3:
+          $sortValue = "buying_date";
+          break;
+        case 4:
+          $sortValue = "stocking_place_id";
+          break;
+        //In case of problem, it automatically switches to name
+        default:
+        case 0:
+          $sortValue = "name";
+          break;
       }
-    }else{
-      //Default to sorting with name
-      $_SESSION['sortingValue'] = "name";
     }
-    if(array_key_exists("asc", $_SESSION)){
-      $asc = !($_SESSION['asc'] === "false");
-    }else{
-      //Default to ascendant order
-      $_SESSION['asc'] = "true";
+    //If not 1, order will be ascending
+    if(array_key_exists("ot", $filters)){
+      $asc = $filters['ot'][0] != 1;
     }
     $output['items'] = $this->sortBySubValue($output['items'], $sortValue, $asc);
 
@@ -86,6 +94,12 @@ class Item extends MY_Controller {
     if (!isset($output["t"])) {
       $output["t"] = '';
     }
+    if (!isset($output["o"])) {
+      $output["o"] = '';
+    }
+    if (!isset($output["ot"])) {
+      $output["ot"] = '';
+    }
 
     // Add page title
     $output['title'] = $this->lang->line('page_item_list');
@@ -99,6 +113,13 @@ class Item extends MY_Controller {
     $output['item_groups'] = $this->item_group_model->dropdown('name');
     $this->load->model('stocking_place_model');
     $output['stocking_places'] = $this->stocking_place_model->dropdown('name');
+    $output['sort_order'] = array($this->lang->line('sort_order_name'),
+                                  $this->lang->line('sort_order_desc'),
+                                  $this->lang->line('sort_order_price'),
+                                  $this->lang->line('sort_order_date'),
+                                  $this->lang->line('sort_order_stocking_place_id'));
+    $output['sort_order_asc'] = array($this->lang->line('sort_order_asc'),
+                                      $this->lang->line('sort_order_desc'));
     
     // Create the pagination
     $this->load->library('pagination');
