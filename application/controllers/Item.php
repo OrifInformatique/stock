@@ -21,6 +21,7 @@ class Item extends MY_Controller {
 			parent::__construct();
 			$this->load->model('item_model');
       $this->load->model('loan_model');
+      $this->load->helper('my_sort');
 	}
 
 
@@ -72,7 +73,7 @@ class Item extends MY_Controller {
     if(array_key_exists("ot", $filters)){
       $asc = $filters['ot'] != 1;
     }
-    $output['items'] = $this->item_model->sortBySubValue($output['items'], $sortValue, $asc);
+    $output['items'] = sortBySubValue($output['items'], $sortValue, $asc);
 
     // Prepare search filters values to send to the view
     $output = array_merge($output, $filters);
