@@ -1,4 +1,4 @@
-<div class="container" style="overflow-x: visible;">
+<div class="container">
 
 <!-- *** ADMIN *** -->
 <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?>
@@ -9,95 +9,111 @@
 <?php } ?>
 <!-- *** END OF ADMIN *** -->
 
-<div class="row">
-  <!-- FILTERS FORM -->
-  <form id="filters" method="get" action="<?=base_url("item/index/1")?>">
-    <p class="bg-primary">&nbsp;<?php echo html_escape($this->lang->line('text_search_filters')); ?></p>
+<!-- FILTERS AND SORT FORM -->
+<form id="filters" class="" style="overflow: visible;" method="get" action="<?=base_url("item/index/1")?>">
+  <div class="row">
+    <!-- FILTERS -->
+    <div class="col-sm-8 top-margin">
+      <!-- HEADING -->
+      <p class="bg-primary">&nbsp;<?php echo html_escape($this->lang->line('text_search_filters')); ?></p>
 
-    <div class="row">
-      <!-- TEXT FILTER -->
-      <div class="col-sm-8 top-margin">
-      <?php
-        echo form_label($this->lang->line('field_text_search'), 'text_search');
-        echo form_input('ts', $ts, 
-                        'id="text_search" class="form-control"
-                         placeholder="'.$this->lang->line('field_no_filter').'"');
-      ?>
+      <div class="row">
+        <!-- TEXT FILTER -->
+        <div class="col-xs-12 top-margin">
+        <?php
+          echo form_label($this->lang->line('field_text_search'), 'text_search');
+          echo form_input('ts', $ts, 
+                          'id="text_search" class="form-control"
+                           placeholder="'.$this->lang->line('field_no_filter').'"');
+        ?>
+        </div>
       </div>
 
-      <!-- CONDITIONS FILTER -->
-      <div class="col-sm-4 top-margin">
-      <?php
-        echo form_label($this->lang->line('field_item_condition'),
-                        'item_conditions-multiselect');
-        echo form_dropdown('c[]', $item_conditions, $c,
-                           'id="item_conditions-multiselect" multiple="multiple"');
-      ?>
+      <div class="row">
+        <!-- TAGS FILTER -->
+        <div class="col-sm-8 top-margin">
+        <?php
+          echo form_label($this->lang->line('field_tags'),
+                          'item_conditions-multiselect');
+          echo form_dropdown('t[]', $item_tags, $t,
+                             'id="item_tags-multiselect" multiple="multiple"');
+        ?>
+        </div>
+
+        <!-- GROUPS FILTER -->
+        <div class="col-sm-4 top-margin">
+        <?php
+          echo form_label($this->lang->line('field_group'),
+                          'item_groups-multiselect');
+          echo form_dropdown('g[]', $item_groups, $g,
+                             'id="item_groups-multiselect" multiple="multiple"');
+        ?>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- STOCKING PLACES FILTER -->
+        <div class="col-sm-8 top-margin">
+          <?php
+            echo form_label($this->lang->line('field_stocking_place'),
+                            'stocking_places-multiselect');
+            echo form_dropdown('s[]', $stocking_places, $s,
+                               'id="stocking_places-multiselect" multiple="multiple"');
+          ?>
+        </div>
+
+        <!-- CONDITIONS FILTER -->
+        <div class="col-sm-4 top-margin">
+        <?php
+          echo form_label($this->lang->line('field_item_condition'),
+                          'item_conditions-multiselect');
+          echo form_dropdown('c[]', $item_conditions, $c,
+                             'id="item_conditions-multiselect" multiple="multiple"');
+        ?>
+        </div>
       </div>
     </div>
 
-    <div class="row">
-      <!-- TAGS FILTER -->
-      <div class="col-sm-8 top-margin">
-      <?php
-        echo form_label($this->lang->line('field_tags'),
-                        'item_conditions-multiselect');
-        echo form_dropdown('t[]', $item_tags, $t,
-                           'id="item_tags-multiselect" multiple="multiple"');
-      ?>
-      </div>
+    <!-- SORT ORDER -->
+    <div class="col-sm-4 top-margin">
+      <!-- HEADING -->
+      <p class="bg-primary">&nbsp;<?php echo html_escape($this->lang->line('text_sort_order')); ?></p>
 
-      <!-- GROUPS FILTER -->
-      <div class="col-sm-4 top-margin">
-      <?php
-        echo form_label($this->lang->line('field_group'),
-                        'item_groups-multiselect');
-        echo form_dropdown('g[]', $item_groups, $g,
-                           'id="item_groups-multiselect" multiple="multiple"');
-      ?>
+      <div class="row">
+        <!-- SORT ORDER -->
+        <div class="col-xs-12 top-margin">
+        <?php
+          echo form_label($this->lang->line('field_sort_order'),
+                            'sort_order');
+          echo form_dropdown('o', $sort_order, $o,
+                               'id="sort_order"');
+        ?>
+        </div>
+      </div>
+      <div class="row">
+        <!-- SORTING ASCENDING / DESCENDING -->
+        <div class="col-xs-12 top-margin">
+        <?php
+          echo form_label($this->lang->line('field_sort_asc_desc'),
+                            'sort_asc_desc');
+          echo form_dropdown('ad', $sort_asc_desc, $ad,
+                               'id="sort_asc_desc"');
+        ?>
+        </div>
       </div>
     </div>
+  </div>
+  
+  <!-- BUTTONS -->
+  <div class="row">
+    <div class="col-sm-6 col-xs-12 top-margin xs-center">
+      <button type="submit" class="btn btn-primary top-margin"><?php echo html_escape($this->lang->line('btn_submit_filters')); ?></button>
+      <a href="<?php echo base_url(); ?>item" class="btn btn-default top-margin"><?php echo html_escape($this->lang->line('btn_remove_filters')); ?></a>
+    </div>
+  </div>
 
-    <div class="row">
-      <!-- SORT ORDER -->
-      <div class="col-sm-4 top-margin">
-      <?php
-        echo form_label($this->lang->line('field_sort_order'),
-                        'sort_order');
-        echo form_dropdown('o', $sort_order, $o,
-                           'id="sort_order"');
-      ?>
-      </div>
-      <!-- SORTING ASCENDING / DESCENDING -->
-      <div class="col-sm-4 top-margin">
-      <?php
-        echo form_label($this->lang->line('field_sort_asc_desc'),
-                        'sort_asc_desc');
-        echo form_dropdown('ad', $sort_asc_desc, $ad,
-                           'id="sort_asc_desc"');
-      ?>
-      </div>
-      <!-- STOCKING PLACES FILTER -->
-      <div class="col-sm-4 top-margin">
-      <?php
-        echo form_label($this->lang->line('field_stocking_place'),
-                        'stocking_places-multiselect');
-        echo form_dropdown('s[]', $stocking_places, $s,
-                           'id="stocking_places-multiselect" multiple="multiple"');
-      ?>
-      </div>
-    </div>
-    
-    <div class="row">
-      <!-- BUTTON TO APPLY FILTERS -->
-      <div class="col-sm-6 col-xs-12 top-margin xs-center">
-        <button type="submit" class="btn btn-primary top-margin"><?php echo html_escape($this->lang->line('btn_submit_filters')); ?></button>
-        <a href="<?php echo base_url(); ?>item" class="btn btn-default top-margin"><?php echo html_escape($this->lang->line('btn_remove_filters')); ?></a>
-      </div>
-    </div>
-  </form>
-  <!-- END OF FILTERS -->
-</div>
+<!-- END OF FILTERS AND SORT FORM -->
+</form>
 
 <!-- PAGINATION -->
 <div id="pagination_top"><?=$pagination?></div>
