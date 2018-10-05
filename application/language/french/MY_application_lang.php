@@ -64,6 +64,17 @@ $lang['field_warranty_duration']        = 'Durée de la garantie (en mois)';
 $lang['field_tags']                     = 'Type d\'objet';
 $lang['field_text_search']              = 'Nom, description, No inventaire, No série';
 $lang['field_no_filter']                = 'Aucun filtre';
+$lang['field_sort_order']               = 'Trier par';
+$lang['field_sort_asc_desc']            = 'Ordre de tri';
+
+// Sorting labels
+$lang['sort_order_name']                = 'Nom';
+$lang['sort_order_stocking_place_id']   = 'Lieu de stockage';
+$lang['sort_order_date']                = 'Date d\'achat';
+$lang['sort_order_inventory_number']    = 'No d\'inventaire';
+
+$lang['sort_order_asc']                 = 'Ascendant';
+$lang['sort_order_des']                 = 'Descendant';
 
 // List headers
 $lang['header_picture']                 = 'Photo';
@@ -109,8 +120,8 @@ $lang['btn_create_inventory_control']   = 'Nouveau contrôle';
 $lang['btn_inventory_control_history']  = 'Historique contrôles';
 $lang['btn_loans_history']              = 'Historique des prêts';
 $lang['btn_create_loan']                = 'Ajouter un prêt';
-$lang['btn_submit_filters']             = 'Appliquer les filtres';
-$lang['btn_remove_filters']             = 'Supprimer les filtres';
+$lang['btn_submit_filters']             = 'Appliquer filtres et tri';
+$lang['btn_remove_filters']             = 'Supprimer filtres et tri';
 $lang['btn_all']                        = 'Tout';
 $lang['btn_none']                       = 'Rien';
 $lang['btn_generate_inventory_nb']	= 'Générer un No d\'inventaire';
@@ -159,7 +170,8 @@ $lang['text_item_detail']               = 'Photo et détail';
 $lang['text_item_condition']            = 'Condition';
 $lang['text_item_loan_status']          = 'Disponibilité et prêts';
 $lang['text_item_buying_warranty']      = 'Achat et garantie';
-$lang['text_item_tags']      			= 'Type d\'objet';
+$lang['text_item_tags']      		= 'Type d\'objet';
 $lang['text_search_filters']            = 'Filtres de recherche';
+$lang['text_sort_order']                = 'Ordre de tri';
 $lang['text_filtered_items_list']       = 'Liste des objets correspondants';
 $lang['text_kinds_to_show']             = 'Afficher uniquement les…';
