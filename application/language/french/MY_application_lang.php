@@ -69,13 +69,12 @@ $lang['field_sort_order_asc']           = 'Trier de façon';
 
 // Sorting labels
 $lang['sort_order_name']                = 'Nom';
-$lang['sort_order_desc']                = 'Description';
-$lang['sort_order_price']               = 'Prix d\'achat';
-$lang['sort_order_date']                = 'Date d\'achat';
 $lang['sort_order_stocking_place_id']   = 'Lieu de stockage';
+$lang['sort_order_date']                = 'Date d\'achat';
+$lang['sort_order_inventory_number']    = 'No inventaire';
 
 $lang['sort_order_asc']                 = 'Ascendante';
-$lang['sort_order_desc']                = 'Descendante';
+$lang['sort_order_des']                = 'Descendante';
 
 // List headers
 $lang['header_picture']                 = 'Photo';

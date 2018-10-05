@@ -51,18 +51,15 @@ class Item extends MY_Controller {
     $asc = true;
     //Verify the existence of the key in filters so there is no null
     if(array_key_exists("o", $filters)){
-      switch ($filters['o'][0]) {
+      switch ($filters['o']) {
         case 1:
-          $sortValue = "description";
+          $sortValue = "stocking_place_id";
           break;
         case 2:
-          $sortValue = "buying_price";
-          break;
-        case 3:
           $sortValue = "buying_date";
           break;
-        case 4:
-          $sortValue = "stocking_place_id";
+        case 3:
+          $sortValue = "inventory_number";
           break;
         //In case of problem, it automatically switches to name
         default:
@@ -73,9 +70,9 @@ class Item extends MY_Controller {
     }
     //If not 1, order will be ascending
     if(array_key_exists("ot", $filters)){
-      $asc = $filters['ot'][0] != 1;
+      $asc = $filters['ot'] != 1;
     }
-    $output['items'] = $this->sortBySubValue($output['items'], $sortValue, $asc);
+    $output['items'] = $this->item_model->sortBySubValue($output['items'], $sortValue, $asc);
 
     // Prepare search filters values to send to the view
     $output = array_merge($output, $filters);
@@ -114,12 +111,11 @@ class Item extends MY_Controller {
     $this->load->model('stocking_place_model');
     $output['stocking_places'] = $this->stocking_place_model->dropdown('name');
     $output['sort_order'] = array($this->lang->line('sort_order_name'),
-                                  $this->lang->line('sort_order_desc'),
-                                  $this->lang->line('sort_order_price'),
+                                  $this->lang->line('sort_order_stocking_place_id'),
                                   $this->lang->line('sort_order_date'),
-                                  $this->lang->line('sort_order_stocking_place_id'));
+                                  $this->lang->line('sort_order_inventory_number'));
     $output['sort_order_asc'] = array($this->lang->line('sort_order_asc'),
-                                      $this->lang->line('sort_order_desc'));
+                                      $this->lang->line('sort_order_des'));
     
     // Create the pagination
     $this->load->library('pagination');
@@ -739,33 +735,5 @@ class Item extends MY_Controller {
     $this->form_validation->set_rules("name", $this->lang->line('field_item_name'), 'required');
 
     $this->form_validation->set_rules("inventory_number", $this->lang->line('field_inventory_number'), 'required');
-  }
-
-  /**
-   * Sorts an array through a subarray's value
-   * @author Pigalev Pavel on StackOverflow
-   *
-   * @param array $array - Array to sort
-   * @param string $value - Key of the value to sort by, will make errors if invalid (ex: "ssssss");
-   * @param bool $asc - ASC (true) or DESC (false) sorting
-   * @param bool $preserveKeys - No idea what it does, if you do replace this part
-   * @return array - Sorted array
-   * */
-  private function sortBySubValue($array, $value, $asc = true, $preserveKeys = false)
-  {
-    if (is_object(reset($array))) {
-        $preserveKeys ? uasort($array, function ($a, $b) use ($value, $asc) {
-            return $a->{$value} == $b->{$value} ? 0 : ($a->{$value} <=> $b->{$value}) * ($asc ? 1 : -1);
-        }) : usort($array, function ($a, $b) use ($value, $asc) {
-            return $a->{$value} == $b->{$value} ? 0 : ($a->{$value} <=> $b->{$value}) * ($asc ? 1 : -1);
-        });
-    } else {
-        $preserveKeys ? uasort($array, function ($a, $b) use ($value, $asc) {
-            return $a[$value] == $b[$value] ? 0 : ($a[$value] <=> $b[$value]) * ($asc ? 1 : -1);
-        }) : usort($array, function ($a, $b) use ($value, $asc) {
-            return $a[$value] == $b[$value] ? 0 : ($a[$value] <=> $b[$value]) * ($asc ? 1 : -1);
-        });
-    }
-    return $array;
   }
 }

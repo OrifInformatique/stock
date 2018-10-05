@@ -57,14 +57,14 @@
       ?>
       </div>
     </div>
-    
+
     <div class="row">
         <!-- SORTING -->
       <div class="col-sm-8 top-margin">
       <?php
         echo form_label($this->lang->line('field_sort_order'),
                         'sort_order');
-        echo form_dropdown('o[]', $sort_order, $o,
+        echo form_dropdown('o', $sort_order, $o,
                            'id="sort_order"');
       ?>
       </div>
@@ -73,7 +73,7 @@
       <?php
         echo form_label($this->lang->line('field_sort_order_asc'),
                         'sort_asc');
-        echo form_dropdown('ot[]', $sort_order_asc, $ot,
+        echo form_dropdown('ot', $sort_order_asc, $ot,
                            'id="sort_asc"');
       ?>
     </div>
