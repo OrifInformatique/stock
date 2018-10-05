@@ -47,10 +47,10 @@ class Item extends MY_Controller {
     // Get item(s) through filtered search on the database
     $output['items'] = $this->item_model->get_filtered($filters);
 
-    //Sort output depending on the user's choice
+    // Sort output depending on the user's choice
     $sortValue = "name";
     $asc = true;
-    //Verify the existence of the key in filters so there is no null
+    // Verify the existence of the sort order key in filters
     if(array_key_exists("o", $filters)){
       switch ($filters['o']) {
         case 1:
@@ -69,9 +69,9 @@ class Item extends MY_Controller {
           break;
       }
     }
-    //If not 1, order will be ascending
-    if(array_key_exists("ot", $filters)){
-      $asc = $filters['ot'] != 1;
+    // If not 1, order will be ascending
+    if(array_key_exists("ad", $filters)){
+      $asc = $filters['ad'] != 1;
     }
     $output['items'] = sortBySubValue($output['items'], $sortValue, $asc);
 
@@ -95,8 +95,8 @@ class Item extends MY_Controller {
     if (!isset($output["o"])) {
       $output["o"] = '';
     }
-    if (!isset($output["ot"])) {
-      $output["ot"] = '';
+    if (!isset($output["ad"])) {
+      $output["ad"] = '';
     }
 
     // Add page title
@@ -115,8 +115,8 @@ class Item extends MY_Controller {
                                   $this->lang->line('sort_order_stocking_place_id'),
                                   $this->lang->line('sort_order_date'),
                                   $this->lang->line('sort_order_inventory_number'));
-    $output['sort_order_asc'] = array($this->lang->line('sort_order_asc'),
-                                      $this->lang->line('sort_order_des'));
+    $output['sort_asc_desc'] = array($this->lang->line('sort_order_asc'),
+                                     $this->lang->line('sort_order_des'));
     
     // Create the pagination
     $this->load->library('pagination');
@@ -159,34 +159,31 @@ class Item extends MY_Controller {
     $this->display_view('item/list', $output);
   }
 
-	/**
-    * Display details of one single item
-    *
-    * @param $id : the item to display
-    */
-	public function view($id = NULL)
-	{
-		if (empty($id))
-		{
-      // No item specified, display items list
-			redirect('/item');
-		}
+    /**
+     * Display details of one single item
+     *
+     * @param $id : the item to display
+     */
+    public function view($id = NULL) {
+        if (empty($id)) {
+            // No item specified, display items list
+            redirect('/item');
+        }
 
-    // Get item object and related objects
-    $item = $this->item_model->with('supplier')
-                             ->with('stocking_place')
-                             ->with('item_condition')
-                             ->with('item_group')
-                             ->get($id);
-		
-    $output['item'] = $item;
-		$this->display_view('item/detail', $output);
-	}
+        // Get item object and related objects
+        $item = $this->item_model->with('supplier')
+                ->with('stocking_place')
+                ->with('item_condition')
+                ->with('item_group')
+                ->get($id);
 
+        $output['item'] = $item;
+        $this->display_view('item/detail', $output);
+    }
 
-  /****************************************************************************
-   * Add a new item
-   */
+    /****************************************************************************
+     * Add a new item
+     */
 	public function create()
   {
     // Check if this is allowed

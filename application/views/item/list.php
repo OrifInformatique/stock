@@ -1,4 +1,4 @@
-<div class="container" style="overflow-x: hidden;">
+<div class="container" style="overflow-x: visible;">
 
 <!-- *** ADMIN *** -->
 <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?>
@@ -59,8 +59,8 @@
     </div>
 
     <div class="row">
-        <!-- SORTING -->
-      <div class="col-sm-8 top-margin">
+      <!-- SORT ORDER -->
+      <div class="col-sm-4 top-margin">
       <?php
         echo form_label($this->lang->line('field_sort_order'),
                         'sort_order');
@@ -68,20 +68,17 @@
                            'id="sort_order"');
       ?>
       </div>
-      <!-- SORTING ORDER -->
+      <!-- SORTING ASCENDING / DESCENDING -->
       <div class="col-sm-4 top-margin">
       <?php
-        echo form_label($this->lang->line('field_sort_order_asc'),
-                        'sort_asc');
-        echo form_dropdown('ot', $sort_order_asc, $ot,
-                           'id="sort_asc"');
+        echo form_label($this->lang->line('field_sort_asc_desc'),
+                        'sort_asc_desc');
+        echo form_dropdown('ad', $sort_asc_desc, $ad,
+                           'id="sort_asc_desc"');
       ?>
-    </div>
-    </div>
-    <div class="row">
-
+      </div>
       <!-- STOCKING PLACES FILTER -->
-      <div class="col-sm-4 col-sm-push-8 top-margin">
+      <div class="col-sm-4 top-margin">
       <?php
         echo form_label($this->lang->line('field_stocking_place'),
                         'stocking_places-multiselect');
@@ -89,10 +86,11 @@
                            'id="stocking_places-multiselect" multiple="multiple"');
       ?>
       </div>
-
-
+    </div>
+    
+    <div class="row">
       <!-- BUTTON TO APPLY FILTERS -->
-      <div class="col-sm-6 col-sm-pull-4 col-xs-12 top-margin xs-center">
+      <div class="col-sm-6 col-xs-12 top-margin xs-center">
         <button type="submit" class="btn btn-primary top-margin"><?php echo html_escape($this->lang->line('btn_submit_filters')); ?></button>
         <a href="<?php echo base_url(); ?>item" class="btn btn-default top-margin"><?php echo html_escape($this->lang->line('btn_remove_filters')); ?></a>
       </div>
@@ -100,7 +98,10 @@
   </form>
   <!-- END OF FILTERS -->
 </div>
+
+<!-- PAGINATION -->
 <div id="pagination_top"><?=$pagination?></div>
+
 <div class="top-margin table-responsive">
   
   <!-- LIST OF ITEMS -->
@@ -198,7 +199,7 @@
         buttonWidth: '100%',
         numberDisplayed: 5
       });
-      $('#sort_asc').multiselect({
+      $('#sort_asc_desc').multiselect({
         nonSelectedText: no_filter,
         buttonWidth: '100%',
         numberDisplayed: 5

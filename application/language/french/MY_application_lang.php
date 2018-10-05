@@ -46,8 +46,8 @@ $lang['field_item_name']            	= 'Nom de l\'objet';
 $lang['field_item_description']         = 'Description de l\'objet';
 $lang['field_item_condition']           = 'État de l\'objet';
 $lang['field_image']                    = 'Photo de l\'objet';
-$lang['field_image_upload']				= 'Ajoutez une image<br />(hauteur et largeur max. 360px)';
-$lang['field_linked_file_upload']		= 'Ajoutez un fichier joint<br />(un seul fichier possible, pdf ou Word, max. 2Mo)';
+$lang['field_image_upload']		= 'Ajoutez une image<br />(hauteur et largeur max. 360px)';
+$lang['field_linked_file_upload']	= 'Ajoutez un fichier joint<br />(un seul fichier possible, pdf ou Word, max. 2Mo)';
 $lang['field_stocking_place']           = 'Lieu de stockage';
 $lang['field_last_inventory_control']   = 'Dernier contrôle d\'inventaire';
 $lang['field_inventory_control']        = 'Contrôle d\'inventaire';
@@ -65,16 +65,16 @@ $lang['field_tags']                     = 'Type d\'objet';
 $lang['field_text_search']              = 'Nom, description, No inventaire, No série';
 $lang['field_no_filter']                = 'Aucun filtre';
 $lang['field_sort_order']               = 'Trier par';
-$lang['field_sort_order_asc']           = 'Trier de façon';
+$lang['field_sort_asc_desc']            = 'Ordre de tri';
 
 // Sorting labels
 $lang['sort_order_name']                = 'Nom';
 $lang['sort_order_stocking_place_id']   = 'Lieu de stockage';
 $lang['sort_order_date']                = 'Date d\'achat';
-$lang['sort_order_inventory_number']    = 'No inventaire';
+$lang['sort_order_inventory_number']    = 'No d\'inventaire';
 
-$lang['sort_order_asc']                 = 'Ascendante';
-$lang['sort_order_des']                = 'Descendante';
+$lang['sort_order_asc']                 = 'Ascendant';
+$lang['sort_order_des']                 = 'Descendant';
 
 // List headers
 $lang['header_picture']                 = 'Photo';
