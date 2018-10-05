@@ -65,9 +65,9 @@ class Item_model extends MY_Model
 	        }
 
 	        $inventory_id = ".".$inventory_id;
+          $item->inventory_id = $inventory_id;
     	}
 
-    	$item->inventory_id = $inventory_id;
     	return $item;
 	}
 
@@ -81,9 +81,9 @@ class Item_model extends MY_Model
 
 		if (!is_null($item)) {
 			$inventory_number_complete = $item->inventory_number.$item->inventory_id;
+      $item->inventory_number_complete = $inventory_number_complete;
     	}
 
-    	$item->inventory_number_complete = $inventory_number_complete;
     	return $item;
 	}
 

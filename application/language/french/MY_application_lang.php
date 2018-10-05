@@ -104,10 +104,10 @@ $lang['header_is_active']               = 'Activé';
 // Buttons
 $lang['btn_admin']                      = 'Administration';
 $lang['btn_cancel']                     = 'Annuler';
-$lang['btn_new']                		= 'Nouveau';
-$lang['btn_modify']                		= 'Modifier';
-$lang['btn_delete']                		= 'Supprimer';
-$lang['btn_save']                		= 'Sauvegarder';
+$lang['btn_new']                	= 'Nouveau';
+$lang['btn_modify']                	= 'Modifier';
+$lang['btn_delete']                	= 'Supprimer';
+$lang['btn_save']                	= 'Sauvegarder';
 $lang['btn_submit']                     = 'Sauvegarder';
 $lang['btn_login']                      = 'Se connecter';
 $lang['btn_logout']                     = 'Se déconnecter';
@@ -124,7 +124,7 @@ $lang['btn_submit_filters']             = 'Appliquer filtres et tri';
 $lang['btn_remove_filters']             = 'Supprimer filtres et tri';
 $lang['btn_all']                        = 'Tout';
 $lang['btn_none']                       = 'Rien';
-$lang['btn_generate_inventory_nb']		= 'Générer un No d\'inventaire';
+$lang['btn_generate_inventory_nb']	= 'Générer un No d\'inventaire';
 
 // Messages
 $lang['msg_err_abbreviation']           = 'Une abréviation doit être fournie';
@@ -133,6 +133,7 @@ $lang['msg_err_access_denied']          = 'Accès refusé';
 $lang['msg_err_email']                  = 'Entrez une adresse email valide ou laisser vide';
 $lang['msg_err_id_needed']              = 'Un identifiant unique doit être fourni';
 $lang['msg_err_id_used']                = 'Cet identifiant est déjà utilisé';
+$lang['msg_err_inexistent_item']        = 'L\'objet auquel vous essayez d\'accéder n\'existe pas';
 $lang['msg_err_item_group_needed']      = 'Le groupe d\'objets doit avoir un nom';
 $lang['msg_err_item_group_short']       = 'Le groupe d\'objets doit avoir une abréviation';
 $lang['msg_err_pwd_length']             = 'Le mot de passe doit faire au moins 6 caractères';
