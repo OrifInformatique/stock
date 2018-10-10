@@ -24,5 +24,3 @@
         <?php echo $this->session->flashdata('message'); ?>
     </div>
 </div>
-<?=
-var_dump($_SESSION)?>
