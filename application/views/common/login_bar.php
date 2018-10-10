@@ -18,6 +18,9 @@
           <?php } ?>
           <!-- END OF ADMIN ACCESS -->
 
+          <!-- Password change -->
+          <a href="<?=base_url("auth/change_password");?>"><?=$this->lang->line('btn_change_password')?></a><br />
+          
           <!-- Logged in, display a "logout" button -->
           <a href="<?php echo base_url("auth/logout"); ?>" ><?php echo $this->lang->line('btn_logout'); ?></a>
 
