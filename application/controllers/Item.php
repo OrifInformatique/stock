@@ -24,7 +24,7 @@ public function __construct()
     parent::__construct();
     $this->load->model('item_model');
     $this->load->model('loan_model');
-    $this->load->helper('MY_sort');
+    $this->load->helper('sort');
 }
 
 
