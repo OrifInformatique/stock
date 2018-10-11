@@ -42,14 +42,10 @@ class Item_model extends MY_Model
 	 */
 	public function get_future_id()
 	{
-		$connection = mysqli_connect("localhost","root","");
-			$result = mysqli_query($connection, "SHOW TABLE STATUS FROM `stock` LIKE 'item'");
-		mysqli_close($connection);
+		$query = $this->db->query("SHOW TABLE STATUS LIKE 'item'");
 
-		while ($row = mysqli_fetch_array($result))
-		{
-			$value = $row['Auto_increment'];
-		}
+    $row = $query->row(0);
+    $value = $row->Auto_increment;
 
 		return $value;
 	}
@@ -69,9 +65,9 @@ class Item_model extends MY_Model
 	        }
 
 	        $inventory_id = ".".$inventory_id;
+          $item->inventory_id = $inventory_id;
     	}
 
-    	$item->inventory_id = $inventory_id;
     	return $item;
 	}
 
@@ -85,9 +81,9 @@ class Item_model extends MY_Model
 
 		if (!is_null($item)) {
 			$inventory_number_complete = $item->inventory_number.$item->inventory_id;
+      $item->inventory_number_complete = $inventory_number_complete;
     	}
 
-    	$item->inventory_number_complete = $inventory_number_complete;
     	return $item;
 	}
 
@@ -254,7 +250,7 @@ class Item_model extends MY_Model
     /**
      * Searching item(s) in the database depending on filters
      * @param array $filters The array of filters
-     * @return The array of item(s) found
+     * @return An array of corresponding items
      */
     function get_filtered($filters){
 
@@ -450,6 +446,8 @@ class Item_model extends MY_Model
                         ->with('item_condition')
                         ->get_many_by($where_itemsFilters);
         }
+        
         return $items;
     }
+
 }
