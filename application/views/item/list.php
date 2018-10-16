@@ -117,7 +117,7 @@
 
 <!-- PAGINATION -->
 
-<div class="top-margin table-responsive">
+<div class="top-margin table-responsive" id="whatToShow">
   <div id="pagination_top"><?=$pagination?></div>
   
   <!-- LIST OF ITEMS -->
