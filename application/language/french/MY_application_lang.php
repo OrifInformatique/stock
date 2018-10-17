@@ -109,7 +109,7 @@ $lang['admin_tab_tags']                 = 'Tags';
 $lang['admin_tab_stocking_places']      = 'Lieux de stockage';
 $lang['admin_tab_suppliers']            = 'Fournisseurs';
 $lang['admin_tab_item_groups']          = 'Groupes d\'objets';
-$lang['admin_tab_admin']                = 'Administartion';
+$lang['admin_tab_admin']                = 'Administration';
 
 // Admin deletion labels
 $lang['admin_delete_item_group']        = 'Supprimer le groupe';
