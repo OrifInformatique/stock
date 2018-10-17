@@ -103,6 +103,15 @@ $lang['header_email']                   = 'E-mail';
 $lang['header_user_type']               = 'Statut';
 $lang['header_is_active']               = 'Activé';
 
+$lang['header_suppliers_name']          = 'Nom';
+$lang['header_suppliers_address_1']     = 'Première ligne d\'addresse';
+$lang['header_suppliers_address_2']     = 'Deuxième ligne d\'adresse';
+$lang['header_suppliers_NPA']           = 'NPA';
+$lang['header_suppliers_city']          = 'Ville';
+$lang['header_suppliers_country']       = 'Pays';
+$lang['header_suppliers_phone']         = 'Téléphone';
+$lang['header_suppliers_email']         = 'E-mail';
+
 // Admin labels
 $lang['admin_tab_users']                = 'Utilisateurs';
 $lang['admin_tab_tags']                 = 'Tags';

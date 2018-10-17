@@ -17,14 +17,14 @@
       <table class="table table-striped table-hover">
         <thead>
           <tr>
-            <th>Nom</th>
-            <th>Première ligne d'adresse</th>
-            <th>Deuxième ligne d'adresse</th>
-            <th>NPA</th>
-            <th>Ville</th>
-            <th>Pays</th>
-            <th>Téléphone</th>
-            <th>E-mail</th>
+            <th><?php echo $this->lang->line('header_suppliers_name'); ?></th>
+            <th><?php echo $this->lang->line('header_suppliers_address_1'); ?></th>
+            <th><?php echo $this->lang->line('header_suppliers_address_2'); ?></th>
+            <th><?php echo $this->lang->line('header_suppliers_NPA'); ?></th>
+            <th><?php echo $this->lang->line('header_suppliers_city'); ?></th>
+            <th><?php echo $this->lang->line('header_suppliers_country'); ?></th>
+            <th><?php echo $this->lang->line('header_suppliers_phone'); ?></th>
+            <th><?php echo $this->lang->line('header_suppliers_email'); ?></th>
           </tr>
         </thead>
         <tbody>
