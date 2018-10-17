@@ -52,7 +52,7 @@
     display:block;
     float:left;
     padding:10px 15px;
-    background:#00bbbb;
+    background:#00bbff;
     border:1px solid #777;
     border-radius:4px 4px 0 0;
     margin-right:1px;
