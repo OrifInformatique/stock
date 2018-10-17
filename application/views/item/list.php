@@ -171,7 +171,7 @@
             <!-- DELETE ACCESS RESTRICTED FOR ADMINISTRATORS ONLY -->
             <?php
             if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= ACCESS_LVL_ADMIN) { ?>
-              <a href="<?php echo base_url('/item/delete').'/'.$item->item_id ?>" class="close" title="Supprimer l'objet">×</a>
+              <a href="<?php echo base_url('/item/delete').'/'.$item->item_id ?>" class="close" title="<?php echo $this->lang->line('admin_delete_item');?>">×</a>
             <?php } ?>
           </td>
         </tr>

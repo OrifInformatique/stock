@@ -117,6 +117,19 @@ $lang['admin_delete_stocking_place']    = 'Supprimer le lieu de stockage';
 $lang['admin_delete_tag']               = 'Supprimer le tag';
 $lang['admin_delete_user']              = 'Supprimer l\'utilisateur';
 $lang['admin_delete_supplier']          = 'Supprimer le fournisseur';
+$lang['admin_delete_item']              = 'Supprimer l\'objet';
+$lang['admin_delete_item_group_verify'] = 'Voulez-vous vraiment supprimer le groupe d\'objets ';
+$lang['admin_delete_stocking_place_verify'] = 'Voulez-vous vraiment supprimer le lieu de stockage ';
+$lang['admin_delete_supplier_verify']   = 'Voulez-vous vraiment supprimer le fournisseur ';
+$lang['admin_delete_tag_verify']        = 'Voulez-vous vraiment supprimer le tag ';
+$lang['admin_delete_user_verify']       = 'Voulez-vous vraiment supprimer l\'utilisateur ';
+$lang['admin_desactivate_user']         = 'Le désactiver';
+
+// Admin other labels
+$lang['admin_modify']                   = 'Modification';
+$lang['admin_delete']                   = 'Suppression';
+$lang['admin_add']                      = 'Ajout';
+$lang['admin_new']                      = 'Nouveau…';
 
 // Buttons
 $lang['btn_admin']                      = 'Administration';
@@ -195,3 +208,5 @@ $lang['text_search_filters']            = 'Filtres de recherche';
 $lang['text_sort_order']                = 'Ordre de tri';
 $lang['text_filtered_items_list']       = 'Liste des objets correspondants';
 $lang['text_kinds_to_show']             = 'Afficher uniquement les…';
+$lang['text_yes']                       = 'Oui';
+$lang['test_no']                        = 'Non';

@@ -17,26 +17,26 @@
 			<?php } ?>
 		</select>,
 		<select id="actions" onchange="changeAction()">
-			<option value="modify">Modification</option>
-			<option value="delete">Suppression</option>
-			<option value="new">Ajout</option>
+			<option value="modify"><?php echo $this->lang->line('admin_modify'); ?></option>
+			<option value="delete"><?php echo $this->lang->line('admin_delete'); ?></option>
+			<option value="new"><?php echo $this->lang->line('admin_add'); ?></option>
 		</select>, 
 		<select onchange="changeRegion()" id="regions">
 		<?php
 		} else { 
 		?>
 		<a class="line-through" href="<?php echo base_url(); ?>admin/view_users">
-			<span class="action">Ajout</span>, 
+			<span class="action"><?php echo $this->lang->line(''); ?></span>, 
 		</a>
 		<select onchange="changeNew()" id="regions"><?php } ?> 
-			<option value="user">Utilisateurs</option>
-			<option value="tag">Tags</option>
-			<option value="stocking_place">Lieux de stockage</option>
-			<option value="supplier">Fournisseurs</option>
-			<option value="item_group">Groupes d'objets</option>
+			<option value="user"><?php echo $this->lang->line('admin_tab_users'); ?></option>
+			<option value="tag"><?php echo $this->lang->line('admin_tab_tags'); ?></option>
+			<option value="stocking_place"><?php echo $this->lang->line('admin_tab_stocking_places'); ?></option>
+			<option value="supplier"><?php echo $this->lang->line('admin_tab_suppliers'); ?></option>
+			<option value="item_group"><?php echo $this->lang->line('admin_tab_item_groups'); ?></option>
 		</select>,
 		<a class="like-normal" href="<?php echo base_url(); ?>admin/"> 
-			<span class="word-administration">Administration</span>
+			<span class="word-administration"><?php echo $this->lang->line('admin_tab_admin'); ?></span>
 		</a>
 	</h1>
         <?php
