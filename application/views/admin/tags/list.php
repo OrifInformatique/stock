@@ -1,12 +1,12 @@
 <div class="container" id="content">
   <div class="row">
   <h3 class="xs-right">
-      <a href="#" onclick="loadPage('admin/view_users/')" class="tab_unselected">Utilisateurs</a>
-      <a href="#" onclick="loadPage('admin/view_tags/')" class="tab_selected">Tags</a>
-      <a href="#" onclick="loadPage('admin/view_stocking_places/')" class="tab_unselected">Lieux de stockage</a>
-      <a href="#" onclick="loadPage('admin/view_suppliers/')" class="tab_unselected">Fournisseurs</a>
-      <a href="#" onclick="loadPage('admin/view_item_groups/')" class="tab_unselected">Groupes d'objets</a>
-      <a href="#" onclick="loadPage('admin/')" class="tab_unselected">Administration</a>
+      <a href="#" onclick="loadPage('admin/view_users/')" class="tab_unselected"><?php echo html_escape($this->lang->line('admin_tab_users')); ?></a>
+      <a href="#" onclick="loadPage('admin/view_tags/')" class="tab_selected"><?php echo html_escape($this->lang->line('admin_tab_tags')); ?></a>
+      <a href="#" onclick="loadPage('admin/view_stocking_places/')" class="tab_unselected"><?php echo html_escape($this->lang->line('admin_tab_stocking_places')); ?></a>
+      <a href="#" onclick="loadPage('admin/view_suppliers/')" class="tab_unselected"><?php echo html_escape($this->lang->line('admin_tab_suppliers')); ?></a>
+      <a href="#" onclick="loadPage('admin/view_item_groups/')" class="tab_unselected"><?php echo html_escape($this->lang->line('admin_tab_item_groups')); ?></a>
+      <a href="#" onclick="loadPage('admin/')" class="tab_unselected"><?php echo html_escape($this->lang->line('admin_tab_admin')); ?></a>
   </h3></div>
   <!-- First something more simple <span onclick="minilist()">Utilisateurs</span>, Administration -->
   <div class="row">
@@ -18,7 +18,7 @@
               <a href="<?php echo base_url(); ?>admin/modify_tag/<?php echo $tag->item_tag_id; ?>"><?php echo html_escape($tag->name); ?></a>
               <span class=".text-center"><?php echo html_escape($tag->short_name); ?></span>
               <a href="<?php echo base_url(); ?>admin/delete_tag/<?php echo $tag->item_tag_id; ?>" class="close"
-                title="Supprimer le tag">×</a>
+                title="<?php echo $this->lang->line('admin_delete_tag');?>">×</a>
             </td>
           </tr>
           <?php } ?>

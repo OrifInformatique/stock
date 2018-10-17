@@ -103,6 +103,21 @@ $lang['header_email']                   = 'E-mail';
 $lang['header_user_type']               = 'Statut';
 $lang['header_is_active']               = 'Activé';
 
+// Admin labels
+$lang['admin_tab_users']                = 'Utilisateurs';
+$lang['admin_tab_tags']                 = 'Tags';
+$lang['admin_tab_stocking_places']      = 'Lieux de stockage';
+$lang['admin_tab_suppliers']            = 'Fournisseurs';
+$lang['admin_tab_item_groups']          = 'Groupes d\'objets';
+$lang['admin_tab_admin']                = 'Administartion';
+
+// Admin deletion labels
+$lang['admin_delete_item_group']        = 'Supprimer le groupe';
+$lang['admin_delete_stocking_place']    = 'Supprimer le lieu de stockage';
+$lang['admin_delete_tag']               = 'Supprimer le tag';
+$lang['admin_delete_user']              = 'Supprimer l\'utilisateur';
+$lang['admin_delete_supplier']          = 'Supprimer le fournisseur';
+
 // Buttons
 $lang['btn_admin']                      = 'Administration';
 $lang['btn_cancel']                     = 'Annuler';
