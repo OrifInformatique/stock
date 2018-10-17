@@ -37,7 +37,7 @@
   </h1>
 
   <div>
-    <em><?php echo $this->lang->line('admin_delete_stocking_place_verify'); echo $short; ?> (<?php echo $name; ?>) ?</em>
+    <em><?php echo $this->lang->line('admin_delete_stocking_place_verify'); echo '"'.$short; ?> (<?php echo $name; ?>)" ?</em>
   </div>
   <div class="btn-group">
     <a href="<?php echo base_url().uri_string()."/confirmed";?>" class="btn btn-danger btn-lg"><?php echo $this->lang->line('text_yes'); ?></a>

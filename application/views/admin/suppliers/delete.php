@@ -20,7 +20,7 @@
     <a class="like-normal" href="<?php echo base_url(); ?>admin/"><?php echo $this->lang->line('admin_tab_admin'); ?></a>
   </h1>
   <div>
-    <em><?php echo $this->lang->line('admin_delete_supplier_verify'); echo $name; ?> ?</em>
+    <em><?php echo $this->lang->line('admin_delete_supplier_verify'); echo '"'.$name.'"'; ?> ?</em>
   </div>
   <div class="btn-group">
     <a href="<?php echo base_url().uri_string()."/confirmed";?>" class="btn btn-danger btn-lg"><?php echo $this->lang->line('text_yes'); ?></a>

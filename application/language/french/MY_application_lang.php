@@ -218,4 +218,4 @@ $lang['text_sort_order']                = 'Ordre de tri';
 $lang['text_filtered_items_list']       = 'Liste des objets correspondants';
 $lang['text_kinds_to_show']             = 'Afficher uniquement les…';
 $lang['text_yes']                       = 'Oui';
-$lang['test_no']                        = 'Non';
+$lang['text_no']                        = 'Non';
