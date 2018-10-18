@@ -38,7 +38,7 @@
     display:block;
     float:left;
     padding:10px 15px;
-    background:#0000bb;
+    background:#337ab7;
     border:1px solid #777;
     border-radius:4px 4px 0 0;
     margin-right:1px;
@@ -52,7 +52,7 @@
     display:block;
     float:left;
     padding:10px 15px;
-    background:#00bbff;
+    background:#47acff;
     border:1px solid #777;
     border-radius:4px 4px 0 0;
     margin-right:1px;
