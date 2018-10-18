@@ -231,7 +231,7 @@
         var linkToChange = linksToChange[i].children[0];
         if(linkToChange.attributes['href'] != null) {
           var linkChanged = "setPage(\'" + linkToChange.attributes['href'].value + "\')";
-          linkToChange.removeAttribute('href');
+          linkToChange.setAttribute('href', '#');
           linkToChange.setAttribute('onclick', linkChanged);
         }
       }
