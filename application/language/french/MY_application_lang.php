@@ -139,6 +139,7 @@ $lang['admin_modify']                   = 'Modification';
 $lang['admin_delete']                   = 'Suppression';
 $lang['admin_add']                      = 'Ajout';
 $lang['admin_new']                      = 'Nouveau…';
+$lang['admin_cancel']                   = 'Annuler';
 
 // Buttons
 $lang['btn_admin']                      = 'Administration';

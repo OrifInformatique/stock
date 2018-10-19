@@ -10,37 +10,6 @@
     </h3>
   </div>
 </div>
-
-<style type="text/css">
-  .tab_unselected {
-    display:block;
-    float:left;
-    padding:10px 15px;
-    background:#337ab7;
-    border:1px solid #777;
-    border-radius:4px 4px 0 0;
-    margin-right:1px;
-    color:#fff;
-    text-decoration:none;
-  }
-  .tab_unselected:hover {
-    color: #fff;
-  }
-  .tab_selected {
-    display:block;
-    float:left;
-    padding:10px 15px;
-    background:#47acff;
-    border:1px solid #777;
-    border-radius:4px 4px 0 0;
-    margin-right:1px;
-    color:#fff;
-    text-decoration:none;
-  }
-  .tab_selected:hover {
-    color: #fff;
-  }
-</style>
 <script type="text/javascript">
     function loadPage(endOfPageString) {
         var targetPart = $('#content');

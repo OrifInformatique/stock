@@ -439,8 +439,8 @@ class Admin extends MY_Controller
       $this->load->model('stocking_place_model');
 
       if (is_null($action)) {
-        $output["stocking_places"] = $this->stocking_place_model->get_all();
         $output = get_object_vars($this->stocking_place_model->get($id));
+        $output["stocking_places"] = $this->stocking_place_model->get_all();
 
         $this->display_view("admin/stocking_places/delete", $output);
       } else {

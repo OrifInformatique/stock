@@ -1,5 +1,5 @@
 <div class="container">
-	<h1 class="xs-right">
+	<h4 class="xs-right">
 		<?php 
 		if (isset($users)) 
 		{
@@ -8,37 +8,38 @@
 			$update_user = FALSE;
 		}
 // This part of the GeoLine is for Update
-		if(isset($users)) 
+		if($update_user) 
 		{ 
 			?>
-		<select id="rows" onchange="changeRow()">
+		<div class="row">
 			<?php foreach($users as $user) { ?>
-			<option value="<?php echo $user->user_id; ?>"<?php if ($user_id == $user->user_id) {echo " selected";} ?>>"<?php echo $user->username; ?>"</option>
+			<a href="<?php echo $user->user_id; ?>" class=<?php if ($user_id == $user->user_id) {echo '"tab_selected"';}else{echo '"tab_unselected"';} ?>>
+				<?php echo $user->username; ?>
+			</a>
 			<?php } ?>
-		</select>,
-		<select id="actions" onchange="changeAction()">
-			<option value="modify"><?php echo $this->lang->line('admin_modify'); ?></option>
-			<option value="delete"><?php echo $this->lang->line('admin_delete'); ?></option>
-			<option value="new"><?php echo $this->lang->line('admin_add'); ?></option>
-		</select>, 
-		<select onchange="changeRegion()" id="regions">
+		</div>
+		<div class="row" style="margin-top: 5px;">
+			<a href="#" class="tab_selected"><?php echo $this->lang->line('admin_modify'); ?></a>
+			<a href="<?php echo base_url(); ?>admin/delete_user/<?php echo $user_id; ?>" class="tab_unselected"><?php echo $this->lang->line('admin_delete'); ?></a>
+			<a href="<?php echo base_url(); ?>admin/new_user/" class="tab_unselected"><?php echo $this->lang->line('admin_add'); ?></a>
+		</div>
 		<?php
 		} else { 
 		?>
-		<a class="line-through" href="<?php echo base_url(); ?>admin/view_users">
-			<span class="action"><?php echo $this->lang->line(''); ?></span>, 
+		<div class="row">
+		<a href="<?php echo base_url(); ?>admin/view_users">
+			<span class="btn btn-primary"><?php echo $this->lang->line('admin_cancel'); ?></span>
 		</a>
-		<select onchange="changeNew()" id="regions"><?php } ?> 
-			<option value="user"><?php echo $this->lang->line('admin_tab_users'); ?></option>
-			<option value="tag"><?php echo $this->lang->line('admin_tab_tags'); ?></option>
-			<option value="stocking_place"><?php echo $this->lang->line('admin_tab_stocking_places'); ?></option>
-			<option value="supplier"><?php echo $this->lang->line('admin_tab_suppliers'); ?></option>
-			<option value="item_group"><?php echo $this->lang->line('admin_tab_item_groups'); ?></option>
-		</select>,
-		<a class="like-normal" href="<?php echo base_url(); ?>admin/"> 
-			<span class="word-administration"><?php echo $this->lang->line('admin_tab_admin'); ?></span>
-		</a>
-	</h1>
+		</div><?php } ?>
+		<div class="row" style="margin-top: 5px;">
+			<a href="<?php echo base_url(); ?>admin/view_users" class="tab_selected"><?php echo $this->lang->line('admin_tab_users'); ?></a>
+			<a href="<?php echo base_url(); ?>admin/view_tags" class="tab_unselected"><?php echo $this->lang->line('admin_tab_tags'); ?></a>
+			<a href="<?php echo base_url(); ?>admin/view_stocking_places" class="tab_unselected"><?php echo $this->lang->line('admin_tab_stocking_places'); ?></a>
+			<a href="<?php echo base_url(); ?>admin/view_suppliers" class="tab_unselected"><?php echo $this->lang->line('admin_tab_suppliers'); ?></a>
+			<a href="<?php echo base_url(); ?>admin/view_item_groups" class="tab_unselected"><?php echo $this->lang->line('admin_tab_item_groups'); ?></a>
+			<a href="<?php echo base_url(); ?>admin/" class="tab_unselected"><?php echo $this->lang->line('admin_tab_admin'); ?></a>
+		</div>
+	</h4>
         <?php
             if (!empty(validation_errors()) || !empty($upload_errors)) {
         ?>
@@ -51,7 +52,7 @@
 			} 
 		?>
 	</div>
-            <?php } ?>
+            <?php } ?><div class="row">
 	<form method="post">
 		<div class="form-group">
 			<label for="username"><?php echo $this->lang->line('field_username') ?></label>
@@ -91,7 +92,7 @@
 		</div>
 		<button type="submit" class="btn btn-primary"><?php echo $this->lang->line('btn_submit'); ?></button>
 		<a class="btn btn-primary" href="<?php echo base_url() . "admin/view_users/"; ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
-	</form>
+	</form></div>
 	<script src="<?php echo base_url(); ?>assets/js/geoline.js">
 	</script>
 </div>
