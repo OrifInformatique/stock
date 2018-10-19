@@ -8,9 +8,7 @@
 			$update_user = FALSE;
 		}
 // This part of the GeoLine is for Update
-		if($update_user) 
-		{ 
-			?>
+		if($update_user) { ?>
 		<div class="row">
 			<?php foreach($users as $user) { ?>
 			<a href="<?php echo $user->user_id; ?>" class=<?php if ($user_id == $user->user_id) {echo '"tab_selected"';}else{echo '"tab_unselected"';} ?>>

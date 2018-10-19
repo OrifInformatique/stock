@@ -134,6 +134,13 @@ $lang['admin_delete_tag_verify']        = 'Voulez-vous vraiment supprimer le tag
 $lang['admin_delete_user_verify']       = 'Voulez-vous vraiment supprimer l\'utilisateur ';
 $lang['admin_desactivate_user']         = 'Le désactiver';
 
+// Admin error labels
+$lang['admin_error_missing_user']       = 'Utilisateur introuvable';
+$lang['admin_error_missing_tag']        = 'Tag introuvable';
+$lang['admin_error_missing_stocking_place'] = 'Lieu de stockage introuvable';
+$lang['admin_error_missing_supplier']   = 'Fournisseur introuvable';
+$lang['admin_error_missing_item_group'] = 'Groupe d\'objets introuvable';
+
 // Admin other labels
 $lang['admin_modify']                   = 'Modification';
 $lang['admin_delete']                   = 'Suppression';

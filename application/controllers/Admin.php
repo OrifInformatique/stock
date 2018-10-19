@@ -105,13 +105,17 @@ class Admin extends MY_Controller
         }
       // The values of the user are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
       } else {
-        $output = get_object_vars($this->user_model->get($id));
+        if(!is_null($this->user_model->get($id))){
+          $output = get_object_vars($this->user_model->get($id));
+        }
       }
 
       $this->load->model('user_model');
       $this->load->model('user_type_model');
-      $output = get_object_vars($this->user_model->get($id));
-      $output["users"] = $this->user_model->get_all();
+      if(!is_null($this->user_model->get($id))){
+        $output = get_object_vars($this->user_model->get($id));
+        $output["users"] = $this->user_model->get_all();
+      }
       $output["user_types"] = $this->user_type_model->get_all();
 
       $this->display_view("admin/users/form", $output);
@@ -195,7 +199,9 @@ class Admin extends MY_Controller
     public function delete_user($id = NULL, $action = NULL) {
       $this->load->model('user_model');
       if (is_null($action)) {
-        $output = get_object_vars($this->user_model->get($id));
+        if(!is_null($this->user_model->get($id))){
+          $output = get_object_vars($this->user_model->get($id));
+        }
         $output["users"] = $this->user_model->get_all();
         $this->display_view("admin/users/delete", $output);
       } else if($action == "d") {
@@ -247,13 +253,18 @@ class Admin extends MY_Controller
 	  
       // The values of the tag are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
       } else {
-        $output = get_object_vars($this->item_tag_model->get($id));
+        if(!is_null($this->item_tag_model->get($id))){
+          $output = get_object_vars($this->item_tag_model->get($id));
+        }
       }
 
       $this->load->model('item_tag_model');
-      $output = get_object_vars($this->item_tag_model->get($id));
-      $output["tags"] = $this->item_tag_model->get_all();	  
-	  
+      if(!is_null($this->item_tag_model->get($id))){
+        $output = get_object_vars($this->item_tag_model->get($id));
+        $output["tags"] = $this->item_tag_model->get_all();
+      }else{
+        $output = null;
+      }
 
       $this->display_view("admin/tags/form", $output);
     }
@@ -324,7 +335,9 @@ class Admin extends MY_Controller
 
       if (is_null($action)) {
         // Display a message to confirm the action
-        $output = get_object_vars($this->item_tag_model->get($id));
+        if(!is_null($this->item_tag_model->get($id))){
+          $output = get_object_vars($this->item_tag_model->get($id));
+        }
         $output["tags"] = $this->item_tag_model->get_all();
         $this->display_view("admin/tags/delete", $output);
       
@@ -370,10 +383,16 @@ class Admin extends MY_Controller
           exit();
         }
       } else {
-        $output = get_object_vars($this->stocking_place_model->get($id));
+        if(!is_null($this->stocking_place_model->get($id))) {
+          $output = get_object_vars($this->stocking_place_model->get($id));
+        }
       }
-      $output = get_object_vars($this->stocking_place_model->get($id));
-      $output["stocking_places"] = $this->stocking_place_model->get_all();
+      if(!is_null($this->stocking_place_model->get($id))) {
+        $output = get_object_vars($this->stocking_place_model->get($id));
+        $output["stocking_places"] = $this->stocking_place_model->get_all();
+      }else{
+        $output = null;
+      }
 
       $this->display_view("admin/stocking_places/form", $output);
     }
@@ -439,7 +458,9 @@ class Admin extends MY_Controller
       $this->load->model('stocking_place_model');
 
       if (is_null($action)) {
-        $output = get_object_vars($this->stocking_place_model->get($id));
+        if(!is_null($this->stocking_place_model->get($id))) {
+          $output = get_object_vars($this->stocking_place_model->get($id));
+        }
         $output["stocking_places"] = $this->stocking_place_model->get_all();
 
         $this->display_view("admin/stocking_places/delete", $output);
@@ -491,11 +512,17 @@ class Admin extends MY_Controller
           exit();
         }
       } else {
-        $output = get_object_vars($this->supplier_model->get($id));
+        if(!is_null($this->supplier_model->get($id))){
+          $output = get_object_vars($this->supplier_model->get($id));
+        }
       }
       
-      $output = get_object_vars($this->supplier_model->get($id));
-      $output["suppliers"] = $this->supplier_model->get_all();	  
+      if(!is_null($this->supplier_model->get($id))){
+        $output = get_object_vars($this->supplier_model->get($id));
+        $output["suppliers"] = $this->supplier_model->get_all();
+      }else{
+        $output = null;
+      }
 	  
       $this->display_view("admin/suppliers/form", $output);
     }
@@ -539,7 +566,9 @@ class Admin extends MY_Controller
       $this->load->model('supplier_model');
 
       if (!isset($action)) {
-        $output = get_object_vars($this->supplier_model->get($id));
+        if(!is_null($this->supplier_model->get($id))){
+          $output = get_object_vars($this->supplier_model->get($id));
+        }
         $output["suppliers"] = $this->supplier_model->get_all();
 
         $this->display_view("admin/suppliers/delete", $output);
@@ -599,10 +628,16 @@ class Admin extends MY_Controller
           exit();
         }
       } else {
-        $output = get_object_vars($this->item_group_model->get($id));
+        if(!is_null($this->item_group_model->get($id))) {
+          $output = get_object_vars($this->item_group_model->get($id));
+        }
       }
       
-      $output["item_groups"] = $this->item_group_model->get_all();
+      if(!is_null($this->item_group_model->get($id))) {
+        $output["item_groups"] = $this->item_group_model->get_all();
+      }else{
+        $output = null;
+      }
       $this->display_view("admin/item_groups/form", $output);
     }
 
@@ -665,7 +700,9 @@ class Admin extends MY_Controller
       $this->load->model('item_group_model');
 
       if (!isset($action)) {
-        $output = get_object_vars($this->item_group_model->get($id));
+        if(!is_null($this->item_group_model->get($id))) {
+          $output = get_object_vars($this->item_group_model->get($id));
+        }
         $output["item_groups"] = $this->item_group_model->get_all();
 
         $this->display_view("admin/item_groups/delete", $output);

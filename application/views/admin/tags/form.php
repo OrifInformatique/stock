@@ -7,7 +7,7 @@
       $update_tag = FALSE;
     }
   // This part of the GeoLine is for Update
-    if($update_tag) { //var_dump($tags);?>
+    if($update_tag) { ?>
     <div class="row">
       <?php foreach($tags as $tag) { ?>
       <a href="<?php echo $tag->item_tag_id; ?>" class=<?php if ($item_tag_id == $tag->item_tag_id) {echo "tab_selected" ;}else{echo "tab_unselected";} ?>>
