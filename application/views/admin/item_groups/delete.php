@@ -2,17 +2,17 @@
   <h4>
     <div class="row">
       <?php foreach($item_groups as $item_group) {
-        if(is_null($item_group->item_group_id)) { ?>
+        if(!is_null($item_group->item_group_id) && isset($item_group_id)) { ?>
       <a href="<?php echo $item_group->item_group_id; ?>" class=<?php if ($item_group_id == $item_group->item_group_id) {echo "tab_selected" ;}else{echo "tab_unselected";} ?>>
         <?php echo $item_group->name; ?>
       </a>
       <?php } } ?>
     </div>
     <div class="row" style="margin-top: 5px;">
-      <?php if(is_null($item_group->item_group_id)) { ?>
+      <?php if(!is_null($item_group->item_group_id) && isset($item_group_id)) { ?>
       <a href="<?php echo base_url(); ?>admin/modify_stocking_place/<?php echo $item_group_id; ?>" class="tab_unselected"><?php echo $this->lang->line('admin_modify'); ?></a>
-    <?php } ?>
       <a href="#" class="tab_selected"><?php echo $this->lang->line('admin_delete'); ?></a>
+    <?php } ?>
       <a href="<?php echo base_url(); ?>admin/new_stocking_place/" class="tab_unselected"><?php echo $this->lang->line('admin_add'); ?></a>
     </div>
     <div class="row" style="margin-top: 5px;">

@@ -2,17 +2,17 @@
   <h4 class="xs-right">
     <div class="row">
       <?php foreach($stocking_places as $stocking_place) {
-        if(is_null($stocking_place->stocking_place_id)) { ?>
+        if(!is_null($stocking_place->stocking_place_id) && isset($stocking_place_id)) { ?>
       <a href="<?php echo $stocking_place->stocking_place_id; ?>" class=<?php if ($stocking_place_id == $stocking_place->stocking_place_id) {echo "tab_selected" ;}else{echo "tab_unselected";} ?>>
         <?php echo $stocking_place->name; ?>
       </a>
       <?php } } ?>
     </div>
     <div class="row" style="margin-top: 5px;">
-      <?php if(is_null($stocking_place->stocking_place_id)) { ?>
+      <?php if(!is_null($stocking_place->stocking_place_id) && isset($stocking_place_id)) { ?>
       <a href="<?php echo base_url(); ?>admin/modify_stocking_place/<?php echo $stocking_place_id; ?>" class="tab_unselected"><?php echo $this->lang->line('admin_modify'); ?></a>
-    <?php } ?>
       <a href="#" class="tab_selected"><?php echo $this->lang->line('admin_delete'); ?></a>
+    <?php } ?>
       <a href="<?php echo base_url(); ?>admin/new_stocking_place/" class="tab_unselected"><?php echo $this->lang->line('admin_add'); ?></a>
     </div>
     <div class="row" style="margin-top: 5px;">
