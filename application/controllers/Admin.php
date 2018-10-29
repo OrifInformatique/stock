@@ -115,6 +115,8 @@ class Admin extends MY_Controller
       if(!is_null($this->user_model->get($id))){
         $output = get_object_vars($this->user_model->get($id));
         $output["users"] = $this->user_model->get_all();
+      } else {
+        $output["missing_user"] = TRUE;
       }
       $output["user_types"] = $this->user_type_model->get_all();
 
@@ -262,8 +264,8 @@ class Admin extends MY_Controller
       if(!is_null($this->item_tag_model->get($id))){
         $output = get_object_vars($this->item_tag_model->get($id));
         $output["tags"] = $this->item_tag_model->get_all();
-      }else{
-        $output = null;
+      } else {
+        $output["missing_tag"] = TRUE;
       }
 
       $this->display_view("admin/tags/form", $output);
@@ -391,7 +393,7 @@ class Admin extends MY_Controller
         $output = get_object_vars($this->stocking_place_model->get($id));
         $output["stocking_places"] = $this->stocking_place_model->get_all();
       }else{
-        $output = null;
+        $output["missing_stocking_place"] = TRUE;
       }
 
       $this->display_view("admin/stocking_places/form", $output);
@@ -521,7 +523,7 @@ class Admin extends MY_Controller
         $output = get_object_vars($this->supplier_model->get($id));
         $output["suppliers"] = $this->supplier_model->get_all();
       }else{
-        $output = null;
+        $output["missing_supplier"] = TRUE;
       }
 	  
       $this->display_view("admin/suppliers/form", $output);
@@ -636,7 +638,7 @@ class Admin extends MY_Controller
       if(!is_null($this->item_group_model->get($id))) {
         $output["item_groups"] = $this->item_group_model->get_all();
       }else{
-        $output = null;
+        $output["missing_item_group"] = TRUE;
       }
       $this->display_view("admin/item_groups/form", $output);
     }

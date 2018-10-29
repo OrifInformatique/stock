@@ -1,12 +1,23 @@
 <div class="container">
 	<h4 class="xs-right">
 		<?php 
-		if (isset($users)) 
-		{
-			$update_user = TRUE;
-		} else {
-			$update_user = FALSE;
-		}
+		if (isset($missing_user)) {
+			if($missing_user){
+		?>
+
+		<div class="alert alert-danger">
+			<?php echo $this->lang->line('admin_error_missing_user'); ?>
+		</div>
+		<a href="<?php echo base_url(); ?>admin/new_user/" class="btn btn-primary"><?php echo $this->lang->line('admin_new');?></a>
+
+		<?php
+		}} else {
+			if (isset($users)) 
+			{
+				$update_user = TRUE;
+			} else {
+				$update_user = FALSE;
+			}
 // This part of the GeoLine is for Update
 		if($update_user) { ?>
 		<div class="row">
@@ -90,7 +101,8 @@
 		</div>
 		<button type="submit" class="btn btn-primary"><?php echo $this->lang->line('btn_submit'); ?></button>
 		<a class="btn btn-primary" href="<?php echo base_url() . "admin/view_users/"; ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
-	</form></div>
+	</form>
+	</div><?php } ?>
 	<script src="<?php echo base_url(); ?>assets/js/geoline.js">
 	</script>
 </div>

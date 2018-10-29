@@ -34,7 +34,7 @@
     <a href="<?php echo base_url().uri_string()."/d";?>" class="btn btn-warning btn-lg"><?php echo $this->lang->line('admin_desactivate_user'); ?></a>
   </div>
     <?php }else{ ?>
-    <div class="row text-danger">
+    <div class="alert alert-danger row">
       <?php echo $this->lang->line('admin_error_missing_user'); ?>
     </div><?php } ?>
 </div>

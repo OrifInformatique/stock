@@ -1,6 +1,17 @@
 <div class="container">
   <h4 class="xs-right">
-    <?php 
+    <?php
+    if(isset($missing_supplier)) {
+      if($missing_supplier) {
+    ?>
+
+    <div class="alert alert-danger">
+      <?php echo $this->lang->line('admin_error_missing_supplier'); ?>
+    </div>
+    <a href="<?php echo base_url(); ?>admin/new_supplier/" class="btn btn-primary"><?php echo $this->lang->line('admin_new');?></a>
+
+    <?php
+    }} else {
 
     if (isset($suppliers)) {
       $update = TRUE;
@@ -79,6 +90,7 @@
       <a class="btn btn-primary" href="<?php echo base_url() . "admin/view_suppliers/"; ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
     </form>
   </div>
+  <?php } ?>
 </div>
 <script src="<?php echo base_url(); ?>assets/js/geoline.js">
 </script>

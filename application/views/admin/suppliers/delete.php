@@ -33,7 +33,7 @@
     <a href="<?php echo base_url()."admin/view_suppliers/";?>" class="btn btn-lg"><?php echo $this->lang->line('text_no'); ?></a>
   </div>
     <?php }else{ ?>
-    <div class="row text-danger">
+    <div class="alert alert-danger row">
       <?php echo $this->lang->line('admin_error_missing_supplier'); ?>
     </div><?php } ?>
 </div>

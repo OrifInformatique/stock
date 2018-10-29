@@ -1,6 +1,17 @@
 <div class="container">
   <h4>
     <?php 
+    if(isset($missing_item_group)){
+      if($missing_item_group){
+    ?>
+    <!-- Section in case of missing item group -->
+    <div class="alert alert-danger">
+      <?php echo $this->lang->line('admin_error_missing_item_group'); ?>
+    </div>
+    <a href="<?php echo base_url(); ?>admin/new_item_group/" class="btn btn-primary"><?php echo $this->lang->line('admin_new'); ?></a>
+
+    <?php
+    }} else {
 
     if (isset($item_groups)) {
       $update = TRUE;
@@ -64,6 +75,7 @@
         <a class="btn btn-primary" href="<?php echo base_url() . "admin/view_item_groups/"; ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
       </form>
     </div>
+  <?php } ?>
   </div>
 </div>
 <script src="<?php echo base_url(); ?>assets/js/geoline.js">

@@ -1,6 +1,17 @@
 <div class="container">
   <h4 class="xs-right">
     <?php 
+    if(isset($missing_stocking_place)) {
+      if($missing_stocking_place) {
+    ?>
+    <!-- Section in case of missing stocking place -->
+    <div class="alert alert-danger">
+      <?php echo $this->lang->line('admin_error_missing_stocking_place'); ?>
+    </div>
+    <a href="<?php echo base_url(); ?>admin/new_stocking_place/" class="btn btn-primary"><?php echo $this->lang->line('admin_new');?></a>
+
+    <?php
+    }} else {
     if (isset($stocking_places)) {
       $update = TRUE;
     } else {
@@ -66,6 +77,7 @@ if (!empty(validation_errors()) || !empty($upload_errors)) {
         <a class="btn btn-primary" href="<?php echo base_url() . "admin/view_stocking_places/"; ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
       </form>
     </div>
+    <?php } ?>
   </div>
 </div>
 <script src="<?php echo base_url(); ?>assets/js/geoline.js">

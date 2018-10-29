@@ -33,7 +33,7 @@
     <a href="<?php echo base_url()."admin/view_tags/";?>" class="btn btn-lg"><?php echo $this->lang->line('text_no'); ?></a>
   </div>
     <?php }else{ ?>
-    <div class="row text-danger">
+    <div class="alert alert-danger row">
       <?php echo $this->lang->line('admin_error_missing_tag'); ?>
     </div><?php } ?>
 </div>

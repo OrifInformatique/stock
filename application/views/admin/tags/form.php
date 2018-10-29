@@ -1,6 +1,17 @@
 <div class="container">
   <h4 class="xs-right">
     <?php 
+    if(isset($missing_tag)) {
+      if($missing_tag){
+    ?>
+
+    <div class="alert alert-danger">
+      <?php echo $this->lang->line('admin_error_missing_tag'); ?>
+    </div>
+    <a href="<?php echo base_url(); ?>admin/new_tag/" class="btn btn-primary"><?php echo $this->lang->line('admin_new');?></a>
+
+    <?php
+    }} else {
     if (isset($tags)) {
       $update_tag = TRUE;
     } else {
@@ -63,5 +74,6 @@
         </a> </div>
       </form>
     </div>
+  <?php } ?>
   </div>
   <script src="<?php echo base_url(); ?>assets/js/geoline.js"/>
