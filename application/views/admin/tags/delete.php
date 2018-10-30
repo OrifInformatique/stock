@@ -22,11 +22,21 @@
     </a>
   </h1>
 
+  <?php if($deletion_allowed) { ?>
   <em>Voulez-vous vraiment supprimer le tag "<?php echo $name; ?>" ?</em>
   <div class="btn-group col-xs-12">
     <a href="<?php echo base_url().uri_string()."/confirmed";?>" class="btn btn-danger btn-lg">Oui</a>
     <a href="<?php echo base_url()."admin/view_tags/";?>" class="btn btn-lg">Non</a>
   </div>
+  <?php } else { ?>
+  <div class="alert alert alert-danger">
+    <em>Le tag "<?php echo $name; ?>" est utilisé par un ou plusieurs objets. Le supprimer risque de causer des problèmes.<br>Êtes-vous sûr(e) de vouloir le supprimer?</em>
+  </div>
+  <div class="btn-group col-xs-12">
+    <a href="<?php echo base_url().uri_string()."/confirmed";?>" class="btn btn-danger btn-lg">Oui</a>
+    <a href="<?php echo base_url()."admin/view_tags/";?>" class="btn btn-lg">Non</a>
+  </div>
+  <?php } ?>
 </div>
 <script src="<?php echo base_url(); ?>assets/js/geoline.js" />
 </script>
