@@ -9,6 +9,7 @@
       <?php echo $this->lang->line('admin_error_missing_tag'); ?>
     </div>
     <a href="<?php echo base_url(); ?>admin/new_tag/" class="btn btn-primary"><?php echo $this->lang->line('admin_new');?></a>
+    <a href="<?php echo base_url()."admin/view_tags/";?>" class="btn btn-primary"><?php echo $this->lang->line('btn_back_to_list'); ?></a>
 
     <?php
     }} else {

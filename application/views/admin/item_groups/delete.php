@@ -1,19 +1,18 @@
 <div class="container">
   <h4>
     <div class="row">
-      <?php foreach($item_groups as $item_group) {
-        if(!is_null($item_group->item_group_id) && isset($item_group_id)) { ?>
+      <?php if(isset($item_group_id)) { 
+        foreach($item_groups as $item_group) { ?>
       <a href="<?php echo $item_group->item_group_id; ?>" class=<?php if ($item_group_id == $item_group->item_group_id) {echo "tab_selected" ;}else{echo "tab_unselected";} ?>>
         <?php echo $item_group->name; ?>
       </a>
-      <?php } } ?>
+      <?php } ?>
     </div>
     <div class="row" style="margin-top: 5px;">
-      <?php if(!is_null($item_group->item_group_id) && isset($item_group_id)) { ?>
       <a href="<?php echo base_url(); ?>admin/modify_stocking_place/<?php echo $item_group_id; ?>" class="tab_unselected"><?php echo $this->lang->line('admin_modify'); ?></a>
       <a href="#" class="tab_selected"><?php echo $this->lang->line('admin_delete'); ?></a>
-    <?php } ?>
       <a href="<?php echo base_url(); ?>admin/new_stocking_place/" class="tab_unselected"><?php echo $this->lang->line('admin_add'); ?></a>
+    <?php } ?>
     </div>
     <div class="row" style="margin-top: 5px;">
       <a href="<?php echo base_url(); ?>admin/view_users" class="tab_unselected"><?php echo $this->lang->line('admin_tab_users'); ?></a>
@@ -33,8 +32,11 @@
     <a href="<?php echo base_url()."admin/view_item_groups/";?>" class="btn btn-lg"><?php echo $this->lang->line('text_no'); ?></a>
   </div>
     <?php }else{ ?>
-    <div class="alert alert-danger row">
-      <?php echo $this->lang->line('admin_error_missing_item_group'); ?>
+    <div class="row">
+      <div class="alert alert-danger">
+        <?php echo $this->lang->line('admin_error_missing_item_group'); ?>
+      </div>
+      <a href="<?php echo base_url()."admin/view_item_groups/";?>" class="btn btn-primary"><?php echo $this->lang->line('btn_back_to_list'); ?></a>
     </div><?php } ?>
 </div>
 <script src="<?php echo base_url(); ?>assets/js/geoline.js">

@@ -1,19 +1,18 @@
 <div class="container">
   <h4 class="xs-right">
     <div class="row">
-      <?php foreach($users as $user) { 
-        if(!is_null($user->user_id) && isset($user_id)) { ?>
+      <?php if(isset($user_id)) {
+      foreach($users as $user) { ?>
       <a href="<?php echo $user->user_id; ?>" class=<?php if ($user_id == $user->user_id) {echo '"tab_selected"'; echo " selected";}else{echo '"tab_unselected"';} ?>>
         <?php echo $user->username; ?>
       </a>
-      <?php } } ?>
+      <?php } ?>
     </div>
     <div class="row" style="margin-top: 5px;">
-      <?php if(!is_null($user->user_id) && isset($user_id)){ ?>
       <a href="<?php echo base_url(); ?>admin/modify_user/<?php echo $user_id; ?>" class="tab_unselected"><?php echo $this->lang->line('admin_modify'); ?></a>
       <a href="#" class="tab_selected"><?php echo $this->lang->line('admin_delete'); ?></a>
-    <?php } ?>
       <a href="<?php echo base_url(); ?>admin/new_user/" class="tab_unselected"><?php echo $this->lang->line('admin_add'); ?></a>
+    <?php } ?>
     </div>
     <div class="row" style="margin-top: 5px;">
       <a href="<?php echo base_url(); ?>admin/view_users" class="tab_selected"><?php echo $this->lang->line('admin_tab_users'); ?></a>
@@ -34,7 +33,11 @@
     <a href="<?php echo base_url().uri_string()."/d";?>" class="btn btn-warning btn-lg"><?php echo $this->lang->line('admin_desactivate_user'); ?></a>
   </div>
     <?php }else{ ?>
-    <div class="alert alert-danger row">
-      <?php echo $this->lang->line('admin_error_missing_user'); ?>
-    </div><?php } ?>
+    <div class="row">
+      <div class="alert alert-danger">
+        <?php echo $this->lang->line('admin_error_missing_user'); ?>
+      </div>
+      <a class="btn btn-primary" href="<?php echo base_url() . "admin/view_users/"; ?>"><?php echo $this->lang->line('btn_back_to_list'); ?></a>
+    </div>
+  <?php } ?>
 </div>

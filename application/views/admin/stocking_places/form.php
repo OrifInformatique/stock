@@ -9,7 +9,7 @@
       <?php echo $this->lang->line('admin_error_missing_stocking_place'); ?>
     </div>
     <a href="<?php echo base_url(); ?>admin/new_stocking_place/" class="btn btn-primary"><?php echo $this->lang->line('admin_new');?></a>
-
+    <a class="btn btn-primary" href="<?php echo base_url() . "admin/view_stocking_places/"; ?>"><?php echo $this->lang->line('btn_back_to_list'); ?></a>
     <?php
     }} else {
     if (isset($stocking_places)) {

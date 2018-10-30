@@ -9,6 +9,7 @@
       <?php echo $this->lang->line('admin_error_missing_supplier'); ?>
     </div>
     <a href="<?php echo base_url(); ?>admin/new_supplier/" class="btn btn-primary"><?php echo $this->lang->line('admin_new');?></a>
+    <a class="btn btn-primary" href="<?php echo base_url() . "admin/view_suppliers/"; ?>"><?php echo $this->lang->line('btn_back_to_list'); ?></a>
 
     <?php
     }} else {

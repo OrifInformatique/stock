@@ -9,7 +9,8 @@
 			<?php echo $this->lang->line('admin_error_missing_user'); ?>
 		</div>
 		<a href="<?php echo base_url(); ?>admin/new_user/" class="btn btn-primary"><?php echo $this->lang->line('admin_new');?></a>
-
+		<a class="btn btn-primary" href="<?php echo base_url() . "admin/view_users/"; ?>"><?php echo $this->lang->line('btn_back_to_list'); ?></a>
+		
 		<?php
 		}} else {
 			if (isset($users)) 

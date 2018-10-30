@@ -9,7 +9,7 @@
       <?php echo $this->lang->line('admin_error_missing_item_group'); ?>
     </div>
     <a href="<?php echo base_url(); ?>admin/new_item_group/" class="btn btn-primary"><?php echo $this->lang->line('admin_new'); ?></a>
-
+    <a href="<?php echo base_url()."admin/view_item_groups/";?>" class="btn btn-primary"><?php echo $this->lang->line('btn_back_to_list'); ?></a>
     <?php
     }} else {
 
