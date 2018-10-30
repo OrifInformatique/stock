@@ -321,10 +321,20 @@ class Admin extends MY_Controller
     public function delete_tag($id = NULL, $action = NULL) {
       $this->load->model('item_tag_model');
       $this->load->model('item_tag_link_model');
+      $this->load->model('item_model');
+
+      $filter = array("t" => array($id));
+      $items = $this->item_model->get_filtered($filter);
 
       if (is_null($action)) {
         // Display a message to confirm the action
         $output = get_object_vars($this->item_tag_model->get($id));
+        if (sizeof($items) > 0 && sizeof($items) < 500){
+        //if (sizeof($items) > 0 && sizeof($items) < sizeof($this->item_model->get_filtered(''))){ //If the focus is on the results instead of speed, this is the condition you need
+          $output["deletion_allowed"] = FALSE;
+        } else {
+          $output["deletion_allowed"] = TRUE;
+        }
         $output["tags"] = $this->item_tag_model->get_all();
         $this->display_view("admin/tags/delete", $output);
       
@@ -437,10 +447,15 @@ class Admin extends MY_Controller
     public function delete_stocking_place($id = NULL, $action = NULL)
     {
       $this->load->model('stocking_place_model');
+      $this->load->model('item_model');
+
+      $filter = array('s' => array($id));
+      $items = $this->item_model->get_filtered($filter);
 
       if (is_null($action)) {
         $output["stocking_places"] = $this->stocking_place_model->get_all();
         $output = get_object_vars($this->stocking_place_model->get($id));
+        $output["deletion_allowed"] = (sizeof($items) == 0);
 
         $this->display_view("admin/stocking_places/delete", $output);
       } else {
@@ -663,10 +678,15 @@ class Admin extends MY_Controller
     public function delete_item_group($id = NULL, $action = NULL)
     {
       $this->load->model('item_group_model');
+      $this->load->model('item_model');
+
+      $filter = array("g" => array($id));
+      $items = $this->item_model->get_filtered($filter);
 
       if (!isset($action)) {
         $output = get_object_vars($this->item_group_model->get($id));
         $output["item_groups"] = $this->item_group_model->get_all();
+        $output["deletion_allowed"] = (sizeof($items) == 0);
 
         $this->display_view("admin/item_groups/delete", $output);
       } else {

@@ -35,7 +35,7 @@
       <span class="word-administration">Administration</span>
     </a>
   </h1>
-
+  <?php if($deletion_allowed){ ?>
   <div>
     <em>Voulez-vous vraiment supprimer le lieu de stockage <?php echo $short; ?> (<?php echo $name; ?>) ?</em>
   </div>
@@ -43,6 +43,9 @@
     <a href="<?php echo base_url().uri_string()."/confirmed";?>" class="btn btn-danger btn-lg">Oui</a>
     <a href="<?php echo base_url()."admin/view_stocking_places/";?>" class="btn btn-lg">Non</a>
   </div>
+  <?php } else { ?>
+    <em>Le lieu de stockage <?php echo $short; ?> (<?php echo $name; ?>) est utilisé sur un ou plusieurs objets et ne peut pas être supprimer.</em>
+  <?php } ?>
 </div>
 
 <script src="<?php echo base_url(); ?>assets/js/geoline.js">

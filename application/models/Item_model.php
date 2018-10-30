@@ -380,9 +380,13 @@ class Item_model extends MY_Model
             $where_stockingPlaceFilter .= 'stocking_place_id='.$stocking_place_id.' OR ';
           }
           // Remove the last " OR "
-          $where_stockingPlaceFilter = substr($where_stockingPlaceFilter, 0, -4);
-          $where_stockingPlaceFilter .= ')';
-
+          if($where_stockingPlaceFilter != "(") {
+            $where_stockingPlaceFilter = substr($where_stockingPlaceFilter, 0, -4);
+            $where_stockingPlaceFilter .= ')';
+          } else {
+            $where_stockingPlaceFilter .= '';
+          }
+          
           // Add this part of WHERE clause to the global WHERE clause
           if ($where_itemsFilters != '')
           {
@@ -418,8 +422,12 @@ class Item_model extends MY_Model
             $where_itemTagsFilter .= 'item_id='.$item_tag_link->item_id.' OR ';
           }
           // Remove the last " OR "
-          $where_itemTagsFilter = substr($where_itemTagsFilter, 0, -4);
-          $where_itemTagsFilter .= ')';
+          if($where_itemTagsFilter != "(") {
+            $where_itemTagsFilter = substr($where_itemTagsFilter, 0, -4);
+            $where_itemTagsFilter .= ')';
+          } else {
+            $where_itemTagsFilter = "";
+          }
 
           // Add this part of WHERE clause to the global WHERE clause
           if ($where_itemsFilters != '')
