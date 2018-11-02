@@ -44,7 +44,9 @@
     <a href="<?php echo base_url()."admin/view_stocking_places/";?>" class="btn btn-lg">Non</a>
   </div>
   <?php } else { ?>
-    <em><?php echo $this->lang->line('delete_stocking_place_notok_start'); echo $short; echo " ("; echo $name; echo ")"; echo $this->lang->line('delete_stocking_place_notok_end'); ?></em>
+    <div class="alert alert alert-danger">
+      <em><?php echo $this->lang->line('delete_stocking_place_notok_start'); echo $short; echo " ("; echo $name; echo ")"; echo $this->lang->line('delete_stocking_place_notok_end'); ?></em>
+    </div>
   <?php } ?>
 </div>
 

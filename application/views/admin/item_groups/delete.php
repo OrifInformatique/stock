@@ -30,7 +30,9 @@
     <a href="<?php echo base_url()."admin/view_item_groups/";?>" class="btn btn-lg">Non</a>
   </div>
 <?php } else { ?>
-  <em><?php echo $this->lang->line('delete_item_group_notok_start'); echo $name; echo $this->lang->line('delete_item_group_notok_end'); ?></em>
+  <div class="alert alert alert-danger">
+    <em><?php echo $this->lang->line('delete_item_group_notok_start'); echo $name; echo $this->lang->line('delete_item_group_notok_end'); ?></em>
+  </div>
 <?php } ?>
 </div>
 <script src="<?php echo base_url(); ?>assets/js/geoline.js">
