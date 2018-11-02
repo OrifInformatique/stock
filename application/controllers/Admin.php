@@ -334,11 +334,23 @@ class Admin extends MY_Controller
     public function delete_tag($id = NULL, $action = NULL) {
       $this->load->model('item_tag_model');
       $this->load->model('item_tag_link_model');
+      $this->load->model('item_model');
+
+      if(is_null($this->item_tag_model->get($id))) {
+        redirect("/admin/view_tags");
+      }
+
+      $filter = array("t" => array($id));
+      $items = $this->item_model->get_filtered($filter);
 
       if (is_null($action)) {
         // Display a message to confirm the action
-        if(!is_null($this->item_tag_model->get($id))){
-          $output = get_object_vars($this->item_tag_model->get($id));
+        $output = get_object_vars($this->item_tag_model->get($id));
+        if (sizeof($items) > 0 && sizeof($items) < 500){
+        //if (sizeof($items) > 0 && sizeof($items) < sizeof($this->item_model->get_filtered(''))){ //If the focus is on the results instead of speed, this is the condition you need
+          $output["deletion_allowed"] = FALSE;
+        } else {
+          $output["deletion_allowed"] = TRUE;
         }
         $output["tags"] = $this->item_tag_model->get_all();
         $this->display_view("admin/tags/delete", $output);
@@ -458,12 +470,19 @@ class Admin extends MY_Controller
     public function delete_stocking_place($id = NULL, $action = NULL)
     {
       $this->load->model('stocking_place_model');
+      $this->load->model('item_model');
+
+      if(is_null($this->stocking_place_model->get($id))) {
+        redirect("/admin/view_stocking_places/");
+      }
+      
+      $filter = array('s' => array($id));
+      $items = $this->item_model->get_filtered($filter);
 
       if (is_null($action)) {
-        if(!is_null($this->stocking_place_model->get($id))) {
-          $output = get_object_vars($this->stocking_place_model->get($id));
-        }
+        $output = get_object_vars($this->stocking_place_model->get($id));
         $output["stocking_places"] = $this->stocking_place_model->get_all();
+        $output["deletion_allowed"] = (sizeof($items) == 0);
 
         $this->display_view("admin/stocking_places/delete", $output);
       } else {
@@ -700,12 +719,19 @@ class Admin extends MY_Controller
     public function delete_item_group($id = NULL, $action = NULL)
     {
       $this->load->model('item_group_model');
+      $this->load->model('item_model');
+
+      if(is_null($this->item_group_model->get($id))) {
+        redirect("/admin/view_item_groups/");
+      }
+
+      $filter = array("g" => array($id));
+      $items = $this->item_model->get_filtered($filter);
 
       if (!isset($action)) {
-        if(!is_null($this->item_group_model->get($id))) {
-          $output = get_object_vars($this->item_group_model->get($id));
-        }
+        $output = get_object_vars($this->item_group_model->get($id));
         $output["item_groups"] = $this->item_group_model->get_all();
+        $output["deletion_allowed"] = (sizeof($items) == 0);
 
         $this->display_view("admin/item_groups/delete", $output);
       } else {

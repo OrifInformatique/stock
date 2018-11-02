@@ -23,21 +23,17 @@
       <a href="<?php echo base_url(); ?>admin/" class="tab_unselected"><?php echo $this->lang->line('admin_tab_admin'); ?></a>
     </div>
   </h4>
-  <?php if(isset($name)) { ?>
+  <?php if(isset($name) && $deletion_allowed) { ?>
   <div class="row" style="margin-top: 20px;">
-    <em><?php echo $this->lang->line('admin_delete_item_group_verify'); echo '"'.$name.'"'; ?> ?</em>
+    <em><?php echo $this->lang->line('delete_item_group_ok_start').$name.$this->lang->line('delete_item_group_ok_end'); ?></em>
   </div>
   <div class="btn-group row" style="margin-top: 10px;">
     <a href="<?php echo base_url().uri_string()."/confirmed";?>" class="btn btn-danger btn-lg"><?php echo $this->lang->line('text_yes'); ?></a>
     <a href="<?php echo base_url()."admin/view_item_groups/";?>" class="btn btn-lg"><?php echo $this->lang->line('text_no'); ?></a>
   </div>
-    <?php }else{ ?>
-    <div class="row">
-      <div class="alert alert-danger">
-        <?php echo $this->lang->line('admin_error_missing_item_group'); ?>
-      </div>
-      <a href="<?php echo base_url()."admin/view_item_groups/";?>" class="btn btn-primary"><?php echo $this->lang->line('btn_back_to_list'); ?></a>
-    </div><?php } ?>
+    <?php } else { ?>
+    <em><?php  echo $this->lang->line('delete_item_group_notok_start').$name.$this->lang->line('delete_item_group_notok_end'); ?></em>
+    <?php } ?>
 </div>
 <script src="<?php echo base_url(); ?>assets/js/geoline.js">
 </script>

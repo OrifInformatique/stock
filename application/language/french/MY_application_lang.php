@@ -127,8 +127,6 @@ $lang['admin_delete_tag']               = 'Supprimer le tag';
 $lang['admin_delete_user']              = 'Supprimer l\'utilisateur';
 $lang['admin_delete_supplier']          = 'Supprimer le fournisseur';
 $lang['admin_delete_item']              = 'Supprimer l\'objet';
-$lang['admin_delete_item_group_verify'] = 'Voulez-vous vraiment supprimer le groupe d\'objets ';
-$lang['admin_delete_stocking_place_verify'] = 'Voulez-vous vraiment supprimer le lieu de stockage ';
 $lang['admin_delete_supplier_verify']   = 'Voulez-vous vraiment supprimer le fournisseur ';
 $lang['admin_delete_tag_verify']        = 'Voulez-vous vraiment supprimer le tag ';
 $lang['admin_delete_user_verify']       = 'Voulez-vous vraiment supprimer l\'utilisateur ';
@@ -141,10 +139,25 @@ $lang['admin_error_missing_stocking_place'] = 'Lieu de stockage introuvable';
 $lang['admin_error_missing_supplier']   = 'Fournisseur introuvable';
 $lang['admin_error_missing_item_group'] = 'Groupe d\'objets introuvable';
 
+// Admin deletion lines
+$lang['delete_tag_ok_start']            = 'Voulez-vous vraiment supprimer le tag "';
+$lang['delete_tag_ok_end']              = '" ?';
+$lang['delete_tag_notok_start']         = 'Le tag "';
+$lang['delete_tag_notok_end']           = '" est utilisé par un ou plusieurs objets. Le supprimer risque de causer des problèmes.';
+$lang['delete_tag_notok_confirm']       = 'Êtes-vous sûr(e) de vouloir le supprimer?';
+$lang['delete_stocking_place_notok_start'] = 'Le lieu de stockage ';
+$lang['delete_stocking_place_notok_end'] = ' est utilisé sur un ou plusieurs objets et ne peut pas être supprimer.';
+$lang['delete_stocking_place_ok_start'] = 'Voulez-vous vraiment supprimer le lieu de stockage ';
+$lang['delete_stocking_place_ok_end']   = ' ?';
+$lang['delete_item_group_ok_start']     = 'Voulez-vous vraiment supprimer le groupe d\'objets ';
+$lang['delete_item_group_ok_end']       = ' ?';
+$lang['delete_item_group_notok_start']  = 'Le groupe d\'objets ';
+$lang['delete_item_group_notok_end']    = ' est utilisé sur un ou plusieurs objets et ne peut pas être supprimer.';
+
 // Admin other labels
 $lang['admin_modify']                   = 'Modification';
 $lang['admin_delete']                   = 'Suppression';
-$lang['admin_add']                      = 'Ajout';
+$lang['admin_add']                      = 'Creation';
 $lang['admin_new']                      = 'Nouveau…';
 $lang['admin_cancel']                   = 'Annuler';
 
