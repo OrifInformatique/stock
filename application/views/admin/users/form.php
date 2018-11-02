@@ -1,53 +1,18 @@
 <div class="container">
 	<h4 class="xs-right">
-		<?php 
-		if (isset($missing_user)) {
-			if($missing_user){
-		?>
-
-		<div class="alert alert-danger">
-			<?php echo $this->lang->line('admin_error_missing_user'); ?>
-		</div>
-		<a href="<?php echo base_url(); ?>admin/new_user/" class="btn btn-primary"><?php echo $this->lang->line('admin_new');?></a>
-		<a class="btn btn-primary" href="<?php echo base_url() . "admin/view_users/"; ?>"><?php echo $this->lang->line('btn_back_to_list'); ?></a>
-		
 		<?php
-		}} else {
 			if (isset($users)) 
 			{
 				$update_user = TRUE;
 			} else {
 				$update_user = FALSE;
-			}
-// This part of the GeoLine is for Update
-		if($update_user) { ?>
-		<div class="row">
-			<?php foreach($users as $user) { ?>
-			<a href="<?php echo $user->user_id; ?>" class=<?php if ($user_id == $user->user_id) {echo '"tab_selected"';}else{echo '"tab_unselected"';} ?>>
-				<?php echo $user->username; ?>
-			</a>
-			<?php } ?>
-		</div>
-		<div class="row" style="margin-top: 5px;">
-			<a href="#" class="tab_selected"><?php echo $this->lang->line('admin_modify'); ?></a>
-			<a href="<?php echo base_url(); ?>admin/delete_user/<?php echo $user_id; ?>" class="tab_unselected"><?php echo $this->lang->line('admin_delete'); ?></a>
-			<a href="<?php echo base_url(); ?>admin/new_user/" class="tab_unselected"><?php echo $this->lang->line('admin_add'); ?></a>
-		</div>
-		<?php
-		} else { 
-		?>
-		<div class="row">
-		<a href="<?php echo base_url(); ?>admin/view_users">
-			<span class="btn btn-primary"><?php echo $this->lang->line('admin_cancel'); ?></span>
-		</a>
-		</div><?php } ?>
+			} ?>
 		<div class="row" style="margin-top: 5px;">
 			<a href="<?php echo base_url(); ?>admin/view_users" class="tab_selected"><?php echo $this->lang->line('admin_tab_users'); ?></a>
 			<a href="<?php echo base_url(); ?>admin/view_tags" class="tab_unselected"><?php echo $this->lang->line('admin_tab_tags'); ?></a>
 			<a href="<?php echo base_url(); ?>admin/view_stocking_places" class="tab_unselected"><?php echo $this->lang->line('admin_tab_stocking_places'); ?></a>
 			<a href="<?php echo base_url(); ?>admin/view_suppliers" class="tab_unselected"><?php echo $this->lang->line('admin_tab_suppliers'); ?></a>
 			<a href="<?php echo base_url(); ?>admin/view_item_groups" class="tab_unselected"><?php echo $this->lang->line('admin_tab_item_groups'); ?></a>
-			<a href="<?php echo base_url(); ?>admin/" class="tab_unselected"><?php echo $this->lang->line('admin_tab_admin'); ?></a>
 		</div>
 	</h4>
         <?php
@@ -100,10 +65,10 @@
 			<input name="is_active" type="checkbox" value="TRUE" <?php if(isset($is_active) && $is_active == 1) {echo "checked";} else {echo set_checkbox('is_active', 'TRUE', TRUE);} ?> />
 			<label style="display: inline-block;" for="is_active">Activé </label>
 		</div>
-		<button type="submit" class="btn btn-primary"><?php echo $this->lang->line('btn_submit'); ?></button>
-		<a class="btn btn-primary" href="<?php echo base_url() . "admin/view_users/"; ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
+		<button type="submit" class="btn btn-success"><?php echo $this->lang->line('btn_submit'); ?></button>
+		<a class="btn btn-danger" href="<?php echo base_url() . "admin/view_users/"; ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
 	</form>
-	</div><?php } ?>
+	</div>
 	<script src="<?php echo base_url(); ?>assets/js/geoline.js">
 	</script>
 </div>

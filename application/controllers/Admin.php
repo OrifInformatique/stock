@@ -55,6 +55,10 @@ class Admin extends MY_Controller
     {
       $this->load->model('user_model');
 
+      if(is_null($this->user_model->get($id))) {
+        redirect("/admin/view_users/");
+      }
+
       if (!empty($_POST)) {
         // VALIDATION
 
@@ -105,9 +109,7 @@ class Admin extends MY_Controller
         }
       // The values of the user are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
       } else {
-        if(!is_null($this->user_model->get($id))){
-          $output = get_object_vars($this->user_model->get($id));
-        }
+        $output = get_object_vars($this->user_model->get($id));
       }
 
       $this->load->model('user_model');
@@ -200,10 +202,13 @@ class Admin extends MY_Controller
     */
     public function delete_user($id = NULL, $action = NULL) {
       $this->load->model('user_model');
+
+      if(is_null($this->user_model->get($id))) {
+        redirect("/admin/view_users/");
+      }
+
       if (is_null($action)) {
-        if(!is_null($this->user_model->get($id))){
-          $output = get_object_vars($this->user_model->get($id));
-        }
+        $output = get_object_vars($this->user_model->get($id));
         $output["users"] = $this->user_model->get_all();
         $this->display_view("admin/users/delete", $output);
       } else if($action == "d") {
@@ -237,6 +242,10 @@ class Admin extends MY_Controller
     {
       $this->load->model('item_tag_model');
 
+      if(is_null($this->item_tag_model->get($id))) {
+        redirect("/admin/view_tags/");
+      }
+
       if (!empty($_POST)) {
         // VALIDATION
 
@@ -255,9 +264,7 @@ class Admin extends MY_Controller
 	  
       // The values of the tag are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
       } else {
-        if(!is_null($this->item_tag_model->get($id))){
-          $output = get_object_vars($this->item_tag_model->get($id));
-        }
+        $output = get_object_vars($this->item_tag_model->get($id));
       }
 
       $this->load->model('item_tag_model');
@@ -514,6 +521,10 @@ class Admin extends MY_Controller
     {
       $this->load->model('supplier_model');
 
+      if(is_null($this->supplier_model->get($id))) {
+        redirect("/admin/view_suppliers/");
+      }
+
       if (!empty($_POST)) {
         // VALIDATION
 
@@ -533,9 +544,7 @@ class Admin extends MY_Controller
           exit();
         }
       } else {
-        if(!is_null($this->supplier_model->get($id))){
-          $output = get_object_vars($this->supplier_model->get($id));
-        }
+        $output = get_object_vars($this->supplier_model->get($id));
       }
       
       if(!is_null($this->supplier_model->get($id))){
@@ -586,10 +595,12 @@ class Admin extends MY_Controller
     {
       $this->load->model('supplier_model');
 
+      if(is_null($this->supplier_model->get($id))) {
+        redirect("/admin/view_suppliers/");
+      }
+
       if (!isset($action)) {
-        if(!is_null($this->supplier_model->get($id))){
-          $output = get_object_vars($this->supplier_model->get($id));
-        }
+        $output = get_object_vars($this->supplier_model->get($id));
         $output["suppliers"] = $this->supplier_model->get_all();
 
         $this->display_view("admin/suppliers/delete", $output);
@@ -637,6 +648,10 @@ class Admin extends MY_Controller
     public function modify_item_group($id = NULL)
     {
       $this->load->model('item_group_model');
+
+      if(is_null($this->item_group_model->get($id))) {
+        redirect("/admin/view_item_groups/");
+      }
 
       if (!empty($_POST)) {
         $this->form_validation->set_rules('name', $this->lang->line('field_name'), "required|callback_unique_groupname[$id]", $this->lang->line('msg_err_item_group_needed'));

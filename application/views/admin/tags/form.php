@@ -48,10 +48,10 @@
     </div>
     <div class="row">
         <br />
-        <button type="submit" class="btn btn-primary">
+        <button type="submit" class="btn btn-success">
           <?php echo $this->lang->line('btn_submit'); ?>
         </button>
-        <a class="btn btn-primary" href="<?php echo base_url() . "admin/view_tags/"; ?>">
+        <a class="btn btn-danger" href="<?php echo base_url() . "admin/view_tags/"; ?>">
           <?php echo $this->lang->line('btn_cancel'); ?>
         </a> </div>
       </form>
