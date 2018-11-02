@@ -323,6 +323,11 @@ class Admin extends MY_Controller
       $this->load->model('item_tag_link_model');
       $this->load->model('item_model');
 
+      if(is_null($this->item_tag_model->get($id))) {
+        // Redirect the user back to the list
+        redirect("/admin/view_stocking_places/");
+      }
+
       $filter = array("t" => array($id));
       $items = $this->item_model->get_filtered($filter);
 
@@ -448,6 +453,11 @@ class Admin extends MY_Controller
     {
       $this->load->model('stocking_place_model');
       $this->load->model('item_model');
+
+      if(is_null($this->stocking_place_model->get($id))) {
+        // Redirect the user back to the list
+        redirect("/admin/view_stocking_places/");
+      }
 
       $filter = array('s' => array($id));
       $items = $this->item_model->get_filtered($filter);
@@ -679,6 +689,11 @@ class Admin extends MY_Controller
     {
       $this->load->model('item_group_model');
       $this->load->model('item_model');
+
+      if(is_null($this->item_group_model->get($id))) {
+        // Redirect the user back to the list
+        redirect("/admin/view_item_groups/");
+      }
 
       $filter = array("g" => array($id));
       $items = $this->item_model->get_filtered($filter);

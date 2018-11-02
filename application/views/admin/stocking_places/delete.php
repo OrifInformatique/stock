@@ -37,14 +37,14 @@
   </h1>
   <?php if($deletion_allowed){ ?>
   <div>
-    <em>Voulez-vous vraiment supprimer le lieu de stockage <?php echo $short; ?> (<?php echo $name; ?>) ?</em>
+    <em><?php echo $this->lang->line('delete_stocking_place_ok_start'); echo $short; echo ' ('; echo $name; echo ')'; echo $this->lang->line('delete_stocking_place_ok_end'); ?></em>
   </div>
   <div class="btn-group">
     <a href="<?php echo base_url().uri_string()."/confirmed";?>" class="btn btn-danger btn-lg">Oui</a>
     <a href="<?php echo base_url()."admin/view_stocking_places/";?>" class="btn btn-lg">Non</a>
   </div>
   <?php } else { ?>
-    <em>Le lieu de stockage <?php echo $short; ?> (<?php echo $name; ?>) est utilisé sur un ou plusieurs objets et ne peut pas être supprimer.</em>
+    <em><?php echo $this->lang->line('delete_stocking_place_notok_start'); echo $short; echo " ("; echo $name; echo ")"; echo $this->lang->line('delete_stocking_place_notok_end'); ?></em>
   <?php } ?>
 </div>
 

@@ -23,14 +23,14 @@
   </h1>
   <?php if($deletion_allowed) { ?>
   <div>
-    <em>Voulez-vous vraiment supprimer le groupe d'objets <?php echo $name; ?> ?</em>
+    <em><?php echo $this->lang->line('delete_item_group_ok_start'); echo $name; echo $this->lang->line('delete_item_group_ok_end'); ?></em>
   </div>
   <div class="btn-group">
     <a href="<?php echo base_url().uri_string()."/confirmed";?>" class="btn btn-danger btn-lg">Oui</a>
     <a href="<?php echo base_url()."admin/view_item_groups/";?>" class="btn btn-lg">Non</a>
   </div>
 <?php } else { ?>
-  <em>Le groupe d'objets <?php echo $name; ?> est utilisé sur un ou plusieurs objets et ne peut pas être supprimer.</em>
+  <em><?php echo $this->lang->line('delete_item_group_notok_start'); echo $name; echo $this->lang->line('delete_item_group_notok_end'); ?></em>
 <?php } ?>
 </div>
 <script src="<?php echo base_url(); ?>assets/js/geoline.js">

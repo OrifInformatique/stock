@@ -129,6 +129,21 @@ $lang['btn_all']                        = 'Tout';
 $lang['btn_none']                       = 'Rien';
 $lang['btn_generate_inventory_nb']	= 'Générer un No d\'inventaire';
 
+// Deletion lines and partial lines
+$lang['delete_tag_ok_start']            = 'Voulez-vous vraiment supprimer le tag "';
+$lang['delete_tag_ok_end']              = '" ?';
+$lang['delete_tag_notok_start']         = 'Le tag "';
+$lang['delete_tag_notok_end']           = '" est utilisé par un ou plusieurs objets. Le supprimer risque de causer des problèmes.';
+$lang['delete_tag_notok_confirm']       = 'Êtes-vous sûr(e) de vouloir le supprimer?';
+$lang['delete_stocking_place_notok_start'] = 'Le lieu de stockage ';
+$lang['delete_stocking_place_notok_end'] = ' est utilisé sur un ou plusieurs objets et ne peut pas être supprimer.';
+$lang['delete_stocking_place_ok_start'] = 'Voulez-vous vraiment supprimer le lieu de stockage ';
+$lang['delete_stocking_place_ok_end']   = ' ?';
+$lang['delete_item_group_ok_start']     = 'Voulez-vous vraiment supprimer le groupe d\'objets ';
+$lang['delete_item_group_ok_end']       = ' ?';
+$lang['delete_item_group_notok_start']  = 'Le groupe d\'objets ';
+$lang['delete_item_group_notok_end']    = ' est utilisé sur un ou plusieurs objets et ne peut pas être supprimer.';
+
 // Messages
 $lang['msg_err_abbreviation']           = 'Une abréviation doit être fournie';
 $lang['msg_err_invalid_password']       = 'L\'identifiant et le mot de passe ne sont pas valides';
