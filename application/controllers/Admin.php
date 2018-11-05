@@ -28,7 +28,7 @@ class Admin extends MY_Controller
     */
     public function index()
     {
-      $this->display_view("admin/menu");
+      $this->view_users();
     }
 
     /**
@@ -354,8 +354,8 @@ class Admin extends MY_Controller
       if (is_null($action)) {
         // Display a message to confirm the action
         $output = get_object_vars($this->item_tag_model->get($id));
-        $output["deletion_allowed"] = !(sizeof($items) > 0 && sizeof($items) < 500);
-        //$output["deletion_allowed"] = !(sizeof($items) > 0 && sizeof($items) < $totalitems); // Full examination, might be slow
+        $output["deletion_allowed"] = !(sizeof($items) > 0 && sizeof($items) < 500); // Do not make the number bigger than the amount of items
+        //$output["deletion_allowed"] = !(sizeof($items) > 0 && sizeof($items) < $totalitems); // Full examination, might be slower than normal
         $output["tags"] = $this->item_tag_model->get_all();
         $this->display_view("admin/tags/delete", $output);
       
@@ -389,6 +389,10 @@ class Admin extends MY_Controller
     {
       $this->load->model('stocking_place_model');
 
+      if(is_null($this->stocking_place_model->get($id))){
+        redirect("/admin/view_stocking_places/");
+      }
+
       if (!empty($_POST)) {
         $this->form_validation->set_rules('short', $this->lang->line('field_short_name'), "required|callback_unique_stocking_short[$id]", $this->lang->line('msg_storage_short_needed'));
         $this->form_validation->set_rules('name', $this->lang->line('field_long_name'), "required|callback_unique_stocking_name[$id]", $this->lang->line('msg_err_storage_long_needed'));
@@ -401,9 +405,7 @@ class Admin extends MY_Controller
           exit();
         }
       } else {
-        if(!is_null($this->stocking_place_model->get($id))) {
-          $output = get_object_vars($this->stocking_place_model->get($id));
-        }
+        $output = get_object_vars($this->stocking_place_model->get($id));
       }
       if(!is_null($this->stocking_place_model->get($id))) {
         $output = get_object_vars($this->stocking_place_model->get($id));

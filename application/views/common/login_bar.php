@@ -14,7 +14,7 @@
           
           <!-- ADMIN ACCESS ONLY -->
           <?php if ($_SESSION['user_access'] >= ACCESS_LVL_MSP) { ?>
-              <a href="<?php echo base_url("admin/view_users"); ?>" ><?php echo $this->lang->line('btn_admin'); ?></a><br />
+              <a href="<?php echo base_url("admin/"); ?>" ><?php echo $this->lang->line('btn_admin'); ?></a><br />
           <?php } ?>
           <!-- END OF ADMIN ACCESS -->
 

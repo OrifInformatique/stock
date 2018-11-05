@@ -144,7 +144,7 @@ $lang['delete_stocking_place_ok_start'] = 'Voulez-vous vraiment supprimer le lie
 $lang['delete_item_group_ok_start']     = 'Voulez-vous vraiment supprimer le groupe d\'objets ';
 $lang['delete_supplier_ok_start']       = 'Voulez-vous vraiment supprimer le fournisseur ';
 $lang['delete_ok_end']                  = ' ?';
-$lang['delete_notok']                   = 'Cet élément ne peut pas être supprimé car il est utilisé';
+$lang['delete_notok']                   = 'Cet élément ne peut pas être supprimé car il est en cours d\'utilisation par un ou plusieurs objets.';
 
 // Admin other labels
 $lang['admin_modify']                   = 'Modification';
