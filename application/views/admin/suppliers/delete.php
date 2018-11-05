@@ -16,9 +16,11 @@
     <a href="<?php echo base_url().uri_string()."/confirmed";?>" class="btn btn-danger btn-lg"><?php echo $this->lang->line('text_yes'); ?></a>
     <a href="<?php echo base_url()."admin/view_suppliers/";?>" class="btn btn-lg"><?php echo $this->lang->line('text_no'); ?></a>
   </div>
-    <?php } else { ?>
-    <em><?php  echo $this->lang->line('delete_supplier_notok_start').$name.$this->lang->line('delete_supplier_notok_end'); ?></em>
-    <?php } ?>
+  <?php } else { ?>
+  <div class="row">
+    <em><?php  echo $this->lang->line('delete_notok'); ?></em>
+  </div>
+  <?php } ?>
 </div>
 <script src="<?php echo base_url(); ?>assets/js/geoline.js">
 </script>

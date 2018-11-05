@@ -10,22 +10,22 @@
   </div>
   <!-- First something more simple <span onclick="minilist()">Utilisateurs</span>, Administration -->
   <div class="row">
-      <table class="table table-striped table-hover">
-        <tbody>
-          <?php foreach ($tags as $tag) { ?>
-          <tr>
-            <td>
-              <a href="<?php echo base_url(); ?>admin/modify_tag/<?php echo $tag->item_tag_id; ?>"><?php echo html_escape($tag->name); ?></a>
-              <span class=".text-center"><?php echo html_escape($tag->short_name); ?></span>
-              <a href="<?php echo base_url(); ?>admin/delete_tag/<?php echo $tag->item_tag_id; ?>" class="close"
-                title="<?php echo $this->lang->line('admin_delete_tag');?>">×</a>
-            </td>
-          </tr>
-          <?php } ?>
-        </tbody>
-      </table>
-      <a href="<?php echo base_url(); ?>admin/new_tag/" class="btn btn-primary"><?php echo $this->lang->line('admin_new');?></a>
-    </div>
+    <table class="table table-striped table-hover">
+      <tbody>
+        <?php foreach ($tags as $tag) { ?>
+        <tr>
+          <td>
+            <a href="<?php echo base_url(); ?>admin/modify_tag/<?php echo $tag->item_tag_id; ?>"><?php echo html_escape($tag->name); ?></a>
+            <span class=".text-center"><?php echo html_escape($tag->short_name); ?></span>
+            <a href="<?php echo base_url(); ?>admin/delete_tag/<?php echo $tag->item_tag_id; ?>" class="close"
+              title="<?php echo $this->lang->line('admin_delete_tag');?>">×</a>
+          </td>
+        </tr>
+        <?php } ?>
+      </tbody>
+    </table>
+    <a href="<?php echo base_url(); ?>admin/new_tag/" class="btn btn-primary"><?php echo $this->lang->line('admin_new');?></a>
+  </div>
 </div>
 <script src="<?php echo base_url(); ?>assets/js/geoline.js">
 </script>

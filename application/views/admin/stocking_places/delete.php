@@ -18,7 +18,7 @@
     <a href="<?php echo base_url()."admin/view_stocking_places/";?>" class="btn btn-lg"><?php echo $this->lang->line('text_no'); ?></a>
   </div>
     <?php } else { ?>
-    <em>Le lieu de stockage <?php echo $short; ?> (<?php echo $name; ?>) est utilisé sur un ou plusieurs objets et ne peut pas être supprimer.</em>
+    <em><?php echo $this->lang->line('delete_notok'); ?></em>
     <?php } ?>
 </div>
 

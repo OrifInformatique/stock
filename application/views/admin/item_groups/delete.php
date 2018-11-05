@@ -17,7 +17,7 @@
     <a href="<?php echo base_url()."admin/view_item_groups/";?>" class="btn btn-lg"><?php echo $this->lang->line('text_no'); ?></a>
   </div>
     <?php } else { ?>
-    <em><?php  echo $this->lang->line('delete_item_group_notok_start').$name.$this->lang->line('delete_item_group_notok_end'); ?></em>
+    <em><?php  echo $this->lang->line('delete_notok'); ?></em>
     <?php } ?>
 </div>
 <script src="<?php echo base_url(); ?>assets/js/geoline.js">

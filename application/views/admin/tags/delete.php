@@ -18,11 +18,7 @@
   </div>
   <?php }else{ ?>
   <div class="row">
-    <em><?php echo $this->lang->line('delete_tag_notok_start').$name.$this->lang->line('delete_tag_notok_end')."<br>".$this->lang->line('delete_tag_notok_confirm'); ?></em>
-  </div>
-  <div class="btn-group col-xs-12">
-    <a href="<?php echo base_url().uri_string()."/confirmed";?>" class="btn btn-danger btn-lg">Oui</a>
-    <a href="<?php echo base_url()."admin/view_tags/";?>" class="btn btn-lg">Non</a>
+    <em><?php echo $this->lang->line('delete_notok'); ?></em>
   </div>
   <?php } ?>
 </div>

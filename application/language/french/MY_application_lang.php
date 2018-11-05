@@ -141,21 +141,13 @@ $lang['admin_error_missing_item_group'] = 'Groupe d\'objets introuvable';
 // Admin deletion lines
 $lang['delete_tag_ok_start']            = 'Voulez-vous vraiment supprimer le tag "';
 $lang['delete_tag_ok_end']              = '" ?';
-$lang['delete_tag_notok_start']         = 'Le tag "';
-$lang['delete_tag_notok_end']           = '" est utilisé par un ou plusieurs objets. Le supprimer risque de causer des problèmes.';
-$lang['delete_tag_notok_confirm']       = 'Êtes-vous sûr(e) de vouloir le supprimer?';
-$lang['delete_stocking_place_notok_start'] = 'Le lieu de stockage ';
-$lang['delete_stocking_place_notok_end'] = ' est utilisé sur un ou plusieurs objets et ne peut pas être supprimé.';
 $lang['delete_stocking_place_ok_start'] = 'Voulez-vous vraiment supprimer le lieu de stockage ';
 $lang['delete_stocking_place_ok_end']   = ' ?';
 $lang['delete_item_group_ok_start']     = 'Voulez-vous vraiment supprimer le groupe d\'objets ';
 $lang['delete_item_group_ok_end']       = ' ?';
-$lang['delete_item_group_notok_start']  = 'Le groupe d\'objets ';
-$lang['delete_item_group_notok_end']    = ' est utilisé sur un ou plusieurs objets et ne peut pas être supprimé.';
 $lang['delete_supplier_ok_start']       = 'Voulez-vous vraiment supprimer le fournisseur ';
 $lang['delete_supplier_ok_end']         = ' ?';
-$lang['delete_supplier_notok_start']    = 'Le fournisseur ';
-$lang['delete_supplier_notok_end']      = ' est utilisé sur un ou plusieurs objets et ne peut pas être supprimé.';
+$lang['delete_notok']                   = 'Cet élément ne peut pas être supprimé car il est utilisé';
 
 // Admin other labels
 $lang['admin_modify']                   = 'Modification';
