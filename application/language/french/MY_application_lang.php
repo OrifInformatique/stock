@@ -139,14 +139,11 @@ $lang['admin_error_missing_supplier']   = 'Fournisseur introuvable';
 $lang['admin_error_missing_item_group'] = 'Groupe d\'objets introuvable';
 
 // Admin deletion lines
-$lang['delete_tag_ok_start']            = 'Voulez-vous vraiment supprimer le tag "';
-$lang['delete_tag_ok_end']              = '" ?';
+$lang['delete_tag_ok_start']            = 'Voulez-vous vraiment supprimer le tag ';
 $lang['delete_stocking_place_ok_start'] = 'Voulez-vous vraiment supprimer le lieu de stockage ';
-$lang['delete_stocking_place_ok_end']   = ' ?';
 $lang['delete_item_group_ok_start']     = 'Voulez-vous vraiment supprimer le groupe d\'objets ';
-$lang['delete_item_group_ok_end']       = ' ?';
 $lang['delete_supplier_ok_start']       = 'Voulez-vous vraiment supprimer le fournisseur ';
-$lang['delete_supplier_ok_end']         = ' ?';
+$lang['delete_ok_end']                  = ' ?';
 $lang['delete_notok']                   = 'Cet élément ne peut pas être supprimé car il est utilisé';
 
 // Admin other labels

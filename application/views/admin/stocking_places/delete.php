@@ -11,7 +11,7 @@
 
   <?php if(isset($short) && isset($name) && $deletion_allowed) { ?>
   <div class="row" style="margin-top: 20px;">
-    <em><?php echo $this->lang->line('delete_stocking_place_ok_start').$short." (".$name.")".$this->lang->line('delete_stocking_place_ok_end'); ?></em>
+    <em><?php echo $this->lang->line('delete_stocking_place_ok_start').$short." (".$name.")".$this->lang->line('delete_ok_end'); ?></em>
   </div>
   <div class="btn-group row" style="margin-top: 10px;">
     <a href="<?php echo base_url().uri_string()."/confirmed";?>" class="btn btn-danger btn-lg"><?php echo $this->lang->line('text_yes'); ?></a>

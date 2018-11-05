@@ -349,11 +349,13 @@ class Admin extends MY_Controller
 
       $filter = array("t" => array($id));
       $items = $this->item_model->get_filtered($filter);
+      //$totalitems = sizeof($this->item_model->get_filtered('')); // Required for full examination
 
       if (is_null($action)) {
         // Display a message to confirm the action
         $output = get_object_vars($this->item_tag_model->get($id));
-        $output["deletion_allowed"] = (sizeof($items) == 0);
+        $output["deletion_allowed"] = !(sizeof($items) > 0 && sizeof($items) < 500);
+        //$output["deletion_allowed"] = !(sizeof($items) > 0 && sizeof($items) < $totalitems); // Full examination, might be slow
         $output["tags"] = $this->item_tag_model->get_all();
         $this->display_view("admin/tags/delete", $output);
       
