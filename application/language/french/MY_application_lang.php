@@ -127,7 +127,6 @@ $lang['admin_delete_tag']               = 'Supprimer le tag';
 $lang['admin_delete_user']              = 'Supprimer l\'utilisateur';
 $lang['admin_delete_supplier']          = 'Supprimer le fournisseur';
 $lang['admin_delete_item']              = 'Supprimer l\'objet';
-$lang['admin_delete_supplier_verify']   = 'Voulez-vous vraiment supprimer le fournisseur ';
 $lang['admin_delete_tag_verify']        = 'Voulez-vous vraiment supprimer le tag ';
 $lang['admin_delete_user_verify']       = 'Voulez-vous vraiment supprimer l\'utilisateur ';
 $lang['admin_desactivate_user']         = 'Le désactiver';
@@ -146,13 +145,17 @@ $lang['delete_tag_notok_start']         = 'Le tag "';
 $lang['delete_tag_notok_end']           = '" est utilisé par un ou plusieurs objets. Le supprimer risque de causer des problèmes.';
 $lang['delete_tag_notok_confirm']       = 'Êtes-vous sûr(e) de vouloir le supprimer?';
 $lang['delete_stocking_place_notok_start'] = 'Le lieu de stockage ';
-$lang['delete_stocking_place_notok_end'] = ' est utilisé sur un ou plusieurs objets et ne peut pas être supprimer.';
+$lang['delete_stocking_place_notok_end'] = ' est utilisé sur un ou plusieurs objets et ne peut pas être supprimé.';
 $lang['delete_stocking_place_ok_start'] = 'Voulez-vous vraiment supprimer le lieu de stockage ';
 $lang['delete_stocking_place_ok_end']   = ' ?';
 $lang['delete_item_group_ok_start']     = 'Voulez-vous vraiment supprimer le groupe d\'objets ';
 $lang['delete_item_group_ok_end']       = ' ?';
 $lang['delete_item_group_notok_start']  = 'Le groupe d\'objets ';
-$lang['delete_item_group_notok_end']    = ' est utilisé sur un ou plusieurs objets et ne peut pas être supprimer.';
+$lang['delete_item_group_notok_end']    = ' est utilisé sur un ou plusieurs objets et ne peut pas être supprimé.';
+$lang['delete_supplier_ok_start']       = 'Voulez-vous vraiment supprimer le fournisseur ';
+$lang['delete_supplier_ok_end']         = ' ?';
+$lang['delete_supplier_notok_start']    = 'Le fournisseur ';
+$lang['delete_supplier_notok_end']      = ' est utilisé sur un ou plusieurs objets et ne peut pas être supprimé.';
 
 // Admin other labels
 $lang['admin_modify']                   = 'Modification';
