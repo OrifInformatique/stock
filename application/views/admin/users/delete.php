@@ -10,7 +10,7 @@
   </h4>
   <?php  if(isset($username)) { ?>
   <div class="row" style="margin-top: 20px;">
-    <em><?php echo $this->lang->line('admin_delete_user_verify'); ?>"<?php echo $username; ?>" ?</em>
+    <em><?php echo $this->lang->line('admin_delete_user_verify').'"'.$username.'" ?'; ?></em>
   </div>
   <div class="btn-group row" style="margin-top: 10px;">
     <a href="<?php echo base_url().uri_string()."/confirmed";?>" class="btn btn-danger btn-lg"><?php echo $this->lang->line('text_yes'); ?></a>
