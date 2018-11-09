@@ -136,8 +136,11 @@ $lang['delete_tag_ok_start']            = 'Voulez-vous vraiment supprimer le tag
 $lang['delete_stocking_place_ok_start'] = 'Voulez-vous vraiment supprimer le lieu de stockage ';
 $lang['delete_item_group_ok_start']     = 'Voulez-vous vraiment supprimer le groupe d\'objets ';
 $lang['delete_supplier_ok_start']       = 'Voulez-vous vraiment supprimer le fournisseur ';
-$lang['delete_ok_end']                  = ' ?';
 $lang['delete_notok']                   = 'Cet élément ne peut pas être supprimé car il est en cours d\'utilisation par un ou plusieurs objets.';
+$lang['delete_notok_with_amount']       = 'Cet élément ne peut pas être supprimé car il est en cours d\'utilisation par ';
+$lang['delete_notok_item']              = ' objet.';
+$lang['delete_notok_items']             = ' objets.';
+
 
 // Admin other labels
 $lang['admin_modify']                   = 'Modification';

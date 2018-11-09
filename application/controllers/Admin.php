@@ -114,12 +114,8 @@ class Admin extends MY_Controller
 
       $this->load->model('user_model');
       $this->load->model('user_type_model');
-      if(!is_null($this->user_model->get($id))){
-        $output = get_object_vars($this->user_model->get($id));
-        $output["users"] = $this->user_model->get_all();
-      } else {
-        $output["missing_user"] = TRUE;
-      }
+      $output = get_object_vars($this->user_model->get($id));
+      $output["users"] = $this->user_model->get_all();
       $output["user_types"] = $this->user_type_model->get_all();
 
       $this->display_view("admin/users/form", $output);
@@ -355,6 +351,7 @@ class Admin extends MY_Controller
         // Display a message to confirm the action
         $output = get_object_vars($this->item_tag_model->get($id));
         $output["deletion_allowed"] = !(sizeof($items) > 0 && sizeof($items) < 500); // Do not make the number bigger than the amount of items
+        $output["users"] = sizeof($items);
         //$output["deletion_allowed"] = !(sizeof($items) > 0 && sizeof($items) < $totalitems); // Full examination, might be slower than normal
         $output["tags"] = $this->item_tag_model->get_all();
         $this->display_view("admin/tags/delete", $output);
@@ -489,6 +486,7 @@ class Admin extends MY_Controller
         $output = get_object_vars($this->stocking_place_model->get($id));
         $output["stocking_places"] = $this->stocking_place_model->get_all();
         $output["deletion_allowed"] = (sizeof($items) == 0);
+        $output["users"] = sizeof($items);
 
         $this->display_view("admin/stocking_places/delete", $output);
       } else {
@@ -611,7 +609,6 @@ class Admin extends MY_Controller
       if (!isset($action)) {
         $output = get_object_vars($this->supplier_model->get($id));
         $output["suppliers"] = $this->supplier_model->get_all();
-
         $output["deletion_allowed"] = !$foundone;
 
         $this->display_view("admin/suppliers/delete", $output);
@@ -758,6 +755,7 @@ class Admin extends MY_Controller
         $output = get_object_vars($this->item_group_model->get($id));
         $output["item_groups"] = $this->item_group_model->get_all();
         $output["deletion_allowed"] = (sizeof($items) == 0);
+        $output["users"] = sizeof($items);
 
         $this->display_view("admin/item_groups/delete", $output);
       } else {
