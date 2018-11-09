@@ -44,11 +44,11 @@ $lang['field_group']                    = 'Groupe';
 $lang['field_serial_number']            = 'Numéro de série';
 $lang['field_inventory_number']         = 'Numéro d\'inventaire';
 $lang['field_inventory_number_abr']     = 'No inventaire';
-$lang['field_item_name']            	= 'Nom de l\'objet';
+$lang['field_item_name']                = 'Nom de l\'objet';
 $lang['field_item_description']         = 'Description de l\'objet';
 $lang['field_item_condition']           = 'État de l\'objet';
 $lang['field_image']                    = 'Photo de l\'objet';
-$lang['field_image_upload']		= 'Ajoutez une image<br />(hauteur et largeur max. 360px)';
+$lang['field_image_upload']             = 'Ajoutez une image<br />(hauteur et largeur max. 360px)';
 $lang['field_linked_file_upload']       = 'Ajoutez un fichier joint<br />(un seul fichier possible, pdf ou Word, max. 2Mo)';
 $lang['field_stocking_place']           = 'Lieu de stockage';
 $lang['field_last_inventory_control']   = 'Dernier contrôle d\'inventaire';
@@ -131,13 +131,6 @@ $lang['admin_delete_tag_verify']        = 'Voulez-vous vraiment supprimer le tag
 $lang['admin_delete_user_verify']       = 'Voulez-vous vraiment supprimer l\'utilisateur ';
 $lang['admin_desactivate_user']         = 'Le désactiver';
 
-// Admin error labels
-$lang['admin_error_missing_user']       = 'Utilisateur introuvable';
-$lang['admin_error_missing_tag']        = 'Tag introuvable';
-$lang['admin_error_missing_stocking_place'] = 'Lieu de stockage introuvable';
-$lang['admin_error_missing_supplier']   = 'Fournisseur introuvable';
-$lang['admin_error_missing_item_group'] = 'Groupe d\'objets introuvable';
-
 // Admin deletion lines
 $lang['delete_tag_ok_start']            = 'Voulez-vous vraiment supprimer le tag ';
 $lang['delete_stocking_place_ok_start'] = 'Voulez-vous vraiment supprimer le lieu de stockage ';
@@ -157,10 +150,10 @@ $lang['admin_cancel']                   = 'Annuler';
 $lang['btn_admin']                      = 'Administration';
 $lang['btn_cancel']                     = 'Annuler';
 $lang['btn_change_password']            = 'Modifier le mot de passe';
-$lang['btn_new']                	= 'Nouveau';
-$lang['btn_modify']                	= 'Modifier';
-$lang['btn_delete']                	= 'Supprimer';
-$lang['btn_save']                	= 'Sauvegarder';
+$lang['btn_new']                        = 'Nouveau';
+$lang['btn_modify']                     = 'Modifier';
+$lang['btn_delete']                     = 'Supprimer';
+$lang['btn_save']                       = 'Sauvegarder';
 $lang['btn_submit']                     = 'Sauvegarder';
 $lang['btn_login']                      = 'Se connecter';
 $lang['btn_logout']                     = 'Se déconnecter';
@@ -177,7 +170,7 @@ $lang['btn_submit_filters']             = 'Appliquer filtres et tri';
 $lang['btn_remove_filters']             = 'Supprimer filtres et tri';
 $lang['btn_all']                        = 'Tout';
 $lang['btn_none']                       = 'Rien';
-$lang['btn_generate_inventory_nb']	= 'Générer un No d\'inventaire';
+$lang['btn_generate_inventory_nb']      = 'Générer un No d\'inventaire';
 
 // Messages
 $lang['msg_err_abbreviation']           = 'Une abréviation doit être fournie';
@@ -225,7 +218,7 @@ $lang['text_item_detail']               = 'Photo et détail';
 $lang['text_item_condition']            = 'Condition';
 $lang['text_item_loan_status']          = 'Disponibilité et prêts';
 $lang['text_item_buying_warranty']      = 'Achat et garantie';
-$lang['text_item_tags']      		= 'Type d\'objet';
+$lang['text_item_tags']                 = 'Type d\'objet';
 $lang['text_search_filters']            = 'Filtres de recherche';
 $lang['text_sort_order']                = 'Ordre de tri';
 $lang['text_filtered_items_list']       = 'Liste des objets correspondants';

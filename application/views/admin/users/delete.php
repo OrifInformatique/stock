@@ -19,12 +19,5 @@
     <a href="<?php echo base_url().uri_string()."/d";?>" class="btn btn-warning btn-lg"><?php echo $this->lang->line('admin_desactivate_user'); ?></a>
     <?php } ?>
   </div>
-    <?php }else{ ?>
-    <div class="row">
-      <div class="alert alert-danger">
-        <?php echo $this->lang->line('admin_error_missing_user'); ?>
-      </div>
-      <a class="btn btn-primary" href="<?php echo base_url() . "admin/view_users/"; ?>"><?php echo $this->lang->line('btn_back_to_list'); ?></a>
-    </div>
-  <?php } ?>
+    <?php } ?>
 </div>
