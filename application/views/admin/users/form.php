@@ -69,6 +69,4 @@
 		<a class="btn btn-danger" href="<?php echo base_url() . "admin/view_users/"; ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
 	</form>
 	</div>
-	<script src="<?php echo base_url(); ?>assets/js/geoline.js">
-	</script>
 </div>

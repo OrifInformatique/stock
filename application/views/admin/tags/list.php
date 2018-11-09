@@ -26,8 +26,6 @@
     <a href="<?php echo base_url(); ?>admin/new_tag/" class="btn btn-primary"><?php echo $this->lang->line('admin_new');?></a>
   </div>
 </div>
-<script src="<?php echo base_url(); ?>assets/js/geoline.js">
-</script>
 <script type="text/javascript">
     // Required on each page so that it does load no matter where the user is
     function loadPage(endOfPageString) {

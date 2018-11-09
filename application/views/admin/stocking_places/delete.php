@@ -21,6 +21,3 @@
     <em><?php echo $this->lang->line('delete_notok'); ?></em>
     <?php } ?>
 </div>
-
-<script src="<?php echo base_url(); ?>assets/js/geoline.js">
-</script>

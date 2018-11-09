@@ -27,8 +27,6 @@
     <a href="<?php echo base_url(); ?>admin/new_item_group/" class="btn btn-primary"><?php echo $this->lang->line('admin_new'); ?></a>
   </div>
 </div>
-<script src="<?php echo base_url(); ?>assets/js/geoline.js">
-</script>
 <script type="text/javascript">
     function loadPage(endOfPageString) {
         var targetPart = $('#content');
