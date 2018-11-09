@@ -1,5 +1,5 @@
 <div class="container">
-  <h4 class="xs-right">
+  <h3 class="xs-right">
     <div class="row" style="margin-top: 5px;">
       <a href="<?php echo base_url(); ?>admin/view_users" class="tab_selected"><?php echo $this->lang->line('admin_tab_users'); ?></a>
       <a href="<?php echo base_url(); ?>admin/view_tags" class="tab_unselected"><?php echo $this->lang->line('admin_tab_tags'); ?></a>
@@ -7,7 +7,7 @@
       <a href="<?php echo base_url(); ?>admin/view_suppliers" class="tab_unselected"><?php echo $this->lang->line('admin_tab_suppliers'); ?></a>
       <a href="<?php echo base_url(); ?>admin/view_item_groups" class="tab_unselected"><?php echo $this->lang->line('admin_tab_item_groups'); ?></a>
     </div>
-  </h4>
+  </h3>
   <?php  if(isset($username)) { ?>
   <div class="row" style="margin-top: 20px;">
     <em><?php echo $this->lang->line('admin_delete_user_verify').'"'.$username.'" ?'; ?></em>

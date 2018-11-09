@@ -1,5 +1,5 @@
 <div class="container">
-	<h4 class="xs-right">
+	<h3 class="xs-right">
 		<?php
 			if (isset($users)) 
 			{
@@ -14,7 +14,7 @@
 			<a href="<?php echo base_url(); ?>admin/view_suppliers" class="tab_unselected"><?php echo $this->lang->line('admin_tab_suppliers'); ?></a>
 			<a href="<?php echo base_url(); ?>admin/view_item_groups" class="tab_unselected"><?php echo $this->lang->line('admin_tab_item_groups'); ?></a>
 		</div>
-	</h4>
+	</h3>
         <?php
             if (!empty(validation_errors()) || !empty($upload_errors)) {
         ?>
@@ -62,7 +62,7 @@
 			<input class="form-control" name="pwdagain" id="pwdagain" type="password" value="<?php echo set_value('pwdagain'); ?>" />
 		</div>
 		<div class="form-group">
-			<input name="is_active" type="checkbox" value="TRUE" <?php if(isset($is_active) && $is_active == 1) {echo "checked";} else {echo set_checkbox('is_active', 'TRUE', TRUE);} ?> />
+			<input name="is_active" type="checkbox" value="TRUE" <?php if(isset($is_active) && $is_active == 1) {echo "checked";} ?> />
 			<label style="display: inline-block;" for="is_active">Activé </label>
 		</div>
 		<button type="submit" class="btn btn-success"><?php echo $this->lang->line('btn_submit'); ?></button>

@@ -8,7 +8,6 @@
       <a href="#" onclick="loadPage('admin/view_item_groups/')" class="tab_unselected"><?php echo $this->lang->line('admin_tab_item_groups'); ?></a>
     </h3>
   </div>
-  <!-- First something more simple <span onclick="minilist()">Utilisateurs</span>, Administration -->
   <div class="row">
     <table class="table table-striped table-hover">
       <tbody>
@@ -30,9 +29,10 @@
 <script src="<?php echo base_url(); ?>assets/js/geoline.js">
 </script>
 <script type="text/javascript">
+    // Required on each page so that it does load no matter where the user is
     function loadPage(endOfPageString) {
         var targetPart = $('#content');
-        if(endOfPageString == undefined) {
+        if(endOfPageString == undefined || endOfPageString == null) {
             endOfPageString = "";
         }
         var newUrlForPart = ('<?php echo base_url(); ?>' + endOfPageString);

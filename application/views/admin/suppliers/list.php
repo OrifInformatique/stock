@@ -56,7 +56,7 @@
 <script type="text/javascript">
     function loadPage(endOfPageString) {
         var targetPart = $('#content');
-        if(endOfPageString == undefined) {
+        if(endOfPageString == undefined || endOfPageString == null) {
             endOfPageString = "";
         }
         var newUrlForPart = ('<?php echo base_url(); ?>' + endOfPageString);
