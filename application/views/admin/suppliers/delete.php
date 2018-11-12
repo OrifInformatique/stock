@@ -18,7 +18,12 @@
   </div>
   <?php } else { ?>
   <div class="row">
-    <em><?php  echo $this->lang->line('delete_notok'); ?></em>
+    <em><?php echo $this->lang->line('delete_notok_with_amount').$amount;
+    if($amount > 1) {
+      echo $this->lang->line('delete_notok_items');
+    } else {
+      echo $this->lang->line('delete_notok_item');
+    } ?></em>
   </div>
   <?php } ?>
 </div>

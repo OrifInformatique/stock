@@ -351,7 +351,7 @@ class Admin extends MY_Controller
         // Display a message to confirm the action
         $output = get_object_vars($this->item_tag_model->get($id));
         $output["deletion_allowed"] = !(sizeof($items) > 0 && sizeof($items) < 500); // Do not make the number bigger than the amount of items
-        $output["users"] = sizeof($items);
+        $output["amount"] = sizeof($items);
         //$output["deletion_allowed"] = !(sizeof($items) > 0 && sizeof($items) < $totalitems); // Full examination, might be slower than normal
         $output["tags"] = $this->item_tag_model->get_all();
         $this->display_view("admin/tags/delete", $output);
@@ -486,7 +486,7 @@ class Admin extends MY_Controller
         $output = get_object_vars($this->stocking_place_model->get($id));
         $output["stocking_places"] = $this->stocking_place_model->get_all();
         $output["deletion_allowed"] = (sizeof($items) == 0);
-        $output["users"] = sizeof($items);
+        $output["amount"] = sizeof($items);
 
         $this->display_view("admin/stocking_places/delete", $output);
       } else {
@@ -599,10 +599,11 @@ class Admin extends MY_Controller
 
       $items = $this->item_model->get_filtered('');
       $foundone = FALSE;
+      $amount = 0;
       foreach ($items as $item) {
         if(get_object_vars($item)["supplier_id"] == $id){
           $foundone = TRUE;
-          break;
+          $amount++;
         }
       }
 
@@ -610,6 +611,7 @@ class Admin extends MY_Controller
         $output = get_object_vars($this->supplier_model->get($id));
         $output["suppliers"] = $this->supplier_model->get_all();
         $output["deletion_allowed"] = !$foundone;
+        $output["amount"] = $amount;
 
         $this->display_view("admin/suppliers/delete", $output);
       } else {
@@ -755,7 +757,7 @@ class Admin extends MY_Controller
         $output = get_object_vars($this->item_group_model->get($id));
         $output["item_groups"] = $this->item_group_model->get_all();
         $output["deletion_allowed"] = (sizeof($items) == 0);
-        $output["users"] = sizeof($items);
+        $output["amount"] = sizeof($items);
 
         $this->display_view("admin/item_groups/delete", $output);
       } else {

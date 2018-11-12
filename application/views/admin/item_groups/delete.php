@@ -17,8 +17,8 @@
     <a href="<?php echo base_url()."admin/view_item_groups/";?>" class="btn btn-lg"><?php echo $this->lang->line('text_no'); ?></a>
   </div>
     <?php } else { ?>
-    <em><?php echo $this->lang->line('delete_notok_with_amount').$users;
-    if($users > 1) {
+    <em><?php echo $this->lang->line('delete_notok_with_amount').$amount;
+    if($amount > 1) {
       echo $this->lang->line('delete_notok_items');
     } else {
       echo $this->lang->line('delete_notok_item');
