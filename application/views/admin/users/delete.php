@@ -19,5 +19,5 @@
     <a href="<?php echo base_url().uri_string()."/d";?>" class="btn btn-warning btn-lg"><?php echo $this->lang->line('admin_desactivate_user'); ?></a>
     <?php } ?>
   </div>
-    <?php } ?>
+  <?php } ?>
 </div>

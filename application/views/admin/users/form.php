@@ -14,6 +14,15 @@
 			<a href="<?php echo base_url(); ?>admin/view_suppliers" class="tab_unselected"><?php echo $this->lang->line('admin_tab_suppliers'); ?></a>
 			<a href="<?php echo base_url(); ?>admin/view_item_groups" class="tab_unselected"><?php echo $this->lang->line('admin_tab_item_groups'); ?></a>
 		</div>
+    <?php if($update_user) { ?>
+    <div class="row alert alert-warning">
+      <?php echo $this->lang->line('admin_modify'); ?>
+    </div>
+    <?php } else { ?>
+    <div class="row alert">
+      <?php echo $this->lang->line('admin_add'); ?>
+    </div>
+  <?php } ?>
 	</h3>
         <?php
             if (!empty(validation_errors()) || !empty($upload_errors)) {
