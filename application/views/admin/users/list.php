@@ -47,7 +47,9 @@
 
 <script type="text/javascript">
     function loadPage(endOfPageString) {
-        var targetPart = $('#content');
+        if($('#content').size == 0) {
+            return;
+        }
         if(endOfPageString == undefined || endOfPageString == null) {
             endOfPageString = "";
         }

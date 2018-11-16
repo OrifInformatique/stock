@@ -29,7 +29,9 @@
 <script type="text/javascript">
     // Required on each page so that it does load no matter where the user is
     function loadPage(endOfPageString) {
-        var targetPart = $('#content');
+        if($('#content').size == 0) {
+            return;
+        }
         if(endOfPageString == undefined || endOfPageString == null) {
             endOfPageString = "";
         }
