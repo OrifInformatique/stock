@@ -120,11 +120,11 @@ public function index($page = 1)
                                   $this->lang->line('sort_order_inventory_number'));
     $output['sort_asc_desc'] = array($this->lang->line('sort_order_asc'),
                                      $this->lang->line('sort_order_des'));
-    
-    // Create the pagination
-    $this->load->library('pagination');
 
-    $config['base_url'] = base_url('/item/index/');
+    // Create the pagination 
+   /* $this->load->library('pagination');
+
+    //$config['base_url'] = base_url('/item/index/');
     $config['total_rows'] = count($output["items"]);
     $config['per_page'] = ITEMS_PER_PAGE;
     $config['use_page_numbers'] = TRUE;
@@ -156,8 +156,8 @@ public function index($page = 1)
     $output['pagination'] = $this->pagination->create_links();
 
     // Keep only the slice of items corresponding to the current page
-    $output["items"] = array_slice($output["items"], ($page-1)*ITEMS_PER_PAGE, ITEMS_PER_PAGE);
-    
+    $output["items"] = array_slice($output["items"], ($page-1)*ITEMS_PER_PAGE, ITEMS_PER_PAGE);*/
+
     // Send the data to the View
     $this->display_view('item/list', $output);
   }
