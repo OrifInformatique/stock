@@ -8143,7 +8143,7 @@ jQuery.fn.delay = function( time, type ) {
     // Setup
     div = document.createElement( "div" );
     div.setAttribute( "className", "t" );
-    div.innerHTML = "  <link/><table></table><a href='/a'>a</a><input type='checkbox'/>";
+    div.innerHTML = "<link/><table></table><a href='/a'>a</a><input type='checkbox'/>";
     a = div.getElementsByTagName( "a" )[ 0 ];
 
     // Support: Windows Web Apps (WWA)
