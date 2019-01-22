@@ -159,18 +159,12 @@
         </thead>
         <tbody>
             <?php foreach ($items as $item) {
-                if (!empty($item->tags)){
-                    $array = array();
-                    foreach ($item->tags as $key => $value) {
-                        array_push($array,$value);
-                    }
-                }
-                $item_tags = empty($array)?"":implode(" ,", $array);
+                
+                //saves all tags in data attributes for to be recovered by js/JQuery
+                $item_tags = empty($item->tags)?"":implode(" ,", $item->tags);
                 $item_conditions = $item->item_condition->name;
                 $item_groups = $item->item_group_id;
                 $stocking_places = $item->stocking_place->name;
-                
-               // echo $item_tags."; ".$item_conditions."; ".$item_groups."; ".$stocking_places;
 		 ?>
 
             <tr data-item_tags="<?=$item_tags?>" data-item_conditions="<?=$item_conditions?>" data-item_groups="<?=$item_groups?>" data-stocking_places="<?=$stocking_places?>">
@@ -295,32 +289,33 @@ function changeTextFocus(newFocus) {
 function updatePagination(index, number) {
     before_after_num_pages = 5;
     index = index == -1 ? 0 : index; //default index set on first element
-    pages = Math.ceil(number / items_per_pages);
+    num_of_pages = Math.ceil(number / items_per_pages);
     $("ul.pagination").empty();
-    if (pages > 1) { //display 5 button before and after index if not negative or limit
+    if (num_of_pages > 1) { //display 5 button before and after index if not negative or limit
         pagination = [];
-        imin = index - before_after_num_pages < 0 ? 0 : index - before_after_num_pages;
-        imax = index + before_after_num_pages > pages ? pages : index + before_after_num_pages;
+        imin = index - before_after_num_pages < 1 ? 0 : index - (before_after_num_pages-1);
+        imax = index + before_after_num_pages > num_of_pages ? num_of_pages : index + before_after_num_pages;
 
         for (let i = imin; i < imax; i++) {
-            menu_item = $("<li></li>").append($("<a data-page=\"" + (i + 1) + "\">" + (i + 1) + "</a>"));
+            menu_item = $("<li></li>").addClass("page-item").append($("<a></a>").addClass("page-link").text(i + 1).data("page", i+1).attr("href", "#"));
             if (i == index) {
                 menu_item.addClass("active");
             }
             pagination.push(menu_item);
         }
         if (imin > 0) { //button go start
-            pagination.unshift($("<li></li>").append($("<a data-page=\"" + 0 + "\">\<\<</a>")));
+            pagination.unshift($("<li></li>").addClass("page-item").append($("<a></a>").addClass("page-link").attr("title", "1").data("page", 0).attr("href", "#").append($("<span></span>").attr("aria-hidden", true).text("«")).append($("<span></span>").addClass("sr-only").text("Previous"))));
         }
-        if (imax < pages) { //button go end
-            pagination.push($("<li></li>").append($("<a data-page=\"" + pages + "\">\>\></a>")));
+        if (imax < num_of_pages) { //button go end
+            pagination.push($("<li></li>").addClass("page-item").append($("<a></a>").addClass("page-link").attr("title", num_of_pages).data("page", num_of_pages).attr("href", "#").append($("<span></span>").attr("aria-hidden", true).text("»")).append($("<span></span>").addClass("sr-only").text("Next"))));
         }
-
         $.each(pagination, function(i, value) {
             $("ul.pagination").append(value);
         });
     }
     $("ul.pagination a").click(function() {
+
+        //change classes for view
         page = $(this).data("page");
         $("ul.pagination li").removeClass("active");
         $("ul.pagination li a").each(function() {
@@ -329,31 +324,36 @@ function updatePagination(index, number) {
             }
         });
 
-        //recursive: if click on <a>, event start updateTable and updatePagination
+        //re-update all elements
         updateTable();
 
-        //on change page, change scrolling to the top of the screen
-        $("html").scrollTop(0); //reset scroll for best result
-        $("html").scrollTop($("#whatToShow").position().top);
+        //on change page, change scrolling to the top of the screen if the scroll position is bottom of "#whatToShow"
+        if($("html").position().top>$("#whatToShow").position().top-$("html").position().top){
+            $("html").scrollTop(0); //reset scroll
+            $("html").scrollTop($("#whatToShow").position().top); //set scroll to top of "#whatToShow"
+        }
     });
     return index * items_per_pages;
 }
 
 function updateTable() {
-    //filter
-    //text-filter
+    //filters
     var text_search = $("#text_search").val().toLowerCase();
-
-    //other filters
     var item_tags = [];
     var item_groups = [];
     var stocking_places = [];
     var item_conditions = [];
+
+    //apply text filter
+    $("#whatToShow table tbody tr").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(text_search) > -1);
+    });
+
+    //get all values of filters
     $("#item_tags ul li.active a label input").each(function() {
         item_tags.push($.trim($(this).parent().text()));
     });
     $("#item_groups ul li.active a label input").each(function() {
-        
         item_groups.push($.trim($(this).val()));
     });
     $("#stocking_places ul li.active a label input").each(function() {
@@ -363,16 +363,11 @@ function updateTable() {
         item_conditions.push($.trim($(this).parent().text()));
     });
     
-    //text filter
-    $("#whatToShow table tbody tr").filter(function() {
-        $(this).toggle($(this).text().toLowerCase().indexOf(text_search) > -1);
-    });
-    console.log(item_groups);
-        //item_tags+"; "+item_groups+"; "+stocking_places+"; "+item_conditions);
+    //get (and loop over) all elements (after text filter)
     items_visibles = $("#whatToShow table tbody tr:visible");
     items_visibles.each(function() {
-		//tag filter
 		valid=false;
+        //apply filter for this element
         if (arrayInArray(item_tags, $(this).data("item_tags").split(",")) || item_tags.length == 0) {
 			if (inArray(item_conditions, $(this).data("item_conditions")) || item_conditions.length == 0) {
 				if (inArray(item_groups, $(this).data("item_groups")) || item_groups.length == 0) {
@@ -382,28 +377,26 @@ function updateTable() {
                 }
             }
 		}
+        //if valid all filter, show element
 		$(this).toggle(valid);
     });
 
-    // console.log("item_tags :"+item_tags+", item_conditions :"+item_conditions+", item_groups :"+item_groups+", stocking_places :"+stocking_places);
-
-
-
-    //update menu
-    all_items = $("#table-items tbody tr:visible");
-    $("#number-item").text("(" + all_items.length + ")");
-    index_page = $(".pagination li.active").first().children().data("page")
-    if (index_page == undefined) index_page = 1;
-    item_index = updatePagination(index_page - 1, all_items.length);
+    //update menu 
+    items_visibles = $("#table-items tbody tr:visible");
+    $("#number-item").text("(" + items_visibles.length + ")");
+    index_page=($(".pagination li.active").first().children().data("page"));
+    index_page=index_page==undefined?0:index_page-1;
+    item_index=updatePagination(index_page, items_visibles.length);
 
     //actualize number displayed
-    $.each(all_items, function(index, value) {
+    $.each(items_visibles, function(index, value) {
         if (index < item_index || index >= item_index + items_per_pages) {
             $(this).toggle(false);
         }
     });
 }
 
+//this function return true only if a element of array 1 is equals of a element of array 2
 function arrayInArray(array1, array2) {
 	var result = false;
     $.each(array1, function(key, array1_value) {
@@ -412,6 +405,7 @@ function arrayInArray(array1, array2) {
     return result;
 }
 
+//this function return true only if the value is in array
 function inArray(array, value) {
 	var result = false;
     $.each(array, function(key, array_value) {
