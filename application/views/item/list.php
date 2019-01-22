@@ -44,7 +44,7 @@
                 </div>
 
                 <!-- GROUPS FILTER -->
-                <div class="col-sm-4 top-margin" id="item_conditions">
+                <div class="col-sm-4 top-margin" id="item_groups">
                     <?php
 		  echo form_label($this->lang->line('field_group'),
 						  'item_groups-multiselect');
@@ -56,7 +56,7 @@
 
             <div class="row">
                 <!-- STOCKING PLACES FILTER -->
-                <div class="col-sm-8 top-margin" id="item_groups">
+                <div class="col-sm-8 top-margin" id="stocking_places">
                     <?php
 			echo form_label($this->lang->line('field_stocking_place'),
 							'stocking_places-multiselect');
@@ -66,7 +66,7 @@
                 </div>
 
                 <!-- CONDITIONS FILTER -->
-                <div class="col-sm-4 top-margin" id="stocking_places">
+                <div class="col-sm-4 top-margin" id="item_conditions">
                     <?php
 		  echo form_label($this->lang->line('field_item_condition'),
 						  'item_conditions-multiselect');
@@ -159,16 +159,21 @@
         </thead>
         <tbody>
             <?php foreach ($items as $item) {
-			 if (!empty($item->tags)){
-				$array = array();
-				foreach ($item->tags as $key => $value) {
-					array_push($array,$value);
-				}
-			 }
-			 var_dump($item);
+                if (!empty($item->tags)){
+                    $array = array();
+                    foreach ($item->tags as $key => $value) {
+                        array_push($array,$value);
+                    }
+                }
+                $item_tags = empty($array)?"":implode(" ,", $array);
+                $item_conditions = $item->item_condition->name;
+                $item_groups = $item->item_group_id;
+                $stocking_places = $item->stocking_place->name;
+                
+               // echo $item_tags."; ".$item_conditions."; ".$item_groups."; ".$stocking_places;
 		 ?>
 
-            <tr data-item_tags="<?=empty($array)?"":implode(" ,", $array)?>" data-item_conditions="<?=$item->item_condition->name?>" data-item_groups="<?=$item->item_group->name?>" data-stocking_places="<?=$item->item_condition->name?>">
+            <tr data-item_tags="<?=$item_tags?>" data-item_conditions="<?=$item_conditions?>" data-item_groups="<?=$item_groups?>" data-stocking_places="<?=$stocking_places?>">
                 <td>
                     <a href="<?= base_url('/item/view').'/'.$item->item_id ?>" style="display:block">
                         <img src="<?= base_url('uploads/images/'.$item->image); ?>" width="100px" alt="<?php html_escape($this->lang->line('field_image')); ?>" />
@@ -260,12 +265,9 @@ function setPage(newPage) {
 
 function voidFilter() {
     //set all select to unselected
-    $(
-        '#item_conditions-multiselect option:selected, #item_tags-multiselect option:selected, #item_groups-multiselect option:selected, #stocking_places-multiselect option:selected'
-    ).prop('selected', false);
+    $('#item_conditions-multiselect option:selected, #item_tags-multiselect option:selected, #item_groups-multiselect option:selected, #stocking_places-multiselect option:selected').prop('selected', false);
     //refresh select
-    $('#item_tags-multiselect, #item_groups-multiselect, #item_conditions-multiselect, #stocking_places-multiselect').multiselect(
-        'refresh');
+    $('#item_tags-multiselect, #item_groups-multiselect, #item_conditions-multiselect, #stocking_places-multiselect').multiselect('refresh');
     //clean search zone
     $('#text_search').val("");
     //set default to "Fonctionel"
@@ -344,27 +346,29 @@ function updateTable() {
 
     //other filters
     var item_tags = [];
-    var item_conditions = [];
     var item_groups = [];
     var stocking_places = [];
+    var item_conditions = [];
     $("#item_tags ul li.active a label input").each(function() {
         item_tags.push($.trim($(this).parent().text()));
+    });
+    $("#item_groups ul li.active a label input").each(function() {
+        
+        item_groups.push($.trim($(this).val()));
+    });
+    $("#stocking_places ul li.active a label input").each(function() {
+        stocking_places.push($.trim($(this).parent().text()));//+
     });
     $("#item_conditions ul li.active a label input").each(function() {
         item_conditions.push($.trim($(this).parent().text()));
     });
-    $("#item_groups ul li.active a label input").each(function() {
-        item_groups.push($.trim($(this).parent().text()));
-    });
-    $("#stocking_places ul li.active a label input").each(function() {
-        stocking_places.push($.trim($(this).parent().text()));
-    });
-
+    
     //text filter
     $("#whatToShow table tbody tr").filter(function() {
         $(this).toggle($(this).text().toLowerCase().indexOf(text_search) > -1);
     });
-
+    console.log(item_groups);
+        //item_tags+"; "+item_groups+"; "+stocking_places+"; "+item_conditions);
     items_visibles = $("#whatToShow table tbody tr:visible");
     items_visibles.each(function() {
 		//tag filter
