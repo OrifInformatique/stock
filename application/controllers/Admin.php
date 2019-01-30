@@ -1,4 +1,5 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
+
 /**
  * Authentication System
  *
@@ -12,35 +13,29 @@ class Admin extends MY_Controller
     /* MY_Controller variables definition */
     protected $access_level = ACCESS_LVL_MSP;
 
-
     /**
     * Constructor
     */
-    public function __construct()
-    {
+    public function __construct(){
         parent::__construct();
-
         $this->load->library('form_validation');
     }
 
     /**
     * Menu for admin privileges
     */
-    public function index()
-    {
+    public function index(){
       $this->display_view("admin/menu");
     }
 
     /**
     * As the name says, view the users.
     */
-    public function view_users()
-    {
+    public function view_users(){
+
       $this->load->model('user_model');
       $this->load->model('user_type_model');
-      $output["users"] = $this->user_model->with("user_type")
-                                          ->get_all();
-
+      $output["users"] = $this->user_model->with("user_type")->get_all();
       $this->display_view("admin/users/list", $output);
     }
 
@@ -49,7 +44,8 @@ class Admin extends MY_Controller
     ********************************************************************************************************* */
 
     /**
-    * Modify a user
+	* Modify a user
+	* @id = 
     */
     public function modify_user($id = NULL)
     {

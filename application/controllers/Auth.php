@@ -29,6 +29,8 @@ class Auth extends MY_Controller
 
     /**
      * Login and create session variables
+     *
+     * @return void
      */
     public function login()
     {
@@ -74,6 +76,8 @@ class Auth extends MY_Controller
 
     /**
      * Logout and erase session variables
+     *
+     * @return void
      */
     public function logout()
     {
@@ -88,6 +92,11 @@ class Auth extends MY_Controller
         redirect('/');
     }
     
+    /**
+     * Change the password 
+     *
+     * @return void
+     */
     public function change_password(){
         
         // Check if this is allowed
@@ -130,6 +139,13 @@ class Auth extends MY_Controller
         }
     }
     
+    /**
+     * Check if the old password is correct
+     *
+     * @param string $pwd
+     * @param string $user
+     * @return boolean true on success, false on failure 
+     */
     public function old_password_check($pwd,$user){
         if($this->user_model->check_password($user, $pwd)){
             return TRUE;
