@@ -12,7 +12,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 /*
 |--------------------------------------------------------------------------
-| Access levels
+| Authentication system constants
 |--------------------------------------------------------------------------
 */
 define('ACCESS_LVL_GUEST', 1);

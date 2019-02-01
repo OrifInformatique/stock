@@ -2,16 +2,15 @@
 /**
  * Authentication System
  *
- * @author      Jeffrey Mostroso
- * @author      Didier Viret
+ * @author      Orif, section informatique (ViDi)
  * @link        https://github.com/OrifInformatique/stock
- * @copyright   Copyright (c) 2016, Orif <http://www.orif.ch>
+ * @copyright   Copyright (c), Orif <http://www.orif.ch>
+ * @version     2.0
  */
 class Auth extends MY_Controller
 {
     /* MY_Controller variables definition */
     protected $access_level = "*";
-
 
     /**
     * Constructor
@@ -25,51 +24,49 @@ class Auth extends MY_Controller
         $this->load->library('form_validation');
     }
 
-
-
     /**
      * Login and create session variables
      */
-    public function login()
+    public function login ()
     {
-        $username = $this->input->post('username');
-        $password = $this->input->post('password');
-        
-        // Keeping in memory the last page in user's history so we can redirect there later
-        if(isset($_SERVER["HTTP_REFERER"]) && $_SERVER["HTTP_REFERER"] != current_url()){
-                $_SESSION["before_login_page"] = $_SERVER["HTTP_REFERER"];
-        } else {
-            $_SESSION["before_login_page"] = base_url();
-        }
-        // Recovering the last page in user's history so we can redirect there after login
-        $redirect_url = $_SESSION["before_login_page"];
-        
-        if ($this->form_validation->run() == true) {
-            // Fields validation passed
+        if (!is_null($this->input->post('after_login_redirect'))) {
+            // Store the redirection URL in a session variable
+            $_SESSION['after_login_redirect'] = $this->input->post('after_login_redirect');
+        } 
 
-            if ($this->user_model->check_password($username, $password)) {
-                // Login success
-                $user = $this->user_model->with('user_type')
-                                         ->get_by('username', $username);
+        if (!is_null($this->input->post('btn_login'))) {
+            $username = $this->input->post('username');
+            $password = $this->input->post('password');
 
-                // Set session variables
-                $_SESSION['user_id'] = (int)$user->user_id;
-                $_SESSION['username'] = (string)$user->username;
-                $_SESSION['user_access'] = (int)$user->user_type->access_level;
-                $_SESSION['logged_in'] = (bool)true;
+            if ($this->form_validation->run() == true) {
+                // Fields validation passed
 
-                // Send the user back to his last page
-                redirect($redirect_url);
-                exit();
+                if ($this->user_model->check_password($username, $password)) {
+                    // Login success
+                    $user = $this->user_model->with('user_type')
+                                             ->get_by('username', $username);
 
-            } else {
-                // Login failed
-                $this->session->set_flashdata('message', '<div class="alert alert-danger text-center">'.$this->lang->line('msg_err_invalid_password').'</div>');
+                    // Set session variables
+                    $_SESSION['user_id'] = (int)$user->user_id;
+                    $_SESSION['username'] = (string)$user->username;
+                    $_SESSION['user_access'] = (int)$user->user_type->access_level;
+                    $_SESSION['logged_in'] = (bool)true;
+
+                    // Send the user to the redirection URL or to the site's root
+                    if (isset($_SESSION['after_login_redirect'])) {
+                        redirect($_SESSION['after_login_redirect']);
+                    } else {
+                        redirect(base_url());
+                    }
+                } else {
+                    // Login failed
+                    $this->session->set_flashdata('message-danger', $this->lang->line('msg_err_invalid_password'));
+                }
             }
         }
         
         // Display login page
-        $this->display_view('login_view');
+        $this->display_view('auth/login_form');
     }
 
     /**
@@ -123,10 +120,10 @@ class Auth extends MY_Controller
             }
 
             // Displaying the form
-            $this->display_view('password_form');
+            $this->display_view('auth/password_change_form');
         } else {
             // Access is not allowed
-            redirect("auth/login");
+            $this->ask_for_login();
         }
     }
     
