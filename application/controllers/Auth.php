@@ -89,19 +89,13 @@ class Auth extends MY_Controller
     }
 
     /**
-     * Logout and erase session variables
+     * Logout and destroy session
      */
     public function logout()
     {
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+        $this->session->sess_destroy();
 
-            // Erase session variables
-            foreach ($_SESSION as $key => $value) {
-                unset($_SESSION[$key]);
-            }
-        }
-        
-        redirect('/');
+        redirect(base_url());
     }
     
     public function change_password(){
