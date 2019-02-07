@@ -13,6 +13,8 @@ $lang['app_title']                      = 'Section informatique<br />Gestion de 
 // Page titles
 $lang['page_prefix']                    = 'Stock';
 $lang['page_item_list']                 = 'Liste des objets';
+$lang['page_login']                     = 'Connexion';
+$lang['page_password_change']           = 'Modification du mot de passe';
 
 // Date and time formats
 $lang['date_format_short']              = 'd.m.Y';
@@ -25,7 +27,7 @@ $lang['field_name']                     = 'Prénom';
 $lang['field_status']                   = 'Statut';
 $lang['field_mail']                     = 'Mail';
 $lang['field_password']                 = 'Mot de passe';
-$lang['field_password_confirm']         = 'Confirmation mot de passe';
+$lang['field_password_confirm']         = 'Confirmer mot de passe';
 $lang['field_new_password']             = 'Nouveau mot de passe';
 $lang['field_old_password']             = 'Ancien mot de passe';
 $lang['field_abbreviation']             = 'Abréviation';
@@ -164,7 +166,6 @@ $lang['lbl_loan_status_loaned']         = 'En prêt';
 $lang['lbl_loan_status_not_loaned']     = 'Pas de prêt en cours';
 
 // Other texts
-$lang['text_login']                     = 'Connexion';
 $lang['text_months']                    = 'mois';
 $lang['text_none']                      = 'aucun';
 $lang['text_warranty_status']           = [0 => '',
