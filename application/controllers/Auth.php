@@ -29,17 +29,36 @@ class Auth extends MY_Controller
      */
     public function login ()
     {
+        // Store the redirection URL in a session variable
         if (!is_null($this->input->post('after_login_redirect'))) {
-            // Store the redirection URL in a session variable
             $_SESSION['after_login_redirect'] = $this->input->post('after_login_redirect');
-        } 
+        }
 
+        // Check if the form has been submitted, else just display the form
         if (!is_null($this->input->post('btn_login'))) {
-            $username = $this->input->post('username');
-            $password = $this->input->post('password');
-
+            // Define fields validation rules
+            $validation_rules = array(
+                array(
+                    'field' => 'username',
+                    'label' => 'lang:field_username',
+                    'rules' => 'trim|required|'
+                             . 'min_length['.USERNAME_MIN_LENGTH.']|'
+                             . 'max_length['.USERNAME_MAX_LENGTH.']'
+                ),
+                array(
+                    'field' => 'password',
+                    'label' => 'lang:field_password',
+                    'rules' => 'trim|required|'
+                             . 'min_length['.PASSWORD_MIN_LENGTH.']|'
+                             . 'max_length['.PASSWORD_MAX_LENGTH.']'
+                )
+            );
+            $this->form_validation->set_rules($validation_rules);
+            
+            // Check fields validation rules
             if ($this->form_validation->run() == true) {
-                // Fields validation passed
+                $username = $this->input->post('username');
+                $password = $this->input->post('password');
 
                 if ($this->user_model->check_password($username, $password)) {
                     // Login success
@@ -60,7 +79,7 @@ class Auth extends MY_Controller
                     }
                 } else {
                     // Login failed
-                    $this->session->set_flashdata('message-danger', $this->lang->line('msg_err_invalid_password'));
+                    $this->session->set_flashdata('message-danger', lang('msg_err_invalid_password'));
                 }
             }
         }

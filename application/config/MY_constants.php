@@ -21,6 +21,11 @@ define('ACCESS_LVL_FORMATION', 4);
 define('ACCESS_LVL_MSP', 8);
 define('ACCESS_LVL_ADMIN', 16);
 
+define('USERNAME_MIN_LENGTH', 3);
+define('USERNAME_MAX_LENGTH', 45);
+define('PASSWORD_MIN_LENGTH', 6);
+define('PASSWORD_MAX_LENGTH', 72);
+
 /*
 |--------------------------------------------------------------------------
 | Inventory number
