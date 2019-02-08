@@ -26,6 +26,8 @@ define('USERNAME_MAX_LENGTH', 45);
 define('PASSWORD_MIN_LENGTH', 6);
 define('PASSWORD_MAX_LENGTH', 72);
 
+define('PASSWORD_HASH_ALGORITHM', PASSWORD_BCRYPT);
+
 /*
 |--------------------------------------------------------------------------
 | Inventory number

@@ -33,6 +33,13 @@ class Auth extends MY_Controller
         if (!is_null($this->input->post('after_login_redirect'))) {
             $_SESSION['after_login_redirect'] = $this->input->post('after_login_redirect');
         }
+        // If no redirection URL is provided or the redirection URL is the
+        // login form, redirect to site's root after login
+        if (!isset($_SESSION['after_login_redirect'])
+                || $_SESSION['after_login_redirect'] == current_url()) {
+            
+            $_SESSION['after_login_redirect'] = base_url();
+        }
 
         // Check if the form has been submitted, else just display the form
         if (!is_null($this->input->post('btn_login'))) {
@@ -70,14 +77,10 @@ class Auth extends MY_Controller
                     $_SESSION['username'] = (string)$user->username;
                     $_SESSION['user_access'] = (int)$user->user_type->access_level;
                     $_SESSION['logged_in'] = (bool)true;
+                    
+                    // Send the user to the redirection URL
+                    redirect($_SESSION['after_login_redirect']);
 
-                    // Send the user to the redirection URL or to the site's root
-                    if (isset($_SESSION['after_login_redirect'])
-                        && $_SESSION['after_login_redirect'] != current_url()) {
-                        redirect($_SESSION['after_login_redirect']);
-                    } else {
-                        redirect(base_url());
-                    }
                 } else {
                     // Login failed
                     $this->session->set_flashdata('message-danger', lang('msg_err_invalid_password'));
@@ -99,6 +102,9 @@ class Auth extends MY_Controller
         redirect(base_url());
     }
     
+    /**
+     * Display a form to let user change his password
+     */
     public function change_password()
     {
         // Check if access is allowed
@@ -146,7 +152,8 @@ class Auth extends MY_Controller
                     $confirm_password = $this->input->post('confirm_password');
                 
                     $this->load->model('user_model');
-                    $this->user_model->update($_SESSION['user_id'], array("password" => password_hash($new_password, PASSWORD_DEFAULT)));
+                    $this->user_model->update($_SESSION['user_id'],
+                            array("password" => password_hash($new_password, PASSWORD_HASH_ALGORITHM)));
 
                     // Send the user back to the site's root
                     redirect(base_url());
@@ -162,7 +169,9 @@ class Auth extends MY_Controller
         }
     }
     
-    // Callback method for change_password validation rule
+    /**
+     * Callback method for change_password validation rule
+     */ 
     public function old_password_check($pwd,$user){
         return $this->user_model->check_password($user, $pwd);
     }
