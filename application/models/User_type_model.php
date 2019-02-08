@@ -2,9 +2,9 @@
 /**
  * The User type model
  * 
- * @author      Didier Viret
+ * @author      Orif, section informatique (ViDi)
  * @link        https://github.com/OrifInformatique/stock
- * @copyright   Copyright (c) 2016, Orif <http://www.orif.ch>
+ * @copyright   Copyright (c), Orif <http://www.orif.ch>
  */
 
 class User_type_model extends MY_Model

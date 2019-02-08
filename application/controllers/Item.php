@@ -301,7 +301,7 @@ public function index($page = 1)
             }
         } else {
             // Access is not allowed
-            redirect("auth/login");
+            $this->ask_for_login();
         }
     }
 
@@ -419,7 +419,7 @@ public function index($page = 1)
             $this->display_view('item/form', $data);
         } else {
             // Update is not allowed
-            redirect("auth/login");
+            $this->ask_for_login();
         }
     }
 
@@ -451,7 +451,7 @@ public function index($page = 1)
             }
         } else {
             // Access is not allowed
-            redirect("auth/login");
+            $this->ask_for_login();
         }
     }
 
@@ -500,7 +500,7 @@ public function index($page = 1)
             }
         } else {
             // Access is not allowed
-            redirect("auth/login");
+            $this->ask_for_login();
         }
     }
 
@@ -578,7 +578,7 @@ public function index($page = 1)
             }
         } else {
             // Access is not allowed
-            redirect("auth/login");
+            $this->ask_for_login();
         }
     }
 
@@ -636,7 +636,7 @@ public function index($page = 1)
             $this->display_view('loan/form', $data);
         } else {
             // Access is not allowed
-            redirect("auth/login");
+            $this->ask_for_login();
         }
     }
 
@@ -691,7 +691,7 @@ public function index($page = 1)
             }
         } else {
             // Access is not allowed
-            redirect("auth/login");
+            $this->ask_for_login();
         }
     }
 

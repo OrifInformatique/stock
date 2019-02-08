@@ -86,7 +86,7 @@ class Admin extends MY_Controller
               $userArray[$forminput] = $formoutput;
             // Do the hash only once…
             } else if ($forminput == "pwd" && $formoutput != "") {
-              $userArray["password"] = password_hash($formoutput, PASSWORD_DEFAULT);
+              $userArray["password"] = password_hash($formoutput, PASSWORD_HASH_ALGORITHM);
             } else if ($forminput == "is_active" && $formoutput == "TRUE") {
               $userArray["is_active"] = 1;
             } else if ($forminput == "email") {
@@ -162,7 +162,7 @@ class Admin extends MY_Controller
               $userArray[$forminput] = $formoutput;
             // Do the hash only once…
             } else if ($forminput == "pwd" && $formoutput != "") {
-              $userArray["password"] = password_hash($formoutput, PASSWORD_DEFAULT);
+              $userArray["password"] = password_hash($formoutput, PASSWORD_HASH_ALGORITHM);
             } else if ($forminput == "is_active" && $formoutput == "TRUE") {
               $userArray["is_active"] = 1;
             } else if ($forminput == "email") {

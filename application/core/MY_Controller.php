@@ -27,6 +27,18 @@ class MY_Controller extends CI_Controller
         }
     }
 
+    
+    /**
+     * Display the login form.
+     * Store the current URL in session to be able to redirect after login.
+     */
+    protected function ask_for_login()
+    {
+        $_SESSION['after_login_redirect'] = current_url();
+        redirect("auth/login");
+    }
+
+    
     /**
     * Check if user access level matches the required access level.
     * Required level can be the controller's default level or a custom
@@ -50,7 +62,7 @@ class MY_Controller extends CI_Controller
             // check if user is logged in
             // if not, redirect to login page
             if ($_SESSION['logged_in'] != true) {
-                redirect("auth/login");
+                $this->ask_for_login();
             }
             // check if page is accessible for all logged in users
             elseif ($required_level == "@") {
