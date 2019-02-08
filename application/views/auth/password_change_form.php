@@ -45,7 +45,7 @@
                 </div>
                 <div class="form-group">
                     <div class="col-sm-12 text-center">
-                        <input id="btn_change_password" name="btn_change_password" type="submit" class="btn btn-default" value="<?= lang('btn_change_password'); ?>" />
+                        <input id="btn_change_password" name="btn_change_password" type="submit" class="btn btn-primary" value="<?= lang('btn_change_password'); ?>" />
                         <a id="btn_cancel" class="btn btn-default" href="<?= base_url(); ?>"><?= lang('btn_cancel'); ?></a>
                     </div>
                 </div>

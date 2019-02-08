@@ -36,7 +36,7 @@
                                   
                 <div class="form-group">
                     <div class="col-sm-12 text-center">
-                        <input id="btn_login" name="btn_login" type="submit" class="btn btn-default" value="<?= lang('btn_login'); ?>" />
+                        <input id="btn_login" name="btn_login" type="submit" class="btn btn-primary" value="<?= lang('btn_login'); ?>" />
                         <a id="btn_cancel" class="btn btn-default" href="<?= base_url(); ?>"><?= lang('btn_cancel'); ?></a>
                     </div>
                 </div>
