@@ -76,7 +76,7 @@
                     echo form_dropdown('item_group_id', $item_groups_name, $item_group_id, 'class="form-control" id="item_group_id"');
                 } else {
                     // No group selected
-                    echo form_dropdown('item_group_id', $item_groups_name, '', 'class="form-control" id="item_group_id"');
+                    echo form_dropdown('item_group_id', $item_groups_name, ITEMS_DEFAULT_GROUP, 'class="form-control" id="item_group_id"');
                 }
                 ?>
             </div>

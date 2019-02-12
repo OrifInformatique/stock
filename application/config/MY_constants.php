@@ -44,6 +44,13 @@ define('INVENTORY_NUMBER_CHARS', 4); // number of chars in the ID part (to add l
 define('FUNCTIONAL_ITEM_CONDITION_ID', 10);
 
 /*
+|--------------------------------------------------------------------------
+| ID of the item's default group
+|--------------------------------------------------------------------------
+*/
+define('ITEMS_DEFAULT_GROUP', 2);
+
+/*
  |-------------------------------------------------------------------------
  | Number of items show by page
  |-------------------------------------------------------------------------
