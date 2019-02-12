@@ -44,7 +44,9 @@
             <?= form_close(); ?>
 
             <!-- Status messages -->
-            <div class="alert alert-danger text-center"><?= $this->session->flashdata('message-danger'); ?></div>
+            <?php if(!is_null($this->session->flashdata('message-danger'))){ ?>
+                <div class="alert alert-danger text-center"><?= $this->session->flashdata('message-danger'); ?></div>
+            <?php } ?>
         </div>
     </div>
 </div>
