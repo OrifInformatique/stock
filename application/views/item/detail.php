@@ -94,10 +94,12 @@
                 </div></div>
                 <div class="row">
                     <div class="col-xs-6">
-                        <label><?= $this->lang->line('field_loan_date'); ?> :&nbsp;</label>
+                        <label><?= lang('field_loan_date'); ?> :&nbsp;</label>
                     </div>
                     <div class="col-xs-6">
-                        <?php if(!empty($item->current_loan->date)){echo nice_date($item->current_loan->date, $this->lang->line('date_format_short'));}?>
+                        <?php if(!empty($item->current_loan->date)){
+                            echo databaseToShortDate($item->current_loan->date);
+                        }?>
                     </div>
                 </div>
                 <div class="row">
@@ -105,7 +107,9 @@
                         <label><?= $this->lang->line('field_loan_planned_return'); ?> :&nbsp;</label>
                     </div>
                     <div class="col-xs-6">
-                        <?php if(!empty($item->current_loan->planned_return_date)){echo nice_date($item->current_loan->planned_return_date, $this->lang->line('date_format_short'));}?>
+                        <?php if(!empty($item->current_loan->planned_return_date)){
+                            echo databaseToShortDate($item->current_loan->planned_return_date);
+                        }?>
                     </div>
                 </div>
             <?php } ?>
@@ -141,8 +145,7 @@
                 </div>
                 <div class="col-sm-8">
                     <?php if(!is_null($item->last_inventory_control)) {
-                        echo nice_date($item->last_inventory_control->date,
-                                       $this->lang->line('date_format_short'));
+                        echo databaseToShortDate($item->last_inventory_control->date);
                         echo ', '.html_escape($item->last_inventory_control->controller->username);
                         if(!is_null($item->last_inventory_control->remarks)) {
                             echo '</br >'.html_escape($item->last_inventory_control->remarks);
@@ -187,7 +190,7 @@
             <?php
             if (!empty($item->buying_date))
             {
-                echo nice_date($item->buying_date, $this->lang->line('date_format_short'));
+                echo databaseToShortDate($item->buying_date);
             }
             ?>
         </div>

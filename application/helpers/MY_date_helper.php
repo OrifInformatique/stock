@@ -46,11 +46,11 @@ function mysqlDate($date)
 {
     if (empty($date) || strtolower($date) == 'now')
     {
-        return date('Y-m-d');
+        return date(DATABASE_DATE_FORMAT);
     }
     else
     {
-        return nice_date($date, 'Y-m-d');
+        return date_format($date, DATABASE_DATE_FORMAT);
     }
 }
 
@@ -63,12 +63,31 @@ function mysqlDateTime($date)
 {
     if (empty($date) || strtolower($date) == 'now')
     {
-        return date('Y-m-d H:i:s');
+        return date(DATABASE_DATETIME_FORMAT);
     }
     else
     {
-        return nice_date($date, 'Y-m-d H:i:s');
+        return date_format($date, DATABASE_DATETIME_FORMAT);
     }
 }
 
+
+/**
+* Convert date from database format to short date format defined in language file
+*
+* @param $date : The database formatted date
+* @return The short formatted date
+*/
+function databaseToShortDate($date)
+{
+    if (!empty($date) && $date!='0000-00-00')
+    {
+        return date_format(date_create_from_format(DATABASE_DATE_FORMAT, $date),
+                           lang('date_format_short'));
+    }
+    else
+    {
+        return Null;
+    }
+}
 /* End of file My_date_helper.php */

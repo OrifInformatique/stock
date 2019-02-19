@@ -56,3 +56,11 @@ define('ITEMS_DEFAULT_GROUP', 2);
  |-------------------------------------------------------------------------
  */
 define('ITEMS_PER_PAGE',25);
+
+/*
+ |-------------------------------------------------------------------------
+ | Database date and datetime format for conversions to PHP format
+ |-------------------------------------------------------------------------
+ */
+define('DATABASE_DATE_FORMAT', 'Y-m-d');
+define('DATABASE_DATETIME_FORMAT', 'Y-m-d H:i:s');
