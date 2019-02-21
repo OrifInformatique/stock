@@ -704,7 +704,7 @@ public function index($page = 1)
 
         $this->form_validation->set_rules("name", $this->lang->line('field_item_name'), 'required');
 
-        $this->form_validation->set_rules("inventory_number", $this->lang->line('field_inventory_number'), 'required');
+        $this->form_validation->set_rules("inventory_prefix", lang('field_inventory_number'), 'required');
     }
 
 }

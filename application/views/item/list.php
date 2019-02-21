@@ -164,7 +164,7 @@
           </td>
           <td><?php echo html_escape($item->stocking_place->name); ?></td>
           <td>
-            <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo html_escape($item->inventory_number_complete); ?></a>
+            <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo html_escape($item->inventory_number); ?></a>
             <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo html_escape($item->serial_number); ?></a>
           </td>
           <td>

@@ -53,7 +53,7 @@ CREATE TABLE `inventory_control` (
 
 CREATE TABLE `item` (
   `item_id` int(11) NOT NULL,
-  `inventory_number` varchar(45) DEFAULT NULL,
+  `inventory_prefix` varchar(45) DEFAULT NULL,
   `name` varchar(100) DEFAULT NULL,
   `description` text,
   `image` varchar(255) DEFAULT NULL,

@@ -16,7 +16,7 @@
 	<div class="row">
         <div class="col-md-8"><h3><?= html_escape($item->name); ?></h3></div>
         <div class="col-md-4">
-            <h4 class="text-right"><?= $this->lang->line('field_inventory_number_abr').' : '.html_escape($item->inventory_number_complete); ?></h4>
+            <h4 class="text-right"><?= $this->lang->line('field_inventory_number_abr').' : '.html_escape($item->inventory_number); ?></h4>
         </div>
     </div>
     <div class="row">

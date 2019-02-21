@@ -32,10 +32,10 @@
         </div>
         <div class="col-md-4">
             <div class="form-group col-xs-7">
-                <input type="text" class="form-control input-bold" name="inventory_number"
-                       id="inventory_number"
+                <input type="text" class="form-control input-bold" name="inventory_prefix"
+                       id="inventory_prefix"
                        placeholder="<?php echo $this->lang->line('field_inventory_number') ?>"
-                       value="<?php if(isset($inventory_number)) {echo set_value('inventory_number',$inventory_number);} else {echo set_value('inventory_number');} ?>" />
+                       value="<?php if(isset($inventory_prefix)) {echo set_value('inventory_prefix',$inventory_prefix);} else {echo set_value('inventory_prefix');} ?>" />
             </div>
             <div class="form-group col-xs-5">
                 <input type="text" class="form-control" name="inventory_id"
@@ -257,7 +257,7 @@ function createInventoryNo(){
     var tagShortName = getFirstTagShortName();
     var buyingDateField = document.getElementById('buying_date');
     var date = new Date(buyingDateField.value).getFullYear();
-    var inventoryNumberField = document.getElementById('inventory_number');
+    var inventoryNumberField = document.getElementById('inventory_prefix');
     var inventoryNumber = "";
     var inventoryIdField = document.getElementById('inventory_id');
     

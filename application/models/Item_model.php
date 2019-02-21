@@ -23,10 +23,9 @@ class Item_model extends MY_Model
     protected $has_many = ['item_tag_links', 'loans', 'inventory_controls'];
 
     /* MY_Model callback methods */
-    protected $after_get = ['get_inventory_id', 'get_inventory_number_complete', 
-    						'get_image', 'get_warranty_status',
-                            'get_current_loan', 'get_last_inventory_control',
-                            'get_tags'];
+    protected $after_get = ['get_inventory_number', 'get_image',
+                            'get_warranty_status', 'get_current_loan',
+                            'get_last_inventory_control', 'get_tags'];
 
 
     /**
@@ -37,55 +36,46 @@ class Item_model extends MY_Model
         parent::__construct();
     }
 
-	/*
-	 * Returns the id that will receive the next item
-	 */
-	public function get_future_id()
-	{
-		$query = $this->db->query("SHOW TABLE STATUS LIKE 'item'");
+    /*
+     * Returns the id that will receive the next item
+     */
+    public function get_future_id()
+    {
+        $query = $this->db->query("SHOW TABLE STATUS LIKE 'item'");
 
-    $row = $query->row(0);
-    $value = $row->Auto_increment;
+        $row = $query->row(0);
+        $value = $row->Auto_increment;
 
-		return $value;
-	}
+        return $value;
+    }
 
-	/*
-	 * Returns the seconde part of inventory number : The ID with leading "0"
-	 */
-	public function get_inventory_id($item)
-	{
-		$inventory_id = "";
+    /*
+     * inventory_id :     Based on the item_id db field,
+     *                    completed with leading zeros
+     * inventory_prefix : Textual first part of the inventory_number
+     * inventory number : complete inventory number, concatenation of
+     *                    inventory_prefix and inventory_id
+     */
+    protected function get_inventory_number($item)
+    {
+        $inventory_id = "";
+        $inventory_number = "";
 
-		if (!is_null($item)) {
-			$inventory_id = $item->item_id;
+        if (!is_null($item)) {
+            $inventory_id = $item->item_id;
+            
+            // Add leading zeros to inventory_id
+            for( $i = strlen($inventory_id) ; $i < INVENTORY_NUMBER_CHARS; $i++) {
+                $inventory_id = "0".$inventory_id;
+            }
+            $item->inventory_id = $inventory_id;
 
-	    	for( $i = strlen($inventory_id) ; $i < INVENTORY_NUMBER_CHARS; $i++) {
-	        	$inventory_id = "0".$inventory_id;
-	        }
+            $inventory_number = $item->inventory_prefix.".".$item->inventory_id;
+            $item->inventory_number = $inventory_number;
+        }
 
-	        $inventory_id = ".".$inventory_id;
-          $item->inventory_id = $inventory_id;
-    	}
-
-    	return $item;
-	}
-
-	/*
-	 * Returns the complete inventory number,
-	 * concatenation of inventory_number and inventory_id.
-	 */
-	public function get_inventory_number_complete($item)
-	{
-		$inventory_number_complete = "";
-
-		if (!is_null($item)) {
-			$inventory_number_complete = $item->inventory_number.$item->inventory_id;
-      $item->inventory_number_complete = $inventory_number_complete;
-    	}
-
-    	return $item;
-	}
+        return $item;
+    }
 
     /**
     * If no image is set, use "no_image.png"
@@ -252,7 +242,7 @@ class Item_model extends MY_Model
      * @param array $filters The array of filters
      * @return An array of corresponding items
      */
-    function get_filtered($filters){
+    public function get_filtered($filters){
 
         // Initialize a global WHERE clause for filtering
         $where_itemsFilters = '';
