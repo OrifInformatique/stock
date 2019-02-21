@@ -252,7 +252,7 @@ class Item_model extends MY_Model
         **********************/
         $where_textSearchFilter = '';
 
-        if (isset($filters['ts'])) {
+        if (isset($filters['ts']) && $filters['ts']!='') {
           $text_search_content = $filters['ts'];
 
           // If the search text is an inventory number, separate the ID from the rest (ID is after the last '.')
@@ -286,12 +286,12 @@ class Item_model extends MY_Model
 
           if (isset($item_id)) {
             if (isset($inventory_number) && $inventory_number != '') {
-              $where_textSearchFilter .= "OR (item_id = ".$item_id." AND inventory_number LIKE '%".$inventory_number."%') ";
+              $where_textSearchFilter .= "OR (item_id = ".$item_id." AND inventory_prefix LIKE '%".$inventory_number."%') ";
             } else {
               $where_textSearchFilter .= "OR item_id = ".$item_id." ";
             }
           } else {
-            $where_textSearchFilter .= "OR inventory_number LIKE '%".$text_search_content."%' ";
+            $where_textSearchFilter .= "OR inventory_prefix LIKE '%".$text_search_content."%' ";
           }
           $where_textSearchFilter .= ')';
 
@@ -302,6 +302,7 @@ class Item_model extends MY_Model
             $where_itemsFilters .= ' AND ';
           }
           $where_itemsFilters .= $where_textSearchFilter;
+          var_dump($where_textSearchFilter);
         }
 
         /*********************
