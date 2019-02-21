@@ -302,7 +302,6 @@ class Item_model extends MY_Model
             $where_itemsFilters .= ' AND ';
           }
           $where_itemsFilters .= $where_textSearchFilter;
-          var_dump($where_textSearchFilter);
         }
 
         /*********************
