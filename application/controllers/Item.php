@@ -11,8 +11,8 @@ if (!defined('BASEPATH'))
  */
 class Item extends MY_Controller {
 
-  /* MY_Controller variables definition */
-  protected $access_level = "*";
+    /* MY_Controller variables definition */
+    protected $access_level = "*";
 
     /**
      * Constructor
@@ -45,13 +45,23 @@ class Item extends MY_Controller {
             // No condition selected for filtering, default filtering for "functional" items
             $filters['c'] = array(FUNCTIONAL_ITEM_CONDITION_ID);
         }
+        var_dump($filters);
+        $output = $this->load_list($filters, array("value"=>"name","asc"=>true), $page);
 
+        // Send the data to the View
+        $this->display_view('item/list', $output);
+    }
+
+    public function load_list($filters, $sorting, $page)
+    {
         // Get item(s) through filtered search on the database
         $output['items'] = $this->item_model->get_filtered($filters);
 
+        //TODO "name" -> $sorting; true -> $sorting;
         // Sort output depending on the user's choice
-        $sortValue = "name";
-        $asc = true;
+        $sortValue = $sorting["value"];
+        $asc = $sorting["asc"];
+
         // Verify the existence of the sort order key in filters
         if(array_key_exists("o", $filters)){
             switch ($filters['o']) {
@@ -79,27 +89,13 @@ class Item extends MY_Controller {
 
         // Prepare search filters values to send to the view
         $output = array_merge($output, $filters);
-        if (!isset($output["ts"])) {
-            $output["ts"] = '';
-        }
-        if (!isset($output["c"])) {
-            $output["c"] = '';
-        }
-        if (!isset($output["g"])) {
-            $output["g"] = '';
-        }
-        if (!isset($output["s"])) {
-            $output["s"] = '';
-        }
-        if (!isset($output["t"])) {
-            $output["t"] = '';
-        }
-        if (!isset($output["o"])) {
-            $output["o"] = '';
-        }
-        if (!isset($output["ad"])) {
-            $output["ad"] = '';
-        }
+        if (!isset($output["ts"])) $output["ts"] = '';
+        if (!isset($output["c"])) $output["c"] = '';
+        if (!isset($output["g"])) $output["g"] = '';
+        if (!isset($output["s"])) $output["s"] = '';
+        if (!isset($output["t"])) $output["t"] = '';
+        if (!isset($output["o"])) $output["o"] = '';
+        if (!isset($output["ad"])) $output["ad"] = '';
 
         // Add page title
         $output['title'] = $this->lang->line('page_item_list');
@@ -119,12 +115,22 @@ class Item extends MY_Controller {
                                         $this->lang->line('sort_order_inventory_number'));
         $output['sort_asc_desc'] = array($this->lang->line('sort_order_asc'),
                                             $this->lang->line('sort_order_des'));
+        
+        $output['pagination'] =  $this->load_pagination(count($output["items"]))->create_links();
 
+        // Keep only the slice of items corresponding to the current page
+        $output["items"] = array_slice($output["items"], ($page-1)*ITEMS_PER_PAGE, ITEMS_PER_PAGE);
+
+        return $output;
+    }
+    
+    public function load_pagination($nbr_items)
+    {
         // Create the pagination
         $this->load->library('pagination');
 
         $config['base_url'] = base_url('/item/index/');
-        $config['total_rows'] = count($output["items"]);
+        $config['total_rows'] = $nbr_items;
         $config['per_page'] = ITEMS_PER_PAGE;
         $config['use_page_numbers'] = TRUE;
         $config['reuse_query_string'] = TRUE;
@@ -149,41 +155,9 @@ class Item extends MY_Controller {
 
         $config['num_tag_open'] = '<li>';
         $config['num_tag_close'] = '</li>';
-
-        $this->pagination->initialize($config);
-
-        $output['pagination'] = $this->pagination->create_links();
-
-        // Keep only the slice of items corresponding to the current page
-        $output["items"] = array_slice($output["items"], ($page-1)*ITEMS_PER_PAGE, ITEMS_PER_PAGE);
-
-        // Send the data to the View
-        $this->display_view('item/list', $output);
+        
+        return $this->pagination->initialize($config);
     }
-
-    public function test($testVar = "ttt"){
-
-
-
-       // Load list of elements to display as filters
-       /*$this->load->model('item_tag_model');
-       $output['item_tags'] = $this->item_tag_model->dropdown('name');
-       $this->load->model('item_condition_model');
-       $output['item_conditions'] = $this->item_condition_model->dropdown('name');
-       $this->load->model('item_group_model');
-       $output['item_groups'] = $this->item_group_model->dropdown('name');
-       $this->load->model('stocking_place_model');
-       $output['stocking_places'] = $this->stocking_place_model->dropdown('name');
-       $output['sort_order'] = array($this->lang->line('sort_order_name'),
-                                       $this->lang->line('sort_order_stocking_place_id'),
-                                       $this->lang->line('sort_order_date'),
-                                       $this->lang->line('sort_order_inventory_number'));
-       $output['sort_asc_desc'] = array($this->lang->line('sort_order_asc'),
-                                           $this->lang->line('sort_order_des'));*/
-                                           
-
-    }
-  
     /**
      * Display details of one single item
      *
