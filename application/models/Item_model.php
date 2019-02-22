@@ -415,7 +415,6 @@ class Item_model extends MY_Model
 
           $item_tag_links = $this->item_tag_link_model->get_many_by($where_itemTagLinks);
 
-
           // Prepare WHERE clause for all corresponding items
           $where_itemTagsFilter .= '(';
           foreach ($item_tag_links as $item_tag_link) {
@@ -426,7 +425,9 @@ class Item_model extends MY_Model
             $where_itemTagsFilter = substr($where_itemTagsFilter, 0, -4);
             $where_itemTagsFilter .= ')';
           } else {
-            $where_itemTagsFilter = "";
+            // No item_tag_link found : no item correspond to the filter.
+            // We use "item_id=-1" filter to return no item.
+            $where_itemTagsFilter = 'item_id=-1';
           }
 
           // Add this part of WHERE clause to the global WHERE clause

@@ -1,7 +1,7 @@
 <form class="container" method="post" enctype="multipart/form-data">
     <!-- BUTTONS -->
     <div class="form-group col-xs-12">
-        <button type="submit" class="btn btn-success"><?php echo $this->lang->line('btn_submit'); ?></button>
+        <button type="submit" class="btn btn-success"><?php echo $this->lang->line('btn_save'); ?></button>
         <a class="btn btn-danger" href="<?php echo base_url(); if(isset($modify)) {echo "item/view/" . $item_id;} ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
     </div>
 

@@ -345,14 +345,12 @@ class Admin extends MY_Controller
 
       $filter = array("t" => array($id));
       $items = $this->item_model->get_filtered($filter);
-      //$totalitems = sizeof($this->item_model->get_filtered('')); // Required for full examination
 
       if (is_null($action)) {
         // Display a message to confirm the action
         $output = get_object_vars($this->item_tag_model->get($id));
         $output["deletion_allowed"] = !(sizeof($items) > 0 && sizeof($items) < 500); // Do not make the number bigger than the amount of items
         $output["amount"] = sizeof($items);
-        //$output["deletion_allowed"] = !(sizeof($items) > 0 && sizeof($items) < $totalitems); // Full examination, might be slower than normal
         $output["tags"] = $this->item_tag_model->get_all();
         $this->display_view("admin/tags/delete", $output);
       
@@ -526,7 +524,7 @@ class Admin extends MY_Controller
         // VALIDATION
 
         //name: if changed,
-        $this->form_validation->set_rules('name', $this->lang->line('field_username'), "required|callback_unique_supplier[$id]", $this->lang->line('msg_err_supplier_needed')); // not void
+        $this->form_validation->set_rules('name', $this->lang->line('field_name'), "required|callback_unique_supplier[$id]", $this->lang->line('msg_err_supplier_needed')); // not void
 
         if (isset($_POST['email'])) {
           // or valid.
@@ -565,7 +563,7 @@ class Admin extends MY_Controller
         // VALIDATION
 
         //name: not void
-        $this->form_validation->set_rules('name', $this->lang->line('field_username'), 'required|callback_unique_supplier', $this->lang->line('msg_err_supplier_needed'));
+        $this->form_validation->set_rules('name', $this->lang->line('field_name'), 'required|callback_unique_supplier', $this->lang->line('msg_err_supplier_needed'));
 
         //email: void
         if (isset($_POST['email'])) {
@@ -664,7 +662,7 @@ class Admin extends MY_Controller
       }
 
       if (!empty($_POST)) {
-        $this->form_validation->set_rules('name', $this->lang->line('field_name'), "required|callback_unique_groupname[$id]", $this->lang->line('msg_err_item_group_needed'));
+        $this->form_validation->set_rules('name', lang('field_name'), "required|callback_unique_groupname[$id]", lang('msg_err_item_group_needed'));
         $this->form_validation->set_rules('short_name', $this->lang->line('field_abbreviation'), "required|callback_unique_groupshort[$id]", $this->lang->line('msg_err_item_group_short'));
 
         if ($this->form_validation->run() === TRUE) {

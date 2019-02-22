@@ -20,8 +20,9 @@ $lang['datetime_format_short']          = 'd.m.Y H:i';
 
 // Fields labels
 $lang['field_username']                 = 'Identifiant';
-$lang['field_surname']                  = 'Nom';
-$lang['field_name']                     = 'Prénom';
+$lang['field_name']                     = 'Nom';
+$lang['field_firstname']                = 'Prénom';
+$lang['field_lastname']                 = 'Nom';
 $lang['field_status']                   = 'Statut';
 $lang['field_mail']                     = 'Mail';
 $lang['field_password']                 = 'Mot de passe';
@@ -120,7 +121,7 @@ $lang['admin_tab_suppliers']            = 'Fournisseurs';
 $lang['admin_tab_item_groups']          = 'Groupes d\'objets';
 $lang['admin_tab_admin']                = 'Administration';
 
-// Admin deletion labels
+// Admin deletion texts
 $lang['admin_delete_item_group']        = 'Supprimer le groupe';
 $lang['admin_delete_stocking_place']    = 'Supprimer le lieu de stockage';
 $lang['admin_delete_tag']               = 'Supprimer le tag';
@@ -130,12 +131,10 @@ $lang['admin_delete_item']              = 'Supprimer l\'objet';
 $lang['admin_delete_tag_verify']        = 'Voulez-vous vraiment supprimer le tag ';
 $lang['admin_delete_user_verify']       = 'Voulez-vous vraiment supprimer l\'utilisateur ';
 $lang['admin_desactivate_user']         = 'Le désactiver';
-
-// Admin deletion lines
-$lang['delete_tag_ok_start']            = 'Voulez-vous vraiment supprimer le tag ';
-$lang['delete_stocking_place_ok_start'] = 'Voulez-vous vraiment supprimer le lieu de stockage ';
-$lang['delete_item_group_ok_start']     = 'Voulez-vous vraiment supprimer le groupe d\'objets ';
-$lang['delete_supplier_ok_start']       = 'Voulez-vous vraiment supprimer le fournisseur ';
+$lang['admin_delete_tag_verify']        = 'Voulez-vous vraiment supprimer le tag ';
+$lang['admin_delete_stocking_place_verify'] = 'Voulez-vous vraiment supprimer le lieu de stockage ';
+$lang['admin_delete_item_group_verify'] = 'Voulez-vous vraiment supprimer le groupe d\'objets ';
+$lang['admin_delete_supplier_verify']   = 'Voulez-vous vraiment supprimer le fournisseur ';
 $lang['delete_notok']                   = 'Cet élément ne peut pas être supprimé car il est en cours d\'utilisation par un ou plusieurs objets.';
 $lang['delete_notok_with_amount']       = 'Cet élément ne peut pas être supprimé car il est en cours d\'utilisation par ';
 $lang['delete_notok_item']              = ' objet.';
@@ -157,7 +156,6 @@ $lang['btn_new']                        = 'Nouveau';
 $lang['btn_modify']                     = 'Modifier';
 $lang['btn_delete']                     = 'Supprimer';
 $lang['btn_save']                       = 'Sauvegarder';
-$lang['btn_submit']                     = 'Sauvegarder';
 $lang['btn_login']                      = 'Se connecter';
 $lang['btn_logout']                     = 'Se déconnecter';
 $lang['btn_signup']                     = 'S\'inscrire';

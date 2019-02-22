@@ -49,7 +49,7 @@
     <div class="row">
         <br />
         <button type="submit" class="btn btn-success">
-          <?php echo $this->lang->line('btn_submit'); ?>
+          <?php echo $this->lang->line('btn_save'); ?>
         </button>
         <a class="btn btn-danger" href="<?php echo base_url() . "admin/view_tags/"; ?>">
           <?php echo $this->lang->line('btn_cancel'); ?>

@@ -43,11 +43,11 @@
 			<input class="form-control" name="username" id="username" value="<?php if (isset($username)) {echo set_value('username',$username);} else {echo set_value('username');} ?>" />
 		</div>
 		<div class="form-group">
-			<label for="lastname"><?php echo $this->lang->line('field_surname') ?></label>
+			<label for="lastname"><?php echo $this->lang->line('field_lastname') ?></label>
 			<input class="form-control" name="lastname" id="lastname" value="<?php if (isset($lastname)) {echo set_value('lastname',$lastname);} else {echo set_value('lastname');} ?>" />
 		</div>
 		<div class="form-group">
-			<label for="firstname"><?php echo $this->lang->line('field_name') ?></label>
+			<label for="firstname"><?php echo $this->lang->line('field_firstname') ?></label>
 			<input class="form-control" name="firstname" id="firstname" value="<?php if (isset($firstname)) {echo set_value('firstname',$firstname);} else {echo set_value('firstname');} ?>" />
 		</div>
 		<div class="form-group">
@@ -74,7 +74,7 @@
 			<input name="is_active" type="checkbox" value="TRUE" <?php if(isset($is_active) && $is_active == 1) {echo "checked";} ?> />
 			<label style="display: inline-block;" for="is_active">Activé </label>
 		</div>
-		<button type="submit" class="btn btn-success"><?php echo $this->lang->line('btn_submit'); ?></button>
+		<button type="submit" class="btn btn-success"><?php echo $this->lang->line('btn_save'); ?></button>
 		<a class="btn btn-danger" href="<?php echo base_url() . "admin/view_users/"; ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
 	</form>
 	</div>
