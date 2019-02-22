@@ -32,74 +32,6 @@ class Item extends MY_Controller {
      * @return void
      */
     public function index($page = 1) {
-        // Store URL to make possible to come back later (from item detail for example)
-        if (isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING'])) {
-            $_SESSION['items_list_url'] = current_url().'?'.$_SERVER['QUERY_STRING'];
-        } else {
-            $_SESSION['items_list_url'] = current_url();
-        }
-
-        // Get user's search filters and add default values
-        $filters = $_GET;
-        if (!isset($filters['c'])) {
-            // No condition selected for filtering, default filtering for "functional" items
-            $filters['c'] = array(FUNCTIONAL_ITEM_CONDITION_ID);
-        }
-        var_dump($filters);
-        $output = $this->load_list($filters, array("value"=>"name","asc"=>true), $page);
-
-        // Send the data to the View
-        $this->display_view('item/list', $output);
-    }
-
-    public function load_list($filters, $sorting, $page)
-    {
-        // Get item(s) through filtered search on the database
-        $output['items'] = $this->item_model->get_filtered($filters);
-
-        //TODO "name" -> $sorting; true -> $sorting;
-        // Sort output depending on the user's choice
-        $sortValue = $sorting["value"];
-        $asc = $sorting["asc"];
-
-        // Verify the existence of the sort order key in filters
-        if(array_key_exists("o", $filters)){
-            switch ($filters['o']) {
-            case 1:
-                $sortValue = "stocking_place_id";
-                break;
-            case 2:
-                $sortValue = "buying_date";
-                break;
-            case 3:
-                $sortValue = "inventory_number";
-                break;
-            //In case of problem, it automatically switches to name
-            default:
-            case 0:
-                $sortValue = "name";
-                break;
-            }
-        }
-        // If not 1, order will be ascending
-        if(array_key_exists("ad", $filters)){
-            $asc = $filters['ad'] != 1;
-        }
-        $output['items'] = sortBySubValue($output['items'], $sortValue, $asc);
-
-        // Prepare search filters values to send to the view
-        $output = array_merge($output, $filters);
-        if (!isset($output["ts"])) $output["ts"] = '';
-        if (!isset($output["c"])) $output["c"] = '';
-        if (!isset($output["g"])) $output["g"] = '';
-        if (!isset($output["s"])) $output["s"] = '';
-        if (!isset($output["t"])) $output["t"] = '';
-        if (!isset($output["o"])) $output["o"] = '';
-        if (!isset($output["ad"])) $output["ad"] = '';
-
-        // Add page title
-        $output['title'] = $this->lang->line('page_item_list');
-
         // Load list of elements to display as filters
         $this->load->model('item_tag_model');
         $output['item_tags'] = $this->item_tag_model->dropdown('name');
@@ -115,15 +47,78 @@ class Item extends MY_Controller {
                                         $this->lang->line('sort_order_inventory_number'));
         $output['sort_asc_desc'] = array($this->lang->line('sort_order_asc'),
                                             $this->lang->line('sort_order_des'));
+        // Prepare search filters values to send to the view
+        if (!isset($output["ts"])) $output["ts"] = '';
+        if (!isset($output["c"])) $output["c"] = '';
+        if (!isset($output["g"])) $output["g"] = '';
+        if (!isset($output["s"])) $output["s"] = '';
+        if (!isset($output["t"])) $output["t"] = '';
+        if (!isset($output["o"])) $output["o"] = '';
+        if (!isset($output["ad"])) $output["ad"] = '';
+        // Send the data to the View
+        $this->display_view('item/list', $output);
+    }
+
+    private function load_list($page)
+    {
+        if (isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING'])) {
+            $_SESSION['items_list_url'] = current_url().'?'.$_SERVER['QUERY_STRING'];
+        } else {
+            $_SESSION['items_list_url'] = current_url();
+        }
+        // Get user's search filters and add default values
+        $filters = $_GET;
+        if (!isset($filters['c'])) {
+            // No condition selected for filtering, default filtering for "functional" items
+            $filters['c'] = array(FUNCTIONAL_ITEM_CONDITION_ID);
+        }
+        
+        // Get item(s) through filtered search on the database
+        $output['items'] = $this->item_model->get_filtered($filters);
+        
+        // Verify the existence of the sort order key in filters
+        if(array_key_exists("o", $filters)){
+            switch ($filters['o']) {
+                case 1:
+                $sortValue = "stocking_place_id";
+                break;
+                case 2:
+                $sortValue = "buying_date";
+                break;
+                case 3:
+                $sortValue = "inventory_number";
+                break;
+                //In case of problem, it automatically switches to name
+                default:
+                case 0:
+                $sortValue = "name";
+                break;
+            }
+        }
+        // If not 1, order will be ascending
+        if(array_key_exists("ad", $filters)){
+            $asc = $filters['ad'] != 1;
+        }
+        $output['items'] = sortBySubValue($output['items'], $sortValue, $asc);
+        
+        // Add page title
+        $output['title'] = $this->lang->line('page_item_list');
         
         $output['pagination'] =  $this->load_pagination(count($output["items"]))->create_links();
-
+        
+        $output['number_page'] = is_numeric($page)?$page:1;
+        if($output['number_page']<1)$output['number_page']=1; 
+        if($output['number_page']>ceil(count($output["items"])/ITEMS_PER_PAGE)) $output['number_page']=ceil(count($output["items"])/ITEMS_PER_PAGE);
+        
         // Keep only the slice of items corresponding to the current page
-        $output["items"] = array_slice($output["items"], ($page-1)*ITEMS_PER_PAGE, ITEMS_PER_PAGE);
-
+        $output["items"] = array_slice($output["items"], ($output['number_page']-1)*ITEMS_PER_PAGE, ITEMS_PER_PAGE);
+        
         return $output;
     }
-    
+    public function load_list_json($page){
+        echo json_encode($this->load_list($page));
+    }
+
     public function load_pagination($nbr_items)
     {
         // Create the pagination
