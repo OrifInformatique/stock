@@ -1,33 +1,45 @@
-<div class="container">
-  <h1 class="xs-right">
-    <select id="regions" onchange="changeRegion()">
-      <option value="tag">Tags</option>
-      <option value="user">Utilisateurs</option>
-      <option value="stocking_place">Lieux de stockage</option>
-      <option value="supplier">Fournisseurs</option>
-      <option value="item_group">Groupes d'objets</option>
-    </select>,
-    <a class="like-normal" href="<?php echo base_url(); ?>admin/">Administration</a>
-  </h1>
-  <!-- First something more simple <span onclick="minilist()">Utilisateurs</span>, Administration -->
+<div class="container" id="content">
   <div class="row">
-    <div class="col-lg-12 col-sm-12">
-      <table class="table table-striped table-hover">
-        <tbody>
-          <?php foreach ($tags as $tag) { ?>
-          <tr>
-            <td>
-              <a href="<?php echo base_url(); ?>admin/modify_tag/<?php echo $tag->item_tag_id; ?>"><?php echo html_escape($tag->name); ?></a>
-              <span class=".text-center"><?php echo html_escape($tag->short_name); ?></span>
-              <a href="<?php echo base_url(); ?>admin/delete_tag/<?php echo $tag->item_tag_id; ?>" class="close">×</a>
-            </td>
-          </tr>
-          <?php } ?>
-        </tbody>
-      </table>
-      <a href="<?php echo base_url(); ?>admin/new_tag/" class="btn btn-primary">Nouveau…</a>
-    </div>
+    <a href="<?= base_url(); ?>admin/new_tag/" class="btn btn-success"><?= lang('btn_new'); ?></a>
+  </div>
+  
+  <div class="row">
+    <h3>
+      <a href="#" onclick="loadPage('admin/view_users/')" class="tab_unselected"><?= lang('admin_tab_users'); ?></a>
+      <a href="#" onclick="loadPage('admin/view_tags/')" class="tab_selected"><?= lang('admin_tab_tags'); ?></a>
+      <a href="#" onclick="loadPage('admin/view_stocking_places/')" class="tab_unselected"><?= lang('admin_tab_stocking_places'); ?></a>
+      <a href="#" onclick="loadPage('admin/view_suppliers/')" class="tab_unselected"><?= lang('admin_tab_suppliers'); ?></a>
+      <a href="#" onclick="loadPage('admin/view_item_groups/')" class="tab_unselected"><?= lang('admin_tab_item_groups'); ?></a>
+    </h3>
+  </div>
+  
+  <div class="row">
+    <table class="table table-striped table-hover">
+      <tbody>
+        <?php foreach ($tags as $tag) { ?>
+        <tr>
+          <td>
+            <a href="<?= base_url(); ?>admin/modify_tag/<?= $tag->item_tag_id; ?>"><?= html_escape($tag->name); ?></a>
+            <span class=".text-center"><?= html_escape($tag->short_name); ?></span>
+            <a href="<?= base_url(); ?>admin/delete_tag/<?= $tag->item_tag_id; ?>" class="close"
+              title="<?= lang('admin_delete_tag');?>">×</a>
+          </td>
+        </tr>
+        <?php } ?>
+      </tbody>
+    </table>
   </div>
 </div>
-<script src="<?php echo base_url(); ?>assets/js/geoline.js">
+<script type="text/javascript">
+    // Required on each page so that it does load no matter where the user is
+    function loadPage(endOfPageString) {
+        if($('#content').size == 0) {
+            return;
+        }
+        if(endOfPageString == undefined || endOfPageString == null) {
+            endOfPageString = "";
+        }
+        var newUrlForPart = ('<?= base_url(); ?>' + endOfPageString);
+        $('#content').load(newUrlForPart + ' #content');
+    }
 </script>

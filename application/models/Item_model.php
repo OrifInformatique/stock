@@ -370,8 +370,12 @@ class Item_model extends MY_Model
             $where_stockingPlaceFilter .= 'stocking_place_id='.$stocking_place_id.' OR ';
           }
           // Remove the last " OR "
-          $where_stockingPlaceFilter = substr($where_stockingPlaceFilter, 0, -4);
-          $where_stockingPlaceFilter .= ')';
+          if($where_stockingPlaceFilter != "(") {
+            $where_stockingPlaceFilter = substr($where_stockingPlaceFilter, 0, -4);
+            $where_stockingPlaceFilter .= ')';
+          } else {
+            $where_stockingPlaceFilter .= '';
+          }
 
           // Add this part of WHERE clause to the global WHERE clause
           if ($where_itemsFilters != '')
@@ -401,15 +405,20 @@ class Item_model extends MY_Model
 
           $item_tag_links = $this->item_tag_link_model->get_many_by($where_itemTagLinks);
 
-
           // Prepare WHERE clause for all corresponding items
           $where_itemTagsFilter .= '(';
           foreach ($item_tag_links as $item_tag_link) {
             $where_itemTagsFilter .= 'item_id='.$item_tag_link->item_id.' OR ';
           }
           // Remove the last " OR "
-          $where_itemTagsFilter = substr($where_itemTagsFilter, 0, -4);
-          $where_itemTagsFilter .= ')';
+          if($where_itemTagsFilter != "(") {
+            $where_itemTagsFilter = substr($where_itemTagsFilter, 0, -4);
+            $where_itemTagsFilter .= ')';
+          } else {
+            // No item_tag_link found : no item correspond to the filter.
+            // We use "item_id=-1" filter to return no item.
+            $where_itemTagsFilter = 'item_id=-1';
+          }
 
           // Add this part of WHERE clause to the global WHERE clause
           if ($where_itemsFilters != '')

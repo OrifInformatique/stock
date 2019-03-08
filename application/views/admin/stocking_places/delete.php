@@ -1,49 +1,32 @@
 <div class="container">
-  <h1 class="xs-right">
-    <select id="rows" onchange="changeRow()" style="text-align: right;">
-      <?php 
-      foreach($stocking_places as $stocking_place) {
-      ?>
-        <option value="<?php echo $stocking_place->stocking_place_id; ?>"
-          <?php 
-            if ($stocking_place_id == $stocking_place->stocking_place_id) 
-            {
-              echo " selected";
-            } 
-          ?>
-        >
-          "<?php echo $stocking_place->name; ?>"
-        </option>
-      <?php 
-      } 
-      ?>
-    </select>, 
-    <select id="actions" onchange="changeAction()">
-      <option value="delete">Suppression</option>
-      <option value="modify">Modification</option>
-      <option value="new">Ajout</option>
-    </select>,
-
-    <select onchange="changeRegion()" id="regions" >
-      <option value="stocking_place">Lieux de stockage</option>
-      <option value="user">Utilisateurs</option>
-      <option value="tag">Tags</option>
-      <option value="stocking_place">Fournisseurs</option>
-      <option value="item_group">Groupes d'objets</option>
-    </select>,
-    <a class="like-normal" href="<?php echo base_url(); ?>admin/">
-      <span class="word-administration">Administration</span>
-    </a>
-  </h1>
-
-  <div>
-    <em>Voulez-vous vraiment supprimer le lieu de stockage <?php echo $short; ?> (<?php echo $name; ?>) ?</em>
+    
+  <div class="row">
+    <h3>
+      <a href="<?= base_url(); ?>admin/view_users" class="tab_unselected"><?= lang('admin_tab_users'); ?></a>
+      <a href="<?= base_url(); ?>admin/view_tags" class="tab_unselected"><?= lang('admin_tab_tags'); ?></a>
+      <a href="<?= base_url(); ?>admin/view_stocking_places" class="tab_selected"><?= lang('admin_tab_stocking_places'); ?></a>
+      <a href="<?= base_url(); ?>admin/view_suppliers" class="tab_unselected"><?= lang('admin_tab_suppliers'); ?></a>
+      <a href="<?= base_url(); ?>admin/view_item_groups" class="tab_unselected"><?= lang('admin_tab_item_groups'); ?></a>
+    </h3>
   </div>
-  <div class="btn-group">
-    <a href="<?php echo base_url().uri_string()."/confirmed";?>" class="btn btn-danger btn-lg">Oui</a>
-    <a href="<?php echo base_url()."admin/view_stocking_places/";?>" class="btn btn-lg">Non</a>
-  </div>
+  
+  <?php if(isset($short) && isset($name) && $deletion_allowed) { ?>
+    <div class="row" >
+      <?= lang('admin_delete_stocking_place_verify').$short." (".$name.") ?"; ?>
+    </div>
+    <div class="btn-group row" >
+      <a href="<?= base_url().uri_string()."/confirmed";?>" class="btn btn-danger btn-lg"><?= lang('text_yes'); ?></a>
+      <a href="<?= base_url()."admin/view_stocking_places/";?>" class="btn btn-lg"><?= lang('text_no'); ?></a>
+    </div>
+  <?php } else { 
+    echo '<div class="alert alert-danger">'.lang('delete_notok_with_amount').$amount;
+    
+    if($amount > 1) {
+      echo lang('delete_notok_items');
+    } else {
+      echo lang('delete_notok_item');
+    }
+    
+    echo '</div>';
+  } ?>
 </div>
-
-<script src="<?php echo base_url(); ?>assets/js/geoline.js">
-</script>

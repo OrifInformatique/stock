@@ -22,8 +22,9 @@ $lang['datetime_format_short']          = 'd.m.Y H:i';
 
 // Fields labels
 $lang['field_username']                 = 'Identifiant';
-$lang['field_surname']                  = 'Nom';
-$lang['field_name']                     = 'Prénom';
+$lang['field_name']                     = 'Nom';
+$lang['field_firstname']                = 'Prénom';
+$lang['field_lastname']                 = 'Nom';
 $lang['field_status']                   = 'Statut';
 $lang['field_mail']                     = 'Mail';
 $lang['field_password']                 = 'Mot de passe';
@@ -46,11 +47,11 @@ $lang['field_group']                    = 'Groupe';
 $lang['field_serial_number']            = 'Numéro de série';
 $lang['field_inventory_number']         = 'Numéro d\'inventaire';
 $lang['field_inventory_number_abr']     = 'No inventaire';
-$lang['field_item_name']            	= 'Nom de l\'objet';
+$lang['field_item_name']                = 'Nom de l\'objet';
 $lang['field_item_description']         = 'Description de l\'objet';
 $lang['field_item_condition']           = 'État de l\'objet';
 $lang['field_image']                    = 'Photo de l\'objet';
-$lang['field_image_upload']		= 'Ajoutez une image<br />(hauteur et largeur max. 360px)';
+$lang['field_image_upload']             = 'Ajoutez une image<br />(hauteur et largeur max. 360px)';
 $lang['field_linked_file_upload']       = 'Ajoutez un fichier joint<br />(un seul fichier possible, pdf ou Word, max. 2Mo)';
 $lang['field_stocking_place']           = 'Lieu de stockage';
 $lang['field_last_inventory_control']   = 'Dernier contrôle d\'inventaire';
@@ -105,15 +106,61 @@ $lang['header_email']                   = 'E-mail';
 $lang['header_user_type']               = 'Statut';
 $lang['header_is_active']               = 'Activé';
 
+$lang['header_suppliers_name']          = 'Nom';
+$lang['header_suppliers_address_1']     = 'Première ligne d\'addresse';
+$lang['header_suppliers_address_2']     = 'Deuxième ligne d\'adresse';
+$lang['header_suppliers_NPA']           = 'NPA';
+$lang['header_suppliers_city']          = 'Ville';
+$lang['header_suppliers_country']       = 'Pays';
+$lang['header_suppliers_phone']         = 'Téléphone';
+$lang['header_suppliers_email']         = 'E-mail';
+
+// Admin labels
+$lang['admin_tab_users']                = 'Utilisateurs';
+$lang['admin_tab_tags']                 = 'Tags';
+$lang['admin_tab_stocking_places']      = 'Lieux de stockage';
+$lang['admin_tab_suppliers']            = 'Fournisseurs';
+$lang['admin_tab_item_groups']          = 'Groupes d\'objets';
+$lang['admin_tab_admin']                = 'Administration';
+
+// Admin deletion texts
+$lang['admin_delete_item_group']        = 'Supprimer le groupe';
+$lang['admin_delete_stocking_place']    = 'Supprimer le lieu de stockage';
+$lang['admin_delete_tag']               = 'Supprimer le tag';
+$lang['admin_delete_user']              = 'Supprimer l\'utilisateur';
+$lang['admin_delete_supplier']          = 'Supprimer le fournisseur';
+$lang['admin_delete_item']              = 'Supprimer l\'objet';
+$lang['admin_delete_tag_verify']        = 'Voulez-vous vraiment supprimer le tag ';
+$lang['admin_delete_user_verify']       = 'Voulez-vous vraiment supprimer l\'utilisateur ';
+$lang['admin_delete_tag_verify']        = 'Voulez-vous vraiment supprimer le tag ';
+$lang['admin_delete_stocking_place_verify'] = 'Voulez-vous vraiment supprimer le lieu de stockage ';
+$lang['admin_delete_item_group_verify'] = 'Voulez-vous vraiment supprimer le groupe d\'objets ';
+$lang['admin_delete_supplier_verify']   = 'Voulez-vous vraiment supprimer le fournisseur ';
+$lang['delete_user_notok']              = 'Cet utilisateur ne peut pas être supprimé car il est lié à des ';
+$lang['delete_notok']                   = 'Cet élément ne peut pas être supprimé car il est en cours d\'utilisation par un ou plusieurs objets.';
+$lang['delete_notok_with_amount']       = 'Cet élément ne peut pas être supprimé car il est en cours d\'utilisation par ';
+$lang['delete_notok_item']              = ' objet.';
+$lang['delete_notok_items']             = ' objets.';
+$lang['delete_linked_items']            = 'objets';
+$lang['delete_linked_loans_registered'] = 'prêts';
+$lang['delete_linked_loans_made']       = 'emprunts';
+
+
+// Admin other labels
+$lang['admin_modify']                   = 'Modification';
+$lang['admin_delete']                   = 'Suppression';
+$lang['admin_add']                      = 'Creation';
+$lang['admin_new']                      = 'Nouveau…';
+$lang['admin_cancel']                   = 'Annuler';
+
 // Buttons
 $lang['btn_admin']                      = 'Administration';
 $lang['btn_cancel']                     = 'Annuler';
 $lang['btn_change_password']            = 'Modifier le mot de passe';
-$lang['btn_new']                	= 'Nouveau';
-$lang['btn_modify']                	= 'Modifier';
-$lang['btn_delete']                	= 'Supprimer';
-$lang['btn_save']                	= 'Sauvegarder';
-$lang['btn_submit']                     = 'Sauvegarder';
+$lang['btn_new']                        = 'Nouveau';
+$lang['btn_modify']                     = 'Modifier';
+$lang['btn_delete']                     = 'Supprimer';
+$lang['btn_save']                       = 'Sauvegarder';
 $lang['btn_login']                      = 'Se connecter';
 $lang['btn_logout']                     = 'Se déconnecter';
 $lang['btn_signup']                     = 'S\'inscrire';
@@ -129,7 +176,7 @@ $lang['btn_submit_filters']             = 'Appliquer filtres et tri';
 $lang['btn_remove_filters']             = 'Supprimer filtres et tri';
 $lang['btn_all']                        = 'Tout';
 $lang['btn_none']                       = 'Rien';
-$lang['btn_generate_inventory_nb']	= 'Générer un No d\'inventaire';
+$lang['btn_generate_inventory_nb']      = 'Générer un No d\'inventaire';
 
 // Messages
 $lang['msg_err_abbreviation']           = 'Une abréviation doit être fournie';
@@ -176,8 +223,11 @@ $lang['text_item_detail']               = 'Photo et détail';
 $lang['text_item_condition']            = 'Condition';
 $lang['text_item_loan_status']          = 'Disponibilité et prêts';
 $lang['text_item_buying_warranty']      = 'Achat et garantie';
-$lang['text_item_tags']      		= 'Type d\'objet';
+$lang['text_item_tags']                 = 'Type d\'objet';
 $lang['text_search_filters']            = 'Filtres de recherche';
 $lang['text_sort_order']                = 'Ordre de tri';
 $lang['text_filtered_items_list']       = 'Liste des objets correspondants';
 $lang['text_kinds_to_show']             = 'Afficher uniquement les…';
+$lang['text_yes']                       = 'Oui';
+$lang['text_no']                        = 'Non';
+$lang['text_disable']                   = 'Désactiver';
