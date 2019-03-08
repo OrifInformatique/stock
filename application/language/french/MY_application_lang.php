@@ -130,15 +130,18 @@ $lang['admin_delete_supplier']          = 'Supprimer le fournisseur';
 $lang['admin_delete_item']              = 'Supprimer l\'objet';
 $lang['admin_delete_tag_verify']        = 'Voulez-vous vraiment supprimer le tag ';
 $lang['admin_delete_user_verify']       = 'Voulez-vous vraiment supprimer l\'utilisateur ';
-$lang['admin_desactivate_user']         = 'Le désactiver';
 $lang['admin_delete_tag_verify']        = 'Voulez-vous vraiment supprimer le tag ';
 $lang['admin_delete_stocking_place_verify'] = 'Voulez-vous vraiment supprimer le lieu de stockage ';
 $lang['admin_delete_item_group_verify'] = 'Voulez-vous vraiment supprimer le groupe d\'objets ';
 $lang['admin_delete_supplier_verify']   = 'Voulez-vous vraiment supprimer le fournisseur ';
+$lang['delete_user_notok']              = 'Cet utilisateur ne peut pas être supprimé car il est lié à des ';
 $lang['delete_notok']                   = 'Cet élément ne peut pas être supprimé car il est en cours d\'utilisation par un ou plusieurs objets.';
 $lang['delete_notok_with_amount']       = 'Cet élément ne peut pas être supprimé car il est en cours d\'utilisation par ';
 $lang['delete_notok_item']              = ' objet.';
 $lang['delete_notok_items']             = ' objets.';
+$lang['delete_linked_items']            = 'objets';
+$lang['delete_linked_loans_registered'] = 'prêts';
+$lang['delete_linked_loans_made']       = 'emprunts';
 
 
 // Admin other labels
@@ -226,3 +229,4 @@ $lang['text_filtered_items_list']       = 'Liste des objets correspondants';
 $lang['text_kinds_to_show']             = 'Afficher uniquement les…';
 $lang['text_yes']                       = 'Oui';
 $lang['text_no']                        = 'Non';
+$lang['text_disable']                   = 'Désactiver';

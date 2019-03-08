@@ -19,12 +19,14 @@
       <a href="<?= base_url()."admin/view_suppliers/";?>" class="btn btn-lg"><?= lang('text_no'); ?></a>
     </div>
   <?php } else { 
-    echo lang('delete_notok_with_amount').$amount;
+    echo '<div class="alert alert-danger">'.lang('delete_notok_with_amount').$amount;
     
     if($amount > 1) {
       echo lang('delete_notok_items');
     } else {
       echo lang('delete_notok_item');
     }
+    
+    echo '</div>';
   } ?>
 </div>

@@ -12,19 +12,21 @@
 
   <?php if(isset($name) && $deletion_allowed) { ?>
     <div class="row">
-      <?php echo $this->lang->line('admin_delete_tag_verify').'"'.$name.'" ?'; ?>
+      <?= lang('admin_delete_tag_verify').'"'.$name.'" ?'; ?>
     </div>
-    <div class="btn-group col-xs-12 row" >
-      <a href="<?php echo base_url().uri_string()."/confirmed";?>" class="btn btn-danger btn-lg"><?php echo $this->lang->line('text_yes'); ?></a>
-      <a href="<?php echo base_url()."admin/view_tags/";?>" class="btn btn-lg"><?php echo $this->lang->line('text_no'); ?></a>
+    <div class="btn-group row" >
+      <a href="<?= base_url().uri_string()."/confirmed";?>" class="btn btn-danger btn-lg"><?= lang('text_yes'); ?></a>
+      <a href="<?= base_url()."admin/view_tags/";?>" class="btn btn-lg"><?= lang('text_no'); ?></a>
     </div>
   <?php } else {
-    echo $this->lang->line('delete_notok_with_amount').$amount;
+    echo '<div class="alert alert-danger">'.lang('delete_notok_with_amount').$amount;
     
     if($amount > 1) {
-      echo $this->lang->line('delete_notok_items');
+      echo lang('delete_notok_items');
     } else {
-      echo $this->lang->line('delete_notok_item');
+      echo lang('delete_notok_item');
     } 
+    
+    echo '</div>';
   } ?>
 </div>

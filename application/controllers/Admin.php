@@ -198,23 +198,47 @@ class Admin extends MY_Controller
     */
     public function delete_user($id = NULL, $action = NULL) {
       $this->load->model('user_model');
-
+      $deletion_allowed = true;
+      $linked_objects = [];
+      
       if(is_null($this->user_model->get($id))) {
         redirect("/admin/view_users/");
       }
+      
+      // Check if user is linked to other objects
+      $user = $this->user_model->with_all()->get($id);
 
-      if (is_null($action)) {
-        $output = get_object_vars($this->user_model->get($id));
-        $output["users"] = $this->user_model->get_all();
-        $this->display_view("admin/users/delete", $output);
-      } else if($action == "d") {
+      if (!empty($user->items_created) || !empty($user->items_modified) || !empty($user->items_checked)) {
+        $linked_objects[] = lang('delete_linked_items');
+        $deletion_allowed = false;
+      }
+      if (!empty($user->loans_registered)) {
+        $linked_objects[] = lang('delete_linked_loans_registered');
+        $deletion_allowed = false;
+      }
+      if (!empty($user->loans_made)) {
+        $linked_objects[] = lang('delete_linked_loans_made');
+        $deletion_allowed = false;
+      }
+      
+      if($deletion_allowed && $action == "disable") {
         $this->user_model->update($id, array('is_active' => 0));
         redirect("/admin/view_users/");
-      } else {
+        
+      } else if($deletion_allowed && $action == "delete") {
         $this->user_model->delete($id);
         redirect("/admin/view_users/");
       }
+      
+      $output = get_object_vars($this->user_model->get($id));
+      
+      $output["deletion_allowed"] = $deletion_allowed;
+      $output["linked_objects"] = $linked_objects;
+      $output["action"] = $action;
+            
+      $this->display_view("admin/users/delete", $output);
     }
+    
 
     /* *********************************************************************************************************
     TAGS
@@ -594,21 +618,14 @@ class Admin extends MY_Controller
       if(is_null($this->supplier_model->get($id))) {
         redirect("/admin/view_suppliers/");
       }
-
-      $items = $this->item_model->get_filtered('');
-      $foundone = FALSE;
-      $amount = 0;
-      foreach ($items as $item) {
-        if(get_object_vars($item)["supplier_id"] == $id){
-          $foundone = TRUE;
-          $amount++;
-        }
-      }
+      
+      // Block deletion if this supplier is used
+      $items = $this->item_model->get_many_by("supplier_id = ".$id);
+      $amount = count($items);
 
       if (!isset($action)) {
         $output = get_object_vars($this->supplier_model->get($id));
-        $output["suppliers"] = $this->supplier_model->get_all();
-        $output["deletion_allowed"] = !$foundone;
+        $output["deletion_allowed"] = ($amount < 1);
         $output["amount"] = $amount;
 
         $this->display_view("admin/suppliers/delete", $output);
