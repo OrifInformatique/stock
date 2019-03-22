@@ -1,44 +1,29 @@
 <div class="container">
-	<h1 class="xs-right">
-		<?php 
-		if (isset($users)) 
-		{
-			$update_user = TRUE;
-		} else {
-			$update_user = FALSE;
-		}
-// This part of the GeoLine is for Update
-		if(isset($users)) 
-		{ 
-			?>
-		<select id="rows" onchange="changeRow()">
-			<?php foreach($users as $user) { ?>
-			<option value="<?php echo $user->user_id; ?>"<?php if ($user_id == $user->user_id) {echo " selected";} ?>>"<?php echo $user->username; ?>"</option>
-			<?php } ?>
-		</select>,
-		<select id="actions" onchange="changeAction()">
-			<option value="modify">Modification</option>
-			<option value="delete">Suppression</option>
-			<option value="new">Ajout</option>
-		</select>, 
-		<select onchange="changeRegion()" id="regions">
+	<h3 class="xs-right">
 		<?php
-		} else { 
-		?>
-		<a class="line-through" href="<?php echo base_url(); ?>admin/view_users">
-			<span class="action">Ajout</span>, 
-		</a>
-		<select onchange="changeNew()" id="regions"><?php } ?> 
-			<option value="user">Utilisateurs</option>
-			<option value="tag">Tags</option>
-			<option value="stocking_place">Lieux de stockage</option>
-			<option value="supplier">Fournisseurs</option>
-			<option value="item_group">Groupes d'objets</option>
-		</select>,
-		<a class="like-normal" href="<?php echo base_url(); ?>admin/"> 
-			<span class="word-administration">Administration</span>
-		</a>
-	</h1>
+			if (isset($users)) 
+			{
+				$update_user = TRUE;
+			} else {
+				$update_user = FALSE;
+			} ?>
+		<div class="row" style="margin-top: 5px;">
+			<a href="<?php echo base_url(); ?>admin/view_users" class="tab_selected"><?php echo $this->lang->line('admin_tab_users'); ?></a>
+			<a href="<?php echo base_url(); ?>admin/view_tags" class="tab_unselected"><?php echo $this->lang->line('admin_tab_tags'); ?></a>
+			<a href="<?php echo base_url(); ?>admin/view_stocking_places" class="tab_unselected"><?php echo $this->lang->line('admin_tab_stocking_places'); ?></a>
+			<a href="<?php echo base_url(); ?>admin/view_suppliers" class="tab_unselected"><?php echo $this->lang->line('admin_tab_suppliers'); ?></a>
+			<a href="<?php echo base_url(); ?>admin/view_item_groups" class="tab_unselected"><?php echo $this->lang->line('admin_tab_item_groups'); ?></a>
+		</div>
+    <?php if($update_user) { ?>
+    <div class="row alert alert-warning">
+      <?php echo $this->lang->line('admin_modify'); ?>
+    </div>
+    <?php } else { ?>
+    <div class="row alert">
+      <?php echo $this->lang->line('admin_add'); ?>
+    </div>
+  <?php } ?>
+	</h3>
         <?php
             if (!empty(validation_errors()) || !empty($upload_errors)) {
         ?>
@@ -51,18 +36,18 @@
 			} 
 		?>
 	</div>
-            <?php } ?>
+            <?php } ?><div class="row">
 	<form method="post">
 		<div class="form-group">
 			<label for="username"><?php echo $this->lang->line('field_username') ?></label>
 			<input class="form-control" name="username" id="username" value="<?php if (isset($username)) {echo set_value('username',$username);} else {echo set_value('username');} ?>" />
 		</div>
 		<div class="form-group">
-			<label for="lastname"><?php echo $this->lang->line('field_surname') ?></label>
+			<label for="lastname"><?php echo $this->lang->line('field_lastname') ?></label>
 			<input class="form-control" name="lastname" id="lastname" value="<?php if (isset($lastname)) {echo set_value('lastname',$lastname);} else {echo set_value('lastname');} ?>" />
 		</div>
 		<div class="form-group">
-			<label for="firstname"><?php echo $this->lang->line('field_name') ?></label>
+			<label for="firstname"><?php echo $this->lang->line('field_firstname') ?></label>
 			<input class="form-control" name="firstname" id="firstname" value="<?php if (isset($firstname)) {echo set_value('firstname',$firstname);} else {echo set_value('firstname');} ?>" />
 		</div>
 		<div class="form-group">
@@ -86,12 +71,11 @@
 			<input class="form-control" name="pwdagain" id="pwdagain" type="password" value="<?php echo set_value('pwdagain'); ?>" />
 		</div>
 		<div class="form-group">
-			<input name="is_active" type="checkbox" value="TRUE" <?php if(isset($is_active) && $is_active == 1) {echo "checked";} else {echo set_checkbox('is_active', 'TRUE', TRUE);} ?> />
+			<input name="is_active" type="checkbox" value="TRUE" <?php if(isset($is_active) && $is_active == 1) {echo "checked";} ?> />
 			<label style="display: inline-block;" for="is_active">Activé </label>
 		</div>
-		<button type="submit" class="btn btn-primary"><?php echo $this->lang->line('btn_submit'); ?></button>
-		<a class="btn btn-primary" href="<?php echo base_url() . "admin/view_users/"; ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
+		<button type="submit" class="btn btn-success"><?php echo $this->lang->line('btn_save'); ?></button>
+		<a class="btn btn-danger" href="<?php echo base_url() . "admin/view_users/"; ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
 	</form>
-	<script src="<?php echo base_url(); ?>assets/js/geoline.js">
-	</script>
+	</div>
 </div>

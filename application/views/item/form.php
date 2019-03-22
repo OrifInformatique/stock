@@ -1,8 +1,8 @@
 <form class="container" method="post" enctype="multipart/form-data">
     <!-- BUTTONS -->
     <div class="form-group col-xs-12">
-        <button type="submit" class="btn btn-success"><?= $this->lang->line('btn_submit'); ?></button>
-        <a class="btn btn-danger" href="<?= base_url().(isset($modify)?"item/view/".$item_id:"") ?>"><?= $this->lang->line('btn_cancel'); ?></a>
+        <button type="submit" class="btn btn-success"><?php echo $this->lang->line('btn_save'); ?></button>
+        <a class="btn btn-danger" href="<?php echo base_url(); if(isset($modify)) {echo "item/view/" . $item_id;} ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
     </div>
 
     <!-- ERROR MESSAGES -->
@@ -32,10 +32,10 @@
         </div>
         <div class="col-md-4">
             <div class="form-group col-xs-7">
-                <input type="text" class="form-control input-bold" name="inventory_number"
-                       id="inventory_number"
-                       placeholder="<?= $this->lang->line('field_inventory_number') ?>"
-                       value="<?php if(isset($inventory_number)) {echo set_value('inventory_number',$inventory_number);} else {echo set_value('inventory_number');} ?>" />
+                <input type="text" class="form-control input-bold" name="inventory_prefix"
+                       id="inventory_prefix"
+                       placeholder="<?php echo $this->lang->line('field_inventory_number') ?>"
+                       value="<?php if(isset($inventory_prefix)) {echo set_value('inventory_prefix',$inventory_prefix);} else {echo set_value('inventory_prefix');} ?>" />
             </div>
             <div class="form-group col-xs-5">
                 <input type="text" class="form-control" name="inventory_id"
@@ -76,7 +76,7 @@
                     echo form_dropdown('item_group_id', $item_groups_name, $item_group_id, 'class="form-control" id="item_group_id"');
                 } else {
                     // No group selected
-                    echo form_dropdown('item_group_id', $item_groups_name, '', 'class="form-control" id="item_group_id"');
+                    echo form_dropdown('item_group_id', $item_groups_name, ITEMS_DEFAULT_GROUP, 'class="form-control" id="item_group_id"');
                 }
                 ?>
             </div>
@@ -269,7 +269,7 @@ function createInventoryNo(){
     var tagShortName = getFirstTagShortName();
     var buyingDateField = document.getElementById('buying_date');
     var date = new Date(buyingDateField.value).getFullYear();
-    var inventoryNumberField = document.getElementById('inventory_number');
+    var inventoryNumberField = document.getElementById('inventory_prefix');
     var inventoryNumber = "";
     var inventoryIdField = document.getElementById('inventory_id');
     

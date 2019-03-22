@@ -224,7 +224,7 @@ function load_item(item){
 	item_name = item["name"]; 
 	item_description = item["description"];
 	stocking_place = "<span>"+item["stocking_place"]["name"]+"</span>";
-	inventory_number_complete = item["inventory_number_complete"];
+	inventory_number = item["inventory_number"];
 	serial_number = item["serial_number"];
 	access_admin = '<?php if(isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] == true && $_SESSION["user_access"] >= ACCESS_LVL_ADMIN) { echo "<td><a href=\"".base_url("/item/delete/"); ?>'+item["item_id"]+'" class=\"close\" title=\"Supprimer l\'objet\">×</a></td> <?php } ?>';
 	//endregion 
@@ -234,7 +234,7 @@ function load_item(item){
 	.append(item_condition+'<br />'+loan_bootstrap_label+item_localisation+'</td>')
 	.append('<td><a href="'+href+'" style="display:block">'+item_name+'</a><h6>'+item_description+'</h6></td>')
 	.append('<td>'+stocking_place+'</td>')
-	.append('<td><a href="'+href+'" style="display:block">'+inventory_number_complete+'</a><a href="'+href+'" style="display:block">'+serial_number+'</a></td>')
+	.append('<td><a href="'+href+'" style="display:block">'+inventory_number+'</a><a href="'+href+'" style="display:block">'+serial_number+'</a></td>')
 	.append(access_admin));
 	//endregion
     

@@ -23,10 +23,9 @@ class Item_model extends MY_Model
     protected $has_many = ['item_tag_links', 'loans', 'inventory_controls'];
 
     /* MY_Model callback methods */
-    protected $after_get = ['get_inventory_id', 'get_inventory_number_complete', 
-    						'get_image', 'get_warranty_status',
-                            'get_current_loan', 'get_last_inventory_control',
-                            'get_tags'];
+    protected $after_get = ['get_inventory_number', 'get_image',
+                            'get_warranty_status', 'get_current_loan',
+                            'get_last_inventory_control', 'get_tags'];
 
 
     /**
@@ -37,55 +36,46 @@ class Item_model extends MY_Model
         parent::__construct();
     }
 
-	/*
-	 * Returns the id that will receive the next item
-	 */
-	public function get_future_id()
-	{
-		$query = $this->db->query("SHOW TABLE STATUS LIKE 'item'");
+    /*
+     * Returns the id that will receive the next item
+     */
+    public function get_future_id()
+    {
+        $query = $this->db->query("SHOW TABLE STATUS LIKE 'item'");
 
-    $row = $query->row(0);
-    $value = $row->Auto_increment;
+        $row = $query->row(0);
+        $value = $row->Auto_increment;
 
-		return $value;
-	}
+        return $value;
+    }
 
-	/*
-	 * Returns the seconde part of inventory number : The ID with leading "0"
-	 */
-	public function get_inventory_id($item)
-	{
-		$inventory_id = "";
+    /*
+     * inventory_id :     Based on the item_id db field,
+     *                    completed with leading zeros
+     * inventory_prefix : Textual first part of the inventory_number
+     * inventory number : complete inventory number, concatenation of
+     *                    inventory_prefix and inventory_id
+     */
+    protected function get_inventory_number($item)
+    {
+        $inventory_id = "";
+        $inventory_number = "";
 
-		if (!is_null($item)) {
-			$inventory_id = $item->item_id;
+        if (!is_null($item)) {
+            $inventory_id = $item->item_id;
+            
+            // Add leading zeros to inventory_id
+            for( $i = strlen($inventory_id) ; $i < INVENTORY_NUMBER_CHARS; $i++) {
+                $inventory_id = "0".$inventory_id;
+            }
+            $item->inventory_id = $inventory_id;
 
-	    	for( $i = strlen($inventory_id) ; $i < INVENTORY_NUMBER_CHARS; $i++) {
-	        	$inventory_id = "0".$inventory_id;
-	        }
+            $inventory_number = $item->inventory_prefix.".".$item->inventory_id;
+            $item->inventory_number = $inventory_number;
+        }
 
-	        $inventory_id = ".".$inventory_id;
-          $item->inventory_id = $inventory_id;
-    	}
-
-    	return $item;
-	}
-
-	/*
-	 * Returns the complete inventory number,
-	 * concatenation of inventory_number and inventory_id.
-	 */
-	public function get_inventory_number_complete($item)
-	{
-		$inventory_number_complete = "";
-
-		if (!is_null($item)) {
-			$inventory_number_complete = $item->inventory_number.$item->inventory_id;
-      $item->inventory_number_complete = $inventory_number_complete;
-    	}
-
-    	return $item;
-	}
+        return $item;
+    }
 
     /**
     * If no image is set, use "no_image.png"
@@ -252,7 +242,7 @@ class Item_model extends MY_Model
      * @param array $filters The array of filters
      * @return An array of corresponding items
      */
-    function get_filtered($filters){
+    public function get_filtered($filters){
 
         // Initialize a global WHERE clause for filtering
         $where_itemsFilters = '';
@@ -262,7 +252,7 @@ class Item_model extends MY_Model
         **********************/
         $where_textSearchFilter = '';
 
-        if (isset($filters['ts'])) {
+        if (isset($filters['ts']) && $filters['ts']!='') {
           $text_search_content = $filters['ts'];
 
           // If the search text is an inventory number, separate the ID from the rest (ID is after the last '.')
@@ -296,12 +286,12 @@ class Item_model extends MY_Model
 
           if (isset($item_id)) {
             if (isset($inventory_number) && $inventory_number != '') {
-              $where_textSearchFilter .= "OR (item_id = ".$item_id." AND inventory_number LIKE '%".$inventory_number."%') ";
+              $where_textSearchFilter .= "OR (item_id = ".$item_id." AND inventory_prefix LIKE '%".$inventory_number."%') ";
             } else {
               $where_textSearchFilter .= "OR item_id = ".$item_id." ";
             }
           } else {
-            $where_textSearchFilter .= "OR inventory_number LIKE '%".$text_search_content."%' ";
+            $where_textSearchFilter .= "OR inventory_prefix LIKE '%".$text_search_content."%' ";
           }
           $where_textSearchFilter .= ')';
 
@@ -380,8 +370,12 @@ class Item_model extends MY_Model
             $where_stockingPlaceFilter .= 'stocking_place_id='.$stocking_place_id.' OR ';
           }
           // Remove the last " OR "
-          $where_stockingPlaceFilter = substr($where_stockingPlaceFilter, 0, -4);
-          $where_stockingPlaceFilter .= ')';
+          if($where_stockingPlaceFilter != "(") {
+            $where_stockingPlaceFilter = substr($where_stockingPlaceFilter, 0, -4);
+            $where_stockingPlaceFilter .= ')';
+          } else {
+            $where_stockingPlaceFilter .= '';
+          }
 
           // Add this part of WHERE clause to the global WHERE clause
           if ($where_itemsFilters != '')
@@ -411,15 +405,20 @@ class Item_model extends MY_Model
 
           $item_tag_links = $this->item_tag_link_model->get_many_by($where_itemTagLinks);
 
-
           // Prepare WHERE clause for all corresponding items
           $where_itemTagsFilter .= '(';
           foreach ($item_tag_links as $item_tag_link) {
             $where_itemTagsFilter .= 'item_id='.$item_tag_link->item_id.' OR ';
           }
           // Remove the last " OR "
-          $where_itemTagsFilter = substr($where_itemTagsFilter, 0, -4);
-          $where_itemTagsFilter .= ')';
+          if($where_itemTagsFilter != "(") {
+            $where_itemTagsFilter = substr($where_itemTagsFilter, 0, -4);
+            $where_itemTagsFilter .= ')';
+          } else {
+            // No item_tag_link found : no item correspond to the filter.
+            // We use "item_id=-1" filter to return no item.
+            $where_itemTagsFilter = 'item_id=-1';
+          }
 
           // Add this part of WHERE clause to the global WHERE clause
           if ($where_itemsFilters != '')

@@ -24,9 +24,14 @@ class Admin extends MY_Controller
     /**
     * Menu for admin privileges
     */
-    public function index(){
-      $this->display_view("admin/menu");
+    public function index()
+    {
+      $this->view_users();
     }
+
+    /* *********************************************************************************************************
+    USERS
+    ********************************************************************************************************* */
 
     /**
     * As the name says, view the users.
@@ -39,10 +44,6 @@ class Admin extends MY_Controller
       $this->display_view("admin/users/list", $output);
     }
 
-    /* *********************************************************************************************************
-    USERS
-    ********************************************************************************************************* */
-
     /**
 	* Modify a user
 	* @id = 
@@ -50,6 +51,10 @@ class Admin extends MY_Controller
     public function modify_user($id = NULL)
     {
       $this->load->model('user_model');
+
+      if(is_null($this->user_model->get($id))) {
+        redirect("/admin/view_users/");
+      }
 
       if (!empty($_POST)) {
         // VALIDATION
@@ -82,7 +87,7 @@ class Admin extends MY_Controller
               $userArray[$forminput] = $formoutput;
             // Do the hash only once…
             } else if ($forminput == "pwd" && $formoutput != "") {
-              $userArray["password"] = password_hash($formoutput, PASSWORD_DEFAULT);
+              $userArray["password"] = password_hash($formoutput, PASSWORD_HASH_ALGORITHM);
             } else if ($forminput == "is_active" && $formoutput == "TRUE") {
               $userArray["is_active"] = 1;
             } else if ($forminput == "email") {
@@ -158,7 +163,7 @@ class Admin extends MY_Controller
               $userArray[$forminput] = $formoutput;
             // Do the hash only once…
             } else if ($forminput == "pwd" && $formoutput != "") {
-              $userArray["password"] = password_hash($formoutput, PASSWORD_DEFAULT);
+              $userArray["password"] = password_hash($formoutput, PASSWORD_HASH_ALGORITHM);
             } else if ($forminput == "is_active" && $formoutput == "TRUE") {
               $userArray["is_active"] = 1;
             } else if ($forminput == "email") {
@@ -190,18 +195,47 @@ class Admin extends MY_Controller
     */
     public function delete_user($id = NULL, $action = NULL) {
       $this->load->model('user_model');
-      if (is_null($action)) {
-        $output = get_object_vars($this->user_model->get($id));
-        $output["users"] = $this->user_model->get_all();
-        $this->display_view("admin/users/delete", $output);
-      } else if($action == "d") {
+      $deletion_allowed = true;
+      $linked_objects = [];
+      
+      if(is_null($this->user_model->get($id))) {
+        redirect("/admin/view_users/");
+      }
+      
+      // Check if user is linked to other objects
+      $user = $this->user_model->with_all()->get($id);
+
+      if (!empty($user->items_created) || !empty($user->items_modified) || !empty($user->items_checked)) {
+        $linked_objects[] = lang('delete_linked_items');
+        $deletion_allowed = false;
+      }
+      if (!empty($user->loans_registered)) {
+        $linked_objects[] = lang('delete_linked_loans_registered');
+        $deletion_allowed = false;
+      }
+      if (!empty($user->loans_made)) {
+        $linked_objects[] = lang('delete_linked_loans_made');
+        $deletion_allowed = false;
+      }
+      
+      if($deletion_allowed && $action == "disable") {
         $this->user_model->update($id, array('is_active' => 0));
         redirect("/admin/view_users/");
-      } else {
+        
+      } else if($deletion_allowed && $action == "delete") {
         $this->user_model->delete($id);
         redirect("/admin/view_users/");
       }
+      
+      $output = get_object_vars($this->user_model->get($id));
+      
+      $output["deletion_allowed"] = $deletion_allowed;
+      $output["linked_objects"] = $linked_objects;
+      $output["action"] = $action;
+            
+      $this->display_view("admin/users/delete", $output);
     }
+    
 
     /* *********************************************************************************************************
     TAGS
@@ -225,6 +259,10 @@ class Admin extends MY_Controller
     {
       $this->load->model('item_tag_model');
 
+      if(is_null($this->item_tag_model->get($id))) {
+        redirect("/admin/view_tags/");
+      }
+
       if (!empty($_POST)) {
         // VALIDATION
 
@@ -247,9 +285,12 @@ class Admin extends MY_Controller
       }
 
       $this->load->model('item_tag_model');
-      $output = get_object_vars($this->item_tag_model->get($id));
-      $output["tags"] = $this->item_tag_model->get_all();	  
-	  
+      if(!is_null($this->item_tag_model->get($id))){
+        $output = get_object_vars($this->item_tag_model->get($id));
+        $output["tags"] = $this->item_tag_model->get_all();
+      } else {
+        $output["missing_tag"] = TRUE;
+      }
 
       $this->display_view("admin/tags/form", $output);
     }
@@ -317,10 +358,20 @@ class Admin extends MY_Controller
     public function delete_tag($id = NULL, $action = NULL) {
       $this->load->model('item_tag_model');
       $this->load->model('item_tag_link_model');
+      $this->load->model('item_model');
+
+      if(is_null($this->item_tag_model->get($id))) {
+        redirect("/admin/view_tags");
+      }
+
+      $filter = array("t" => array($id));
+      $items = $this->item_model->get_filtered($filter);
 
       if (is_null($action)) {
         // Display a message to confirm the action
         $output = get_object_vars($this->item_tag_model->get($id));
+        $output["deletion_allowed"] = !(sizeof($items) > 0 && sizeof($items) < 500); // Do not make the number bigger than the amount of items
+        $output["amount"] = sizeof($items);
         $output["tags"] = $this->item_tag_model->get_all();
         $this->display_view("admin/tags/delete", $output);
       
@@ -354,6 +405,10 @@ class Admin extends MY_Controller
     {
       $this->load->model('stocking_place_model');
 
+      if(is_null($this->stocking_place_model->get($id))){
+        redirect("/admin/view_stocking_places/");
+      }
+
       if (!empty($_POST)) {
         $this->form_validation->set_rules('short', $this->lang->line('field_short_name'), "required|callback_unique_stocking_short[$id]", $this->lang->line('msg_storage_short_needed'));
         $this->form_validation->set_rules('name', $this->lang->line('field_long_name'), "required|callback_unique_stocking_name[$id]", $this->lang->line('msg_err_storage_long_needed'));
@@ -368,8 +423,12 @@ class Admin extends MY_Controller
       } else {
         $output = get_object_vars($this->stocking_place_model->get($id));
       }
-      $output = get_object_vars($this->stocking_place_model->get($id));
-      $output["stocking_places"] = $this->stocking_place_model->get_all();
+      if(!is_null($this->stocking_place_model->get($id))) {
+        $output = get_object_vars($this->stocking_place_model->get($id));
+        $output["stocking_places"] = $this->stocking_place_model->get_all();
+      }else{
+        $output["missing_stocking_place"] = TRUE;
+      }
 
       $this->display_view("admin/stocking_places/form", $output);
     }
@@ -433,10 +492,20 @@ class Admin extends MY_Controller
     public function delete_stocking_place($id = NULL, $action = NULL)
     {
       $this->load->model('stocking_place_model');
+      $this->load->model('item_model');
+
+      if(is_null($this->stocking_place_model->get($id))) {
+        redirect("/admin/view_stocking_places/");
+      }
+      
+      $filter = array('s' => array($id));
+      $items = $this->item_model->get_filtered($filter);
 
       if (is_null($action)) {
-        $output["stocking_places"] = $this->stocking_place_model->get_all();
         $output = get_object_vars($this->stocking_place_model->get($id));
+        $output["stocking_places"] = $this->stocking_place_model->get_all();
+        $output["deletion_allowed"] = (sizeof($items) == 0);
+        $output["amount"] = sizeof($items);
 
         $this->display_view("admin/stocking_places/delete", $output);
       } else {
@@ -468,11 +537,15 @@ class Admin extends MY_Controller
     {
       $this->load->model('supplier_model');
 
+      if(is_null($this->supplier_model->get($id))) {
+        redirect("/admin/view_suppliers/");
+      }
+
       if (!empty($_POST)) {
         // VALIDATION
 
         //name: if changed,
-        $this->form_validation->set_rules('name', $this->lang->line('field_username'), "required|callback_unique_supplier[$id]", $this->lang->line('msg_err_supplier_needed')); // not void
+        $this->form_validation->set_rules('name', $this->lang->line('field_name'), "required|callback_unique_supplier[$id]", $this->lang->line('msg_err_supplier_needed')); // not void
 
         if (isset($_POST['email'])) {
           // or valid.
@@ -490,8 +563,12 @@ class Admin extends MY_Controller
         $output = get_object_vars($this->supplier_model->get($id));
       }
       
-      $output = get_object_vars($this->supplier_model->get($id));
-      $output["suppliers"] = $this->supplier_model->get_all();	  
+      if(!is_null($this->supplier_model->get($id))){
+        $output = get_object_vars($this->supplier_model->get($id));
+        $output["suppliers"] = $this->supplier_model->get_all();
+      }else{
+        $output["missing_supplier"] = TRUE;
+      }
 	  
       $this->display_view("admin/suppliers/form", $output);
     }
@@ -507,7 +584,7 @@ class Admin extends MY_Controller
         // VALIDATION
 
         //name: not void
-        $this->form_validation->set_rules('name', $this->lang->line('field_username'), 'required|callback_unique_supplier', $this->lang->line('msg_err_supplier_needed'));
+        $this->form_validation->set_rules('name', $this->lang->line('field_name'), 'required|callback_unique_supplier', $this->lang->line('msg_err_supplier_needed'));
 
         //email: void
         if (isset($_POST['email'])) {
@@ -533,10 +610,20 @@ class Admin extends MY_Controller
     public function delete_supplier($id = NULL, $action = NULL)
     {
       $this->load->model('supplier_model');
+      $this->load->model('item_model');
+
+      if(is_null($this->supplier_model->get($id))) {
+        redirect("/admin/view_suppliers/");
+      }
+      
+      // Block deletion if this supplier is used
+      $items = $this->item_model->get_many_by("supplier_id = ".$id);
+      $amount = count($items);
 
       if (!isset($action)) {
         $output = get_object_vars($this->supplier_model->get($id));
-        $output["suppliers"] = $this->supplier_model->get_all();
+        $output["deletion_allowed"] = ($amount < 1);
+        $output["amount"] = $amount;
 
         $this->display_view("admin/suppliers/delete", $output);
       } else {
@@ -584,8 +671,12 @@ class Admin extends MY_Controller
     {
       $this->load->model('item_group_model');
 
+      if(is_null($this->item_group_model->get($id))) {
+        redirect("/admin/view_item_groups/");
+      }
+
       if (!empty($_POST)) {
-        $this->form_validation->set_rules('name', $this->lang->line('field_name'), "required|callback_unique_groupname[$id]", $this->lang->line('msg_err_item_group_needed'));
+        $this->form_validation->set_rules('name', lang('field_name'), "required|callback_unique_groupname[$id]", lang('msg_err_item_group_needed'));
         $this->form_validation->set_rules('short_name', $this->lang->line('field_abbreviation'), "required|callback_unique_groupshort[$id]", $this->lang->line('msg_err_item_group_short'));
 
         if ($this->form_validation->run() === TRUE) {
@@ -595,10 +686,16 @@ class Admin extends MY_Controller
           exit();
         }
       } else {
-        $output = get_object_vars($this->item_group_model->get($id));
+        if(!is_null($this->item_group_model->get($id))) {
+          $output = get_object_vars($this->item_group_model->get($id));
+        }
       }
       
-      $output["item_groups"] = $this->item_group_model->get_all();
+      if(!is_null($this->item_group_model->get($id))) {
+        $output["item_groups"] = $this->item_group_model->get_all();
+      }else{
+        $output["missing_item_group"] = TRUE;
+      }
       $this->display_view("admin/item_groups/form", $output);
     }
 
@@ -659,10 +756,20 @@ class Admin extends MY_Controller
     public function delete_item_group($id = NULL, $action = NULL)
     {
       $this->load->model('item_group_model');
+      $this->load->model('item_model');
+
+      if(is_null($this->item_group_model->get($id))) {
+        redirect("/admin/view_item_groups/");
+      }
+
+      $filter = array("g" => array($id));
+      $items = $this->item_model->get_filtered($filter);
 
       if (!isset($action)) {
         $output = get_object_vars($this->item_group_model->get($id));
         $output["item_groups"] = $this->item_group_model->get_all();
+        $output["deletion_allowed"] = (sizeof($items) == 0);
+        $output["amount"] = sizeof($items);
 
         $this->display_view("admin/item_groups/delete", $output);
       } else {
