@@ -197,9 +197,11 @@ class Admin extends MY_Controller
     * If it is anything else, the user will be deleted. 
     */
     public function delete_user($id = NULL, $action = NULL) {
-      $this->load->model('user_model');
+      $this->load->model(['user_model','stocking_place_model']);
       $deletion_allowed = true;
       $linked_objects = [];
+      $linked_items = [];
+      $linked_loans = [];
       
       if(is_null($this->user_model->get($id))) {
         redirect("/admin/view_users/");
@@ -209,14 +211,39 @@ class Admin extends MY_Controller
       $user = $this->user_model->with_all()->get($id);
 
       if (!empty($user->items_created) || !empty($user->items_modified) || !empty($user->items_checked)) {
+        if(is_array($user->items_created))
+          $linked_items = array_merge($linked_items, $user->items_created);
+        else
+          array_push($linked_items, $user->items_created);
+
+        if(is_array($user->items_modified))
+          $linked_items = array_merge($linked_items, $user->items_modified);
+        else
+          array_push($linked_items, $user->items_modified);
+
+        if(is_array($user->items_checked))
+          $linked_items = array_merge($linked_items, $user->items_checked);
+        else
+          array_push($linked_items, $user->items_checked);
+
         $linked_objects[] = lang('delete_linked_items');
         $deletion_allowed = false;
       }
       if (!empty($user->loans_registered)) {
+        if(is_array($user->loans_registered))
+          $linked_loans = array_merge($linked_loans, $user->loans_registered);
+        else
+          array_push($linked_loans, $user->loans_registered);
+
         $linked_objects[] = lang('delete_linked_loans_registered');
         $deletion_allowed = false;
       }
       if (!empty($user->loans_made)) {
+        if(is_array($user->loans_made))
+          $linked_loans = array_merge($linked_loans, $user->loans_made);
+        else
+          array_push($linked_loans, $user->loans_made);
+
         $linked_objects[] = lang('delete_linked_loans_made');
         $deletion_allowed = false;
       }
@@ -229,9 +256,15 @@ class Admin extends MY_Controller
         $this->user_model->delete($id);
         redirect("/admin/view_users/");
       }
-      
+
       $output = get_object_vars($this->user_model->get($id));
-      
+
+      $linked_items = $this->remove_array_duplicates($linked_items);
+      $linked_loans = $this->remove_array_duplicates($linked_loans);
+      $output['stocking_places'] = $this->stocking_place_model->get_all();
+      $output['users'] = $this->user_model->get_all();
+      $output['items'] = $linked_items;
+      $output['loans'] = $linked_loans;
       $output["deletion_allowed"] = $deletion_allowed;
       $output["linked_objects"] = $linked_objects;
       $output["action"] = $action;
@@ -783,4 +816,22 @@ class Admin extends MY_Controller
         redirect("/admin/view_item_groups/");
       }
     }
+	
+  /**
+  * Removes duplicates in an array.
+  * Better than array_unique, as it takes things that cannot be converted to string.
+  * @param array $array
+  *   Array that needs its duplicates removed.
+  * @return array
+  *   The array without any duplicates.
+  * @author Amr Berag on stackoverflow
+  */
+	private function remove_array_duplicates($array) {
+    $result = array();
+		foreach ($array as $key => $value){
+		if(!in_array($value, $result))
+			$result[$key] = $value;
+		}
+		return $result;
+	}
 }
