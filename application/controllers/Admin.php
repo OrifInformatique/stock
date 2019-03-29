@@ -191,22 +191,21 @@ class Admin extends MY_Controller
     }
 
     /**
-    * Delete a user. 
-    * If $action is NULL, a confirmation will be shown.
-    * If it is "d", is_active will be set to 0.
-    * If it is anything else, the user will be deleted. 
+    * Delete a user.
+    * If $action is "disable", is_active will be set to 0.
+    * If it is "delete", the user will be deleted.
+    * If it is anything else or NULL, a confirmation will be shown.
     */
     public function delete_user($id = NULL, $action = NULL) {
-      $this->load->model(['user_model','stocking_place_model']);
+      $this->load->model(['stocking_place_model','user_model']);
       $deletion_allowed = true;
-      $linked_objects = [];
       $linked_items = [];
       $linked_loans = [];
       
       if(is_null($this->user_model->get($id))) {
         redirect("/admin/view_users/");
       }
-      
+
       // Check if user is linked to other objects
       $user = $this->user_model->with_all()->get($id);
 
@@ -226,7 +225,6 @@ class Admin extends MY_Controller
         else
           array_push($linked_items, $user->items_checked);
 
-        $linked_objects[] = lang('delete_linked_items');
         $deletion_allowed = false;
       }
       if (!empty($user->loans_registered)) {
@@ -235,7 +233,6 @@ class Admin extends MY_Controller
         else
           array_push($linked_loans, $user->loans_registered);
 
-        $linked_objects[] = lang('delete_linked_loans_registered');
         $deletion_allowed = false;
       }
       if (!empty($user->loans_made)) {
@@ -244,14 +241,13 @@ class Admin extends MY_Controller
         else
           array_push($linked_loans, $user->loans_made);
 
-        $linked_objects[] = lang('delete_linked_loans_made');
         $deletion_allowed = false;
       }
-      
+
       if($deletion_allowed && $action == "disable") {
         $this->user_model->update($id, array('is_active' => 0));
         redirect("/admin/view_users/");
-        
+
       } else if($deletion_allowed && $action == "delete") {
         $this->user_model->delete($id);
         redirect("/admin/view_users/");
@@ -266,12 +262,11 @@ class Admin extends MY_Controller
       $output['items'] = $linked_items;
       $output['loans'] = $linked_loans;
       $output["deletion_allowed"] = $deletion_allowed;
-      $output["linked_objects"] = $linked_objects;
       $output["action"] = $action;
-            
+
       $this->display_view("admin/users/delete", $output);
     }
-    
+
 
     /* *********************************************************************************************************
     TAGS
@@ -386,15 +381,13 @@ class Admin extends MY_Controller
         return TRUE;
       }
     }
-    
+
     /**
     * Delete a tag. 
     * If $action is NULL, a confirmation will be shown. If it is anything else, the tag will be deleted.
     */
     public function delete_tag($id = NULL, $action = NULL) {
-      $this->load->model('item_tag_model');
-      $this->load->model('item_tag_link_model');
-      $this->load->model('item_model');
+      $this->load->model(['stocking_place_model','item_tag_model','item_tag_link_model','item_model']);
 
       if(is_null($this->item_tag_model->get($id))) {
         redirect("/admin/view_tags");
@@ -406,6 +399,8 @@ class Admin extends MY_Controller
       if (is_null($action)) {
         // Display a message to confirm the action
         $output = get_object_vars($this->item_tag_model->get($id));
+        $output['stocking_places'] = $this->stocking_place_model->get_all();
+        $output['items'] = $items;
         $output["deletion_allowed"] = !(sizeof($items) > 0 && sizeof($items) < 500); // Do not make the number bigger than the amount of items
         $output["amount"] = sizeof($items);
         $output["tags"] = $this->item_tag_model->get_all();
@@ -479,7 +474,7 @@ class Admin extends MY_Controller
 
         //name: not void
         $this->form_validation->set_rules('name', $this->lang->line('field_username'), 'required|callback_unique_stocking_name', $this->lang->line('msg_err_stocking_needed'));
-		$this->form_validation->set_rules('short', $this->lang->line('field_short'), 'required|callback_unique_stocking_short', $this->lang->line('msg_err_stocking_short'));
+        $this->form_validation->set_rules('short', $this->lang->line('field_short'), 'required|callback_unique_stocking_short', $this->lang->line('msg_err_stocking_short'));
 
 
         if ($this->form_validation->run() === TRUE)
@@ -507,7 +502,7 @@ class Admin extends MY_Controller
         return TRUE;
       }
     }
-	
+
     public function unique_stocking_short($newShort, $stockID) {
       $this->load->model('stocking_place_model');
 
@@ -521,7 +516,7 @@ class Admin extends MY_Controller
         return TRUE;
       }
     }
-    
+
     /**
     * Delete the stocking place $id. If $action is null, a confirmation will be shown
     */
@@ -539,6 +534,7 @@ class Admin extends MY_Controller
 
       if (is_null($action)) {
         $output = get_object_vars($this->stocking_place_model->get($id));
+        $output['items'] = $items;
         $output["stocking_places"] = $this->stocking_place_model->get_all();
         $output["deletion_allowed"] = (sizeof($items) == 0);
         $output["amount"] = sizeof($items);
@@ -645,8 +641,7 @@ class Admin extends MY_Controller
     */
     public function delete_supplier($id = NULL, $action = NULL)
     {
-      $this->load->model('supplier_model');
-      $this->load->model('item_model');
+      $this->load->model(['supplier_model','stocking_place_model','item_model']);
 
       if(is_null($this->supplier_model->get($id))) {
         redirect("/admin/view_suppliers/");
@@ -658,6 +653,8 @@ class Admin extends MY_Controller
 
       if (!isset($action)) {
         $output = get_object_vars($this->supplier_model->get($id));
+        $output['items'] = $items;
+        $output['stocking_places'] = $this->stocking_place_model->get_all();
         $output["deletion_allowed"] = ($amount < 1);
         $output["amount"] = $amount;
 
@@ -684,7 +681,7 @@ class Admin extends MY_Controller
         return TRUE;
       }
     }
-    
+
     /* *********************************************************************************************************
     ITEM GROUPS
     ********************************************************************************************************* */
@@ -785,14 +782,13 @@ class Admin extends MY_Controller
         return TRUE;
       }
     }
-	
+
     /**
     * Delete an unused item group
     */
     public function delete_item_group($id = NULL, $action = NULL)
     {
-      $this->load->model('item_group_model');
-      $this->load->model('item_model');
+      $this->load->model(['item_group_model','stocking_place_model','item_model']);
 
       if(is_null($this->item_group_model->get($id))) {
         redirect("/admin/view_item_groups/");
@@ -803,6 +799,8 @@ class Admin extends MY_Controller
 
       if (!isset($action)) {
         $output = get_object_vars($this->item_group_model->get($id));
+        $output['items'] = $items;
+        $output['stocking_places'] = $this->stocking_place_model->get_all();
         $output["item_groups"] = $this->item_group_model->get_all();
         $output["deletion_allowed"] = (sizeof($items) == 0);
         $output["amount"] = sizeof($items);
@@ -816,7 +814,7 @@ class Admin extends MY_Controller
         redirect("/admin/view_item_groups/");
       }
     }
-	
+
   /**
   * Removes duplicates in an array.
   * Better than array_unique, as it takes things that cannot be converted to string.
@@ -824,14 +822,13 @@ class Admin extends MY_Controller
   *   Array that needs its duplicates removed.
   * @return array
   *   The array without any duplicates.
-  * @author Amr Berag on stackoverflow
   */
-	private function remove_array_duplicates($array) {
+  private function remove_array_duplicates(array $array) : array {
     $result = array();
-		foreach ($array as $key => $value){
-		if(!in_array($value, $result))
-			$result[$key] = $value;
-		}
-		return $result;
-	}
+    foreach ($array as $key => $value){
+      if(!in_array($value, $result))
+        $result[$key] = $value;
+    }
+    return $result;
+  }
 }

@@ -21,12 +21,7 @@
         <a href="<?= base_url().uri_string()."/disable";?>" class="btn btn-warning btn-lg"><?= lang('text_disable'); ?></a>
       <?php } ?>
     </div>
-  <?php } else { 
-    /* echo '<div class="alert alert-danger">'.lang('delete_user_notok');
-    foreach ($linked_objects as $linked_object) {
-        echo '['.$linked_object.'] ';
-    }
-    echo '</div>'; */?>
+  <?php } else { ?>
     <div class="alert alert-danger"><?= $this->lang->line('delete_user_notok'); ?></div>
     <?php if(!empty($items)) { ?>
       <h2>Objets</h2>
@@ -41,6 +36,7 @@
               echo '<br />'.html_escape($this->lang->line('header_serial_nb'));
             ?>
             </th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -48,13 +44,15 @@
             if(empty($item)) continue; ?>
             <tr>
               <td>
-                <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo html_escape($item->name); ?></a>
+                <a href="<?php echo base_url('/item/view/').$item->item_id ?>" style="display:block"><?php echo html_escape($item->name); ?></a>
                 <h6><?php echo html_escape($item->description); ?></h6>
               </td>
               <td><?php echo get_stocking_place($item->stocking_place_id, $stocking_places); ?></td>
               <td>
-                <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo html_escape($item->inventory_number); ?></a>
-                <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo html_escape($item->serial_number); ?></a>
+                <a href="<?php echo base_url('/item/view/').$item->item_id ?>">
+                  <div><?php echo html_escape($item->inventory_number); ?></div>
+                  <div><?php echo html_escape($item->serial_number); ?></div>
+                </a>
               </td>
               <td>
                 <!-- No need to check for admin, you need to be one to be here. -->
@@ -78,6 +76,7 @@
             <th><?php echo $this->lang->line('header_loan_localisation'); ?></th>
             <th><?php echo $this->lang->line('header_loan_by_user'); ?></th>
             <th><?php echo $this->lang->line('header_loan_to_user'); ?></th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -90,14 +89,12 @@
               <td><?php echo $loan->item_localisation; ?></td>
               <td><?php echo get_user($loan->loan_by_user_id, $users); ?></td>
               <td><?php echo get_user($loan->loan_to_user_id, $users); ?></td>
-              <td><a href="<?php echo base_url('/item/delete-loan').'/'.$loan->loan_id ?>" class="close" title="Supprimer le prêt">×</a></td>
+              <td><a href="<?php echo base_url('/item/delete-loan').'/'.$loan->loan_id ?>" class="close" title="<?php echo $this->lang->line('admin_delete_loan'); ?>">×</a></td>
             </tr>
           <?php } ?>
         </tbody>
       </table>
-    <?php } ?>
-  <?php } ?>
-  <?php
+    <?php } }
   /**
   * Returns the stocking place's name.
   * @param integer $stocking_place_id
@@ -107,7 +104,7 @@
   * @return string
   *   The name of the stocking place.
   */
-  function get_stocking_place($stocking_place_id, $stocking_places) {
+  function get_stocking_place(int $stocking_place_id, array $stocking_places) {
     if($stocking_place_id == 0)
       return '';
     foreach ($stocking_places as $stocking_place) {
@@ -124,7 +121,7 @@
   * @return string
   *   The user's name.
   */
-  function get_user($user_id, $users) {
+  function get_user(int $user_id, array $users) {
     if($user_id == 0)
       return '';
     foreach ($users as $user) {

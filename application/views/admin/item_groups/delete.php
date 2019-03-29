@@ -18,15 +18,62 @@
       <a href="<?= base_url().uri_string()."/confirmed";?>" class="btn btn-danger btn-lg"><?= lang('text_yes'); ?></a>
       <a href="<?= base_url()."admin/view_item_groups/";?>" class="btn btn-lg"><?= lang('text_no'); ?></a>
     </div>
-  <?php } else { 
-    echo '<div class="alert alert-danger">'.lang('delete_notok_with_amount').$amount;
-    
-    if($amount > 1) {
-      echo lang('delete_notok_items');
-    } else {
-      echo lang('delete_notok_item');
-    } 
-    
-    echo '</div>';
-  } ?>
+  <?php } else { ?>
+    <div class="alert alert-danger"><?php echo $this->lang->line('delete_notok_with_amount'); ?></div>
+    <?php if (!empty($items)) { ?>
+      <h2>Objets</h2>
+      <table class="table table-striped table-hover">
+        <thead>
+          <tr>
+            <th><?php echo html_escape($this->lang->line('header_item_name')); ?></th>
+            <th nowrap><?php echo html_escape($this->lang->line('header_stocking_place')); ?></th>
+            <th nowrap>
+            <?php
+              echo html_escape($this->lang->line('header_inventory_nb'));
+              echo '<br />'.html_escape($this->lang->line('header_serial_nb'));
+            ?>
+            </th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($items as $item) {
+            if(empty($item)) continue; ?>
+            <tr>
+              <td>
+                <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo html_escape($item->name); ?></a>
+                <h6><?php echo html_escape($item->description); ?></h6>
+              </td>
+              <td><?php echo get_stocking_place($item->stocking_place_id, $stocking_places); ?></td>
+              <td>
+                <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo html_escape($item->inventory_number); ?></a>
+                <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo html_escape($item->serial_number); ?></a>
+              </td>
+              <td>
+                <!-- No need to check for admin, you need to be one to be here. -->
+                <a href="<?php echo base_url('/item/delete').'/'.$item->item_id ?>" class="close" title="<?php echo $this->lang->line('admin_delete_item');?>">×</a>
+              </td>
+            </tr>
+          <?php } ?>
+        </tbody>
+      </table>
+    <?php } }
+  /**
+  * Returns the stocking place's name.
+  * @param integer $stocking_place_id
+  *   The ID of the stocking place.
+  * @param array $stocking_places
+  *   The stocking places.
+  * @return string
+  *   The name of the stocking place.
+  */
+  function get_stocking_place(int $stocking_place_id, array $stocking_places) {
+    if($stocking_place_id == 0)
+      return '';
+    foreach ($stocking_places as $stocking_place) {
+      if ($stocking_place->stocking_place_id == $stocking_place_id)
+        return $stocking_place->name;
+    }
+  }
+  ?>
 </div>
