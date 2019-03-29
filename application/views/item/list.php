@@ -162,7 +162,9 @@
             <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo html_escape($item->name); ?></a>
             <h6><?php echo html_escape($item->description); ?></h6>
           </td>
-          <td><?php echo html_escape($item->stocking_place->name); ?></td>
+          <td><?php if(!is_null($item->stocking_place)) {
+            echo html_escape($item->stocking_place->name);
+          } ?></td>
           <td>
             <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo html_escape($item->inventory_number); ?></a>
             <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo html_escape($item->serial_number); ?></a>

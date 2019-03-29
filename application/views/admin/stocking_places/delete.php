@@ -57,6 +57,9 @@
           <?php } ?>
         </tbody>
       </table>
+      <div>
+        <a href="<?php echo base_url('admin/unlink_stocking_place/').$stocking_place_id; ?>" class="btn btn-danger"><?= $this->lang->line('admin_unlink'); ?></a>
+      </div>
     <?php } }
   /**
   * Returns the stocking place's name.
@@ -67,7 +70,7 @@
   * @return string
   *   The name of the stocking place.
   */
-  function get_stocking_place(int $stocking_place_id, array $stocking_places) {
+  function get_stocking_place(?int $stocking_place_id, array $stocking_places) {
     if($stocking_place_id == 0)
       return '';
     foreach ($stocking_places as $stocking_place) {

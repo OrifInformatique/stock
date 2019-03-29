@@ -41,22 +41,25 @@
             if(empty($item)) continue; ?>
             <tr>
               <td>
-                <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo html_escape($item->name); ?></a>
+                <a href="<?php echo base_url('/item/view/').$item->item_id ?>" style="display:block"><?php echo html_escape($item->name); ?></a>
                 <h6><?php echo html_escape($item->description); ?></h6>
               </td>
               <td><?php echo get_stocking_place($item->stocking_place_id, $stocking_places); ?></td>
               <td>
-                <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo html_escape($item->inventory_number); ?></a>
-                <a href="<?php echo base_url('/item/view').'/'.$item->item_id ?>" style="display:block"><?php echo html_escape($item->serial_number); ?></a>
+                <a href="<?php echo base_url('/item/view/').$item->item_id ?>" style="display:block"><?php echo html_escape($item->inventory_number); ?></a>
+                <a href="<?php echo base_url('/item/view/').$item->item_id ?>" style="display:block"><?php echo html_escape($item->serial_number); ?></a>
               </td>
               <td>
                 <!-- No need to check for admin, you need to be one to be here. -->
-                <a href="<?php echo base_url('/item/delete').'/'.$item->item_id ?>" class="close" title="<?php echo $this->lang->line('admin_delete_item');?>">×</a>
+                <a href="<?php echo base_url('/item/delete/').$item->item_id ?>" class="close" title="<?php echo $this->lang->line('admin_delete_item');?>">×</a>
               </td>
             </tr>
           <?php } ?>
         </tbody>
       </table>
+      <div>
+        <a href="<?php echo base_url('admin/unlink_tag/').$item_tag_id; ?>" class="btn btn-danger"><?= $this->lang->line('admin_unlink'); ?></a>
+      </div>
     <?php } }
   /**
   * Returns the stocking place's name.
@@ -67,7 +70,7 @@
   * @return string
   *   The name of the stocking place.
   */
-  function get_stocking_place(int $stocking_place_id, array $stocking_places) {
+  function get_stocking_place(?int $stocking_place_id, array $stocking_places) {
     if($stocking_place_id == 0)
       return '';
     foreach ($stocking_places as $stocking_place) {
