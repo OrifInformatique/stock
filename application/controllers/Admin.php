@@ -196,7 +196,7 @@ class Admin extends MY_Controller
     * If it is "delete", the user will be deleted.
     * If it is anything else or NULL, a confirmation will be shown.
     */
-    public function delete_user($id = NULL, $action = NULL) {
+    public function delete_user($id, $action = NULL) {
       $this->load->model(['stocking_place_model','user_model']);
       $deletion_allowed = true;
       $linked_items = [];
@@ -209,45 +209,32 @@ class Admin extends MY_Controller
       // Check if user is linked to other objects
       $user = $this->user_model->with_all()->get($id);
 
-      if (!empty($user->items_created) || !empty($user->items_modified) || !empty($user->items_checked)) {
-        if(is_array($user->items_created))
-          $linked_items = array_merge($linked_items, $user->items_created);
-        else
-          array_push($linked_items, $user->items_created);
-
-        if(is_array($user->items_modified))
-          $linked_items = array_merge($linked_items, $user->items_modified);
-        else
-          array_push($linked_items, $user->items_modified);
-
-        if(is_array($user->items_checked))
-          $linked_items = array_merge($linked_items, $user->items_checked);
-        else
-          array_push($linked_items, $user->items_checked);
-
-        $deletion_allowed = false;
+      // Store linked objects in variable
+      if (!empty($user->items_created)) {
+        $linked_items = array_merge($linked_items, $user->items_created);
+      }
+      if(!empty($user->items_modified)) {
+        $linked_items = array_merge($linked_items, $user->items_modified);
+      }
+      if(!empty($user->items_checked)) {
+        $linked_items = array_merge($linked_items, $user->items_checked);
       }
       if (!empty($user->loans_registered)) {
-        if(is_array($user->loans_registered))
-          $linked_loans = array_merge($linked_loans, $user->loans_registered);
-        else
-          array_push($linked_loans, $user->loans_registered);
-
-        $deletion_allowed = false;
+        $linked_loans = array_merge($linked_loans, $user->loans_registered);
       }
       if (!empty($user->loans_made)) {
-        if(is_array($user->loans_made))
-          $linked_loans = array_merge($linked_loans, $user->loans_made);
-        else
-          array_push($linked_loans, $user->loans_made);
-
-        $deletion_allowed = false;
+        $linked_loans = array_merge($linked_loans, $user->loans_made);
       }
 
-      if($deletion_allowed && $action == "disable") {
+      // Make sure that all variables are empty
+      $deletion_allowed = (
+        empty($linked_items) &&
+        empty($linked_loans)
+      );
+
+      if($action == "disable") {
         $this->user_model->update($id, array('is_active' => 0));
         redirect("/admin/view_users/");
-
       } else if($deletion_allowed && $action == "delete") {
         $this->user_model->delete($id);
         redirect("/admin/view_users/");
@@ -255,14 +242,16 @@ class Admin extends MY_Controller
 
       $output = get_object_vars($this->user_model->get($id));
 
-      $linked_items = $this->remove_array_duplicates($linked_items);
-      $linked_loans = $this->remove_array_duplicates($linked_loans);
+      // Removes duplicates from the linked objects
+      $linked_items = array_unique($linked_items, SORT_REGULAR);
+      $linked_loans = array_unique($linked_loans, SORT_REGULAR);
+
       $output['stocking_places'] = $this->stocking_place_model->get_all();
       $output['users'] = $this->user_model->get_all();
       $output['items'] = $linked_items;
       $output['loans'] = $linked_loans;
-      $output["deletion_allowed"] = $deletion_allowed;
-      $output["action"] = $action;
+      $output['deletion_allowed'] = $deletion_allowed;
+      $output['action'] = $action;
 
       $this->display_view("admin/users/delete", $output);
     }
@@ -298,7 +287,6 @@ class Admin extends MY_Controller
 
     /**
     * Unlinks an user and the loans linked.
-    * If $action is NULL, a confirmation will be shown. Otherwise, the loans will be unlinked.
     */
     public function unlink_user_loans($id) {
       $this->load->model(['user_model','item_model','loan_model']);
@@ -313,7 +301,7 @@ class Admin extends MY_Controller
         $output['user'] = $this->user_model->get($id);
         $output['new_users'] = $this->user_model->get_all();
         $this->display_view('admin/users/unlink_loans', $output);
-      } else {
+      } else if(ctype_digit($post['new_user'])) {
         $new_user = $post['new_user'];
         $loans_registered = $user->loans_registered;
         $loans_made = $user->loans_made;
@@ -445,26 +433,26 @@ class Admin extends MY_Controller
     * Delete a tag. 
     * If $action is NULL, a confirmation will be shown. If it is anything else, the tag will be deleted.
     */
-    public function delete_tag($id = NULL, $action = NULL) {
+    public function delete_tag($id, $action = NULL) {
       $this->load->model(['stocking_place_model','item_tag_model','item_tag_link_model','item_model']);
 
       if(is_null($this->item_tag_model->get($id))) {
         redirect("/admin/view_tags");
       }
 
-      $filter = array("t" => array($id));
-      $items = $this->item_model->get_filtered($filter);
+      $items = $this->item_model->get_filtered(["t" => [$id]]);
+      $deletion_allowed = !(sizeof($items) > 0 && sizeof($items) < 500); // Do not make the number bigger than the amount of items
 
-      if (is_null($action)) {
+      if (is_null($action) || !$deletion_allowed) {
         // Display a message to confirm the action
         $output = get_object_vars($this->item_tag_model->get($id));
         $output['stocking_places'] = $this->stocking_place_model->get_all();
         $output['items'] = $items;
-        $output["deletion_allowed"] = !(sizeof($items) > 0 && sizeof($items) < 500); // Do not make the number bigger than the amount of items
+        $output["deletion_allowed"] = $deletion_allowed;
         $output["amount"] = sizeof($items);
         $output["tags"] = $this->item_tag_model->get_all();
+
         $this->display_view("admin/tags/delete", $output);
-      
       } else {
         // Action confirmed : delete links and delete tag
         $this->item_tag_link_model->delete_by('item_tag_id='.$id);
@@ -595,7 +583,7 @@ class Admin extends MY_Controller
     /**
     * Delete the stocking place $id. If $action is null, a confirmation will be shown
     */
-    public function delete_stocking_place($id = NULL, $action = NULL)
+    public function delete_stocking_place($id, $action = NULL)
     {
       $this->load->model(['stocking_place_model','item_model']);
 
@@ -603,14 +591,14 @@ class Admin extends MY_Controller
         redirect("/admin/view_stocking_places/");
       }
 
-      $filter = array('s' => array($id));
-      $items = $this->item_model->get_filtered($filter);
+      $items = $this->item_model->get_many_by('stocking_place_id='.$id);
+      $deletion_allowed = sizeof($items) == 0;
 
-      if (is_null($action)) {
+      if (is_null($action) || !$deletion_allowed) {
         $output = get_object_vars($this->stocking_place_model->get($id));
         $output['items'] = $items;
         $output["stocking_places"] = $this->stocking_place_model->get_all();
-        $output["deletion_allowed"] = (sizeof($items) == 0);
+        $output["deletion_allowed"] = $deletion_allowed;
         $output["amount"] = sizeof($items);
 
         $this->display_view("admin/stocking_places/delete", $output);
@@ -631,8 +619,7 @@ class Admin extends MY_Controller
         redirect("/admin/view_stocking_places/");
       }
 
-      $filter = array('s' => array($id));
-      $items = $this->item_model->get_filtered($filter);
+      $items = $this->item_model->get_many_by('stocking_place_id='.$id);
 
       if(is_null($action)) {
         $output = get_object_vars($this->stocking_place_model->get($id));
@@ -737,7 +724,7 @@ class Admin extends MY_Controller
     /**
     * Delete a supplier
     */
-    public function delete_supplier($id = NULL, $action = NULL)
+    public function delete_supplier($id, $action = NULL)
     {
       $this->load->model(['supplier_model','stocking_place_model','item_model']);
 
@@ -748,13 +735,13 @@ class Admin extends MY_Controller
       // Block deletion if this supplier is used
       $items = $this->item_model->get_many_by("supplier_id = ".$id);
       $amount = count($items);
+      $deletion_allowed = ($amount < 1);
 
-      if (!isset($action)) {
+      if (!isset($action) || !$deletion_allowed) {
         $output = get_object_vars($this->supplier_model->get($id));
         $output['items'] = $items;
         $output['stocking_places'] = $this->stocking_place_model->get_all();
-        $output["deletion_allowed"] = ($amount < 1);
-        $output["amount"] = $amount;
+        $output["deletion_allowed"] = $deletion_allowed;
 
         $this->display_view("admin/suppliers/delete", $output);
       } else {
@@ -908,7 +895,7 @@ class Admin extends MY_Controller
     /**
     * Delete an unused item group
     */
-    public function delete_item_group($id = NULL, $action = NULL)
+    public function delete_item_group($id, $action = NULL)
     {
       $this->load->model(['item_group_model','stocking_place_model','item_model']);
 
@@ -916,15 +903,15 @@ class Admin extends MY_Controller
         redirect("/admin/view_item_groups/");
       }
 
-      $filter = array("g" => array($id));
-      $items = $this->item_model->get_filtered($filter);
+      $items = $this->item_model->get_many_by('item_group_id='.$id);
+      $deletion_allowed = (sizeof($items) == 0);
 
-      if (!isset($action)) {
+      if (!isset($action) || !$deletion_allowed) {
         $output = get_object_vars($this->item_group_model->get($id));
         $output['items'] = $items;
         $output['stocking_places'] = $this->stocking_place_model->get_all();
         $output["item_groups"] = $this->item_group_model->get_all();
-        $output["deletion_allowed"] = (sizeof($items) == 0);
+        $output["deletion_allowed"] = $deletion_allowed;
         $output["amount"] = sizeof($items);
 
         $this->display_view("admin/item_groups/delete", $output);
@@ -960,21 +947,4 @@ class Admin extends MY_Controller
         redirect('/admin/delete_item_group/'.$id);
       }
     }
-
-  /**
-  * Removes duplicates in an array.
-  * Better than array_unique, as it takes things that cannot be converted to string.
-  * @param array $array
-  *   Array that needs its duplicates removed.
-  * @return array
-  *   The array without any duplicates.
-  */
-  private function remove_array_duplicates(array $array) : array {
-    $result = array();
-    foreach ($array as $key => $value){
-      if(!in_array($value, $result))
-        $result[$key] = $value;
-    }
-    return $result;
-  }
 }

@@ -22,6 +22,10 @@
       <?php } ?>
     </div>
   <?php } else { ?>
+    <?php if($is_active) { ?>
+      <a href="<?= base_url().uri_string()."/disable";?>" class="btn btn-warning"><?= lang('text_disable'); ?></a>
+      <hr>
+    <?php } ?>
     <div class="alert alert-danger"><?= $this->lang->line('delete_user_notok'); ?></div>
     <?php if(!empty($items)) { ?>
       <h2>Objets</h2>
