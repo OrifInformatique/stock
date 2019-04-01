@@ -21,7 +21,7 @@
   <?php } else { ?>
     <div class="alert alert-danger"><?php echo $this->lang->line('delete_notok_with_amount'); ?></div>
     <?php if (!empty($items)) { ?>
-      <h2>Objets</h2>
+      <h2><?= $this->lang->line('admin_delete_objects_list'); ?></h2>
       <table class="table table-striped table-hover">
         <thead>
           <tr>

@@ -23,12 +23,13 @@
     </div>
   <?php } else { ?>
     <?php if($is_active) { ?>
-      <a href="<?= base_url().uri_string()."/disable";?>" class="btn btn-warning"><?= lang('text_disable'); ?></a>
-      <hr>
+      <a href="<?= base_url().uri_string()."/disable";?>" class="btn btn-warning">
+        <?= lang('text_disable'); ?>
+      </a>
     <?php } ?>
     <div class="alert alert-danger"><?= $this->lang->line('delete_user_notok'); ?></div>
     <?php if(!empty($items)) { ?>
-      <h2>Objets</h2>
+      <h2><?= $this->lang->line('admin_delete_objects_list'); ?></h2>
       <table class="table table-striped table-hover">
         <thead>
           <tr>
@@ -71,9 +72,9 @@
       </div>
       <?php if(!empty($loans))
         echo '<hr>';
-    } ?>
-    <?php if(!empty($loans)) { ?>
-      <h2>Prêts</h2>
+    }
+    if(!empty($loans)) { ?>
+      <h2><?= $this->lang->line('admin_delete_loans_list'); ?></h2>
       <table class="table table-striped table-hover">
         <thead>
           <tr>

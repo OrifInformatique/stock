@@ -136,7 +136,9 @@ $lang['admin_delete_user_verify']       = 'Voulez-vous vraiment supprimer l\'uti
 $lang['admin_delete_stocking_place_verify'] = 'Voulez-vous vraiment supprimer le lieu de stockage ';
 $lang['admin_delete_item_group_verify'] = 'Voulez-vous vraiment supprimer le groupe d\'objets ';
 $lang['admin_delete_supplier_verify']   = 'Voulez-vous vraiment supprimer le fournisseur ';
-$lang['delete_user_notok']              = 'Cet utilisateur ne peut pas être supprimé car il est lié aux objects suivants: ';
+$lang['admin_delete_objects_list']      = 'Objets liés: ';
+$lang['admin_delete_loans_list']        = 'Prêts liés: ';
+$lang['delete_user_notok']              = 'Cet utilisateur ne peut pas être supprimé car il est lié aux objects et/ou prêts suivants: ';
 $lang['delete_notok']                   = 'Cet élément ne peut pas être supprimé car il est en cours d\'utilisation par un ou plusieurs objets.';
 $lang['delete_notok_with_amount']       = 'Cet élément ne peut pas être supprimé car il est en cours d\'utilisation par les objets suivants: ';
 $lang['delete_notok_item']              = ' objet.';
@@ -150,7 +152,6 @@ $lang['admin_relink_user_loans']        = 'Choisir le nouvel utilisateur qui ser
 $lang['delete_linked_items']            = 'objets';
 $lang['delete_linked_loans_registered'] = 'prêts';
 $lang['delete_linked_loans_made']       = 'emprunts';
-
 
 // Admin other labels
 $lang['admin_modify']                   = 'Modification';

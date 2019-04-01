@@ -202,37 +202,23 @@ class Admin extends MY_Controller
       $linked_items = [];
       $linked_loans = [];
 
+      // Check if there is an user with $id
       if(is_null($this->user_model->get($id))) {
         redirect("/admin/view_users/");
       }
 
-      // Check if user is linked to other objects
+      // Get user with links to other objects
       $user = $this->user_model->with_all()->get($id);
 
       // Store linked objects in variable
-      if (!empty($user->items_created)) {
-        $linked_items = array_merge($linked_items, $user->items_created);
-      }
-      if(!empty($user->items_modified)) {
-        $linked_items = array_merge($linked_items, $user->items_modified);
-      }
-      if(!empty($user->items_checked)) {
-        $linked_items = array_merge($linked_items, $user->items_checked);
-      }
-      if (!empty($user->loans_registered)) {
-        $linked_loans = array_merge($linked_loans, $user->loans_registered);
-      }
-      if (!empty($user->loans_made)) {
-        $linked_loans = array_merge($linked_loans, $user->loans_made);
-      }
+      $linked_items = array_merge($user->items_created, $user->items_modified, $user->items_checked);
+      $linked_loans = array_merge($user->loans_registered, $user->loans_made);
 
       // Make sure that all variables are empty
-      $deletion_allowed = (
-        empty($linked_items) &&
-        empty($linked_loans)
-      );
+      $deletion_allowed = empty($linked_items + $linked_loans);
 
       if($action == "disable") {
+        // User still exists, so there is no need to remove item connections
         $this->user_model->update($id, array('is_active' => 0));
         redirect("/admin/view_users/");
       } else if($deletion_allowed && $action == "delete") {
@@ -261,27 +247,20 @@ class Admin extends MY_Controller
     */
     public function unlink_user_items($id, $action = NULL) {
       $this->load->model(['user_model','item_model']);
+
+      // Check if there is an user with $id
       if(is_null($this->user_model->get($id))) {
         redirect("/admin/view_users/");
       }
-      $user = $this->user_model->with_all()->get($id);
 
       if(is_null($action)) {
         $output = get_object_vars($this->user_model->get($id));
         $this->display_view('admin/users/unlink_items', $output);
       } else {
-        $items_created = $user->items_created;
-        $items_modified = $user->items_modified;
-        $items_checked = $user->items_checked;
-        foreach ($items_created as $created) {
-          $this->item_model->update($created->item_id, array("created_by_user_id" => NULL));
-        }
-        foreach ($items_modified as $modified) {
-          $this->item_model->update($modified->item_id, array("modified_by_user_id" => NULL));
-        }
-        foreach ($items_checked as $checked) {
-          $this->item_model->update($checked->item_id, array("checked_by_user_id" => NULL));
-        }
+        $this->item_model->update_by('created_by_user_id='.$id, array('created_by_user_id' => NULL));
+        $this->item_model->update_by('modified_by_user_id='.$id, array('modified_by_user_id' => NULL));
+        $this->item_model->update_by('checked_by_user_id='.$id, array('checked_by_user_id' => NULL));
+        redirect('admin/delete_user/'.$id);
       }
     }
 
@@ -290,27 +269,24 @@ class Admin extends MY_Controller
     */
     public function unlink_user_loans($id) {
       $this->load->model(['user_model','item_model','loan_model']);
+
+      // Check if there is an user with $id
       if(is_null($this->user_model->get($id))) {
         redirect("/admin/view_users/");
       }
-      $user = $this->user_model->with_all()->get($id);
 
+      // Don't directly access $_POST
       $post = $_POST;
-      if(!isset($post['new_user'])) {
+      $new_user = (isset($post['new_user']) ? $post['new_user'] : -1);
+
+      if($new_user == -1) {
         $output = get_object_vars($this->user_model->get($id));
         $output['user'] = $this->user_model->get($id);
         $output['new_users'] = $this->user_model->get_all();
         $this->display_view('admin/users/unlink_loans', $output);
-      } else if(ctype_digit($post['new_user'])) {
-        $new_user = $post['new_user'];
-        $loans_registered = $user->loans_registered;
-        $loans_made = $user->loans_made;
-        foreach($loans_registered as $registered) {
-          $this->loan_model->update($registered->loan_id, array("loan_by_user_id" => $new_user));
-        }
-        foreach($loans_made as $made) {
-          $this->loan_model->update($made->loan_id, array("loan_to_user_id" => $new_user));
-        }
+      } else if(ctype_digit($new_user)) {
+        $this->loan_model->update_by('loan_by_user_id='.$id, array('loan_by_user_id' => $new_user));
+        $this->loan_model->update_by('loan_to_user_id='.$id, array('loan_to_user_id' => $new_user));
         redirect('admin/delete_user/'.$id);
       }
     }
@@ -436,6 +412,7 @@ class Admin extends MY_Controller
     public function delete_tag($id, $action = NULL) {
       $this->load->model(['stocking_place_model','item_tag_model','item_tag_link_model','item_model']);
 
+      // Check if there is a tag with $id
       if(is_null($this->item_tag_model->get($id))) {
         redirect("/admin/view_tags");
       }
@@ -454,7 +431,7 @@ class Admin extends MY_Controller
 
         $this->display_view("admin/tags/delete", $output);
       } else {
-        // Action confirmed : delete links and delete tag
+        // Action confirmed : delete tag
         $this->item_tag_link_model->delete_by('item_tag_id='.$id);
         $this->item_tag_model->delete($id);
         redirect("/admin/view_tags/");
@@ -466,12 +443,18 @@ class Admin extends MY_Controller
     * If $action is NULL, a confirmation will be shown. Otherwise, the tag will be unlinked.
     */
     public function unlink_tag($id, $action = NULL) {
-      $this->load->model(['item_tag_model','item_tag_link_model','item_model']);
+      $this->load->model(['item_tag_model','item_tag_link_model']);
+
+      // Check if there is a tag with $id
+      if(is_null($this->item_tag_model->get($id))) {
+        redirect("/admin/view_tags");
+      }
 
       if(is_null($action)) {
         $output = get_object_vars($this->item_tag_model->get($id));
         $this->display_view('admin/tags/unlink', $output);
       } else {
+        // Delete all links and go back to deletion
         $this->item_tag_link_model->delete_by('item_tag_id='.$id);
         redirect("/admin/delete_tag/".$id);
       }
@@ -587,12 +570,13 @@ class Admin extends MY_Controller
     {
       $this->load->model(['stocking_place_model','item_model']);
 
+      // Check if there is a stocking place with $id
       if(is_null($this->stocking_place_model->get($id))) {
         redirect("/admin/view_stocking_places/");
       }
 
       $items = $this->item_model->get_many_by('stocking_place_id='.$id);
-      $deletion_allowed = sizeof($items) == 0;
+      $deletion_allowed = sizeof($items) <= 0;
 
       if (is_null($action) || !$deletion_allowed) {
         $output = get_object_vars($this->stocking_place_model->get($id));
@@ -615,19 +599,17 @@ class Admin extends MY_Controller
     public function unlink_stocking_place($id, $action = NULL) {
       $this->load->model(['stocking_place_model','item_model']);
 
+      // Check if there is a stocking place with $id
       if(is_null($this->stocking_place_model->get($id))) {
         redirect("/admin/view_stocking_places/");
       }
-
-      $items = $this->item_model->get_many_by('stocking_place_id='.$id);
 
       if(is_null($action)) {
         $output = get_object_vars($this->stocking_place_model->get($id));
         $this->display_view('admin/stocking_places/unlink', $output);
       } else {
-        foreach($items as $item) {
-          $this->item_model->update($item->item_id, array('stocking_place_id' => NULL));
-        }
+        // Set them all to NULL and go back to deletion
+        $this->item_model->update_by('stocking_place_id='.$id, array('stocking_place_id' => NULL));
         redirect('/admin/delete_stocking_place/'.$id);
       }
     }
@@ -728,14 +710,14 @@ class Admin extends MY_Controller
     {
       $this->load->model(['supplier_model','stocking_place_model','item_model']);
 
+      // Check if there is a supplier with $id
       if(is_null($this->supplier_model->get($id))) {
         redirect("/admin/view_suppliers/");
       }
       
-      // Block deletion if this supplier is used
+      // Prevent deletion if this supplier is used
       $items = $this->item_model->get_many_by("supplier_id = ".$id);
-      $amount = count($items);
-      $deletion_allowed = ($amount < 1);
+      $deletion_allowed = (count($items) < 1);
 
       if (!isset($action) || !$deletion_allowed) {
         $output = get_object_vars($this->supplier_model->get($id));
@@ -760,19 +742,17 @@ class Admin extends MY_Controller
     public function unlink_supplier($id, $action = NULL) {
       $this->load->model(['supplier_model','item_model']);
 
+      // Check if there is a supplier with $id
       if(is_null($this->supplier_model->get($id))) {
         redirect("/admin/view_suppliers/");
       }
-
-      $items = $this->item_model->get_many_by("supplier_id = ".$id);
 
       if(is_null($action)) {
         $output = get_object_vars($this->supplier_model->get($id));
         $this->display_view('admin/suppliers/unlink', $output);
       } else {
-        foreach($items as $item) {
-          $this->item_model->update($item->item_id, array('supplier_id' => NULL));
-        }
+        // Set them all to NULL and go back to deletion
+        $this->item_model->update_by('supplier_id='.$id, array('supplier_id' => NULL));
         redirect('/admin/delete_supplier/'.$id);
       }
     }
@@ -899,6 +879,7 @@ class Admin extends MY_Controller
     {
       $this->load->model(['item_group_model','stocking_place_model','item_model']);
 
+      // Check if there is an item group with $id
       if(is_null($this->item_group_model->get($id))) {
         redirect("/admin/view_item_groups/");
       }
@@ -931,19 +912,16 @@ class Admin extends MY_Controller
     public function unlink_item_group($id, $action = NULL) {
       $this->load->model(['item_group_model','item_model']);
 
+      // Check if there is an item group with $id
       if(is_null($this->item_group_model->get($id))) {
         redirect("/admin/view_item_groups/");
       }
-
-      $items = $this->item_model->get_many_by("item_group_id = ".$id);
 
       if(is_null($action)) {
         $output = get_object_vars($this->item_group_model->get($id));
         $this->display_view('admin/item_groups/unlink', $output);
       } else {
-        foreach($items as $item) {
-          $this->item_model->update($item->item_id, array('item_group_id' => NULL));
-        }
+        $this->item_model->update_by('item_group_id='.$id, array('item_group_id' => NULL));
         redirect('/admin/delete_item_group/'.$id);
       }
     }
