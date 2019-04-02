@@ -1,6 +1,6 @@
 <div class="container">
-  
-  <div class="row" >
+
+  <div class="row">
     <h3>
       <a href="<?= base_url(); ?>admin/view_users" class="tab_selected"><?= lang('admin_tab_users'); ?></a>
       <a href="<?= base_url(); ?>admin/view_tags" class="tab_unselected"><?= lang('admin_tab_tags'); ?></a>
@@ -9,8 +9,8 @@
       <a href="<?= base_url(); ?>admin/view_item_groups" class="tab_unselected"><?= lang('admin_tab_item_groups'); ?></a>
     </h3>
   </div>
-  
-  <?php if(is_null($action) && $deletion_allowed) { ?>
+
+  <?php if($deletion_allowed) { ?>
     <div class="row" >
       <?= lang('admin_delete_user_verify').'"'.$username.'" ?'; ?>
     </div>

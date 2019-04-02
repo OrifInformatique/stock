@@ -205,6 +205,10 @@ class Admin extends MY_Controller
       // Check if there is an user with $id
       if(is_null($this->user_model->get($id))) {
         redirect("/admin/view_users/");
+      } elseif($action == "disable") {
+        // User still exists, so there is no need to remove item connections
+        $this->user_model->update($id, array('is_active' => 0));
+        redirect("/admin/view_users/");
       }
 
       // Get user with links to other objects
@@ -217,11 +221,7 @@ class Admin extends MY_Controller
       // Make sure that all variables are empty
       $deletion_allowed = empty($linked_items + $linked_loans);
 
-      if($action == "disable") {
-        // User still exists, so there is no need to remove item connections
-        $this->user_model->update($id, array('is_active' => 0));
-        redirect("/admin/view_users/");
-      } else if($deletion_allowed && $action == "delete") {
+      if($deletion_allowed && $action == "delete") {
         $this->user_model->delete($id);
         redirect("/admin/view_users/");
       }
@@ -237,7 +237,6 @@ class Admin extends MY_Controller
       $output['items'] = $linked_items;
       $output['loans'] = $linked_loans;
       $output['deletion_allowed'] = $deletion_allowed;
-      $output['action'] = $action;
 
       $this->display_view("admin/users/delete", $output);
     }
@@ -268,7 +267,7 @@ class Admin extends MY_Controller
     * Unlinks an user and the loans linked.
     */
     public function unlink_user_loans($id) {
-      $this->load->model(['user_model','item_model','loan_model']);
+      $this->load->model(['user_model','loan_model']);
 
       // Check if there is an user with $id
       if(is_null($this->user_model->get($id))) {
@@ -418,7 +417,7 @@ class Admin extends MY_Controller
       }
 
       $items = $this->item_model->get_filtered(["t" => [$id]]);
-      $deletion_allowed = !(sizeof($items) > 0 && sizeof($items) < 500); // Do not make the number bigger than the amount of items
+      $deletion_allowed = !(sizeof($items) > 0);
 
       if (is_null($action) || !$deletion_allowed) {
         // Display a message to confirm the action
