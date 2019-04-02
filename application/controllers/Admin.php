@@ -28,7 +28,7 @@ class Admin extends MY_Controller
     */
     public function index()
     {
-      $this->view_users();
+      $this->view_generic('user');
     }
 
     /* *********************************************************************************************************
@@ -923,5 +923,85 @@ class Admin extends MY_Controller
         $this->item_model->update_by('item_group_id='.$id, array('item_group_id' => NULL));
         redirect('/admin/delete_item_group/'.$id);
       }
+    }
+
+    /* *********************************************************************************************************
+    GENERIC (FOR EVERYTHING)
+    ********************************************************************************************************* */
+    /**
+    * As the name and section suggest, shows one of the lists of items
+    * @param string $category: The type of things wanted.
+    *     Accepts any string on the first line.
+    */
+    public function view_generic($category = 'user') {
+      $admin_menus = ['user', 'tag', 'stocking_place', 'supplier', 'item_group'];
+      if(!in_array($category, $admin_menus)) {
+        $category = 'user';
+      }
+
+      $things = [];
+      $things = $this->{"generic_get_{$category}s"}();
+      $headers = $things['headers'];
+      $current_items = $things['current_items'];
+
+      $output['headers'] = $headers;
+      $output['admin_menus'] = $admin_menus;
+      $output['current_menu'] = $category;
+      $output['current_items'] = $current_items;
+      $this->display_view('/admin/listgeneric', $output);
+    }
+
+    private function generic_get_users() {
+      $output['headers'] = [
+        'header_username', 'header_lastname',
+        'header_firstname', 'header_email',
+        'header_user_type', 'header_is_active'
+      ];
+
+      $this->load->model('user_model');
+      $output['current_items'] = $this->user_model->with('user_type')->get_all();
+
+      return $output;
+    }
+
+    private function generic_get_tags() {
+      $output['headers'] =  NULL;
+
+      $this->load->model('item_tag_model');
+      $output['current_items'] = $this->item_tag_model->get_all();
+
+      return $output;
+    }
+
+    private function generic_get_stocking_places() {
+      $output['headers'] = ['field_short_name', 'field_long_name'];
+
+      $this->load->model('stocking_place_model');
+      $output['current_items'] = $this->stocking_place_model->get_all();
+
+      return $output;
+    }
+
+    private function generic_get_suppliers() {
+      $output['headers'] = [
+        'header_suppliers_name', 'header_suppliers_address_1',
+        'header_suppliers_address_2', 'header_suppliers_NPA',
+        'header_suppliers_city', 'header_suppliers_country',
+        'header_suppliers_phone', 'header_suppliers_email'
+      ];
+
+      $this->load->model('supplier_model');
+      $output["current_items"] = $this->supplier_model->get_all();
+
+      return $output;
+    }
+
+    private function generic_get_item_groups() {
+      $output['headers'] = NULL;
+
+      $this->load->model('item_group_model');
+      $output["current_items"] = $this->item_group_model->get_all();
+
+      return $output;
     }
 }
