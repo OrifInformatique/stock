@@ -72,9 +72,11 @@ label {
     margin-right:1px;
     color:#fff;
     text-decoration:none;
+    cursor: pointer;
 }
 .tab_unselected:hover {
     color: #fff;
+    text-decoration:underline;
 }
 .tab_selected {
     display:block;
@@ -86,7 +88,9 @@ label {
     margin-right:1px;
     color:#fff;
     text-decoration:none;
+    cursor: pointer;
 }
 .tab_selected:hover {
     color: #fff;
+    text-decoration:underline;
 }
