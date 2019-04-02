@@ -17,7 +17,7 @@
     ?>
 
     <!-- ITEM NAME AND DESCRIPTION -->
-    <div>
+    <div class="form-group col-xs-12">
         <div class="col-md-8">
             <div class="form-group">
                 <input type="text" class="form-control input-bold" name="name"
@@ -30,7 +30,7 @@
                         value="<?php if(isset($description)) {echo set_value('description',$description);} else {echo set_value('description');} ?>" />
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4 row">
             <div class="form-group col-xs-7">
                 <input type="text" class="form-control input-bold" name="inventory_prefix"
                        id="inventory_prefix"
@@ -51,7 +51,7 @@
     </div>
 
     <!-- ITEM DETAILS -->
-    <div>
+    <div class="form-group col-xs-12">
         <div class="col-xs-12">
             <p class="bg-primary">&nbsp;<?php echo $this->lang->line('text_item_detail'); ?></p>
         </div>
@@ -64,7 +64,7 @@
                      alt="<?php echo $this->lang->line('field_image'); ?>" />
             <?php } ?>
         </div>
-        <div class="col-md-8">
+        <div class="col-md-8 row">
             <div class="form-group col-md-4">
                 <label for="item_group_id"><?php echo $this->lang->line('field_group'); ?>&nbsp;</label>
                 <?php
@@ -102,7 +102,7 @@
     </div>
 
     <!-- ITEM STATUS, LOAN STATUS AND HISTORY -->
-    <div>
+    <div class="form-group col-xs-12">
         <div class="col-xs-12">
             <p class="bg-primary">&nbsp;<?php echo $this->lang->line('text_item_loan_status'); ?></p>
         </div>
@@ -133,7 +133,7 @@
     </div>
 
     <!-- ITEM SUPPLIER, BUYING AND WARRANTY INFORMATIONS -->
-    <div>
+    <div class="form-group col-xs-12">
         <div class="col-xs-12">
             <p class="bg-primary">&nbsp;<?php echo $this->lang->line('text_item_buying_warranty'); ?></p>
         </div>
@@ -179,7 +179,7 @@
     </div>
 
     <!-- ITEM TAGS -->
-    <div>
+    <div class="form-group col-xs-12">
         <div class="col-xs-12">
             <p class="bg-primary">&nbsp;<?php echo $this->lang->line('text_item_tags'); ?></p>
         </div>
