@@ -210,7 +210,6 @@ $lang['msg_err_unique_shortname']       = 'Cette abréviation est déjà utilis�
 $lang['msg_err_stocking_needed']        = 'Un nom d\'emplacement unique doit être fourni';
 $lang['msg_err_stocking_short_unique']  = 'Un nom court d\'emplacement doit être fourni';
 $lang['msg_err_stocking_unique']        = 'Un nom d\'emplacement unique doit être unique';
-$lang['msg_err_stocking_short_unique']  = 'Un nom court d\'emplacement doit être unique';
 $lang['msg_err_username_used']          = 'Ce nom est déjà utilisé';
 $lang['msg_no_loan']                    = 'Aucun prêt à afficher';
 $lang['msg_no_inventory_controls']      = 'Aucun contrôle d\'inventaire';

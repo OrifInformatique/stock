@@ -7,9 +7,9 @@ if (isset($item_groups)) {
 <form class="container" method="post">
   <div class="row" >
     <button type="submit" class="btn btn-success"><?= lang('btn_save'); ?></button>
-    <a class="btn btn-danger" href="<?= base_url() . "admin/view_item_groups/"; ?>"><?= lang('btn_cancel'); ?></a>    
+    <a class="btn btn-danger" href="<?= base_url() . "admin/view_item_groups/"; ?>"><?= lang('btn_cancel'); ?></a>
   </div>
-    
+
   <div class="row" >
     <h3>
       <a href="<?= base_url(); ?>admin/view_generic/user" class="tab_unselected"><?= lang('admin_tab_users'); ?></a>
@@ -19,19 +19,19 @@ if (isset($item_groups)) {
       <a href="<?= base_url(); ?>admin/view_generic/item_group" class="tab_selected"><?= lang('admin_tab_item_groups'); ?></a>
     </h3>
   </div>
-    
+
   <div class="row alert alert-warning">
     <?php if($update) {
       echo lang('admin_modify');
-    } else { 
+    } else {
       echo lang('admin_add');
     } ?>
   </div>
-  
+
   <?php if (!empty(validation_errors())) { ?>
     <div class="alert alert-danger"><?= validation_errors(); ?></div>
   <?php } ?>
-  
+
   <div class="row">
     <div class="form-input row">
       <div class="col-sm-3">

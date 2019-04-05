@@ -1,7 +1,7 @@
 <div class="container" id="content">
     <div class="row">
         <a href="<?php
-            $link = base_url("admin/new_{$current_menu}");
+            $link = base_url("admin/form_generic/{$current_menu}");
             echo $link;
         ?>" class="btn btn-success">
             <?= $this->lang->line('btn_new'); ?>

@@ -1,11 +1,11 @@
 <div class="container">
     <div class="row">
         <h3>
-            <a href="<?= base_url(); ?>admin/view_generic/user" class="tab_unselected"><?= lang('admin_tab_users'); ?></a>
+            <a href="<?= base_url(); ?>admin/view_generic/user" class="tab_selected"><?= lang('admin_tab_users'); ?></a>
             <a href="<?= base_url(); ?>admin/view_generic/tag" class="tab_unselected"><?= lang('admin_tab_tags'); ?></a>
             <a href="<?= base_url(); ?>admin/view_generic/stocking_place" class="tab_unselected"><?= lang('admin_tab_stocking_places'); ?></a>
             <a href="<?= base_url(); ?>admin/view_generic/supplier" class="tab_unselected"><?= lang('admin_tab_suppliers'); ?></a>
-            <a href="<?= base_url(); ?>admin/view_generic/item_group" class="tab_selected"><?= lang('admin_tab_item_groups'); ?></a>
+            <a href="<?= base_url(); ?>admin/view_generic/item_group" class="tab_unselected"><?= lang('admin_tab_item_groups'); ?></a>
         </h3>
     </div>
 

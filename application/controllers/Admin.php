@@ -929,17 +929,17 @@ class Admin extends MY_Controller
     GENERIC (FOR EVERYTHING)
     ********************************************************************************************************* */
     /**
-    * As the name and section suggest, shows one of the lists of items
-    * @param string $category: The type of things wanted.
-    *     Accepts any string on the first line.
-    */
+     * As the name and section suggest, shows one of the lists of items
+     * @param string $category The type of things wanted.
+     *     Accepts any string on the first line.
+     */
     public function view_generic($category = 'user') {
       $admin_menus = ['user', 'tag', 'stocking_place', 'supplier', 'item_group'];
       if(!in_array($category, $admin_menus)) {
         $category = 'user';
       }
 
-      $things = $this->{"generic_get_{$category}s"}();
+      $things = $this->{"generic_get_{$category}s_items"}();
       $headers = $things['headers'];
       $current_items = $things['current_items'];
 
@@ -950,7 +950,115 @@ class Admin extends MY_Controller
       $this->display_view('/admin/listgeneric', $output);
     }
 
-    private function generic_get_users() {
+    /**
+     * As the name and section suggest, opens a form for a type of item
+     * @param string $category The type of things wanted.
+     *    Accepts any string on the first line.
+     * @param integer $id The id of the item to modify.
+     *    Set to 0 for new item.
+     */
+    public function form_generic($category, $id = 0) {
+      $admin_menus = ['user', 'tag', 'stocking_place', 'supplier', 'item_group'];
+      if(!in_array($category, $admin_menus)) {
+        $this->view_generic();
+      }
+
+      if(!empty($_POST)) {
+        $this->check_form_generic();
+      } else {
+        $fields = $this->{"generic_get_{$category}s_fields"}($id);
+        $selects = $this->generic_get_selects();
+
+        $output['admin_menus'] = $admin_menus;
+        $output['current_menu'] = $category;
+        $output['fields'] = $fields;
+        $output['selects'] = $selects;
+        $output['update'] = ($id > 0);
+        $this->display_view('/admin/formgeneric', $output);
+      }
+    }
+
+    /**
+     * @todo
+     * Checks that the generic form was done correctly.
+     */
+    public function check_form_generic() {
+      $data = $_POST['field'];
+      $category = $_POST['category'];
+      $update = FALSE;
+      $id = -1;
+      if(isset($_POST['id'])) {
+        $update = TRUE;
+        $id = $_POST['id'];
+      }
+
+      // Choosing which model to load
+      if($category === 'tag') {
+        $current_model = 'item_tag_model';
+      } else {
+        $current_model = "{$category}_model";
+      }
+
+      // Setting the validation rules
+      switch($category) {
+        case 'user':
+          $pwd_rules = ($update ? '' : 'required|').'min_length[6]';
+          $this->form_validation->set_rules('field[username]', $this->lang->line('field_username'), "required|callback_unique_username[$id]", $this->lang->line('msg_id_needed'));
+          $this->form_validation->set_rules('field[email]', $this->lang->line('field_mail'), 'valid_email', $this->lang->line('msg_err_email'));
+          if(!empty($data['pwd']) || !empty($data['pwdagain']) || $update) {
+            $pwd = $data['pwd'];
+            $this->form_validation->set_rules('field[pwd]', $this->lang->line('field_password'), $pwd_rules, $this->lang->line('msg_err_pwd_length'));
+            $this->form_validation->set_rules('field[pwdagain]', $this->lang->line('field_password'), "in_list[".$pwd."]", $this->lang->line('msg_err_pwg_wrong'));
+          }
+          break;
+        case 'tag':
+          $this->form_validation->set_rules('field[name]', $this->lang->line('field_username'), "required|callback_unique_tagname[$id]", $this->lang->line('msg_err_tag_name_needed'));
+          $this->form_validation->set_rules('field[short_name]', $this->lang->line('field_abbreviation'), "required|callback_unique_tagshort[$id]", $this->lang->line('msg_err_abbreviation'));
+          break;
+        case 'stocking_place':
+          $this->form_validation->set_rules('field[short]', $this->lang->line('field_short_name'), "required|callback_unique_stocking_short[$id]", $this->lang->line('msg_err_storage_short_needed'));
+          $this->form_validation->set_rules('field[name]', $this->lang->line('field_long_name'), "required|callback_unique_stocking_name[$id]", $this->lang->line('msg_err_storage_long_needed'));
+          break;
+        case 'supplier':
+          $this->form_validation->set_rules('field[name]', $this->lang->line('field_name'), "required|callback_unique_supplier[$id]", $this->lang->line('msg_err_supplier_needed'));
+          $this->form_validation->set_rules('field[email]', $this->lang->line('field_mail'), 'valid_email', $this->lang->line('msg_err_email'));
+          break;
+        case 'item_group':
+          $this->form_validation->set_rules('field[name]', $this->lang->line('field_username'), "required|callback_unique_groupname[$id]", lang('msg_err_item_group_needed'));
+          $this->form_validation->set_rules('field[short_name]', $this->lang->line('field_abbreviation'), "required|callback_unique_groupshort[$id]", $this->lang->line('msg_err_item_group_short'));
+          break;
+      }
+
+      if($category == 'user' && (!$update || !empty($data['pwd']))) {
+        $data['password'] = password_hash($data['pwd'], PASSWORD_HASH_ALGORITHM);
+        $data['is_active'] = (isset($data['is_active']) ? $data['is_active'] : 0);
+      }
+      if(!isset($data['email']) || empty($data['email'])) {
+        unset($data['email']);
+      }
+
+      $this->load->model($current_model);
+
+      if($this->form_validation->run()) {
+        unset($data['pwd']);
+        unset($data['pwdagain']);
+        if($update) {
+          $this->{$current_model}->update($id, $data);
+        } else {
+          $res = $this->{$current_model}->insert($data);
+        }
+        redirect("admin/view_generic/".$category);
+      } else {
+        $this->form_generic($category,$id);
+      }
+    }
+
+    /**
+     * Returns the items and the headers for the list.
+     * Items are modified to allow a simpler list.
+     * @return array: The list headers and items
+     */
+    private function generic_get_users_items() {
       $output['headers'] = [
         'header_username', 'header_lastname',
         'header_firstname', 'header_email',
@@ -963,7 +1071,7 @@ class Admin extends MY_Controller
       foreach($current_items as &$current_item) {
         $current_id = $current_item->user_id;
         $temp = [
-          'username' => "<a href='".base_url("admin/modify_user/{$current_id}")."'>{$current_item->username}</a>",
+          'username' => "<a href='".base_url("admin/form_generic/user/{$current_id}")."'>{$current_item->username}</a>",
           'lastname' => $current_item->lastname,
           'firstname' => $current_item->firstname,
           'email' => $current_item->email,
@@ -979,8 +1087,12 @@ class Admin extends MY_Controller
       $output['current_items'] = $current_items;
       return $output;
     }
-
-    private function generic_get_tags() {
+    /**
+     * Returns the tags and the headers for the list.
+     * Tags are modified to allow a simpler list.
+     * @return array: The list headers and tags
+     */
+    private function generic_get_tags_items() {
       $output['headers'] =  NULL;
 
       $this->load->model('item_tag_model');
@@ -990,7 +1102,7 @@ class Admin extends MY_Controller
         $current_id = $current_item->item_tag_id;
 
         $temp = [
-          'name' => "<a href='".base_url("admin/modify_tag/{$current_id}")."'>{$current_item->name}</a>",
+          'name' => "<a href='".base_url("admin/form_generic/tag/{$current_id}")."'>{$current_item->name}</a> {$current_item->short_name}",
           'delete' => "<a href='".base_url("/admin/delete_tag/{$current_id}")."' class='close'>x</a>"
         ];
 
@@ -1002,8 +1114,12 @@ class Admin extends MY_Controller
       $output['current_items'] = $current_items;
       return $output;
     }
-
-    private function generic_get_stocking_places() {
+    /**
+     * Returns the stocking places and the headers for the list.
+     * Stocking places are modified to allow a simpler list.
+     * @return array: The list headers and stocking places
+     */
+    private function generic_get_stocking_places_items() {
       $output['headers'] = ['field_short_name', 'field_long_name'];
 
       $this->load->model('stocking_place_model');
@@ -1013,7 +1129,7 @@ class Admin extends MY_Controller
         $current_id = $current_item->stocking_place_id;
 
         $temp = [
-          'short' => '<a href=\''.base_url("admin/modify_stocking_place/{$current_id}")."'>{$current_item->short}</a>",
+          'short' => '<a href=\''.base_url("admin/form_generic/stocking_place/{$current_id}")."'>{$current_item->short}</a>",
           'long' => $current_item->name,
           'delete' => "<a href='".base_url("/admin/delete_stocking_place/{$current_id}")."' class='close'>x</a>"
         ];
@@ -1026,8 +1142,12 @@ class Admin extends MY_Controller
       $output['current_items'] = $current_items;
       return $output;
     }
-
-    private function generic_get_suppliers() {
+    /**
+     * Returns the suppliers and the headers for the list.
+     * Suppliers are modified to allow a simpler list.
+     * @return array: The list headers and suppliers
+     */
+    private function generic_get_suppliers_items() {
       $output['headers'] = [
         'header_suppliers_name', 'header_suppliers_address_1',
         'header_suppliers_address_2', 'header_suppliers_NPA',
@@ -1042,7 +1162,7 @@ class Admin extends MY_Controller
         $current_id = $current_item->supplier_id;
 
         $temp = [
-          'name' => '<a href=\''.base_url("admin/modify_supplier/{$current_id}")."'>{$current_item->name}</a>",
+          'name' => '<a href=\''.base_url("admin/form_generic/supplier/{$current_id}")."'>{$current_item->name}</a>",
           'address_line1' => $current_item->address_line1,
           'address_line2' => $current_item->address_line2,
           'zip' => $current_item->zip,
@@ -1061,8 +1181,12 @@ class Admin extends MY_Controller
       $output['current_items'] = $current_items;
       return $output;
     }
-
-    private function generic_get_item_groups() {
+    /**
+     * Returns the item groups and the headers for the list.
+     * Item groups are modified to allow a simpler list.
+     * @return array: The list headers and item groups
+     */
+    private function generic_get_item_groups_items() {
       $output['headers'] = NULL;
 
       $this->load->model('item_group_model');
@@ -1072,7 +1196,7 @@ class Admin extends MY_Controller
         $current_id = $current_item->item_group_id;
 
         $temp = [
-          'name' => '<a href=\''.base_url("admin/modify_item_group/{$current_id}")."'>{$current_item->name}</a>",
+          'name' => '<a href=\''.base_url("admin/form_generic/item_group/{$current_id}")."'>{$current_item->name}</a>",
           'short_name' => $current_item->short_name,
           'delete' => "<a href='".base_url("/admin/delete_item_group/{$current_id}")."' class='close'>x</a>"
         ];
@@ -1084,5 +1208,198 @@ class Admin extends MY_Controller
 
       $output['current_items'] = $current_items;
       return $output;
+    }
+
+    /**
+     * Returns the selects for the users with the data.
+     * @param integer $id
+     *    The id of the user's user type.
+     * @return array: fields for the item groups, already containing data.
+     */
+    private function generic_get_selects($id = 0) {
+      $selects = [];
+
+      $this->load->model('user_type_model');
+      $selects[0] = $this->user_type_model->get_all();
+      foreach($selects[0] as &$select) {
+        $temp = (object) [
+          'value' => $select->user_type_id,
+          'text' => $select->name,
+          'selected' => ($select->user_type_id == $id),
+        ];
+        $select = $temp;
+      }
+
+      unset($select);
+
+      return $selects;
+    }
+
+    /**
+     * Returns the fields for the users with the data.
+     * @param integer $id
+     *    The id of the user to get.
+     * @return array: fields for the item groups, already containing data.
+     */
+    private function generic_get_users_fields($id = 0){
+      $this->load->model('user_model');
+      if(!is_null($this->user_model->get($id)) && $id !== 0) {
+        $user = $this->user_model->get($id);
+      }
+
+      $is_active = (isset($user) && $user->is_active == 1);
+
+      $fields = [
+        $this->generic_get_field_object('field_username', 'text', 'field[username]', (isset($user->username) ? $user->username : NULL)),
+        $this->generic_get_field_object('field_lastname', 'text', 'field[lastname]', (isset($user->lastname) ? $user->lastname : NULL)),
+        $this->generic_get_field_object('field_firstname', 'text', 'field[firstname]', (isset($user->firstname) ? $user->firstname : NULL)),
+        $this->generic_get_field_object('field_email', 'text', 'field[email]', (isset($user->email) ? $user->email : NULL)),
+        $this->generic_get_field_object('field_status', 'select', 'field[user_type_id]', (isset($user->user_type_id) ? $user->user_type_id : NULL)),
+        $this->generic_get_field_object('field_password', 'password', 'field[pwd]', NULL, 'placeholder="Au moins 6 caractères"'),
+        $this->generic_get_field_object('field_password_confirm', 'password', 'field[pwdagain]', NULL),
+        $this->generic_get_field_object(NULL , 'checkbox', 'field[is_active]', $is_active)
+      ];
+      $fields[7]->text = 'Activé ';
+
+      if(isset($user)) {
+        $fields[] = $this->generic_get_field_object(NULL, 'hidden', 'id', $id);
+      }
+
+      return $fields;
+    }
+    /**
+     * Returns the fields for the tags with the data.
+     * @param integer $id
+     *    The id of the tag to get.
+     * @return array: fields for the item groups, already containing data.
+     */
+    private function generic_get_tags_fields($id = 0){
+      $this->load->model('item_tag_model');
+      if(!is_null($this->item_tag_model->get($id)) && $id !== 0) {
+        $item_tag = $this->item_tag_model->get($id);
+      }
+
+      $fields = [
+        $this->generic_get_field_object('field_abbreviation', 'text', 'field[short_name]', (isset($item_tag->short_name) ? $item_tag->short_name : NULL), 'maxlength="3"'),
+        $this->generic_get_field_object('field_tag', 'text', 'field[name]', (isset($item_tag->name) ? $item_tag->name : NULL)),
+      ];
+
+      if(isset($item_tag)) {
+        $fields[] = $this->generic_get_field_object(NULL, 'hidden', 'id', $id);
+      }
+
+      return $fields;
+    }
+    /**
+     * Returns the fields for the stocking places with the data.
+     * @param integer $id
+     *    The id of the stocking place to get.
+     * @return array: fields for the item groups, already containing data.
+     */
+    private function generic_get_stocking_places_fields($id = 0){
+      $this->load->model('stocking_place_model');
+      if(!is_null($this->stocking_place_model->get($id)) && $id !== 0) {
+        $stocking_place = $this->stocking_place_model->get($id);
+      }
+
+      $fields = [
+        $this->generic_get_field_object('field_short_name', 'text', 'field[short]', (isset($stocking_place->short) ? $stocking_place->short : NULL)),
+        $this->generic_get_field_object('field_long_name', 'text', 'field[name]', (isset($stocking_place->name) ? $stocking_place->name : NULL))
+      ];
+
+      if(isset($stocking_place)) {
+        $fields[] = $this->generic_get_field_object(NULL, 'hidden', 'id', $id);
+      }
+
+      return $fields;
+    }
+    /**
+     * Returns the fields for the suppliers with the data.
+     * @param integer $id
+     *    The id of the supplier to get.
+     * @return array: fields for the item groups, already containing data.
+     */
+    private function generic_get_suppliers_fields($id = 0){
+      $this->load->model('supplier_model');
+      if(!is_null($this->supplier_model->get($id)) && $id !== 0) {
+        $supplier = $this->supplier_model->get($id);
+      }
+
+      $fields = [
+        $this->generic_get_field_object('field_name', 'text', 'field[name]', (isset($supplier->name) ? $supplier->name : NULL)),
+        $this->generic_get_field_object('field_first_adress', 'text', 'field[address_line1]', (isset($supplier->address_line1) ? $supplier->address_line1 : NULL)),
+        $this->generic_get_field_object('field_second_adress', 'text', 'field[address_line2]', (isset($supplier->address_line2) ? $supplier->address_line2 : NULL)),
+        $this->generic_get_field_object('field_postal_code', 'number', 'field[zip]', (isset($supplier->zip) ? $supplier->zip : NULL)),
+        $this->generic_get_field_object('field_city', 'text', 'field[city]', (isset($supplier->city) ? $supplier->city : NULL)),
+        $this->generic_get_field_object('field_tel', 'text', 'field[tel]', (isset($supplier->tel) ? $supplier->tel : NULL)),
+        $this->generic_get_field_object('field_email', 'text', 'field[email]', (isset($supplier->email) ? $supplier->email : NULL))
+      ];
+
+      if(isset($supplier)) {
+        $fields[] = $this->generic_get_field_object(NULL, 'hidden', 'id', $id);
+      }
+
+      return $fields;
+    }
+    /**
+     * Returns the fields for the item groups with the data.
+     * @param integer $id
+     *    The id of the item group to get.
+     * @return array: fields for the item groups, already containing data.
+     */
+    private function generic_get_item_groups_fields($id = 0) {
+      $this->load->model('item_group_model');
+      if(!is_null($this->item_group_model->get($id)) && $id !== 0) {
+        $item_group = $this->item_group_model->get($id);
+      }
+
+      $fields = [
+        $this->generic_get_field_object('field_abbreviation', 'text', 'field[short_name]', (isset($item_group->short_name) ? $item_group->short_name : NULL)),
+        $this->generic_get_field_object('field_name', 'text', 'field[name]', (isset($item_group->name) ? $item_group->name : NULL))
+      ];
+
+      if(isset($item_group)) {
+        $fields[] = $this->generic_get_field_object(NULL, 'hidden', 'item_group_id', $id);
+      }
+
+      return $fields;
+    }
+
+    /**
+     * Returns a field ready to be used in generic forms.
+     * @param string $text
+     *    The lang line to display.
+     * @param string $type
+     *    The type of field.
+     * @param string $name
+     *    The field's name.
+     * @param string $value
+     *    The field's value.
+     * @param array|string $other
+     *    The other things to add to the field.
+     * @return object
+     *    An object with the attributes ready to be put in the generic form.
+     */
+    private function generic_get_field_object($text, $type, $name, $value = NULL, $other = NULL) {
+      $otherhtml = "";
+      if(is_array($other)) {
+        foreach($other as $param) {
+          $otherhtml .= $param." ";
+        }
+      } else {
+        $otherhtml = $other;
+      }
+      $field = (object) [
+        'text' => $this->lang->line($text),
+        'type' => $type,
+        'name' => $name,
+        'value' => $value,
+      ];
+
+      if(!is_null($other)) {
+        $field->other = $otherhtml;
+      }
+
+      return $field;
     }
 }

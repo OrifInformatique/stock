@@ -1,18 +1,18 @@
 <div class="container">
 	<h3 class="xs-right">
 		<?php
-			if (isset($users)) 
+			if (isset($users))
 			{
 				$update_user = TRUE;
 			} else {
 				$update_user = FALSE;
 			} ?>
 		<div class="row" style="margin-top: 5px;">
-			<a href="<?= base_url(); ?>admin/view_generic/user" class="tab_unselected"><?= lang('admin_tab_users'); ?></a>
+			<a href="<?= base_url(); ?>admin/view_generic/user" class="tab_selected"><?= lang('admin_tab_users'); ?></a>
 			<a href="<?= base_url(); ?>admin/view_generic/tag" class="tab_unselected"><?= lang('admin_tab_tags'); ?></a>
 			<a href="<?= base_url(); ?>admin/view_generic/stocking_place" class="tab_unselected"><?= lang('admin_tab_stocking_places'); ?></a>
 			<a href="<?= base_url(); ?>admin/view_generic/supplier" class="tab_unselected"><?= lang('admin_tab_suppliers'); ?></a>
-			<a href="<?= base_url(); ?>admin/view_generic/item_group" class="tab_selected"><?= lang('admin_tab_item_groups'); ?></a>
+			<a href="<?= base_url(); ?>admin/view_generic/item_group" class="tab_unselected"><?= lang('admin_tab_item_groups'); ?></a>
 		</div>
     <?php if($update_user) { ?>
     <div class="row alert alert-warning">
@@ -28,12 +28,12 @@
             if (!empty(validation_errors()) || !empty($upload_errors)) {
         ?>
 	<div class="alert alert-danger">
-		<?php 
+		<?php
 		echo validation_errors();
-		if (isset($upload_errors)) 
+		if (isset($upload_errors))
 			{
 				echo $upload_errors;
-			} 
+			}
 		?>
 	</div>
             <?php } ?><div class="row">
