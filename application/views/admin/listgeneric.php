@@ -19,6 +19,18 @@
                     echo $class;
                 ?>" onclick="loadPage(<?php echo "'admin/view_generic/{$admin_menu}'"; ?>)"><?php echo $this->lang->line("admin_tab_{$admin_menu}s"); ?></span>
             <?php } ?>
+            <script type="text/javascript">
+                function loadPage(endOfPageString) {
+                    if($('#content').size == 0) {
+                        return;
+                    }
+                    if(endOfPageString == undefined || endOfPageString == null) {
+                        endOfPageString = "";
+                    }
+                    var newUrlForPart = ('<?= base_url(); ?>' + endOfPageString);
+                    $('#content').load(newUrlForPart + ' #content');
+                }
+            </script>
         </h3>
     </div>
 
@@ -37,64 +49,11 @@
                 </thead>
 
                 <tbody>
-                    <?php foreach($current_items as $current_item) {
-                        $current_id = -1;
-                        if(isset($current_item->user_id)) {
-                            $current_id = $current_item->user_id;
-                            $temp = [
-                                'username' => "<a href='".base_url("admin/modify_user/{$current_id}")."'>{$current_item->username}</a>",
-                                'lastname' => $current_item->lastname,
-                                'firstname' => $current_item->firstname,
-                                'email' => $current_item->email,
-                                'status' => $current_item->user_type->name,
-                                'is_active' => ($current_item->is_active == 1 ? lang('text_yes') : lang('text_no'))
-                            ];
-                            $current_item = $temp;
-                        } elseif(isset($current_item->item_tag_id)) {
-                            $current_id = $current_item->item_tag_id;
-                            $temp = [
-                                'name' => '<a href=\''.base_url("admin/modify_tag/{$current_id}")."'>{$current_item->name}</a>"
-                            ];
-                            $current_item = $temp;
-                        } elseif(isset($current_item->stocking_place_id)) {
-                            $current_id = $current_item->stocking_place_id;
-                            $temp = [
-                                'short' => '<a href=\''.base_url("admin/modify_stocking_place/{$current_id}")."'>{$current_item->short}</a>",
-                                'long' => $current_item->name
-                            ];
-                            $current_item = $temp;
-                        } elseif(isset($current_item->supplier_id)) {
-                            $current_id = $current_item->supplier_id;
-                            $temp = [
-                                'name' => '<a href=\''.base_url("admin/modify_supplier/{$current_id}")."'>{$current_item->name}</a>",
-                                'address_line1' => $current_item->address_line1,
-                                'address_line2' => $current_item->address_line2,
-                                'zip' => $current_item->zip,
-                                'city' => $current_item->city,
-                                'country' => $current_item->country,
-                                'tel' => $current_item->tel,
-                                'email' => $current_item->email
-                            ];
-                            $current_item = $temp;
-                        } elseif(isset($current_item->item_group_id)) {
-                            $current_id = $current_item->item_group_id;
-                            $temp = [
-                                'name' => '<a href=\''.base_url("admin/modify_item_group/{$current_id}")."'>{$current_item->name}</a>",
-                                'short_name' => $current_item->short_name
-                            ];
-                            $current_item = $temp;
-                        }
-                        ?>
+                    <?php foreach($current_items as $current_item) { ?>
                         <tr class="row">
-                            <?php
-                            foreach($current_item as $part_name => $part) {
-                                if(is_string($part) && (strlen($part) === 60 || strlen($part) == 19)) {
-                                    continue;
-                                }
-                                ?>
+                            <?php foreach($current_item as $part_name => $part) { ?>
                                 <td><?php echo $part; ?></td>
                             <?php } ?>
-                            <td><a href="<?= base_url("/admin/delete_{$current_menu}/{$current_id}"); ?>" class="close">x</a></td>
                         </tr>
                     <?php } ?>
                 </tbody>
@@ -102,16 +61,3 @@
         </div>
     </div>
 </div>
-
-<script type="text/javascript">
-    function loadPage(endOfPageString) {
-        if($('#content').size == 0) {
-            return;
-        }
-        if(endOfPageString == undefined || endOfPageString == null) {
-            endOfPageString = "";
-        }
-        var newUrlForPart = ('<?= base_url(); ?>' + endOfPageString);
-        $('#content').load(newUrlForPart + ' #content');
-    }
-</script>

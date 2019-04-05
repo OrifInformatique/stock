@@ -939,7 +939,6 @@ class Admin extends MY_Controller
         $category = 'user';
       }
 
-      $things = [];
       $things = $this->{"generic_get_{$category}s"}();
       $headers = $things['headers'];
       $current_items = $things['current_items'];
@@ -959,8 +958,25 @@ class Admin extends MY_Controller
       ];
 
       $this->load->model('user_model');
-      $output['current_items'] = $this->user_model->with('user_type')->get_all();
+      $current_items = $this->user_model->with('user_type')->get_all();
 
+      foreach($current_items as &$current_item) {
+        $current_id = $current_item->user_id;
+        $temp = [
+          'username' => "<a href='".base_url("admin/modify_user/{$current_id}")."'>{$current_item->username}</a>",
+          'lastname' => $current_item->lastname,
+          'firstname' => $current_item->firstname,
+          'email' => $current_item->email,
+          'status' => $current_item->user_type->name,
+          'is_active' => ($current_item->is_active == 1 ? lang('text_yes') : lang('text_no')),
+          'delete' => "<a href='".base_url("/admin/delete_user/{$current_id}")."' class='close'>x</a>"
+        ];
+        $current_item = $temp;
+      }
+
+      unset($current_item);
+
+      $output['current_items'] = $current_items;
       return $output;
     }
 
@@ -968,8 +984,22 @@ class Admin extends MY_Controller
       $output['headers'] =  NULL;
 
       $this->load->model('item_tag_model');
-      $output['current_items'] = $this->item_tag_model->get_all();
+      $current_items = $this->item_tag_model->get_all();
 
+      foreach($current_items as &$current_item) {
+        $current_id = $current_item->item_tag_id;
+
+        $temp = [
+          'name' => "<a href='".base_url("admin/modify_tag/{$current_id}")."'>{$current_item->name}</a>",
+          'delete' => "<a href='".base_url("/admin/delete_tag/{$current_id}")."' class='close'>x</a>"
+        ];
+
+        $current_item = $temp;
+      }
+
+      unset($current_item);
+
+      $output['current_items'] = $current_items;
       return $output;
     }
 
@@ -977,8 +1007,23 @@ class Admin extends MY_Controller
       $output['headers'] = ['field_short_name', 'field_long_name'];
 
       $this->load->model('stocking_place_model');
-      $output['current_items'] = $this->stocking_place_model->get_all();
+      $current_items = $this->stocking_place_model->get_all();
 
+      foreach($current_items as &$current_item) {
+        $current_id = $current_item->stocking_place_id;
+
+        $temp = [
+          'short' => '<a href=\''.base_url("admin/modify_stocking_place/{$current_id}")."'>{$current_item->short}</a>",
+          'long' => $current_item->name,
+          'delete' => "<a href='".base_url("/admin/delete_stocking_place/{$current_id}")."' class='close'>x</a>"
+        ];
+
+        $current_item = $temp;
+      }
+
+      unset($current_item);
+
+      $output['current_items'] = $current_items;
       return $output;
     }
 
@@ -991,8 +1036,29 @@ class Admin extends MY_Controller
       ];
 
       $this->load->model('supplier_model');
-      $output["current_items"] = $this->supplier_model->get_all();
+      $current_items = $this->supplier_model->get_all();
 
+      foreach($current_items as &$current_item) {
+        $current_id = $current_item->supplier_id;
+
+        $temp = [
+          'name' => '<a href=\''.base_url("admin/modify_supplier/{$current_id}")."'>{$current_item->name}</a>",
+          'address_line1' => $current_item->address_line1,
+          'address_line2' => $current_item->address_line2,
+          'zip' => $current_item->zip,
+          'city' => $current_item->city,
+          'country' => $current_item->country,
+          'tel' => $current_item->tel,
+          'email' => $current_item->email,
+          'delete' => "<a href='".base_url("/admin/delete_supplier/{$current_id}")."' class='close'>x</a>"
+        ];
+
+        $current_item = $temp;
+      }
+
+      unset($current_item);
+
+      $output['current_items'] = $current_items;
       return $output;
     }
 
@@ -1000,8 +1066,23 @@ class Admin extends MY_Controller
       $output['headers'] = NULL;
 
       $this->load->model('item_group_model');
-      $output["current_items"] = $this->item_group_model->get_all();
+      $current_items = $this->item_group_model->get_all();
 
+      foreach($current_items as &$current_item) {
+        $current_id = $current_item->item_group_id;
+
+        $temp = [
+          'name' => '<a href=\''.base_url("admin/modify_item_group/{$current_id}")."'>{$current_item->name}</a>",
+          'short_name' => $current_item->short_name,
+          'delete' => "<a href='".base_url("/admin/delete_item_group/{$current_id}")."' class='close'>x</a>"
+        ];
+
+        $current_item = $temp;
+      }
+
+      unset($current_item);
+
+      $output['current_items'] = $current_items;
       return $output;
     }
 }
