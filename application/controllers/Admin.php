@@ -939,7 +939,7 @@ class Admin extends MY_Controller
         $category = 'user';
       }
 
-      $things = $this->{"generic_get_{$category}s_items"}();
+      $things = $this->{"generic_get_{$category}s"}();
       $headers = $things['headers'];
       $current_items = $things['current_items'];
 
@@ -960,7 +960,7 @@ class Admin extends MY_Controller
     public function form_generic($category, $id = 0) {
       $admin_menus = ['user', 'tag', 'stocking_place', 'supplier', 'item_group'];
       if(!in_array($category, $admin_menus)) {
-        $this->view_generic();
+        redirect('/admin');
       }
 
       if(!empty($_POST)) {
@@ -979,8 +979,7 @@ class Admin extends MY_Controller
     }
 
     /**
-     * @todo
-     * Checks that the generic form was done correctly.
+     * Checks that the generic form was filled correctly.
      */
     public function check_form_generic() {
       $data = $_POST['field'];
@@ -1031,11 +1030,11 @@ class Admin extends MY_Controller
 
       if($category == 'user' && (!$update || !empty($data['pwd']))) {
         $data['password'] = password_hash($data['pwd'], PASSWORD_HASH_ALGORITHM);
-        $data['is_active'] = (isset($data['is_active']) ? $data['is_active'] : 0);
       }
       if(!isset($data['email']) || empty($data['email'])) {
         unset($data['email']);
       }
+      $data['is_active'] = isset($data['is_active']);
 
       $this->load->model($current_model);
 
@@ -1054,11 +1053,121 @@ class Admin extends MY_Controller
     }
 
     /**
+     * As the name and section suggest, opens a view for item deletion.
+     * @param string $category
+     *    The category of item to delete.
+     * @param integer $id
+     *    The id of the item to delete.
+     * @param string $command
+     *    The command to do. "delete" will delete the item, "disable" will disable the user, NULL will ask for confirmation.
+     */
+    public function delete_generic($category, $id, $command = NULL) {
+      $admin_menus = ['user', 'tag', 'stocking_place', 'supplier', 'item_group'];
+      if(!in_array($category, $admin_menus)) {
+        redirect('/admin');
+      }
+
+      // Choosing which model to load
+      $current_models = ['stocking_place_model', 'item_model'];
+      switch($category) {
+        case 'user':
+          $current_models[] = 'user_model';
+          $current_model = 'user_model';
+          break;
+        case 'tag':
+          $current_models = array_merge($current_models, ['item_tag_model','item_tag_link_model']);
+          $current_model = 'item_tag_model';
+          break;
+        case 'stocking_place':
+          $current_model = 'stocking_place_model';
+          break;
+        case 'supplier':
+          $current_models[] = 'supplier_model';
+          $current_model = 'supplier_model';
+          break;
+        case 'item_group':
+          $current_models[] = 'item_group_model';
+          $current_model = 'item_group_model';
+          break;
+      }
+      $this->load->model($current_models);
+      if(is_null($this->{$current_model}->get($id))) {
+        redirect('/admin');
+      }
+      $item = $this->{$current_model}->with_all()->get($id);
+
+      // Set name and is_active
+      $itemname = "";
+      if($category === 'user') {
+        $itemname = $item->username;
+        $is_active = $item->is_active;
+      } else {
+        $itemname = $item->name;
+        $is_active = FALSE;
+      }
+
+      // Get linked items and loans
+      $linked_items = [];
+      $linked_loans = [];
+      if($category === 'user') {
+        $linked_items = array_merge($item->items_created, $item->items_modified, $item->items_checked);
+        $linked_loans = array_merge($item->loans_registered, $item->loans_made);
+      } elseif($category === 'tag') {
+        $linked_items = $this->item_model->get_filtered(["t" => [$id]]);
+      } else {
+        $linked_items = $this->item_model->get_many_by("{$category}_id=".$id);
+      }
+      $linked_items = $this->generic_format_items($linked_items);
+      $linked_loans = $this->generic_format_loans($linked_loans);
+      $linked_items = array_unique($linked_items, SORT_REGULAR);
+      $linked_loans = array_unique($linked_loans, SORT_REGULAR);
+
+      $deletion_allowed = (empty($linked_loans) && empty($linked_items));
+
+      // Lists headers
+      $header_items = [
+        $this->lang->line('header_item_name'),
+        $this->lang->line('header_stocking_place'),
+        $this->lang->line('header_inventory_nb').'<br>'.$this->lang->line('header_serial_nb')
+      ];
+      $header_loans = [
+        $this->lang->line('header_loan_date'),
+        $this->lang->line('header_loan_planned_return'),
+        $this->lang->line('header_loan_real_return'),
+        $this->lang->line('header_loan_localisation'),
+        $this->lang->line('header_loan_by_user'),
+        $this->lang->line('header_loan_to_user'),
+      ];
+
+      if(is_null($command)) {
+        $output['admin_menus'] = $admin_menus;
+        $output['current_menu'] = $category;
+        $output['deletion_allowed'] = $deletion_allowed;
+        $output['header_items'] = $header_items;
+        $output['header_loans'] = $header_loans;
+        $output['linked_items'] = $linked_items;
+        $output['linked_loans'] = $linked_loans;
+        $output['is_active'] = $is_active;
+        $output['name'] = $itemname;
+        $output['current_id'] = $id;
+        $this->display_view('/admin/deletegeneric', $output);
+      } elseif($command === 'delete') {
+        $this->{$current_model}->delete($id);
+        redirect("admin/view_generic/{$category}");
+      } elseif($command === 'disable' && $category === 'user') {
+        $this->user_model->update($id, ['is_active' => 0]);
+        redirect("admin/view_generic/{$category}");
+      } else {
+        redirect("admin/view_generic/{$category}");
+      }
+    }
+
+    /**
      * Returns the items and the headers for the list.
      * Items are modified to allow a simpler list.
      * @return array: The list headers and items
      */
-    private function generic_get_users_items() {
+    private function generic_get_users() {
       $output['headers'] = [
         'header_username', 'header_lastname',
         'header_firstname', 'header_email',
@@ -1092,7 +1201,7 @@ class Admin extends MY_Controller
      * Tags are modified to allow a simpler list.
      * @return array: The list headers and tags
      */
-    private function generic_get_tags_items() {
+    private function generic_get_tags() {
       $output['headers'] =  NULL;
 
       $this->load->model('item_tag_model');
@@ -1119,7 +1228,7 @@ class Admin extends MY_Controller
      * Stocking places are modified to allow a simpler list.
      * @return array: The list headers and stocking places
      */
-    private function generic_get_stocking_places_items() {
+    private function generic_get_stocking_places() {
       $output['headers'] = ['field_short_name', 'field_long_name'];
 
       $this->load->model('stocking_place_model');
@@ -1147,7 +1256,7 @@ class Admin extends MY_Controller
      * Suppliers are modified to allow a simpler list.
      * @return array: The list headers and suppliers
      */
-    private function generic_get_suppliers_items() {
+    private function generic_get_suppliers() {
       $output['headers'] = [
         'header_suppliers_name', 'header_suppliers_address_1',
         'header_suppliers_address_2', 'header_suppliers_NPA',
@@ -1186,7 +1295,7 @@ class Admin extends MY_Controller
      * Item groups are modified to allow a simpler list.
      * @return array: The list headers and item groups
      */
-    private function generic_get_item_groups_items() {
+    private function generic_get_item_groups() {
       $output['headers'] = NULL;
 
       $this->load->model('item_group_model');
@@ -1208,31 +1317,6 @@ class Admin extends MY_Controller
 
       $output['current_items'] = $current_items;
       return $output;
-    }
-
-    /**
-     * Returns the selects for the users with the data.
-     * @param integer $id
-     *    The id of the user's user type.
-     * @return array: fields for the item groups, already containing data.
-     */
-    private function generic_get_selects($id = 0) {
-      $selects = [];
-
-      $this->load->model('user_type_model');
-      $selects[0] = $this->user_type_model->get_all();
-      foreach($selects[0] as &$select) {
-        $temp = (object) [
-          'value' => $select->user_type_id,
-          'text' => $select->name,
-          'selected' => ($select->user_type_id == $id),
-        ];
-        $select = $temp;
-      }
-
-      unset($select);
-
-      return $selects;
     }
 
     /**
@@ -1366,6 +1450,90 @@ class Admin extends MY_Controller
     }
 
     /**
+     * Formats the input items in an array for a generic list.
+     * @param array $items
+     *    The array of items to reformat.
+     * @return array
+     *    A ready-to-use array for a generic list.
+     */
+    private function generic_format_items($items) {
+      if(empty($items) || is_null($items))
+        return [];
+
+      $stocking_places = $this->generic_get_stocking_places_as_array();
+
+      foreach($items as &$item) {
+        $temp = [
+          'name' => "<a style='display: block;' href=".base_url("item/view/{$item->item_id}").">{$item->name}</a>".
+            "<h6>{$item->description}</h6>",
+          'stocking_place' => $stocking_places[$item->stocking_place_id],
+          'inventory_number' => "<a href='".base_url("item/view/{$item->item_id}")."'>".
+            "<div>{$item->inventory_number}</div><div>{$item->serial_number}</div>",
+          'delete' => "<a href='".base_url("item/delete/{$item->item_id}"."' class='close' title='".$this->lang->line('admin_delete_item')."'>x</a>")
+        ];
+
+        $item = $temp;
+      }
+      unset($item);
+
+      return $items;
+    }
+    /**
+     * Formats the input loans in an array for a generic list.
+     * @param array $loans
+     *    The array of loans to reformat.
+     * @return array
+     *    A ready-to-use array for a generic list.
+     */
+    private function generic_format_loans($loans) {
+      if(empty($loans) || is_null($loans))
+        return [];
+
+      $users = $this->generic_get_users_as_array();
+
+      foreach($loans as &$loan) {
+        $temp = [
+          'date' => "<a href='".base_url('/item/modify_loan/{$loan->loan_id}')."'>{$loan->date}</a>",
+          'planned_return_date' => $loan->planned_return_date,
+          'real_return_date' => $loan->real_return_date,
+          'item_localisation' => $loan->item_localisation,
+          'loan_by_user_id' => $users[$loan->loan_by_user_id],
+          'loan_to_user_id' => $users[$loan->loan_to_user_id],
+          'delete' => "<a href='".base_url("item/delete_loan/{$loan->loan_id}")."' class='close' title='".$this->lang->line('admin_delete_loan')."'>x</a>"
+        ];
+
+        $loan = $temp;
+      }
+      unset($loan);
+
+      return $loans;
+    }
+
+    /**
+     * Returns the selects for the users with the data.
+     * @param integer $id
+     *    The id of the user's user type.
+     * @return array: fields for the item groups, already containing data.
+     */
+    private function generic_get_selects($id = 0) {
+      $selects = [];
+
+      $this->load->model('user_type_model');
+      $selects[0] = $this->user_type_model->get_all();
+      foreach($selects[0] as &$select) {
+        $temp = (object) [
+          'value' => $select->user_type_id,
+          'text' => $select->name,
+          'selected' => ($select->user_type_id == $id),
+        ];
+        $select = $temp;
+      }
+
+      unset($select);
+
+      return $selects;
+    }
+    /**
      * Returns a field ready to be used in generic forms.
      * @param string $text
      *    The lang line to display.
@@ -1401,5 +1569,33 @@ class Admin extends MY_Controller
       }
 
       return $field;
+    }
+    /**
+     * Function to make your life easier.
+     * Returns all stocking places as an array with $stocking_place->id => $stocking_place->name
+     */
+    private function generic_get_stocking_places_as_array() {
+      $this->load->model('stocking_place_model');
+
+      $stocking_places = $this->stocking_place_model->get_all();
+      $output = [];
+      foreach($stocking_places as $stocking_place) {
+        $output[$stocking_place->stocking_place_id] = $stocking_place->name;
+      }
+      return $output;
+    }
+    /**
+     * Function to make your life easier.
+     * Returns all users as an array with $user->id => $user->name
+     */
+    private function generic_get_users_as_array() {
+      $this->load->model('user_model');
+
+      $users = $this->user_model->get_all();
+      $output = [];
+      foreach($users as $user) {
+        $output[$user->user_id] = $user->username;
+      }
+      return $output;
     }
 }

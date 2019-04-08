@@ -1,5 +1,4 @@
 <form class="container" method="post">
-
     <div class="row">
         <h3>
             <?php foreach($admin_menus as $admin_menu) { ?>
@@ -43,7 +42,7 @@
                 <?php } elseif ($field->type === "select") { ?>
                 <select class="form-control" name="<?= $field->name; ?>" id="<?= $field->name; ?>">
                     <?php foreach($selects[$current_select] as $select) { ?>
-                        <option value="<?= $select->value; ?>" <?php if($select->selected) {echo "selected";}; ?>><?= $select->text; ?></option>
+                        <option value="<?= $select->value; ?>" <?php if($select->selected) {echo "checked";}; ?>><?= $select->text; ?></option>
                     <?php } ?>
                 </select>
                 <?php $current_select++;
