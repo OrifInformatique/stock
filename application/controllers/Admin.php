@@ -37,6 +37,7 @@ class Admin extends MY_Controller
 
     /**
     * As the name says, view the users.
+    * @deprecated use view_generic('user')
     */
     public function view_users()
     {
@@ -50,6 +51,7 @@ class Admin extends MY_Controller
 
     /**
     * Modify a user
+    * @deprecated use form_generic('user', $id)
     */
     public function modify_user($id = NULL)
     {
@@ -137,6 +139,7 @@ class Admin extends MY_Controller
 
     /**
     * Create a new user
+    * @deprecated use form_generic('user')
     */
     public function new_user()
     {
@@ -195,6 +198,7 @@ class Admin extends MY_Controller
     * If $action is "disable", is_active will be set to 0.
     * If it is "delete", the user will be deleted.
     * If it is anything else or NULL, a confirmation will be shown.
+    * @deprecated use delete_generic('user', $id, $action)
     */
     public function delete_user($id, $action = NULL) {
       $this->load->model(['stocking_place_model','user_model']);
@@ -296,6 +300,7 @@ class Admin extends MY_Controller
 
     /**
     * As the name says, view the tags.
+    * @deprecated use view_generic('tag')
     */
     public function view_tags()
     {
@@ -307,6 +312,7 @@ class Admin extends MY_Controller
 
     /**
     * Modify a tag
+    * @deprecated use form_generic('tag', $id)
     */
     public function modify_tag($id = NULL)
     {
@@ -350,6 +356,7 @@ class Admin extends MY_Controller
 
     /**
     * Create a new tag
+    * @deprecated use form_generic('tag')
     */
     public function new_tag()
     {
@@ -407,6 +414,7 @@ class Admin extends MY_Controller
     /**
     * Delete a tag. 
     * If $action is NULL, a confirmation will be shown. If it is anything else, the tag will be deleted.
+    * @deprecated use delete_generic('tag', $id, $action)
     */
     public function delete_tag($id, $action = NULL) {
       $this->load->model(['stocking_place_model','item_tag_model','item_tag_link_model','item_model']);
@@ -465,6 +473,7 @@ class Admin extends MY_Controller
 
     /**
     * As the name says, view the stocking places.
+    * @deprecated use view_generic('stocking_place')
     */
     public function view_stocking_places()
     {
@@ -476,6 +485,7 @@ class Admin extends MY_Controller
 
     /**
     * As the name says, modify a stocking place, which id is $id
+    * @deprecated use form_generic('stocking_place', $id)
     */
     public function modify_stocking_place($id = NULL)
     {
@@ -511,6 +521,7 @@ class Admin extends MY_Controller
 
     /**
     * Create a new stocking_place
+    * @deprecated use form_generic('stocking_place')
     */
     public function new_stocking_place()
     {
@@ -564,6 +575,7 @@ class Admin extends MY_Controller
 
     /**
     * Delete the stocking place $id. If $action is null, a confirmation will be shown
+    * @deprecated use delete_generic('stocking_place', $id)
     */
     public function delete_stocking_place($id, $action = NULL)
     {
@@ -619,6 +631,7 @@ class Admin extends MY_Controller
           
     /**
     * As the name says, view the suppliers.
+    * @deprecated use view_generic('supplier')
     */
     public function view_suppliers()
     {
@@ -630,6 +643,7 @@ class Admin extends MY_Controller
 
     /**
     * Modify a supplier
+    * @deprecated use form_generic('supplier', $id)
     */
     public function modify_supplier($id = NULL)
     {
@@ -673,6 +687,7 @@ class Admin extends MY_Controller
 	
     /**
     * Create a new supplier
+    * @deprecated use form_generic('supplier')
     */
     public function new_supplier()
     {
@@ -704,6 +719,7 @@ class Admin extends MY_Controller
 
     /**
     * Delete a supplier
+    * @deprecated use delete_generic('supplier', $id)
     */
     public function delete_supplier($id, $action = NULL)
     {
@@ -776,6 +792,7 @@ class Admin extends MY_Controller
 
     /**
     * As the name says, view the item groups.
+    * @deprecated use view_generic('item_group')
     */
     public function view_item_groups()
     {
@@ -787,6 +804,7 @@ class Admin extends MY_Controller
 
     /**
     * Modify a group
+    * @deprecated use form_generic('item_group', $id)
     */
     public function modify_item_group($id = NULL)
     {
@@ -822,6 +840,7 @@ class Admin extends MY_Controller
 
     /**
     * Create a new group
+    * @deprecated use form_generic('item_group')
     */
     public function new_item_group()
     {
@@ -873,6 +892,7 @@ class Admin extends MY_Controller
 
     /**
     * Delete an unused item group
+    * @deprecated use delete_generic('item_group', $id, $action)
     */
     public function delete_item_group($id, $action = NULL)
     {
@@ -1469,7 +1489,7 @@ class Admin extends MY_Controller
           'stocking_place' => $stocking_places[$item->stocking_place_id],
           'inventory_number' => "<a href='".base_url("item/view/{$item->item_id}")."'>".
             "<div>{$item->inventory_number}</div><div>{$item->serial_number}</div>",
-          'delete' => "<a href='".base_url("item/delete/{$item->item_id}"."' class='close' title='".$this->lang->line('admin_delete_item')."'>x</a>")
+          'delete' => "<a href='".base_url("item/delete/{$item->item_id}"."' class='close' title='".html_escape($this->lang->line('admin_delete_item'))."'>x</a>")
         ];
 
         $item = $temp;
