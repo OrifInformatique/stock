@@ -1186,7 +1186,7 @@ class Admin extends MY_Controller
           'email' => $current_item->email,
           'status' => $current_item->user_type->name,
           'is_active' => ($current_item->is_active == 1 ? lang('text_yes') : lang('text_no')),
-          'delete' => "<a href='".base_url("/admin/delete_user/{$current_id}")."' class='close'>x</a>"
+          'delete' => "<a href='".base_url("/admin/delete_generic/user/{$current_id}")."' class='close'>x</a>"
         ];
         $current_item = $temp;
       }
@@ -1212,7 +1212,7 @@ class Admin extends MY_Controller
 
         $temp = [
           'name' => "<a href='".base_url("admin/form_generic/tag/{$current_id}")."'>{$current_item->name}</a> {$current_item->short_name}",
-          'delete' => "<a href='".base_url("/admin/delete_tag/{$current_id}")."' class='close'>x</a>"
+          'delete' => "<a href='".base_url("/admin/delete_generic/tag/{$current_id}")."' class='close'>x</a>"
         ];
 
         $current_item = $temp;
@@ -1240,7 +1240,7 @@ class Admin extends MY_Controller
         $temp = [
           'short' => '<a href=\''.base_url("admin/form_generic/stocking_place/{$current_id}")."'>{$current_item->short}</a>",
           'long' => $current_item->name,
-          'delete' => "<a href='".base_url("/admin/delete_stocking_place/{$current_id}")."' class='close'>x</a>"
+          'delete' => "<a href='".base_url("/admin/delete_generic/stocking_place/{$current_id}")."' class='close'>x</a>"
         ];
 
         $current_item = $temp;
@@ -1279,7 +1279,7 @@ class Admin extends MY_Controller
           'country' => $current_item->country,
           'tel' => $current_item->tel,
           'email' => $current_item->email,
-          'delete' => "<a href='".base_url("/admin/delete_supplier/{$current_id}")."' class='close'>x</a>"
+          'delete' => "<a href='".base_url("/admin/delete_generic/supplier/{$current_id}")."' class='close'>x</a>"
         ];
 
         $current_item = $temp;
@@ -1307,7 +1307,7 @@ class Admin extends MY_Controller
         $temp = [
           'name' => '<a href=\''.base_url("admin/form_generic/item_group/{$current_id}")."'>{$current_item->name}</a>",
           'short_name' => $current_item->short_name,
-          'delete' => "<a href='".base_url("/admin/delete_item_group/{$current_id}")."' class='close'>x</a>"
+          'delete' => "<a href='".base_url("/admin/delete_generic/item_group/{$current_id}")."' class='close'>x</a>"
         ];
 
         $current_item = $temp;
