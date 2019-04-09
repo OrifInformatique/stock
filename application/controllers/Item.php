@@ -46,9 +46,6 @@ public function index($page = 1)
       // No condition selected for filtering, default filtering for "functional" items
       $filters['c'] = array(FUNCTIONAL_ITEM_CONDITION_ID);
     }
-    
-    // Get item(s) through filtered search on the database
-    $output['items'] = $this->item_model->get_filtered($filters);
 
     // Sort output depending on the user's choice
     $sortValue = "name";
@@ -72,11 +69,15 @@ public function index($page = 1)
           break;
       }
     }
+    // Get item(s) through ordered, limited, and filtered search on the database
+    $output['items'] = $this->item_model->order_by($sortValue)->
+                                          limit(ITEMS_PER_PAGE, ($page-1)*ITEMS_PER_PAGE)->
+                                          get_filtered($filters);
+
     // If not 1, order will be ascending
     if(array_key_exists("ad", $filters)){
       $asc = $filters['ad'] != 1;
     }
-    $output['items'] = sortBySubValue($output['items'], $sortValue, $asc);
 
     // Prepare search filters values to send to the view
     $output = array_merge($output, $filters);
@@ -125,7 +126,7 @@ public function index($page = 1)
     $this->load->library('pagination');
 
     $config['base_url'] = base_url('/item/index/');
-    $config['total_rows'] = count($output["items"]);
+    $config['total_rows'] = $this->item_model->count_all();
     $config['per_page'] = ITEMS_PER_PAGE;
     $config['use_page_numbers'] = TRUE;
     $config['reuse_query_string'] = TRUE;
@@ -154,9 +155,6 @@ public function index($page = 1)
     $this->pagination->initialize($config);
 
     $output['pagination'] = $this->pagination->create_links();
-
-    // Keep only the slice of items corresponding to the current page
-    $output["items"] = array_slice($output["items"], ($page-1)*ITEMS_PER_PAGE, ITEMS_PER_PAGE);
     
     // Send the data to the View
     $this->display_view('item/list', $output);
