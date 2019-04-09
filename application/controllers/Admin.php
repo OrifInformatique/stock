@@ -1048,13 +1048,15 @@ class Admin extends MY_Controller
           break;
       }
 
-      if($category == 'user' && (!$update || !empty($data['pwd']))) {
-        $data['password'] = password_hash($data['pwd'], PASSWORD_HASH_ALGORITHM);
+      if($category == 'user') {
+        $data['is_active'] = isset($data['is_active']);
+        if(!$update || !empty($data['pwd'])) {
+          $data['password'] = password_hash($data['pwd'], PASSWORD_HASH_ALGORITHM);
+        }
       }
       if(!isset($data['email']) || empty($data['email'])) {
         unset($data['email']);
       }
-      $data['is_active'] = isset($data['is_active']);
 
       $this->load->model($current_model);
 
@@ -1088,28 +1090,24 @@ class Admin extends MY_Controller
       }
 
       // Choosing which model to load
-      $current_models = ['stocking_place_model', 'item_model'];
       switch($category) {
         case 'user':
-          $current_models[] = 'user_model';
           $current_model = 'user_model';
           break;
         case 'tag':
-          $current_models = array_merge($current_models, ['item_tag_model','item_tag_link_model']);
           $current_model = 'item_tag_model';
           break;
         case 'stocking_place':
           $current_model = 'stocking_place_model';
           break;
         case 'supplier':
-          $current_models[] = 'supplier_model';
           $current_model = 'supplier_model';
           break;
         case 'item_group':
-          $current_models[] = 'item_group_model';
           $current_model = 'item_group_model';
           break;
       }
+      $current_models = ['item_model', $current_model];
       $this->load->model($current_models);
       if(is_null($this->{$current_model}->get($id))) {
         redirect('/admin');
@@ -1171,13 +1169,13 @@ class Admin extends MY_Controller
         $output['name'] = $itemname;
         $output['current_id'] = $id;
         $this->display_view('/admin/deletegeneric', $output);
-      } elseif($command === 'delete') {
-        $this->{$current_model}->delete($id);
-        redirect("admin/view_generic/{$category}");
-      } elseif($command === 'disable' && $category === 'user') {
-        $this->user_model->update($id, ['is_active' => 0]);
-        redirect("admin/view_generic/{$category}");
       } else {
+        if($command === 'delete' && $deletion_allowed) {
+          $this->{$current_model}->delete($id);
+        } elseif($deletion_allowed && $category === 'user' && $command === 'disable') {
+          $this->user_model->update($id, ['is_active' => 0]);
+        }
+
         redirect("admin/view_generic/{$category}");
       }
     }
