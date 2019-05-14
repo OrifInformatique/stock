@@ -59,7 +59,7 @@ class Item extends MY_Controller {
         $this->display_view('item/list', $output);
     }
 
-    private function load_list($page)
+    private function load_list($page = 1)
     {
         // Store URL to make possible to come back later (from item detail for example)
         if (isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING'])) {
@@ -67,11 +67,17 @@ class Item extends MY_Controller {
         } else {
             $_SESSION['items_list_url'] = current_url();
         }
+        
         // Get user's search filters and add default values
         $filters = $_GET;
         if (!isset($filters['c'])) {
             // No condition selected for filtering, default filtering for "functional" items
             $filters['c'] = array(FUNCTIONAL_ITEM_CONDITION_ID);
+        }
+        
+        // Sanitize $page parameter
+        if (empty($page) || !is_numeric($page) || $page<1) {
+            $page = 1;
         }
         
         // Get item(s) through filtered search on the database
@@ -95,28 +101,36 @@ class Item extends MY_Controller {
                 $sortValue = "name";
                 break;
             }
+        } else {
+            // default sort by name
+            $sortValue = "name";
         }
+        
         // If not 1, order will be ascending
         if(array_key_exists("ad", $filters)){
             $asc = $filters['ad'] != 1;
+        } else {
+            // default sort order is asc
+            $asc = true;
         }
         $output['items'] = sortBySubValue($output['items'], $sortValue, $asc);
         
         // Add page title
         $output['title'] = $this->lang->line('page_item_list');
         
-        $output['pagination'] =  $this->load_pagination(count($output["items"]))->create_links();
+        // Pagination
+        $items_count = count($output["items"]);
+        $output['pagination'] =  $this->load_pagination($items_count)->create_links();
         
-        $output['number_page'] = is_numeric($page)?$page:1;
-        if($output['number_page']<1)$output['number_page']=1; 
-        if($output['number_page']>ceil(count($output["items"])/ITEMS_PER_PAGE)) $output['number_page']=ceil(count($output["items"])/ITEMS_PER_PAGE);
+        $output['number_page'] = $page;
+        if($output['number_page']>ceil($items_count/ITEMS_PER_PAGE)) $output['number_page']=ceil($items_count/ITEMS_PER_PAGE);
         
         // Keep only the slice of items corresponding to the current page
         $output["items"] = array_slice($output["items"], ($output['number_page']-1)*ITEMS_PER_PAGE, ITEMS_PER_PAGE);
         
         return $output;
     }
-    public function load_list_json($page){
+    public function load_list_json($page = 1){
         echo json_encode($this->load_list($page));
     }
 
