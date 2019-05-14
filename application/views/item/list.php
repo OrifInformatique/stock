@@ -70,15 +70,17 @@
                         <?= form_label($this->lang->line('field_sort_asc_desc'),'sort_asc_desc').form_dropdown('ad', $sort_asc_desc, isset($_GET["ad"])?$_GET["ad"]:"",'id="sort_asc_desc"');?>
                     </div>
                 </div>
+                <div class="row">
+                    <!-- RESET FILTERS BUTTON -->
+                    <div class="col-sm-6 col-sm-offset-6 top-margin">
+                        <?= form_label("&nbsp;") ?>
+                        <a href="<?= base_url("item/index/")?>" class="btn btn-warning top-margin"><?php echo html_escape($this->lang->line('btn_remove_filters')); ?></a>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- BUTTONS -->
-        <div class="row">
-            <div class="col-sm-6 col-xs-12 top-margin xs-center">
-                <a href="<?= base_url("item/index/")?>" class="btn btn-default top-margin"><?php echo html_escape($this->lang->line('btn_remove_filters')); ?></a>
-            </div>
-        </div>
+        
         <!-- END OF FILTERS AND SORT FORM -->
     </form>
 
@@ -142,7 +144,7 @@ $(document).ready(function() {
         // Load page 1 with new filters
         load_items(1, getFilters());
     });
-    $("#text_search").on("change paste keyup", function(){
+    $("#text_search").on("change blur", function(){
         // Load page 1 with new filters
         load_items(1, getFilters());
     });
