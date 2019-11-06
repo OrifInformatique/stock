@@ -14,7 +14,7 @@
             } 
             echo '</div>';
         }
-        ?>
+    ?>
 
     <!-- ITEM NAME AND DESCRIPTION -->
     <div class="row">

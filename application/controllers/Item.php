@@ -724,4 +724,9 @@ class Item extends MY_Controller {
         $this->form_validation->set_rules("inventory_prefix", lang('field_inventory_number'), 'required');
     }
 
+    public function test_photo(){
+        
+        
+        $this->display_view("item/photo_test");
+    }
 }
