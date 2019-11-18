@@ -19,21 +19,24 @@ document.getElementById("snap").addEventListener("click", function(){
 
 // Setup mouse events
 onmousedown = beginSelect;
+touchstart = beginSelect;
 onmousemove = changeSelect;
+touchmove = changeSelect;
 onmouseup = endSelect;
+touchend = endSelect;
 
 // Show the selection div and setup it's first point
 function beginSelect(e){
     selection.hidden = 0;
-    x1 = e.clientX;
-    y1 = e.clientY;
+    x1 = e.pageX;
+    y1 = e.pageY;
     calculateSelection();
 }
 
 // Update in real time the selection div's last point
 function changeSelect(e){
-    x2 = e.clientX;
-    y2 = e.clientY;
+    x2 = e.pageX;
+    y2 = e.pageY;
     calculateSelection();
 }
 

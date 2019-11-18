@@ -5,6 +5,7 @@
             <button id="snap" onclick="return false">Photo</button>
             <canvas id="canvas" width="360" height="360"></canvas>
             <input id="camera" type="file" accept="image/*" capture="camera" onchange="showPhoto()" />
+            <input id="camera" type="file" accept="image/*" onchange="showPhoto()" />
             <img id="image" width="360" height="360" />
             <div id="selection" hidden></div>
         </form>
