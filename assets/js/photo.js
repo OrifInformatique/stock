@@ -18,12 +18,12 @@ document.getElementById("snap").addEventListener("click", function(){
 });
 
 // Setup mouse events
-onmousedown = beginSelect;
-touchstart = beginSelect;
-onmousemove = changeSelect;
-touchmove = changeSelect;
-onmouseup = endSelect;
-touchend = endSelect;
+image.onmousedown = beginSelect;
+image.touchstart = beginSelect;
+image.onmousemove = changeSelect;
+image.touchmove = changeSelect;
+image.onmouseup = endSelect;
+image.touchcancel = endSelect;
 
 // Show the selection div and setup it's first point
 function beginSelect(e){

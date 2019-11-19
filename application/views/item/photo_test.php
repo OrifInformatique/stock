@@ -4,7 +4,9 @@
             <video id="video" width="360" height="360" autoplay></video>
             <button id="snap" onclick="return false">Photo</button>
             <canvas id="canvas" width="360" height="360"></canvas>
+            <h6>Prendre une photo</h6>
             <input id="camera" type="file" accept="image/*" capture="camera" onchange="showPhoto()" />
+            <h6>Importer une photo</h6>
             <input id="camera" type="file" accept="image/*" onchange="showPhoto()" />
             <img id="image" width="360" height="360" />
             <div id="selection" hidden></div>
