@@ -1,48 +1,56 @@
-var canvas = document.getElementById('canvas');
-var context = canvas.getContext('2d');
-var video = document.getElementById('video');
 var selection = document.getElementById("selection");
+var image = document.getElementById("image");
 var x1 = 0, y1 = 0, x2 = 0, y2 = 0;
 
-// Record the camera's input and show it as a video
-if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
-    navigator.mediaDevices.getUserMedia({video: true}).then(function(stream){
-        video.srcObject = stream;
-        video.play();
-    });
-}
-
-// Create a screenshot (360x360) of the camera when the snap button is pressed
-document.getElementById("snap").addEventListener("click", function(){
-   context.drawImage(video, 0,0, 360, 360); 
-});
-
 // Setup mouse events
-image.onmousedown = beginSelect;
-image.touchstart = beginSelect;
-image.onmousemove = changeSelect;
-image.touchmove = changeSelect;
-image.onmouseup = endSelect;
-image.touchcancel = endSelect;
+//image.onmousedown = beginSelect;
+//image.touchstart = beginSelect;
+//image.onmousemove = changeSelect;
+//image.touchmove = changeSelect;
+//image.onmouseup = endSelect;
+//image.touchend = endSelect;
+
+image.addEventListener("mousedown", beginSelect, false);
+//image.addEventListener("touchstart", beginSelect, false);
+image.addEventListener("mousemove", changeSelect, false);
+//image.addEventListener("touchmove", changeSelect, false);
+image.addEventListener("mouseleave", endSelect, false);
+//image.addEventListener("touchcancel", endSelect, false);
+//image.addEventListener("mouseup", endSelect, false);
+//image.addEventListener("touchend", endSelect, false);
 
 // Show the selection div and setup it's first point
 function beginSelect(e){
     selection.hidden = 0;
-    x1 = e.pageX;
-    y1 = e.pageY;
+    
+    if(e.touches === undefined){
+        x1 = e.pageX;
+        y1 = e.pageY;
+    }else{
+        x1 = e.touches[0].pageX;
+        y1 = e.touches[0].pageY;
+    }
     calculateSelection();
+    console.log("Event début | x : " + x1 + " y : " + y1);
 }
 
 // Update in real time the selection div's last point
 function changeSelect(e){
-    x2 = e.pageX;
-    y2 = e.pageY;
+    if(e.touches === undefined){
+        x2 = e.pageX;
+        y2 = e.pageY;
+    }else{
+        x2 = e.touches[0].pageX;
+        y2 = e.touches[0].pageY;
+    }
     calculateSelection();
+    console.log("Event millieu | x : " + x2 + " y : " + y2);
 }
 
 // Hide the selection
 function endSelect(e){
     selection.hidden = 1;
+    console.log("Event fin");
 }
 
 // Draw the selection div
