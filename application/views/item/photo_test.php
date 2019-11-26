@@ -10,6 +10,7 @@
         </form>
     </div>
 </div>
+<script src="<?=base_url("assets/js/jquery.imgareaselect.dev.js");?>" type="text/javascript"></script>
 <script src="<?=base_url("assets/js/photo.js");?>" type="text/javascript"></script>
 <style>
     #selection {

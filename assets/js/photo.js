@@ -10,11 +10,11 @@ var x1 = 0, y1 = 0, x2 = 0, y2 = 0;
 //image.onmouseup = endSelect;
 //image.touchend = endSelect;
 
-image.addEventListener("mousedown", beginSelect, false);
+//image.addEventListener("mousedown", beginSelect, false);
 //image.addEventListener("touchstart", beginSelect, false);
-image.addEventListener("mousemove", changeSelect, false);
+//image.addEventListener("mousemove", changeSelect, false);
 //image.addEventListener("touchmove", changeSelect, false);
-image.addEventListener("mouseleave", endSelect, false);
+//image.addEventListener("mouseleave", endSelect, false);
 //image.addEventListener("touchcancel", endSelect, false);
 //image.addEventListener("mouseup", endSelect, false);
 //image.addEventListener("touchend", endSelect, false);
@@ -79,3 +79,13 @@ function showPhoto(){
 function setPhoto(event){
     document.getElementById("image").src = event.target.result;
 }
+
+$(document).ready(function () {
+        $('img#image').imgAreaSelect({
+            aspectRatio: "1:1",
+            handles: true,
+            //onSelectStart: beginSelect,
+            //onSelectChange: changeSelect,
+            //onSelectEnd: endSelect
+        });
+});
