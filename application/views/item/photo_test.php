@@ -2,19 +2,14 @@
     <div clas="row">
         <form>
             <h6>Prendre une photo</h6>
-            <input id="camera" type="file" accept="image/*" capture="camera" onchange="showPhoto()" />
+            <input id="camera" type="file" accept="image/*" capture="camera" onchange="showPhoto('camera')" />
             <h6>Importer une photo</h6>
-            <input id="camera" type="file" accept="image/*" onchange="showPhoto()" />
-            <img id="image" width="360" height="360" />
-            <div id="selection" hidden></div>
+            <input id="import" type="file" accept="image/*" onchange="showPhoto('import')" />
+            <img id="image" />
+            <canvas id="canvas" width="360" height="360"></canvas>
         </form>
     </div>
 </div>
 <script src="<?=base_url("assets/js/jquery.imgareaselect.dev.js");?>" type="text/javascript"></script>
 <script src="<?=base_url("assets/js/photo.js");?>" type="text/javascript"></script>
-<style>
-    #selection {
-        border: 1px dotted #000;
-        position: absolute;
-    }
-</style>
+<link rel="stylesheet" href="<?=base_url("assets/css/imgareaselect/imgareaselect-default.css");?>">
