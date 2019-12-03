@@ -28,9 +28,6 @@ function setPhoto(event){
 $(document).ready(function () {
         $('img#image').imgAreaSelect({
             aspectRatio: "1:1",
-            handles: true,
-            //onSelectStart: beginSelect,
-            //onSelectChange: changeSelect,
-            //onSelectEnd: endSelect
+            handles: true
         });
 });

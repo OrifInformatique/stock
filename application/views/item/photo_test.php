@@ -12,4 +12,6 @@
 </div>
 <script src="<?=base_url("assets/js/jquery.imgareaselect.dev.js");?>" type="text/javascript"></script>
 <script src="<?=base_url("assets/js/photo.js");?>" type="text/javascript"></script>
+<script src="<?=base_url("assets/js/external/cropper/cropper.js");?>" type="module"></script>
 <link rel="stylesheet" href="<?=base_url("assets/css/imgareaselect/imgareaselect-default.css");?>">
+<link href="<?=base_url("assets/css/cropper/cropper.css");?>" rel="stylesheet">
