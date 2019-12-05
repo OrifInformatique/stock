@@ -8,6 +8,7 @@
             <div>
                 <img id="image" />
             </div>
+            <input id="crop" type="button" value="Rogner">
             <canvas id="canvas" width="360" height="360"></canvas>
         </form>
     </div>

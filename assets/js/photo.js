@@ -1,8 +1,11 @@
 var selection = document.getElementById("selection");
-var image = document.getElementById("image");
+var rawImage = document.getElementById("image");
 var btnCamera = document.getElementById("camera");
 var btnImport = document.getElementById("import");
+var btnCrop = document.getElementById("crop");
+var canvas = document.getElementById("canvas");
 var cropper = null;
+var croppedImage = null;
 
 // Show the photo taken with the user's camera
 function showPhoto(origin){
@@ -24,7 +27,7 @@ function showPhoto(origin){
 
 // Set the photo taken with the user's camera
 function setPhoto(event){
-    document.getElementById("image").src = event.target.result;
+    rawImage.src = event.target.result;
     
     setChopper(event);
 }
@@ -32,6 +35,8 @@ function setPhoto(event){
 btnCamera.addEventListener("change", showPhoto);
 
 btnImport.addEventListener("change", showPhoto);
+
+btnCrop.addEventListener("click", cropImage);
 
 function setChopper(event){
     cropper = new Cropper(image, {
@@ -43,4 +48,9 @@ function setChopper(event){
 
 function chopperReady(event){
     console.log("Ready");
+}
+
+function cropImage(event){
+   croppedImage = cropper.getCroppedCanvas({maxWidth: 360, maxHeight: 360});
+   canvas.src = croppedImage;
 }
