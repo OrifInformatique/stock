@@ -51,6 +51,8 @@ function chopperReady(event){
 }
 
 function cropImage(event){
-   croppedImage = cropper.getCroppedCanvas({maxWidth: 360, maxHeight: 360});
-   canvas.src = croppedImage;
+    if(cropper !== null){
+        croppedImage = cropper.getCroppedCanvas({maxWidth: 360, maxHeight: 360, imageSmoothingQuality: "medium"});
+        canvas.src = croppedImage.toDataURL("image/png");
+    }
 }
