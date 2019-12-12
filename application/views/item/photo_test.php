@@ -1,15 +1,13 @@
 <div class="container">
     <div clas="row">
         <form>
-            <h6>Prendre une photo</h6>
-            <input id="camera" type="file" accept="image/*" capture="camera" />
-            <h6>Importer une photo</h6>
-            <input id="import" type="file" accept="image/*" />
+            <h6 id="inputHeader"><?= $this->lang->line("field_take_photo"); ?></h6>
+            <input id="cameraImport" type="file" accept="image/*" capture="camera" />
+            <input id="toggleImport" type="button" value="<?= $this->lang->line("field_import_photo") ?>">
             <!-- The Cropper.js library requires the image to be manipulated to be on a div -->
             <div>
                 <img id="image" />
             </div>
-            <input id="crop" type="button" value="Rogner">
             <img id="canvas" width="360" height="360"></img>
         </form>
     </div>
@@ -18,11 +16,10 @@
 <script src="<?=base_url("assets/js/external/cropper/cropper.js");?>" type="module"></script>
 <script>
 // Get every HTML element required for the code
-var selection = document.getElementById("selection");
 var rawImage = document.getElementById("image");
-var btnCamera = document.getElementById("camera");
-var btnImport = document.getElementById("import");
-var btnCrop = document.getElementById("crop");
+var btnCameraImport = document.getElementById("cameraImport");
+var btnToggleImport = document.getElementById("toggleImport");
+var inputHeader = document.getElementById("inputHeader");
 var canvas = document.getElementById("canvas");
 
 // Initialization a void Cropper and a croppedImage, for later use
@@ -40,13 +37,7 @@ function showPhoto(origin){
     
     reader.onload = setPhoto;
     
-    if(origin.srcElement.id === "camera"){
-        file = btnCamera.files[0];
-    }else if(origin.srcElement.id === "import"){
-        file = btnImport.files[0];
-    }else{
-        console.log("Error ! : Component not found");
-    }
+    file = cameraImport.files[0];
     
     reader.readAsDataURL(file);
 }
@@ -59,11 +50,9 @@ function setPhoto(event){
 }
 
 // Setup events for every button
-btnCamera.addEventListener("change", showPhoto);
+btnCameraImport.addEventListener("change", showPhoto);
 
-btnImport.addEventListener("change", showPhoto);
-
-btnCrop.addEventListener("click", cropImage);
+btnToggleImport.addEventListener("click", changeInputButton);
 
 // Setup a Cropper with a 1:1 aspect ratio
 function setChopper(event){
@@ -92,6 +81,24 @@ function cropImage(event){
     if(cropper !== null){
         croppedImage = cropper.getCroppedCanvas({width: IMAGE_UPLOAD_WIDTH, height: IMAGE_UPLOAD_HEIGHT, imageSmoothingQuality: "high"});
         canvas.src = croppedImage.toDataURL("image/png");
+    }
+}
+
+// Change the import button's behavoir between taking a picture or selecting one
+function changeInputButton(event){
+    const TAKE_IMAGE = "<?= $this->lang->line("field_take_photo"); ?>";
+    const SELECT_IMAGE = "<?= $this->lang->line("field_import_photo") ?>";
+    
+    // Change to selection
+    if(btnCameraImport.getAttribute("capture") === "camera"){
+        btnCameraImport.removeAttribute("capture");
+        btnToggleImport.value = TAKE_IMAGE;
+        inputHeader.innerText = SELECT_IMAGE;
+    }else{
+    // Change to take
+        btnCameraImport.setAttribute("capture","camera");
+        btnToggleImport.value = SELECT_IMAGE;
+        inputHeader.innerText = TAKE_IMAGE;
     }
 }
 </script>

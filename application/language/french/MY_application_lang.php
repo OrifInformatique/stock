@@ -71,6 +71,8 @@ $lang['field_text_search']              = 'Nom, description, No inventaire, No s
 $lang['field_no_filter']                = 'Aucun filtre';
 $lang['field_sort_order']               = 'Trier par';
 $lang['field_sort_asc_desc']            = 'Ordre de tri';
+$lang['field_take_photo']               = 'Prendre une photo';
+$lang['field_import_photo']             = 'Importer une photo';
 
 // Sorting labels
 $lang['sort_order_name']                = 'Nom';
