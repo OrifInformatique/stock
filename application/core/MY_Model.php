@@ -127,7 +127,7 @@ class MY_Model extends CI_Model
      */
     public function get($primary_value)
     {
-		return $this->get_by($this->primary_key, $primary_value);
+        return $this->get_by($this->primary_key, $primary_value);
     }
 
     /**
@@ -143,7 +143,7 @@ class MY_Model extends CI_Model
             $this->_database->where($this->soft_delete_key, (bool)$this->_temporary_only_deleted);
         }
 
-	$this->_set_where($where);
+    $this->_set_where($where);
 
         $this->trigger('before_get');
 
@@ -372,7 +372,7 @@ class MY_Model extends CI_Model
     {
         $where = func_get_args();
 
-	    $where = $this->trigger('before_delete', $where);
+        $where = $this->trigger('before_delete', $where);
 
         $this->_set_where($where);
 
@@ -413,7 +413,21 @@ class MY_Model extends CI_Model
 
         return $result;
     }
+    
+    /**
+     * Rollback a soft deletion for a row in the database, by the primary value
+     */
+    public function undelete($id)
+    {
+        if ($this->soft_delete) {
+            /* The data to update is the soft delete key, to reset to false */
+            $data = array($this->soft_delete_key => FALSE);
 
+            return $this->update($id, $data);
+        } else {
+            return FALSE;
+        }
+    }
 
     /**
      * Truncates the table
@@ -473,7 +487,7 @@ class MY_Model extends CI_Model
     
     public function relate($row)
     {
-	if (empty($row))
+    if (empty($row))
         {
             return $row;
         }
@@ -936,8 +950,8 @@ class MY_Model extends CI_Model
         {
             $this->_database->where($params[0]);
         }
-    	else if(count($params) == 2)
-		{
+        else if(count($params) == 2)
+        {
             if (is_array($params[1]))
             {
                 $this->_database->where_in($params[0], $params[1]);    
@@ -946,11 +960,11 @@ class MY_Model extends CI_Model
             {
                 $this->_database->where($params[0], $params[1]);
             }
-		}
-		else if(count($params) == 3)
-		{
-			$this->_database->where($params[0], $params[1], $params[2]);
-		}
+        }
+        else if(count($params) == 3)
+        {
+            $this->_database->where($params[0], $params[1], $params[2]);
+        }
         else
         {
             if (is_array($params[1]))
