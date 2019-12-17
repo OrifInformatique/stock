@@ -1,16 +1,22 @@
 <div class="container">
-    <div clas="row">
-        <form>
-            <h6 id="inputHeader"><?= $this->lang->line("field_take_photo"); ?></h6>
-            <input id="cameraImport" type="file" accept="image/*" capture="camera" />
-            <input id="toggleImport" type="button" value="<?= $this->lang->line("field_import_photo") ?>">
+    <form>
+        <div class="row">
+            <div class="col-sm-12 col-xs-12">
+                <h6 id="inputHeader"><?= $this->lang->line("field_take_photo"); ?></h6>
+                <input id="cameraImport" type="file" accept="image/*" capture="camera" />
+                <input id="toggleImport" type="button" value="<?= $this->lang->line("field_import_photo") ?>">
+            </div>
+        </div>
+        <div class="row">
             <!-- The Cropper.js library requires the image to be manipulated to be on a div -->
-            <div>
+            <div class="col-xs-6 col-sm-6">
                 <img id="image" />
             </div>
-            <img id="canvas" width="360" height="360"></img>
-        </form>
-    </div>
+            <div class="col-xs-6 col-sm-6">
+                <img id="canvas" width="360" height="360"></img>
+            </div>
+        </div>
+    </form>
 </div>
 <link href="<?=base_url("assets/css/cropper/cropper.css");?>" rel="stylesheet">
 <script src="<?=base_url("assets/js/external/cropper/cropper.js");?>" type="module"></script>
@@ -59,6 +65,8 @@ function setChopper(event){
     cropper = new Cropper(image, {
         aspectRatio : 1,
         preview: '.img-preview',
+        minCropBoxWidth: IMAGE_UPLOAD_WIDTH,
+        minCropBoxHeight: IMAGE_UPLOAD_HEIGHT,
         movable: false,
         rotatable: false,
         scalable: false,
@@ -96,7 +104,7 @@ function changeInputButton(event){
         inputHeader.innerText = SELECT_IMAGE;
     }else{
     // Change to take
-        btnCameraImport.setAttribute("capture","camera");
+        btnCameraImport.setAttribute("capture", "camera");
         btnToggleImport.value = SELECT_IMAGE;
         inputHeader.innerText = TAKE_IMAGE;
     }
