@@ -723,10 +723,17 @@ class Item extends MY_Controller {
 
         $this->form_validation->set_rules("inventory_prefix", lang('field_inventory_number'), 'required');
     }
-
-    public function test_photo(){
+    
+    /**
+     * Save previous url, then redirect to Picture/get_picture
+     * 
+     * @param string $url the origin url
+     * @return void
+     */
+    public function select_picture(){
         
+        $_SESSION['picture_callback'] = $_SERVER['HTTP_REFERER'];
         
-        $this->display_view("item/photo_test");
+        redirect(base_url('picture/get_picture'));
     }
 }

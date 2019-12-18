@@ -56,8 +56,7 @@
             <p class="bg-primary">&nbsp;<?= $this->lang->line('text_item_detail'); ?></p>
         </div>
         <div class="form-group col-md-4">
-            <label for="photo"><?= $this->lang->line('field_image_upload'); ?></label>
-			<input type="file" id="photo" name="photo" accept="image/*" class="form-control-file" />
+            <a class="btn btn-default" href="<?= base_url("item/select_picture"); ?>"><?= $this->lang->line('field_add_modify_photo'); ?></a>
             <?php if (isset($image) && $image!='') { ?>
                 <img src="<?= base_url('uploads/images/'.$image); ?>"
                      width="100%"

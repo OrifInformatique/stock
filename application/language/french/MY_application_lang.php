@@ -73,6 +73,7 @@ $lang['field_sort_order']               = 'Trier par';
 $lang['field_sort_asc_desc']            = 'Ordre de tri';
 $lang['field_take_photo']               = 'Prendre une photo';
 $lang['field_import_photo']             = 'Importer une photo';
+$lang['field_add_modify_photo']          = 'Ajouter / Modifier une photo';
 
 // Sorting labels
 $lang['sort_order_name']                = 'Nom';
