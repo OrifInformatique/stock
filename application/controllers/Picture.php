@@ -21,9 +21,6 @@ class Picture extends MY_Controller {
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('item_model');
-        $this->load->model('loan_model');
-        $this->load->helper('sort');
     }
 
     /**
@@ -31,6 +28,7 @@ class Picture extends MY_Controller {
      */
     public function index(){
         $this->get_picture();
+        $this->load->library('form_validation');
     }
     
     /**
@@ -50,5 +48,46 @@ class Picture extends MY_Controller {
      */
     public function add_picture(){
         
+        if(isset($_POST) && !empty($_POST['original_file']) && !empty($_POST['cropped_file'])){
+            $this->set_validation_rules();
+            
+            if($this->form_validation->run()){
+                
+                $_SESSION['picture_path'] = $_POST['cropped_file'];
+                $_SESSION['picture_name'] = $_POST['original_file'];
+                
+                redirect($_SESSION['picture_callback']);
+                exit();
+                
+            }else{
+                $data['upload_error'] = $lang->lang->line('msg_err_photo_upload');
+                
+                $this->load->view('item/select_photo', $data);
+            }
+            
+        }else{
+            redirect(base_url());
+            exit();
+        }
+    }
+    
+    /**
+     * Check if there is a named file send
+     * 
+     * @return void
+     */
+    private function set_validation_rules(){
+        $config = array(
+            array(
+                'field' => 'original_file',
+                'label' => $this->lang->line('field_full_photo'),
+                'rules' => 'required'
+            ),
+            array(
+                'field' => 'cropped_file',
+                'label' => $this->lang->line('field_cropped_photo'),
+                'rules' => 'required'
+            )
+        );
     }
 }

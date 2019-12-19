@@ -1,20 +1,25 @@
 <div class="container">
-    <form>
-        <div class="row">
-            <div class="col-sm-12 col-xs-12">
-                <h6 id="inputHeader"><?= $this->lang->line("field_take_photo"); ?></h6>
-                <input id="cameraImport" type="file" accept="image/*" capture="camera" />
-                <input id="toggleImport" type="button" value="<?= $this->lang->line("field_import_photo") ?>">
-            </div>
+    <?php
+        if (isset($upload_errors)) {
+            ?><div class="alert alert-danger"><?=$upload_errors?></div><?php
+        }
+    ?>
+    
+    <form class="row" method="post" action="add_picture" >
+        <div class="col-sm-8 col-xs-8 form-group">
+            <h6 id="inputHeader"><?= $this->lang->line("field_take_photo"); ?></h6>
+            <input id="cameraImport" name="original_file" type="file" accept="image/*" capture="camera" class="btn" />
+            <input id="toggleImport" type="button" value="<?= $this->lang->line("field_import_photo") ?>" class="btn btn-default" />
+            <input id="croppedPath" name="cropped_file" type="hidden" />
+            <input type="submit" value="<?= $this->lang->line('field_validate_photo'); ?>" class="btn btn-success" />
+            <a href="<?= $_SERVER['HTTP_REFERER'] ?>" class="btn btn-danger"><?= $this->lang->line('btn_cancel'); ?></a>
         </div>
-        <div class="row">
-            <!-- The Cropper.js library requires the image to be manipulated to be on a div -->
-            <div class="col-xs-6 col-sm-6">
-                <img id="image" />
-            </div>
-            <div class="col-xs-6 col-sm-6">
-                <img id="canvas" width="360" height="360"></img>
-            </div>
+        <!-- The Cropper.js library requires the image to be manipulated to be on a div -->
+        <div class="col-xs-4 col-sm-4">
+            <img id="image" />
+        </div>
+        <div class="col-xs-4 col-sm-4">
+            <img id="canvas" width="360" height="360" />
         </div>
     </form>
 </div>
@@ -26,6 +31,7 @@ var rawImage = document.getElementById("image");
 var btnCameraImport = document.getElementById("cameraImport");
 var btnToggleImport = document.getElementById("toggleImport");
 var inputHeader = document.getElementById("inputHeader");
+var croppedPathInput = document.getElementById("croppedPath");
 var canvas = document.getElementById("canvas");
 
 // Initialization a void Cropper and a croppedImage, for later use
@@ -62,6 +68,11 @@ btnToggleImport.addEventListener("click", changeInputButton);
 
 // Setup a Cropper with a 1:1 aspect ratio
 function setChopper(event){
+    
+    if(cropper !== null){
+        cropper.destroy();
+    }
+    
     cropper = new Cropper(image, {
         aspectRatio : 1,
         preview: '.img-preview',
@@ -89,6 +100,7 @@ function cropImage(event){
     if(cropper !== null){
         croppedImage = cropper.getCroppedCanvas({width: IMAGE_UPLOAD_WIDTH, height: IMAGE_UPLOAD_HEIGHT, imageSmoothingQuality: "high"});
         canvas.src = croppedImage.toDataURL("image/png");
+        croppedPathInput.value = canvas.src;
     }
 }
 
