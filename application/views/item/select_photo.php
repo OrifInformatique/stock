@@ -1,7 +1,8 @@
+<?= var_dump($_SESSION)?>
 <div class="container">
     <?php
-        if (isset($upload_errors)) {
-            ?><div class="alert alert-danger"><?=$upload_errors?></div><?php
+        if (isset($upload_error)) {
+            ?><div class="alert alert-danger"><?=$upload_error?></div><?php
         }
     ?>
     

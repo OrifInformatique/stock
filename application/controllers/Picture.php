@@ -13,7 +13,7 @@ class Picture extends MY_Controller {
 
     
     /* MY_Controller variables definition */
-    protected $access_level = "*";
+    protected $access_level = "@";
 
     /**
      * Constructor
@@ -21,24 +21,23 @@ class Picture extends MY_Controller {
     public function __construct()
     {
         parent::__construct();
-    }
-
-    /**
-     * The Controller's index, redirect to get_picture
-     */
-    public function index(){
-        $this->get_picture();
         $this->load->library('form_validation');
     }
-    
+
     /**
      * Show the image selection and cropping view
      * 
      * @return void
      */
-    public function get_picture(){
+    public function get_picture($errorId = 0){
         
-        $this->display_view("item/select_photo");
+        $data = array();
+        
+        if($errorId == 1){
+            $data['upload_error'] = $this->lang->line('msg_err_photo_upload');
+        }
+        
+        $this->display_view("item/select_photo", $data);
     }
     
     /**
@@ -48,21 +47,19 @@ class Picture extends MY_Controller {
      */
     public function add_picture(){
         
-        if(isset($_POST) && !empty($_POST['original_file']) && !empty($_POST['cropped_file'])){
+        if(isset($_POST)){
             $this->set_validation_rules();
             
             if($this->form_validation->run()){
                 
                 $_SESSION['picture_path'] = $_POST['cropped_file'];
                 $_SESSION['picture_name'] = $_POST['original_file'];
-                
                 redirect($_SESSION['picture_callback']);
                 exit();
                 
             }else{
-                $data['upload_error'] = $lang->lang->line('msg_err_photo_upload');
-                
-                $this->load->view('item/select_photo', $data);
+                redirect(base_url('picture/get_picture/1'));
+                exit();
             }
             
         }else{
@@ -89,5 +86,7 @@ class Picture extends MY_Controller {
                 'rules' => 'required'
             )
         );
+        
+        $this->form_validation->set_rules($config);
     }
 }
