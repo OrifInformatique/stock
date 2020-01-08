@@ -55,6 +55,13 @@ class Item extends MY_Controller {
         if (!isset($output["t"])) $output["t"] = '';
         if (!isset($output["o"])) $output["o"] = '';
         if (!isset($output["ad"])) $output["ad"] = '';
+        
+        //Delete picture_path flashdata as well as the matching picture on the server, since accessing that page after it's setup means that the user canceled a item creation/modification
+        if(isset($_SESSION['picture_path'])){
+            unlink($_SESSION['picture_path']);
+            $_SESSION['picture_path'] = null;
+        }
+        
         // Send the data to the View
         $this->display_view('item/list', $output);
     }
