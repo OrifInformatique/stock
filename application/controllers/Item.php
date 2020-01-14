@@ -58,7 +58,7 @@ class Item extends MY_Controller {
         
         //Delete picture_path flashdata as well as the matching picture on the server, since accessing that page after it's setup means that the user canceled a item creation/modification
         if(isset($_SESSION['picture_path'])){
-            unlink($_SESSION['picture_path']);
+            unlink('uploads/images/'.$_SESSION['picture_path']);
             $_SESSION['picture_path'] = null;
         }
         
@@ -216,6 +216,9 @@ class Item extends MY_Controller {
             $this->set_validation_rules();
 
             $data['upload_errors'] = "";
+            
+            $upload_failed = false;
+            /*
             if (isset($_FILES['photo']) && $_FILES['photo']['name'] != '') {
                 // IMAGE UPLOADING
                 $config['upload_path'] = './uploads/images/';
@@ -234,6 +237,17 @@ class Item extends MY_Controller {
                     $upload_failed = TRUE;
                 }
             }
+            */
+            
+            if(isset($_POST['photo'])){
+                    
+                    if(!file_exists('uploads/images/'.$_POST['photo'])){
+                        $data['upload_errors'] = $this->lang->line('msg_err_photo_upload');
+                        $upload_failed = TRUE;
+                    }
+                    
+                }
+            
             if (isset($_FILES['linked_file']) && $_FILES['linked_file']['name'] != '') {
 
                 // LINKED FILE UPLOADING
@@ -341,6 +355,9 @@ class Item extends MY_Controller {
                 $this->set_validation_rules($id);
 
                 $data['upload_errors'] = "";
+                
+                $upload_failed = false;
+                /*
                 if (isset($_FILES['photo']) && $_FILES['photo']['name'] != '') {
                     // IMAGE UPLOADING
                     $config['upload_path'] = './uploads/images/';
@@ -359,6 +376,17 @@ class Item extends MY_Controller {
                         $upload_failed = TRUE;
                     }
                 }
+                */
+                
+                if(isset($_POST['photo'])){
+                    
+                    if(!file_exists(base_url($_POST['photo']))){
+                        $data['upload_errors'] = $this->lang->line('msg_err_photo_upload');
+                        $upload_failed = TRUE;
+                    }
+                    
+                }
+                
                 if (isset($_FILES['linked_file']) && $_FILES['linked_file']['name'] != '') {
 
                     // LINKED FILE UPLOADING

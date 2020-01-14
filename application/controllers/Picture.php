@@ -57,7 +57,7 @@ class Picture extends MY_Controller {
                 
                 file_put_contents("uploads/images/$picture_name", base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $picture_file)));
                 
-                $_SESSION['picture_path'] = "uploads/images/$picture_name";
+                $_SESSION['picture_path'] = $picture_name;
                 
                 redirect($_SESSION['picture_callback']);
                 exit();
