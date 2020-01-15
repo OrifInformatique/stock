@@ -94,4 +94,17 @@ class Picture extends MY_Controller {
         
         $this->form_validation->set_rules($config);
     }
+    
+    /**
+     * Save previous url, then redirect to Picture/get_picture
+     * 
+     * @param string $url the origin url
+     * @return void
+     */
+    public function select_picture(){
+        
+        $_SESSION['picture_callback'] = $_SERVER['HTTP_REFERER'];
+        
+        redirect(base_url('picture/get_picture'));
+    }
 }

@@ -1,4 +1,3 @@
-<?= var_dump($_POST)?>
 <form class="container" method="post" enctype="multipart/form-data">
     <!-- BUTTONS -->
     <div class="form-group col-xs-12">
@@ -57,11 +56,12 @@
             <p class="bg-primary">&nbsp;<?= $this->lang->line('text_item_detail'); ?></p>
         </div>
         <div class="form-group col-md-4">
-            <a class="btn btn-default" href="<?= base_url("item/select_picture"); ?>"><?= $this->lang->line('field_add_modify_photo'); ?></a>
-            <?php if (isset($image) && $image!='') {
-                $imagePath = $image;
-            }else if(isset($_SESSION['picture_path'])){
+            <a class="btn btn-default" href="<?= base_url("picture/select_picture"); ?>"><?= $this->lang->line('field_add_modify_photo'); ?></a>
+            <?php 
+            if(isset($_SESSION['picture_path'])){
                 $imagePath = $_SESSION['picture_path'];
+            }else if (isset($image) && $image!='') {
+                $imagePath = $image;
             }
 ?>
             <?php if(isset($imagePath)){ ?>

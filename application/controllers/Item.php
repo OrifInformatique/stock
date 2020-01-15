@@ -58,7 +58,7 @@ class Item extends MY_Controller {
         
         //Delete picture_path flashdata as well as the matching picture on the server, since accessing that page after it's setup means that the user canceled a item creation/modification
         if(isset($_SESSION['picture_path'])){
-            unlink('uploads/images/'.$_SESSION['picture_path']);
+            // unlink('uploads/images/'.$_SESSION['picture_path']);
             $_SESSION['picture_path'] = null;
         }
         
@@ -239,14 +239,10 @@ class Item extends MY_Controller {
             }
             */
             
-            if(isset($_POST['photo'])){
-                    
-                    if(!file_exists('uploads/images/'.$_POST['photo'])){
-                        $data['upload_errors'] = $this->lang->line('msg_err_photo_upload');
-                        $upload_failed = TRUE;
-                    }
-                    
-                }
+            if(isset($_POST['photo']) && !file_exists('uploads/images/'.$_POST['photo'])){
+                $data['upload_errors'] = $this->lang->line('msg_err_photo_upload');
+                $upload_failed = TRUE;
+            }
             
             if (isset($_FILES['linked_file']) && $_FILES['linked_file']['name'] != '') {
 
@@ -378,13 +374,9 @@ class Item extends MY_Controller {
                 }
                 */
                 
-                if(isset($_POST['photo'])){
-                    
-                    if(!file_exists(base_url($_POST['photo']))){
-                        $data['upload_errors'] = $this->lang->line('msg_err_photo_upload');
-                        $upload_failed = TRUE;
-                    }
-                    
+                if(isset($_POST['photo']) && !file_exists(base_url($_POST['photo']))){
+                    $data['upload_errors'] = $this->lang->line('msg_err_photo_upload');
+                    $upload_failed = TRUE;
                 }
                 
                 if (isset($_FILES['linked_file']) && $_FILES['linked_file']['name'] != '') {
@@ -759,16 +751,4 @@ class Item extends MY_Controller {
         $this->form_validation->set_rules("inventory_prefix", lang('field_inventory_number'), 'required');
     }
     
-    /**
-     * Save previous url, then redirect to Picture/get_picture
-     * 
-     * @param string $url the origin url
-     * @return void
-     */
-    public function select_picture(){
-        
-        $_SESSION['picture_callback'] = $_SERVER['HTTP_REFERER'];
-        
-        redirect(base_url('picture/get_picture'));
-    }
 }
