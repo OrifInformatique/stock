@@ -56,10 +56,15 @@ class Item extends MY_Controller {
         if (!isset($output["o"])) $output["o"] = '';
         if (!isset($output["ad"])) $output["ad"] = '';
         
-        //Delete picture_path flashdata as well as the matching picture on the server, since accessing that page after it's setup means that the user canceled a item creation/modification
+        // Delete picture_path flashdata as well as the matching picture on the server, since accessing that page after it's setup means that the user canceled a item creation/modification
         if(isset($_SESSION['picture_path'])){
             // unlink('uploads/images/'.$_SESSION['picture_path']);
             $_SESSION['picture_path'] = null;
+        }
+        
+        // Delete POST flashdata to prevent possible session break
+        if(isset($_SESSION['POST'])){
+            unset($_SESSION['POST']);
         }
         
         // Send the data to the View
@@ -210,6 +215,7 @@ class Item extends MY_Controller {
      * @return void
      */
     public function create() {
+        
         // Check if this is allowed
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
 
@@ -238,6 +244,17 @@ class Item extends MY_Controller {
                 }
             }
             */
+            
+            // If the user want to add a image we will first save every field's value in the session, then redirect them to picture/select_picture
+            if(isset($_POST['photoSubmit']) && $_POST['photoSubmit'] == $this->lang->line('field_add_modify_photo')){
+                
+                foreach ($_POST as $key => $value) {
+                    $_SESSION["POST"][$key] = $value;
+                }
+                
+                redirect(base_url("picture/select_picture"));
+                exit();
+            }
             
             if(isset($_POST['photo']) && !file_exists('uploads/images/'.$_POST['photo'])){
                 $data['upload_errors'] = $this->lang->line('msg_err_photo_upload');
@@ -281,13 +298,17 @@ class Item extends MY_Controller {
                 }
 
                 $itemArray["created_by_user_id"] = $_SESSION['user_id'];
-
+                
+                // The submit value is only for knowing which action must be done between uploading the item and switching to picture/get_picture, keeping it will prevent the item to be put on the database
+                unset($itemArray['itemSubmit']);
+                
                 $this->item_model->insert($itemArray);
                 $item_id = $this->db->insert_id();
 
                 foreach ($linkArray as $tag) {
                     $this->item_tag_link_model->insert(array("item_tag_id" => $tag, "item_id" => ($item_id)));
                 }
+                
                 redirect("item/view/" . $item_id);
             } else {
                 // Remember checked tags to display them checked again
@@ -321,6 +342,21 @@ class Item extends MY_Controller {
 
                 $data['item_id'] = $this->item_model->get_future_id();
 
+                // If the user switched to picture/select_photo then convert the data to be usable by the view
+                if(isset($_SESSION['POST'])){
+                    foreach ($_SESSION['POST'] as $key => $value) {
+                        // If it is a tag
+                        if (substr($key, 0, 3) == "tag") {
+                            // put it in the data array
+                            $tag_link = new stdClass();
+                            $tag_link->item_tag_id = substr($key, 3);
+                            $data['tag_links'][] = (object) $tag_link;
+                        }else{
+                            $data[$key] = $value;
+                        }
+                    }
+                }
+                
                 $this->display_view('item/form', $data);
             }
         } else {
@@ -374,7 +410,18 @@ class Item extends MY_Controller {
                 }
                 */
                 
-                if(isset($_POST['photo']) && !file_exists(base_url($_POST['photo']))){
+                // If the user want to add a image we will first save every field's value in the session, then redirect them to picture/select_picture
+                if(isset($_POST['photoSubmit']) && $_POST['photoSubmit'] == $this->lang->line('field_add_modify_photo')){
+
+                    foreach ($_POST as $key => $value) {
+                        $_SESSION["POST"][$key] = $value;
+                    }
+
+                    redirect(base_url("picture/select_picture"));
+                    exit();
+                }
+                
+                if(isset($_POST['photo']) && !file_exists('uploads/images/'.$_POST['photo'])){
                     $data['upload_errors'] = $this->lang->line('msg_err_photo_upload');
                     $upload_failed = TRUE;
                 }
@@ -415,8 +462,12 @@ class Item extends MY_Controller {
                         }
                     }
 
+                    // The submit value is only for knowing which action must be done between updating the item and switching to picture/get_picture, keeping it will prevent the item to be put on the database
+                    unset($itemArray['itemSubmit']);
+                    
                     // Execute the changes in the item table
                     $this->item_model->update($id, $itemArray);
+                    
                     redirect("/item/view/" . $id);
                 } else {
                     // Remember checked tags to display them checked again
@@ -452,6 +503,21 @@ class Item extends MY_Controller {
             $this->load->model('item_tag_model');
             $data['item_tags'] = $this->item_tag_model->get_all();
 
+            // If the user switched to picture/select_photo then convert the data to be usable by the view
+            if(isset($_SESSION['POST'])){
+                foreach ($_SESSION['POST'] as $key => $value) {
+                    // If it is a tag
+                    if (substr($key, 0, 3) == "tag") {
+                        // put it in the data array
+                        $tag_link = new stdClass();
+                        $tag_link->item_tag_id = substr($key, 3);
+                        $data['tag_links'][] = (object) $tag_link;
+                    }else{
+                        $data[$key] = $value;
+                    }
+                }
+            }
+            
             $this->display_view('item/form', $data);
         } else {
             // Update is not allowed

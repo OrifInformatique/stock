@@ -1,7 +1,7 @@
 <form class="container" method="post" enctype="multipart/form-data">
     <!-- BUTTONS -->
     <div class="form-group col-xs-12">
-        <button type="submit" class="btn btn-success"><?php echo $this->lang->line('btn_save'); ?></button>
+        <input name="itemSubmit" type="submit" class="btn btn-success" value="<?= $this->lang->line('btn_save') ?>" />
         <a class="btn btn-danger" href="<?php echo base_url(); if(isset($modify)) {echo "item/view/" . $item_id;} ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
     </div>
 
@@ -56,7 +56,7 @@
             <p class="bg-primary">&nbsp;<?= $this->lang->line('text_item_detail'); ?></p>
         </div>
         <div class="form-group col-md-4">
-            <a class="btn btn-default" href="<?= base_url("picture/select_picture"); ?>"><?= $this->lang->line('field_add_modify_photo'); ?></a>
+            <input name="photoSubmit" type="submit" value="<?= $this->lang->line('field_add_modify_photo')?>" class="btn btn-default" />
             <?php 
             if(isset($_SESSION['picture_path'])){
                 $imagePath = $_SESSION['picture_path'];
