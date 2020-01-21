@@ -1,25 +1,27 @@
 <div class="container">
     <?php
-        if (isset($upload_error)) {
-            ?><div class="alert alert-danger"><?=$upload_error?></div><?php
-        }
+    if (isset($upload_error)) {
+        ?><div class="alert alert-danger"><?=$upload_error?></div><?php
+    }
     ?>
     
     <form class="row" method="post" action="add_picture" >
-        <!-- The Cropper.js library requires the image to be manipulated to be on a div -->
-        <div id="cropArea" class="col-xs-9 col-sm-9">
+        <!-- The Cropper.js library requires the manipulated image to be on a div -->
+        <div id="cropArea" class="col-xs-12 col-sm-12">
             <img id="image" height="auto" width="100%" />
         </div>
-        <div class="col-xs-3 col-sm-3">
+        <!--
+        <div class="col-xs-3 col-sm-3" class="hidden-sm hidden-xs">
             <img id="canvas" width="360" height="360" />
         </div>
+        -->
         <div class="col-sm-12 col-xs-12 form-group">
             <h6 id="inputHeader"><?= $this->lang->line("field_take_photo"); ?></h6>
             <input id="cameraImport" name="original_file" type="file" accept="image/*" capture="camera" class="btn" />
-            <input id="toggleImport" type="button" value="<?= $this->lang->line("field_import_photo") ?>" class="btn btn-default" />
+            <input id="toggleImport" type="button" value="<?= $this->lang->line("field_import_photo"); ?>" class="btn btn-default" />
             <input id="croppedFile" name="cropped_file" type="hidden" />
             <input type="submit" value="<?= $this->lang->line('field_validate_photo'); ?>" class="btn btn-success" />
-            <a href="<?= $_SERVER['HTTP_REFERER'] ?>" class="btn btn-danger"><?= $this->lang->line('btn_cancel'); ?></a>
+            <a href="<?= $_SESSION['picture_callback'] ?>" class="btn btn-danger"><?= $this->lang->line('btn_cancel'); ?></a>
         </div>
     </form>
 </div>
@@ -40,8 +42,8 @@ var cropper = null;
 var croppedImage = null;
 
 // Define image upload dimensions
-const IMAGE_UPLOAD_WIDTH = <?= IMAGE_UPLOAD_WIDTH ?>;
-const IMAGE_UPLOAD_HEIGHT = <?= IMAGE_UPLOAD_HEIGHT ?>;
+const IMAGE_UPLOAD_WIDTH = <?= IMAGE_UPLOAD_WIDTH; ?>;
+const IMAGE_UPLOAD_HEIGHT = <?= IMAGE_UPLOAD_HEIGHT; ?>;
 
 // Show the photo taken with the user's camera / imported from the user's files
 function showPhoto(origin){
@@ -76,13 +78,14 @@ function setCropper(event){
     
     cropper = new Cropper(image, {
         aspectRatio : 1,
+        autoCropArea: 0.1,
         preview: '.img-preview',
         minCropBoxWidth: IMAGE_UPLOAD_WIDTH,
         minCropBoxHeight: IMAGE_UPLOAD_HEIGHT,
         movable: false,
         rotatable: false,
         scalable: false,
-        viewMode: 2,
+        viewMode: 1,
         ready: cropperReady,
         cropmove: cropImage
     });
