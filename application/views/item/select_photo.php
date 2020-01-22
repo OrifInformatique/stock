@@ -5,20 +5,18 @@
     }
     ?>
     
-    <form class="row" method="post" action="add_picture" >
+    <form id="form" class="row" method="post" action="add_picture" >
         <!-- The Cropper.js library requires the manipulated image to be on a div -->
-        <div id="cropArea" class="col-xs-12 col-sm-12">
+        <div id="cropArea" class="col-xs-10 col-sm-10 col-xs-offset-1 col-sm-offset-1">
             <img id="image" height="auto" width="100%" />
         </div>
-        <!--
-        <div class="col-xs-3 col-sm-3" class="hidden-sm hidden-xs">
+        <div class="hidden">
             <img id="canvas" width="360" height="360" />
         </div>
-        -->
         <div class="col-sm-12 col-xs-12 form-group">
-            <h6 id="inputHeader"><?= $this->lang->line("field_take_photo"); ?></h6>
-            <input id="cameraImport" name="original_file" type="file" accept="image/*" capture="camera" class="btn" />
-            <input id="toggleImport" type="button" value="<?= $this->lang->line("field_import_photo"); ?>" class="btn btn-default" />
+            <input id="imageInput" name="original_file" type="file" accept="image/*" capture="camera" class="btn hidden" />
+            <input id="cameraImport" type="button" value="<?= $this->lang->line("field_take_photo"); ?>" class="btn btn-default" />
+            <input id="imageImport" type="button" value="<?= $this->lang->line("field_import_photo"); ?>" class="btn btn-default" />
             <input id="croppedFile" name="cropped_file" type="hidden" />
             <input type="submit" value="<?= $this->lang->line('field_validate_photo'); ?>" class="btn btn-success" />
             <a href="<?= $_SESSION['picture_callback'] ?>" class="btn btn-danger"><?= $this->lang->line('btn_cancel'); ?></a>
@@ -30,12 +28,14 @@
 <script>
 // Get every HTML element required for the code
 var rawImage = document.getElementById("image");
+var btnImageInput = document.getElementById("imageInput");
 var btnCameraImport = document.getElementById("cameraImport");
-var btnToggleImport = document.getElementById("toggleImport");
+var btnImageImport = document.getElementById("imageImport");
 var inputHeader = document.getElementById("inputHeader");
 var cropArea = document.getElementById("cropArea");
 var croppedFileInput = document.getElementById("croppedFile");
 var canvas = document.getElementById("canvas");
+var form = document.getElementById("form");
 
 // Initialization a void Cropper and a croppedImage, for later use
 var cropper = null;
@@ -52,7 +52,7 @@ function showPhoto(origin){
     
     reader.onload = setPhoto;
     
-    file = cameraImport.files[0];
+    file = imageInput.files[0];
     
     reader.readAsDataURL(file);
 }
@@ -65,9 +65,12 @@ function setPhoto(event){
 }
 
 // Setup events for every button
-btnCameraImport.addEventListener("change", showPhoto);
+btnCameraImport.addEventListener("click",clickInput);
+btnImageImport.addEventListener("click",clickInput);
 
-btnToggleImport.addEventListener("click", changeInputButton);
+btnImageInput.addEventListener("change", showPhoto);
+
+form.addEventListener("submit", cropImage);
 
 // Setup a Cropper with a 1:1 aspect ratio
 function setCropper(event){
@@ -78,26 +81,28 @@ function setCropper(event){
     
     cropper = new Cropper(image, {
         aspectRatio : 1,
-        autoCropArea: 0.1,
+        autoCropArea: 1.0,
         preview: '.img-preview',
-        minCropBoxWidth: IMAGE_UPLOAD_WIDTH,
-        minCropBoxHeight: IMAGE_UPLOAD_HEIGHT,
+        minCanvasWidth: IMAGE_UPLOAD_WIDTH,
+        minCanvasHeight: IMAGE_UPLOAD_HEIGHT,
         movable: false,
         rotatable: false,
         scalable: false,
-        viewMode: 1,
-        ready: cropperReady,
-        cropmove: cropImage
+        viewMode: 1
     });
 }
 
-// Write a log on the console (Only for debugging purpose)
-// Also setup the cropped image's printing
-function cropperReady(event){
-    console.log("Cropper ready");
-    
-    cropImage();
+// Simulate a click on the hidden input with the matching image's source
+function clickInput(){
+    if(event.target.id == btnCameraImport.id){
+        btnImageInput.click();
+        btnImageInput.removeAttribute("capture");
+    }else if(event.target.id == btnImageImport.id){
+        btnImageInput.click();
+        btnImageInput.setAttribute("capture", "camera");
+    }
 }
+
 
 // Convert the cropped image into a new image
 function cropImage(event){
@@ -105,24 +110,6 @@ function cropImage(event){
         croppedImage = cropper.getCroppedCanvas({width: IMAGE_UPLOAD_WIDTH, height: IMAGE_UPLOAD_HEIGHT, imageSmoothingQuality: "high"});
         canvas.src = croppedImage.toDataURL("image/png");
         croppedFileInput.value = canvas.src;
-    }
-}
-
-// Change the import button's behavoir between taking a picture or selecting one
-function changeInputButton(event){
-    const TAKE_IMAGE = "<?= $this->lang->line("field_take_photo"); ?>";
-    const SELECT_IMAGE = "<?= $this->lang->line("field_import_photo") ?>";
-    
-    // Change to selection
-    if(btnCameraImport.getAttribute("capture") === "camera"){
-        btnCameraImport.removeAttribute("capture");
-        btnToggleImport.value = TAKE_IMAGE;
-        inputHeader.innerText = SELECT_IMAGE;
-    }else{
-    // Change to take
-        btnCameraImport.setAttribute("capture", "camera");
-        btnToggleImport.value = SELECT_IMAGE;
-        inputHeader.innerText = TAKE_IMAGE;
     }
 }
 </script>
