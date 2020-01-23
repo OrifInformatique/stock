@@ -26,6 +26,8 @@ class Auth extends MY_Controller
 
     /**
      * Login and create session variables
+     *
+     * @return void
      */
     public function login ()
     {
@@ -93,7 +95,9 @@ class Auth extends MY_Controller
     }
 
     /**
-     * Logout and destroy session
+     * Logout and erase session variables
+     *
+     * @return void
      */
     public function logout()
     {

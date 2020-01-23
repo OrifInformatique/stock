@@ -52,6 +52,10 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# Visual Studio
+# =========================
+.vscode
+
 # Some config files
 # =========================
 index.php
@@ -65,3 +69,4 @@ uploads/images/*
 /nbproject/private/
 nbproject/project.properties
 nbproject/project.xml
+AskFtpSiteDeployer.xml

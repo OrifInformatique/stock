@@ -1,7 +1,7 @@
 <div class="container" >
   <div class="row xs-center">
     <a href="<?= base_url(); ?>" style="color:inherit">
-      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 ">
+      <div id="logo" class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
         <img src="<?= base_url("assets/images/logo.jpg"); ?>" >
       </div>
       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">

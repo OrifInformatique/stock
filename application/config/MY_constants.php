@@ -33,7 +33,7 @@ define('PASSWORD_HASH_ALGORITHM', PASSWORD_BCRYPT);
 | Inventory number
 |--------------------------------------------------------------------------
 */
-define('INVENTORY_PREFIX', 'ORP');		 // first part of inventory number (Orif site prefix)
+define('INVENTORY_PREFIX', 'ORP');   // first part of inventory number (Orif site prefix)
 define('INVENTORY_NUMBER_CHARS', 4); // number of chars in the ID part (to add leading zeros)
 
 /*

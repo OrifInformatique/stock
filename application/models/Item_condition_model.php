@@ -1,4 +1,5 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
+
 /**
  * The Item condition model
  * 
@@ -6,7 +7,6 @@
  * @link        https://github.com/OrifInformatique/stock
  * @copyright   Copyright (c) 2016, Orif <http://www.orif.ch>
  */
-
 class Item_condition_model extends MY_Model
 {
     /* MY_Model variables definition */
@@ -27,11 +27,13 @@ class Item_condition_model extends MY_Model
     }
 
     /**
-    * Returns a bootstrap <span> tag with class depending of the item condition
-    *
-    * Attribute name : bootstrap_label
-    *
-    */
+     * Returns a bootstrap <span> tag with class depending of the item condition
+     *
+     * Attribute name : bootstrap_label
+     *
+     * @param [type] $item_condition
+     * @return void
+     */
     protected function get_bootstrap_label($item_condition)
     {
         if ($item_condition->item_condition_id == 10)
