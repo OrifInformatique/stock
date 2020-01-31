@@ -1,30 +1,41 @@
-<div class="container">
-    <?php
-    if (isset($upload_error)) {
-        ?><div class="alert alert-danger"><?=$upload_error?></div><?php
-    }
-    ?>
-    
-    <form id="form" class="row" method="post" action="add_picture" >
-        <!-- The Cropper.js library requires the manipulated image to be on a div -->
-        <div id="cropArea" class="col-xs-10 col-sm-10 col-xs-offset-1 col-sm-offset-1">
-            <img id="image" height="auto" width="100%" />
+<form id="form" class="container" method="post" action="add_picture" >
+    <?php if (isset($upload_error)) { ?>
+    <div class="row alert alert-danger"><?=$upload_error?></div>
+    <?php } ?>
+
+    <!-- The Cropper.js library requires the manipulated image to be in a div -->
+    <div class="row">
+        <div id="cropArea" class="col-xs-10 col-xs-offset-1 form-group">
+            <img id="image" style="height:auto; width:100%;" />
         </div>
-        <div class="hidden">
-            <img id="canvas" width="360" height="360" />
-        </div>
-        <div class="col-sm-12 col-xs-12 form-group">
-            <input id="imageInput" name="original_file" type="file" accept="image/*" capture="camera" class="btn hidden" />
+    </div>
+    <div class="hidden">
+        <img id="canvas" width="360" height="360" />
+    </div>
+    <div class="row">
+        <!-- Hidden file button, on which a click is simulated when user is clicking on one of the visible buttons -->
+        <input id="imageInput" name="original_file" type="file" accept="image/*" class="btn hidden" />
+        
+        <div class="col-sm-6 form-group">
+            <!-- Two buttons to differentiate taking a new picture or importing an existing one -->
             <input id="cameraImport" type="button" value="<?= $this->lang->line("field_take_photo"); ?>" class="btn btn-default" />
             <input id="imageImport" type="button" value="<?= $this->lang->line("field_import_photo"); ?>" class="btn btn-default" />
-            <input id="croppedFile" name="cropped_file" type="hidden" />
+        </div>
+
+        <!-- Hidden field used to store the cropped image -->
+        <input id="croppedFile" name="cropped_file" type="hidden" />
+        
+        <div class="col-sm-6 form-group">
+            <!-- Save / cancel Buttons -->
             <input type="submit" value="<?= $this->lang->line('field_validate_photo'); ?>" class="btn btn-success" />
             <a href="<?= $_SESSION['picture_callback'] ?>" class="btn btn-danger"><?= $this->lang->line('btn_cancel'); ?></a>
         </div>
-    </form>
-</div>
+    </div>
+</form>
+
 <link href="<?=base_url("assets/css/cropper/cropper.css");?>" rel="stylesheet">
 <script src="<?=base_url("assets/js/external/cropper/cropper.js");?>" type="module"></script>
+
 <script>
 // Get every HTML element required for the code
 var rawImage = document.getElementById("image");
@@ -111,12 +122,3 @@ function cropImage(event){
     }
 }
 </script>
-<style>
-    /* Ensure the size of the image fit the container perfectly */
-    image {
-      display: block;
-      
-      /* This rule is very important, please don't ignore this */
-      max-width: 100%;
-    }
-</style>
