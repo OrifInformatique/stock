@@ -54,6 +54,18 @@ var croppedImage = null;
 const IMAGE_UPLOAD_WIDTH = <?= IMAGE_UPLOAD_WIDTH; ?>;
 const IMAGE_UPLOAD_HEIGHT = <?= IMAGE_UPLOAD_HEIGHT; ?>;
 
+//
+function reSelectPhoto(event)
+{
+    var path = "<?= isset($_SESSION['POST']['image']) && !empty($_SESSION['POST']['image'])? $_SESSION['POST']['image'] : "" ?>";
+    
+    if(path !== ""){
+        image.src = "<?= base_url("uploads/images/".$_SESSION['POST']['image'])?>";
+        btnImageInput.name = path;
+        setCropper();
+    }
+}
+
 // Show the photo taken with the user's camera / imported from the user's files
 function showPhoto(origin){
     var reader = new FileReader();
@@ -76,6 +88,7 @@ function setPhoto(event){
 // Setup events for every button
 btnCameraImport.addEventListener("click",clickInput);
 btnImageImport.addEventListener("click",clickInput);
+window.addEventListener("load",reSelectPhoto);
 
 btnImageInput.addEventListener("change", showPhoto);
 
@@ -118,7 +131,9 @@ function cropImage(event){
     if(cropper !== null){
         croppedImage = cropper.getCroppedCanvas({width: IMAGE_UPLOAD_WIDTH, height: IMAGE_UPLOAD_HEIGHT, imageSmoothingQuality: "high"});
         canvas.src = croppedImage.toDataURL("image/png");
-        croppedFileInput.value = canvas.src;
+        croppedFileInput.files[0] = canvas;
+        
+        return false;
     }
 }
 </script>

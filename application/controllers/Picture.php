@@ -63,7 +63,10 @@ class Picture extends MY_Controller {
                 exit();
                 
             }else{
-                redirect(base_url('picture/get_picture/1'));
+                echo form_error('original_file');
+                echo form_error("cropped_file");
+                
+                //redirect(base_url('picture/get_picture/1'));
                 exit();
             }
             
