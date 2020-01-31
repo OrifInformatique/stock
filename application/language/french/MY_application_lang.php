@@ -71,6 +71,12 @@ $lang['field_text_search']              = 'Nom, description, No inventaire, No s
 $lang['field_no_filter']                = 'Aucun filtre';
 $lang['field_sort_order']               = 'Trier par';
 $lang['field_sort_asc_desc']            = 'Ordre de tri';
+$lang['field_take_photo']               = 'Prendre une photo';
+$lang['field_import_photo']             = 'Importer une photo';
+$lang['field_add_modify_photo']         = 'Ajouter / Modifier une photo';
+$lang['field_validate_photo']           = 'Valider l\'image';
+$lang['field_full_photo']               = 'Photo originale';
+$lang['field_cropped_photo']            = 'Photo rognée';
 
 // Sorting labels
 $lang['sort_order_name']                = 'Nom';
@@ -211,6 +217,7 @@ $lang['msg_err_stocking_needed']        = 'Un nom d\'emplacement unique doit êt
 $lang['msg_err_stocking_short_unique']  = 'Un nom court d\'emplacement doit être fourni';
 $lang['msg_err_stocking_unique']        = 'Un nom d\'emplacement unique doit être unique';
 $lang['msg_err_username_used']          = 'Ce nom est déjà utilisé';
+$lang['msg_err_photo_upload']           = 'Aucune photo n\'a été ajouté';
 $lang['msg_no_loan']                    = 'Aucun prêt à afficher';
 $lang['msg_no_inventory_controls']      = 'Aucun contrôle d\'inventaire';
 $lang['msg_no_item']                    = 'Aucun objet à afficher';

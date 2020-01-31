@@ -33,7 +33,7 @@ define('PASSWORD_HASH_ALGORITHM', PASSWORD_BCRYPT);
 | Inventory number
 |--------------------------------------------------------------------------
 */
-define('INVENTORY_PREFIX', 'ORP');		 // first part of inventory number (Orif site prefix)
+define('INVENTORY_PREFIX', 'ORP');   // first part of inventory number (Orif site prefix)
 define('INVENTORY_NUMBER_CHARS', 4); // number of chars in the ID part (to add leading zeros)
 
 /*
@@ -64,3 +64,11 @@ define('ITEMS_PER_PAGE',25);
  */
 define('DATABASE_DATE_FORMAT', 'Y-m-d');
 define('DATABASE_DATETIME_FORMAT', 'Y-m-d H:i:s');
+
+/*
+ |-------------------------------------------------------------------------
+ | Image upload dimensions
+ |-------------------------------------------------------------------------
+ */
+define('IMAGE_UPLOAD_WIDTH', 360);
+define('IMAGE_UPLOAD_HEIGHT', 360);
