@@ -93,10 +93,10 @@ function setCropper(event){
 // Simulate a click on the hidden input with the matching image's source
 function clickInput(){
     if(event.target.id == btnCameraImport.id){
-        btnImageInput.removeAttribute("capture");
+        btnImageInput.setAttribute("capture", "camera");
         btnImageInput.click();
     }else if(event.target.id == btnImageImport.id){
-        btnImageInput.setAttribute("capture", "camera");
+        btnImageInput.removeAttribute("capture");
         btnImageInput.click();
     }
 }
