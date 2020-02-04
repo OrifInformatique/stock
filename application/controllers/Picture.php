@@ -53,7 +53,7 @@ class Picture extends MY_Controller {
             if($this->form_validation->run()){
                 
                 $picture_file = $_POST['cropped_file'];
-                $picture_name = $_POST['original_file'];
+                $picture_name = $_POST['cropped_name'];
                 
                 file_put_contents("uploads/images/$picture_name", base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $picture_file)));
                 
@@ -63,10 +63,8 @@ class Picture extends MY_Controller {
                 exit();
                 
             }else{
-                echo form_error('original_file');
-                echo form_error("cropped_file");
                 
-                //redirect(base_url('picture/get_picture/1'));
+                redirect(base_url('picture/get_picture/1'));
                 exit();
             }
             
@@ -84,8 +82,8 @@ class Picture extends MY_Controller {
     private function set_validation_rules(){
         $config = array(
             array(
-                'field' => 'original_file',
-                'label' => $this->lang->line('field_full_photo'),
+                'field' => 'cropped_name',
+                'label' => $this->lang->line('field_cropped_name'),
                 'rules' => 'required'
             ),
             array(

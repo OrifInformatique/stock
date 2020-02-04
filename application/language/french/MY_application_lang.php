@@ -75,8 +75,8 @@ $lang['field_take_photo']               = 'Prendre une photo';
 $lang['field_import_photo']             = 'Importer une photo';
 $lang['field_add_modify_photo']         = 'Ajouter / Modifier une photo';
 $lang['field_validate_photo']           = 'Valider l\'image';
-$lang['field_full_photo']               = 'Photo originale';
 $lang['field_cropped_photo']            = 'Photo rognée';
+$lang['field_cropped_name']             = 'Nom de la photo rognée';
 
 // Sorting labels
 $lang['sort_order_name']                = 'Nom';

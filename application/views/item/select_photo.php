@@ -14,7 +14,7 @@
     </div>
     <div class="row">
         <!-- Hidden file button, on which a click is simulated when user is clicking on one of the visible buttons -->
-        <input id="imageInput" name="original_file" type="file" accept="image/*" class="btn hidden" />
+        <input id="imageInput" type="file" accept="image/*" class="btn hidden" />
         
         <div class="col-sm-6 form-group">
             <!-- Two buttons to differentiate taking a new picture or importing an existing one -->
@@ -22,8 +22,9 @@
             <input id="imageImport" type="button" value="<?= $this->lang->line("field_import_photo"); ?>" class="btn btn-default" />
         </div>
 
-        <!-- Hidden field used to store the cropped image -->
+        <!-- Hidden fields used to store the cropped image's data -->
         <input id="croppedFile" name="cropped_file" type="hidden" />
+        <input id='croppedName' name='cropped_name' type="hidden" />
         
         <div class="col-sm-6 form-group">
             <!-- Save / cancel Buttons -->
@@ -43,6 +44,7 @@ var btnImageInput = document.getElementById("imageInput");
 var btnCameraImport = document.getElementById("cameraImport");
 var btnImageImport = document.getElementById("imageImport");
 var croppedFileInput = document.getElementById("croppedFile");
+var croppedNameInput = document.getElementById("croppedName");
 var canvas = document.getElementById("canvas");
 var form = document.getElementById("form");
 
@@ -60,8 +62,8 @@ function reSelectPhoto(event)
     var path = "<?= isset($_SESSION['POST']['image']) && !empty($_SESSION['POST']['image'])? $_SESSION['POST']['image'] : "" ?>";
     
     if(path !== ""){
-        image.src = "<?= base_url("uploads/images/".$_SESSION['POST']['image'])?>";
-        btnImageInput.name = path;
+        rawImage.src = "<?= base_url("uploads/images/".$_SESSION['POST']['image'])?>";
+        croppedNameInput.value = path;
         setCropper();
     }
 }
@@ -73,7 +75,7 @@ function showPhoto(origin){
     
     reader.onload = setPhoto;
     
-    file = imageInput.files[0];
+    file = btnImageInput.files[0];
     
     reader.readAsDataURL(file);
 }
@@ -115,7 +117,7 @@ function setCropper(event){
 }
 
 // Simulate a click on the hidden input with the matching image's source
-function clickInput(){
+function clickInput(event){
     if(event.target.id == btnCameraImport.id){
         btnImageInput.setAttribute("capture", "camera");
         btnImageInput.click();
@@ -125,13 +127,16 @@ function clickInput(){
     }
 }
 
-
 // Convert the cropped image into a new image
 function cropImage(event){
     if(cropper !== null){
         croppedImage = cropper.getCroppedCanvas({width: IMAGE_UPLOAD_WIDTH, height: IMAGE_UPLOAD_HEIGHT, imageSmoothingQuality: "high"});
         canvas.src = croppedImage.toDataURL("image/png");
-        croppedFileInput.files[0] = canvas;
+        croppedFileInput.value = canvas.src;
+        
+        if(croppedNameInput.value == ""){
+            croppedNameInput.value = btnImageInput.files[0].name;   
+        }
         
         return false;
     }
