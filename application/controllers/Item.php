@@ -5,8 +5,8 @@ if (!defined('BASEPATH'))
 /**
  * A controller to display and manage items
  *
- * @author      Didier Viret
- * @link        https://github.com/OrifInformatique/stock
+ * @author      Orif (ViDi)
+ * @link        https://github.com/OrifInformatique
  * @copyright   Copyright (c) 2016, Orif <http://www.orif.ch>
  */
 class Item extends MY_Controller {
@@ -55,18 +55,6 @@ class Item extends MY_Controller {
         if (!isset($output["t"])) $output["t"] = '';
         if (!isset($output["o"])) $output["o"] = '';
         if (!isset($output["ad"])) $output["ad"] = '';
-        
-        // Delete picture_path flashdata as well as the matching picture on the server, since accessing that page after it's setup means that the user canceled a item creation/modification
-        if(isset($_SESSION['picture_path'])){
-            // unlink('uploads/images/'.$_SESSION['picture_path']);
-            $_SESSION['picture_path'] = null;
-        }
-        
-        // Delete POST flashdata to prevent possible session break
-        if(isset($_SESSION['POST'])){
-            unset($_SESSION['POST']);
-        }
-        
         // Send the data to the View
         $this->display_view('item/list', $output);
     }
@@ -142,6 +130,7 @@ class Item extends MY_Controller {
         
         return $output;
     }
+    
     public function load_list_json($page = 1){
         echo json_encode($this->load_list($page));
     }
@@ -215,7 +204,6 @@ class Item extends MY_Controller {
      * @return void
      */
     public function create() {
-        
         // Check if this is allowed
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
 
@@ -224,41 +212,13 @@ class Item extends MY_Controller {
             $data['upload_errors'] = "";
             
             $upload_failed = false;
-            /*
-            if (isset($_FILES['photo']) && $_FILES['photo']['name'] != '') {
-                // IMAGE UPLOADING
-                $config['upload_path'] = './uploads/images/';
-                $config['allowed_types'] = 'gif|jpg|png';
-                $config['max_size'] = 2048;
-                $config['max_width'] = 360;
-                $config['max_height'] = 360;
-
-                $this->load->library('upload');
-                $this->upload->initialize($config);
-
-                if ($this->upload->do_upload('photo')) {
-                    $itemArray['image'] = $this->upload->data('file_name');
-                } else {
-                    $data['upload_errors'] = $this->upload->display_errors();
-                    $upload_failed = TRUE;
-                }
-            }
-            */
             
-            // If the user want to add a image we will first save every field's value in the session, then redirect them to picture/select_picture
-            if(isset($_POST['photoSubmit']) && $_POST['photoSubmit'] == $this->lang->line('field_add_modify_photo')){
-                
-                foreach ($_POST as $key => $value) {
-                    $_SESSION["POST"][$key] = $value;
-                }
+            // If the user want to display the image form, we first save fields
+            // values in the session, then redirect him to the image form
+            if(isset($_POST['photoSubmit'])){
+                $this->session->set_userdata("POST", $_POST);
                 
                 redirect(base_url("picture/select_picture"));
-                exit();
-            }
-            
-            if(isset($_POST['photo']) && !file_exists('uploads/images/'.$_POST['photo'])){
-                $data['upload_errors'] = $this->lang->line('msg_err_photo_upload');
-                $upload_failed = TRUE;
             }
             
             if (isset($_FILES['linked_file']) && $_FILES['linked_file']['name'] != '') {
@@ -299,16 +259,12 @@ class Item extends MY_Controller {
 
                 $itemArray["created_by_user_id"] = $_SESSION['user_id'];
                 
-                // The submit value is only for knowing which action must be done between uploading the item and switching to picture/get_picture, keeping it will prevent the item to be put on the database
-                unset($itemArray['itemSubmit']);
-                
                 $this->item_model->insert($itemArray);
                 $item_id = $this->db->insert_id();
 
                 foreach ($linkArray as $tag) {
                     $this->item_tag_link_model->insert(array("item_tag_id" => $tag, "item_id" => ($item_id)));
                 }
-                
                 redirect("item/view/" . $item_id);
             } else {
                 // Remember checked tags to display them checked again
@@ -342,7 +298,9 @@ class Item extends MY_Controller {
 
                 $data['item_id'] = $this->item_model->get_future_id();
 
-                // If the user switched to picture/select_photo then convert the data to be usable by the view
+                // If the user gets back from another view, get the fields values
+                // which have been saved in session variable.
+                // Then reset this session variable.
                 if(isset($_SESSION['POST'])){
                     foreach ($_SESSION['POST'] as $key => $value) {
                         // If it is a tag
@@ -355,6 +313,7 @@ class Item extends MY_Controller {
                             $data[$key] = $value;
                         }
                     }
+                    unset($_SESSION['POST']);
                 }
                 
                 $this->display_view('item/form', $data);
@@ -389,41 +348,14 @@ class Item extends MY_Controller {
                 $data['upload_errors'] = "";
                 
                 $upload_failed = false;
-                /*
-                if (isset($_FILES['photo']) && $_FILES['photo']['name'] != '') {
-                    // IMAGE UPLOADING
-                    $config['upload_path'] = './uploads/images/';
-                    $config['allowed_types'] = 'gif|jpg|png';
-                    $config['max_size'] = 2048;
-                    $config['max_width'] = 360;
-                    $config['max_height'] = 360;
-
-                    $this->load->library('upload');
-                    $this->upload->initialize($config);
-
-                    if ($this->upload->do_upload('photo')) {
-                        $itemArray['image'] = $this->upload->data('file_name');
-                    } else {
-                        $data['upload_errors'] = $this->upload->display_errors();
-                        $upload_failed = TRUE;
-                    }
-                }
-                */
                 
-                // If the user want to add a image we will first save every field's value in the session, then redirect them to picture/select_picture
-                if(isset($_POST['photoSubmit']) && $_POST['photoSubmit'] == $this->lang->line('field_add_modify_photo')){
-
-                    foreach ($_POST as $key => $value) {
-                        $_SESSION["POST"][$key] = $value;
-                    }
+                // If the user wants to display the image form, we first save fields
+                // values in the session, then redirect him to the image form
+                if(isset($_POST['photoSubmit'])){
+                    $this->session->set_userdata("POST", $_POST);
 
                     redirect(base_url("picture/select_picture"));
                     exit();
-                }
-                
-                if(isset($_POST['photo']) && !file_exists('uploads/images/'.$_POST['photo'])){
-                    $data['upload_errors'] = $this->lang->line('msg_err_photo_upload');
-                    $upload_failed = TRUE;
                 }
                 
                 if (isset($_FILES['linked_file']) && $_FILES['linked_file']['name'] != '') {
@@ -461,9 +393,6 @@ class Item extends MY_Controller {
                             $itemArray[$key] = $value;
                         }
                     }
-
-                    // The submit value is only for knowing which action must be done between updating the item and switching to picture/get_picture, keeping it will prevent the item to be put on the database
-                    unset($itemArray['itemSubmit']);
                     
                     // Execute the changes in the item table
                     $this->item_model->update($id, $itemArray);
@@ -503,7 +432,9 @@ class Item extends MY_Controller {
             $this->load->model('item_tag_model');
             $data['item_tags'] = $this->item_tag_model->get_all();
 
-            // If the user switched to picture/select_photo then convert the data to be usable by the view
+            // If the user gets back from another view, get the fields values
+            // which have been saved in session variable.
+            // Then reset this session variable.
             if(isset($_SESSION['POST'])){
                 foreach ($_SESSION['POST'] as $key => $value) {
                     // If it is a tag
@@ -516,6 +447,7 @@ class Item extends MY_Controller {
                         $data[$key] = $value;
                     }
                 }
+                unset($_SESSION['POST']);
             }
             
             $this->display_view('item/form', $data);

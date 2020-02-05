@@ -2,7 +2,7 @@
     <!-- BUTTONS -->
     <div class="row">
         <div class="form-group col-xs-12">
-            <input name="itemSubmit" type="submit" class="btn btn-success" value="<?= $this->lang->line('btn_save') ?>" />
+            <button type="submit" class="btn btn-success"><?php echo $this->lang->line('btn_save'); ?></button>
             <a class="btn btn-danger" href="<?php echo base_url(); if(isset($modify)) {echo "item/view/" . $item_id;} ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
         </div>
     </div>
@@ -80,7 +80,8 @@
 
                 if(isset($imagePath)){
                 ?>
-                    <img src="<?= base_url('uploads/images/'.$imagePath); ?>"
+                    <img id="picture"
+                         src="<?= base_url('uploads/images/'.$imagePath); ?>"
                          width="100%"
                          alt="<?= $this->lang->line('field_image'); ?>" />
                 <?php } ?>
@@ -242,6 +243,13 @@
     </div>
 </form>
 <script>
+$(document).ready(function() {
+    // Refresh the image to prevent display of an old cach image.
+    // Changing the src attribute forces browser to update.
+    d = new Date();
+    $("#picture").attr("src", "<?= base_url('uploads/images/'.$imagePath); ?>?"+d.getTime());
+});
+
 function get(objectName){
     switch (objectName) {
         case "item_groups":
@@ -261,7 +269,6 @@ function get(objectName){
         
     }
 }
-
 
 function change_warranty() {
 	var buying_date = new Date(document.getElementById('buying_date').value);
