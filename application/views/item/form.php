@@ -1,11 +1,14 @@
 <form class="container" method="post" enctype="multipart/form-data">
     <!-- BUTTONS -->
-    <div class="form-group col-xs-12">
-        <button type="submit" class="btn btn-success"><?php echo $this->lang->line('btn_save'); ?></button>
-        <a class="btn btn-danger" href="<?php echo base_url(); if(isset($modify)) {echo "item/view/" . $item_id;} ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
+    <div class="row">
+        <div class="form-group col-xs-12">
+            <button type="submit" class="btn btn-success"><?php echo $this->lang->line('btn_save'); ?></button>
+            <a class="btn btn-danger" href="<?php echo base_url(); if(isset($modify)) {echo "item/view/" . $item_id;} ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
+        </div>
     </div>
 
     <!-- ERROR MESSAGES -->
+    <div class="row">
     <?php
         if (!empty(validation_errors()) || !empty($upload_errors)) {
             echo '<div class="alert alert-danger">'.validation_errors();
@@ -14,7 +17,8 @@
             } 
             echo '</div>';
         }
-        ?>
+    ?>
+    </div>
 
     <!-- ITEM NAME AND DESCRIPTION -->
     <div class="row">
@@ -31,21 +35,25 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="form-group col-xs-7">
-                <input type="text" class="form-control input-bold" name="inventory_prefix"
-                       id="inventory_prefix"
-                       placeholder="<?php echo $this->lang->line('field_inventory_number') ?>"
-                       value="<?php if(isset($inventory_prefix)) {echo set_value('inventory_prefix',$inventory_prefix);} else {echo set_value('inventory_prefix');} ?>" />
+            <div class="row">
+                <div class="form-group col-xs-7">
+                    <input type="text" class="form-control input-bold" name="inventory_prefix"
+                           id="inventory_prefix"
+                           placeholder="<?php echo $this->lang->line('field_inventory_number') ?>"
+                           value="<?php if(isset($inventory_prefix)) {echo set_value('inventory_prefix',$inventory_prefix);} else {echo set_value('inventory_prefix');} ?>" />
+                </div>
+                <div class="form-group col-xs-5">
+                    <input type="text" class="form-control" name="inventory_id"
+                           id="inventory_id"
+                           value="<?php if(isset($inventory_id)) {echo set_value('inventory_id',$inventory_id);} else {echo set_value('inventory_id');} ?>"
+                            disabled />
+                </div>
             </div>
-            <div class="form-group col-xs-5">
-                <input type="text" class="form-control" name="inventory_id"
-                       id="inventory_id"
-                       value="<?php if(isset($inventory_id)) {echo set_value('inventory_id',$inventory_id);} else {echo set_value('inventory_id');} ?>"
-                        disabled />
-            </div>
-            <div class="form-group col-xs-12">
-                <input type="button" class="form-control btn btn-primary" name="inventory_number_button"
-                       value="<?= $this->lang->line('btn_generate_inventory_nb') ?>" onclick="createInventoryNo()">
+            <div class="row">
+                <div class="form-group col-xs-12">
+                    <input type="button" class="form-control btn btn-primary" name="inventory_number_button"
+                           value="<?= $this->lang->line('btn_generate_inventory_nb') ?>" onclick="createInventoryNo()">
+                </div>
             </div>
         </div>
     </div>
@@ -55,42 +63,65 @@
         <div class="col-xs-12">
             <p class="bg-primary">&nbsp;<?= $this->lang->line('text_item_detail'); ?></p>
         </div>
-        <div class="form-group col-md-4">
-            <label for="photo"><?= $this->lang->line('field_image_upload'); ?></label>
-			<input type="file" id="photo" name="photo" accept="image/*" class="form-control-file" />
-            <?php if (isset($image) && $image!='') { ?>
-                <img src="<?= base_url('uploads/images/'.$image); ?>"
-                     width="100%"
-                     alt="<?= $this->lang->line('field_image'); ?>" />
-            <?php } ?>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <input name="photoSubmit" type="submit" value="<?= $this->lang->line('field_add_modify_photo')?>" class="btn btn-default" />
+            </div>
+            
+            <div class="form-group">
+                <?php 
+                if(isset($_SESSION['picture_path'])){
+                    $imagePath = $_SESSION['picture_path'];
+                }else if (isset($image) && $image!='') {
+                    $imagePath = $image;
+                }
+
+                if(isset($imagePath)){
+                ?>
+                    <img id="picture"
+                         src="<?= base_url('uploads/images/'.$imagePath); ?>"
+                         width="100%"
+                         alt="<?= $this->lang->line('field_image'); ?>" />
+                <?php } ?>
+            </div>
+            
+            <div class="form-group">
+                <input type="hidden" id="image" name="image" value="<?php if(isset($imagePath)){ echo $imagePath; }?>"/>
+            </div>
         </div>
         <div class="col-md-8">
-            <div class="form-group col-md-4">
-                <label for="item_group_id"><?= $this->lang->line('field_group'); ?>&nbsp;</label>
-                <?php
-                if (isset($_POST['item_group_id'])) {
-                    // A group has allready been selected, keep it selected
-                    echo form_dropdown('item_group_id', $item_groups_name, $_POST['item_group_id'], 'class="form-control" id="item_group_id"');
-                } elseif (isset($item_group_id)) {
-                    // The item exists, get its group and select it
-                    echo form_dropdown('item_group_id', $item_groups_name, $item_group_id, 'class="form-control" id="item_group_id"');
-                } else {
-                    // No group selected
-                    echo form_dropdown('item_group_id', $item_groups_name, ITEMS_DEFAULT_GROUP, 'class="form-control" id="item_group_id"');
-                }
-                ?>
+            <div class="row">
+                <div class="form-group col-md-4">
+                    <label for="item_group_id"><?= $this->lang->line('field_group'); ?>&nbsp;</label>
+                    <?php
+                    if (isset($_POST['item_group_id'])) {
+                        // A group has allready been selected, keep it selected
+                        echo form_dropdown('item_group_id', $item_groups_name, $_POST['item_group_id'], 'class="form-control" id="item_group_id"');
+                    } elseif (isset($item_group_id)) {
+                        // The item exists, get its group and select it
+                        echo form_dropdown('item_group_id', $item_groups_name, $item_group_id, 'class="form-control" id="item_group_id"');
+                    } else {
+                        // No group selected
+                        echo form_dropdown('item_group_id', $item_groups_name, ITEMS_DEFAULT_GROUP, 'class="form-control" id="item_group_id"');
+                    }
+                    ?>
+                </div>
+                <div class="form-group col-md-8">
+                    <label for="serial_number"><?= $this->lang->line('field_serial_number'); ?>&nbsp;</label>
+                    <input type="text" id="serial_number" name="serial_number" class="form-control"
+                            value="<?php if(isset($serial_number)) {echo set_value('serial_number',$serial_number);} else {echo set_value('serial_number');} ?>" />
+                </div>
             </div>
-            <div class="form-group col-md-8">
-                <label for="serial_number"><?= $this->lang->line('field_serial_number'); ?>&nbsp;</label>
-                <input type="text" id="serial_number" name="serial_number" class="form-control"
-                        value="<?php if(isset($serial_number)) {echo set_value('serial_number',$serial_number);} else {echo set_value('serial_number');} ?>" />
-            </div>
-            <div class="form-group col-xs-12">
-                <label for="remarks"><?= $this->lang->line('field_remarks'); ?></label>
-                <textarea id="remarks" name="remarks" class="form-control"><?php
-                    // Don't move the <php> markups or they will be white spaces in textarea
-                    if(isset($remarks)) {echo set_value('remarks',$remarks);} else {echo set_value('remarks');} 
-                ?></textarea>
+            <div class="row">
+                <div class="form-group col-xs-12">
+                    <label for="remarks"><?= $this->lang->line('field_remarks'); ?></label>
+                    <textarea id="remarks" name="remarks" class="form-control"><?php
+                        // Don't move the <php> markups or they will be white spaces in textarea
+                        if(isset($remarks)) {echo set_value('remarks',$remarks);} else {echo set_value('remarks');} 
+                    ?></textarea>
+                </div>
             </div>
         </div>
 
@@ -106,6 +137,8 @@
         <div class="col-xs-12">
             <p class="bg-primary">&nbsp;<?= $this->lang->line('text_item_loan_status'); ?></p>
         </div>
+    </div>
+    <div class="row">
         <div class="form-group col-md-4">
             <label for="item_condition_id"><?= $this->lang->line('text_item_condition'); ?></label>
             <select id="item_condition_id" name="item_condition_id" class="form-control"><?php
@@ -137,6 +170,8 @@
         <div class="col-xs-12">
             <p class="bg-primary">&nbsp;<?= $this->lang->line('text_item_buying_warranty'); ?></p>
         </div>
+    </div>
+    <div class="row">
         <div class ="col-md-4">
             <div class="form-group">
                 <label for="supplier_id"><?= $this->lang->line('field_supplier'); ?></label>
@@ -183,6 +218,8 @@
         <div class="col-xs-12">
             <p class="bg-primary">&nbsp;<?= $this->lang->line('text_item_tags'); ?></p>
         </div>
+    </div>
+    <div class="row">
         <div class="checkbox col-xs-12">
 			<?php foreach ($item_tags as $item_tag) { ?>
                 <label class="checkbox-inline">
@@ -206,6 +243,13 @@
     </div>
 </form>
 <script>
+$(document).ready(function() {
+    // Refresh the image to prevent display of an old cach image.
+    // Changing the src attribute forces browser to update.
+    d = new Date();
+    $("#picture").attr("src", "<?= base_url('uploads/images/'.$imagePath); ?>?"+d.getTime());
+});
+
 function get(objectName){
     switch (objectName) {
         case "item_groups":
@@ -225,7 +269,6 @@ function get(objectName){
         
     }
 }
-
 
 function change_warranty() {
 	var buying_date = new Date(document.getElementById('buying_date').value);

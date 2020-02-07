@@ -5,8 +5,8 @@ if (!defined('BASEPATH'))
 /**
  * A controller to display and manage items
  *
- * @author      Didier Viret
- * @link        https://github.com/OrifInformatique/stock
+ * @author      Orif (ViDi)
+ * @link        https://github.com/OrifInformatique
  * @copyright   Copyright (c) 2016, Orif <http://www.orif.ch>
  */
 class Item extends MY_Controller {
@@ -130,6 +130,7 @@ class Item extends MY_Controller {
         
         return $output;
     }
+    
     public function load_list_json($page = 1){
         echo json_encode($this->load_list($page));
     }
@@ -209,24 +210,17 @@ class Item extends MY_Controller {
             $this->set_validation_rules();
 
             $data['upload_errors'] = "";
-            if (isset($_FILES['photo']) && $_FILES['photo']['name'] != '') {
-                // IMAGE UPLOADING
-                $config['upload_path'] = './uploads/images/';
-                $config['allowed_types'] = 'gif|jpg|png';
-                $config['max_size'] = 2048;
-                $config['max_width'] = 360;
-                $config['max_height'] = 360;
-
-                $this->load->library('upload');
-                $this->upload->initialize($config);
-
-                if ($this->upload->do_upload('photo')) {
-                    $itemArray['image'] = $this->upload->data('file_name');
-                } else {
-                    $data['upload_errors'] = $this->upload->display_errors();
-                    $upload_failed = TRUE;
-                }
+            
+            $upload_failed = false;
+            
+            // If the user want to display the image form, we first save fields
+            // values in the session, then redirect him to the image form
+            if(isset($_POST['photoSubmit'])){
+                $this->session->set_userdata("POST", $_POST);
+                
+                redirect(base_url("picture/select_picture"));
             }
+            
             if (isset($_FILES['linked_file']) && $_FILES['linked_file']['name'] != '') {
 
                 // LINKED FILE UPLOADING
@@ -264,7 +258,7 @@ class Item extends MY_Controller {
                 }
 
                 $itemArray["created_by_user_id"] = $_SESSION['user_id'];
-
+                
                 $this->item_model->insert($itemArray);
                 $item_id = $this->db->insert_id();
 
@@ -304,6 +298,24 @@ class Item extends MY_Controller {
 
                 $data['item_id'] = $this->item_model->get_future_id();
 
+                // If the user gets back from another view, get the fields values
+                // which have been saved in session variable.
+                // Then reset this session variable.
+                if(isset($_SESSION['POST'])){
+                    foreach ($_SESSION['POST'] as $key => $value) {
+                        // If it is a tag
+                        if (substr($key, 0, 3) == "tag") {
+                            // put it in the data array
+                            $tag_link = new stdClass();
+                            $tag_link->item_tag_id = substr($key, 3);
+                            $data['tag_links'][] = (object) $tag_link;
+                        }else{
+                            $data[$key] = $value;
+                        }
+                    }
+                    unset($_SESSION['POST']);
+                }
+                
                 $this->display_view('item/form', $data);
             }
         } else {
@@ -334,24 +346,18 @@ class Item extends MY_Controller {
                 $this->set_validation_rules($id);
 
                 $data['upload_errors'] = "";
-                if (isset($_FILES['photo']) && $_FILES['photo']['name'] != '') {
-                    // IMAGE UPLOADING
-                    $config['upload_path'] = './uploads/images/';
-                    $config['allowed_types'] = 'gif|jpg|png';
-                    $config['max_size'] = 2048;
-                    $config['max_width'] = 360;
-                    $config['max_height'] = 360;
+                
+                $upload_failed = false;
+                
+                // If the user wants to display the image form, we first save fields
+                // values in the session, then redirect him to the image form
+                if(isset($_POST['photoSubmit'])){
+                    $this->session->set_userdata("POST", $_POST);
 
-                    $this->load->library('upload');
-                    $this->upload->initialize($config);
-
-                    if ($this->upload->do_upload('photo')) {
-                        $itemArray['image'] = $this->upload->data('file_name');
-                    } else {
-                        $data['upload_errors'] = $this->upload->display_errors();
-                        $upload_failed = TRUE;
-                    }
+                    redirect(base_url("picture/select_picture"));
+                    exit();
                 }
+                
                 if (isset($_FILES['linked_file']) && $_FILES['linked_file']['name'] != '') {
 
                     // LINKED FILE UPLOADING
@@ -387,9 +393,10 @@ class Item extends MY_Controller {
                             $itemArray[$key] = $value;
                         }
                     }
-
+                    
                     // Execute the changes in the item table
                     $this->item_model->update($id, $itemArray);
+                    
                     redirect("/item/view/" . $id);
                 } else {
                     // Remember checked tags to display them checked again
@@ -425,6 +432,24 @@ class Item extends MY_Controller {
             $this->load->model('item_tag_model');
             $data['item_tags'] = $this->item_tag_model->get_all();
 
+            // If the user gets back from another view, get the fields values
+            // which have been saved in session variable.
+            // Then reset this session variable.
+            if(isset($_SESSION['POST'])){
+                foreach ($_SESSION['POST'] as $key => $value) {
+                    // If it is a tag
+                    if (substr($key, 0, 3) == "tag") {
+                        // put it in the data array
+                        $tag_link = new stdClass();
+                        $tag_link->item_tag_id = substr($key, 3);
+                        $data['tag_links'][] = (object) $tag_link;
+                    }else{
+                        $data[$key] = $value;
+                    }
+                }
+                unset($_SESSION['POST']);
+            }
+            
             $this->display_view('item/form', $data);
         } else {
             // Update is not allowed
@@ -723,5 +748,5 @@ class Item extends MY_Controller {
 
         $this->form_validation->set_rules("inventory_prefix", lang('field_inventory_number'), 'required');
     }
-
+    
 }

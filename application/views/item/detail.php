@@ -30,7 +30,8 @@
             <p class="bg-primary">&nbsp;<?= html_escape($this->lang->line('text_item_detail')); ?></p>
         </div>
         <div class="col-md-4">
-            <img src="<?= base_url('uploads/images/'.$item->image); ?>"
+            <img id="picture"
+                 src="<?= base_url('uploads/images/'.$item->image); ?>"
                  width="100%"
                  alt="<?= $this->lang->line('field_image'); ?>" />
         </div>
@@ -231,3 +232,11 @@
         </div>
     </div>
 </div>
+<script>
+$(document).ready(function() {
+    // Refresh the image to prevent display of an old cach image.
+    // Changing the src attribute forces browser to update.
+    d = new Date();
+    $("#picture").attr("src", "<?= base_url('uploads/images/'.$item->image); ?>?"+d.getTime());
+});
+</script>
