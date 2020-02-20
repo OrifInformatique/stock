@@ -266,8 +266,9 @@ function display_item(item){
     row.append('<td>'+item_condition+'<br />'+loan_bootstrap_label+'<br />'+item_localisation+'</td>');
     row.append('<td><a href="'+href+'">'+item_name+'</a><h6>'+item_description+'</h6></td>');
     row.append('<td>'+stocking_place+'</td>');
-    row.append('<td><a href="'+href+'">'+inventory_number+'</a><a href="'+href+'">'+serial_number+'</a></td>');
+    row.append('<td><a href="'+href+'">'+inventory_number+'</a><br><a href="'+href+'">'+serial_number+'</a></td>');
     row.append(delete_item);
+    row.append('</tr>');
     
     return row;
 }
