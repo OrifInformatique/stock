@@ -322,7 +322,7 @@ function createInventoryNo(){
     if(date == "N"){
         date = "00";
     }
-    inventoryNumber = get("INVENTORY_PREFIX") + objectGroups[objectGroupField.value-1] + tagShortName + date;
+    inventoryNumber = get("INVENTORY_PREFIX") + "." + objectGroups[objectGroupField.value-1] + tagShortName + date;
     inventoryNumberField.value = inventoryNumber;
 
     // If inventory_id field is empty, complete it
