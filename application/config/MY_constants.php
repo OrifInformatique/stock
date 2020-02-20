@@ -51,6 +51,13 @@ define('FUNCTIONAL_ITEM_CONDITION_ID', 10);
 define('ITEMS_DEFAULT_GROUP', 2);
 
 /*
+|--------------------------------------------------------------------------
+| Default image used for when there is no image assigned to a item
+|--------------------------------------------------------------------------
+*/
+define('ITEM_NO_IMAGE', 'no_image.png');
+
+/*
  |-------------------------------------------------------------------------
  | Number of items show by page
  |-------------------------------------------------------------------------
