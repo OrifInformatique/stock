@@ -62,10 +62,9 @@ class Item extends MY_Controller {
     private function load_list($page = 1)
     {
         // Store URL to make possible to come back later (from item detail for example)
+        $_SESSION['items_list_url'] = base_url('item/index/'.$page);
         if (isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING'])) {
-            $_SESSION['items_list_url'] = current_url().'?'.$_SERVER['QUERY_STRING'];
-        } else {
-            $_SESSION['items_list_url'] = current_url();
+            $_SESSION['items_list_url'] .= '?'.$_SERVER['QUERY_STRING'];
         }
         
         // Get user's search filters and add default values
