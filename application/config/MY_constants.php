@@ -33,7 +33,7 @@ define('PASSWORD_HASH_ALGORITHM', PASSWORD_BCRYPT);
 | Inventory number
 |--------------------------------------------------------------------------
 */
-define('INVENTORY_PREFIX', 'ORP');		 // first part of inventory number (Orif site prefix)
+define('INVENTORY_PREFIX', 'ORP');   // first part of inventory number (Orif site prefix)
 define('INVENTORY_NUMBER_CHARS', 4); // number of chars in the ID part (to add leading zeros)
 
 /*
@@ -51,6 +51,13 @@ define('FUNCTIONAL_ITEM_CONDITION_ID', 10);
 define('ITEMS_DEFAULT_GROUP', 2);
 
 /*
+|--------------------------------------------------------------------------
+| Default image used for when there is no image assigned to a item
+|--------------------------------------------------------------------------
+*/
+define('ITEM_NO_IMAGE', 'no_image.png');
+
+/*
  |-------------------------------------------------------------------------
  | Number of items show by page
  |-------------------------------------------------------------------------
@@ -64,3 +71,11 @@ define('ITEMS_PER_PAGE',25);
  */
 define('DATABASE_DATE_FORMAT', 'Y-m-d');
 define('DATABASE_DATETIME_FORMAT', 'Y-m-d H:i:s');
+
+/*
+ |-------------------------------------------------------------------------
+ | Image upload dimensions
+ |-------------------------------------------------------------------------
+ */
+define('IMAGE_UPLOAD_WIDTH', 360);
+define('IMAGE_UPLOAD_HEIGHT', 360);

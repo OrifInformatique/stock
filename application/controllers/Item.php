@@ -1,173 +1,180 @@
 <?php
-
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 
 /**
  * A controller to display and manage items
  *
- * @author      Didier Viret
- * @link        https://github.com/OrifInformatique/stock
+ * @author      Orif (ViDi)
+ * @link        https://github.com/OrifInformatique
  * @copyright   Copyright (c) 2016, Orif <http://www.orif.ch>
  */
 class Item extends MY_Controller {
 
-  /* MY_Controller variables definition */
-  protected $access_level = "*";
+    /* MY_Controller variables definition */
+    protected $access_level = "*";
 
-
-/****************************************************************************
- * Constructor
- */
-public function __construct()
-{
-    parent::__construct();
-    $this->load->model('item_model');
-    $this->load->model('loan_model');
-    $this->load->helper('sort');
-}
-
-
-/****************************************************************************
- * Display items list, with filtering
- */
-public function index($page = 1)
-  {
-    // Store URL to make possible to come back later (from item detail for example)
-    if (isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING'])) {
-      $_SESSION['items_list_url'] = current_url().'?'.$_SERVER['QUERY_STRING'];
-    } else {
-      $_SESSION['items_list_url'] = current_url();
-    }
-    
-    // Get user's search filters and add default values
-    $filters = $_GET;
-    if (!isset($filters['c'])) {
-      // No condition selected for filtering, default filtering for "functional" items
-      $filters['c'] = array(FUNCTIONAL_ITEM_CONDITION_ID);
-    }
-    
-    // Get item(s) through filtered search on the database
-    $output['items'] = $this->item_model->get_filtered($filters);
-
-    // Sort output depending on the user's choice
-    $sortValue = "name";
-    $asc = true;
-    // Verify the existence of the sort order key in filters
-    if(array_key_exists("o", $filters)){
-      switch ($filters['o']) {
-        case 1:
-          $sortValue = "stocking_place_id";
-          break;
-        case 2:
-          $sortValue = "buying_date";
-          break;
-        case 3:
-          $sortValue = "inventory_number";
-          break;
-        //In case of problem, it automatically switches to name
-        default:
-        case 0:
-          $sortValue = "name";
-          break;
-      }
-    }
-    // If not 1, order will be ascending
-    if(array_key_exists("ad", $filters)){
-      $asc = $filters['ad'] != 1;
-    }
-    $output['items'] = sortBySubValue($output['items'], $sortValue, $asc);
-
-    // Prepare search filters values to send to the view
-    $output = array_merge($output, $filters);
-    if (!isset($output["ts"])) {
-      $output["ts"] = '';
-    }
-    if (!isset($output["c"])) {
-      $output["c"] = '';
-    }
-    if (!isset($output["g"])) {
-      $output["g"] = '';
-    }
-    if (!isset($output["s"])) {
-      $output["s"] = '';
-    }
-    if (!isset($output["t"])) {
-      $output["t"] = '';
-    }
-    if (!isset($output["o"])) {
-      $output["o"] = '';
-    }
-    if (!isset($output["ad"])) {
-      $output["ad"] = '';
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->model('item_model');
+        $this->load->model('loan_model');
+        $this->load->helper('sort');
     }
 
-    // Add page title
-    $output['title'] = $this->lang->line('page_item_list');
+    /**
+     * Display items list, with filtering
+     *
+     * @param integer $page
+     * @return void
+     */
+    public function index($page = 1) {
+        // Load list of elements to display as filters
+        $this->load->model('item_tag_model');
+        $output['item_tags'] = $this->item_tag_model->dropdown('name');
+        $this->load->model('item_condition_model');
+        $output['item_conditions'] = $this->item_condition_model->dropdown('name');
+        $this->load->model('item_group_model');
+        $output['item_groups'] = $this->item_group_model->dropdown('name');
+        $this->load->model('stocking_place_model');
+        $output['stocking_places'] = $this->stocking_place_model->dropdown('name');
+        $output['sort_order'] = array($this->lang->line('sort_order_name'),
+                                        $this->lang->line('sort_order_stocking_place_id'),
+                                        $this->lang->line('sort_order_date'),
+                                        $this->lang->line('sort_order_inventory_number'));
+        $output['sort_asc_desc'] = array($this->lang->line('sort_order_asc'),
+                                            $this->lang->line('sort_order_des'));
+        // Prepare search filters values to send to the view
+        if (!isset($output["ts"])) $output["ts"] = '';
+        if (!isset($output["c"])) $output["c"] = '';
+        if (!isset($output["g"])) $output["g"] = '';
+        if (!isset($output["s"])) $output["s"] = '';
+        if (!isset($output["t"])) $output["t"] = '';
+        if (!isset($output["o"])) $output["o"] = '';
+        if (!isset($output["ad"])) $output["ad"] = '';
+        // Send the data to the View
+        $this->display_view('item/list', $output);
+    }
 
-    // Load list of elements to display as filters
-    $this->load->model('item_tag_model');
-    $output['item_tags'] = $this->item_tag_model->dropdown('name');
-    $this->load->model('item_condition_model');
-    $output['item_conditions'] = $this->item_condition_model->dropdown('name');
-    $this->load->model('item_group_model');
-    $output['item_groups'] = $this->item_group_model->dropdown('name');
-    $this->load->model('stocking_place_model');
-    $output['stocking_places'] = $this->stocking_place_model->dropdown('name');
-    $output['sort_order'] = array($this->lang->line('sort_order_name'),
-                                  $this->lang->line('sort_order_stocking_place_id'),
-                                  $this->lang->line('sort_order_date'),
-                                  $this->lang->line('sort_order_inventory_number'));
-    $output['sort_asc_desc'] = array($this->lang->line('sort_order_asc'),
-                                     $this->lang->line('sort_order_des'));
+    private function load_list($page = 1)
+    {
+        // Store URL to make possible to come back later (from item detail for example)
+        if (isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING'])) {
+            $_SESSION['items_list_url'] = current_url().'?'.$_SERVER['QUERY_STRING'];
+        } else {
+            $_SESSION['items_list_url'] = current_url();
+        }
+        
+        // Get user's search filters and add default values
+        $filters = $_GET;
+        if (!isset($filters['c'])) {
+            // No condition selected for filtering, default filtering for "functional" items
+            $filters['c'] = array(FUNCTIONAL_ITEM_CONDITION_ID);
+        }
+        
+        // Sanitize $page parameter
+        if (empty($page) || !is_numeric($page) || $page<1) {
+            $page = 1;
+        }
+        
+        // Get item(s) through filtered search on the database
+        $output['items'] = $this->item_model->get_filtered($filters);
+        
+        // Verify the existence of the sort order key in filters
+        if(array_key_exists("o", $filters)){
+            switch ($filters['o']) {
+                case 1:
+                $sortValue = "stocking_place_id";
+                break;
+                case 2:
+                $sortValue = "buying_date";
+                break;
+                case 3:
+                $sortValue = "inventory_number";
+                break;
+                //In case of problem, it automatically switches to name
+                default:
+                case 0:
+                $sortValue = "name";
+                break;
+            }
+        } else {
+            // default sort by name
+            $sortValue = "name";
+        }
+        
+        // If not 1, order will be ascending
+        if(array_key_exists("ad", $filters)){
+            $asc = $filters['ad'] != 1;
+        } else {
+            // default sort order is asc
+            $asc = true;
+        }
+        $output['items'] = sortBySubValue($output['items'], $sortValue, $asc);
+        
+        // Add page title
+        $output['title'] = $this->lang->line('page_item_list');
+        
+        // Pagination
+        $items_count = count($output["items"]);
+        $output['pagination'] =  $this->load_pagination($items_count)->create_links();
+        
+        $output['number_page'] = $page;
+        if($output['number_page']>ceil($items_count/ITEMS_PER_PAGE)) $output['number_page']=ceil($items_count/ITEMS_PER_PAGE);
+        
+        // Keep only the slice of items corresponding to the current page
+        $output["items"] = array_slice($output["items"], ($output['number_page']-1)*ITEMS_PER_PAGE, ITEMS_PER_PAGE);
+        
+        return $output;
+    }
     
-    // Create the pagination
-    $this->load->library('pagination');
+    public function load_list_json($page = 1){
+        echo json_encode($this->load_list($page));
+    }
 
-    $config['base_url'] = base_url('/item/index/');
-    $config['total_rows'] = count($output["items"]);
-    $config['per_page'] = ITEMS_PER_PAGE;
-    $config['use_page_numbers'] = TRUE;
-    $config['reuse_query_string'] = TRUE;
-    
-    $config['full_tag_open'] = '<ul class="pagination">';
-    $config['full_tag_close'] = '</ul>';
-    
-    $config['first_link'] = '&laquo;';
-    $config['first_tag_open'] = '<li>';
-    $config['first_tag_close'] = '</li>';
-    
-    $config['last_link'] = '&raquo;';
-    $config['last_tag_open'] = '<li>';
-    $config['last_tag_close'] = '</li>';
-    
-    $config['next_link'] = FALSE;
-    $config['prev_link'] = FALSE;
-    
-    $config['cur_tag_open'] = '<li class="active"><a>';
-    $config['cur_tag_close'] = '</li></a>';
-    $config['num_links'] = 5;
-    
-    $config['num_tag_open'] = '<li>';
-    $config['num_tag_close'] = '</li>';
-    
-    $this->pagination->initialize($config);
+    public function load_pagination($nbr_items)
+    {
+        // Create the pagination
+        $this->load->library('pagination');
 
-    $output['pagination'] = $this->pagination->create_links();
+        $config['base_url'] = base_url('/item/index/');
+        $config['total_rows'] = $nbr_items;
+        $config['per_page'] = ITEMS_PER_PAGE;
+        $config['use_page_numbers'] = TRUE;
+        $config['reuse_query_string'] = TRUE;
 
-    // Keep only the slice of items corresponding to the current page
-    $output["items"] = array_slice($output["items"], ($page-1)*ITEMS_PER_PAGE, ITEMS_PER_PAGE);
-    
-    // Send the data to the View
-    $this->display_view('item/list', $output);
-  }
+        $config['full_tag_open'] = '<ul class="pagination">';
+        $config['full_tag_close'] = '</ul>';
 
-  
-  /**
-   * Display details of one single item
-   *
-   * @param $id : the item to display
-   */
+        $config['first_link'] = '&laquo;';
+        $config['first_tag_open'] = '<li>';
+        $config['first_tag_close'] = '</li>';
+
+        $config['last_link'] = '&raquo;';
+        $config['last_tag_open'] = '<li>';
+        $config['last_tag_close'] = '</li>';
+
+        $config['next_link'] = FALSE;
+        $config['prev_link'] = FALSE;
+
+        $config['cur_tag_open'] = '<li class="active"><a>';
+        $config['cur_tag_close'] = '</li></a>';
+        $config['num_links'] = 5;
+
+        $config['num_tag_open'] = '<li>';
+        $config['num_tag_close'] = '</li>';
+        
+        return $this->pagination->initialize($config);
+    }
+    /**
+     * Display details of one single item
+     *
+     * @param $id : the item to display
+     * @return void
+     */
     public function view($id = NULL) {
 
         if (is_null($id)) {
@@ -191,10 +198,11 @@ public function index($page = 1)
         }
     }
 
-    /***************************************************************************
+    /**
      * Add a new item
+     *
+     * @return void
      */
-
     public function create() {
         // Check if this is allowed
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
@@ -202,24 +210,17 @@ public function index($page = 1)
             $this->set_validation_rules();
 
             $data['upload_errors'] = "";
-            if (isset($_FILES['photo']) && $_FILES['photo']['name'] != '') {
-                // IMAGE UPLOADING
-                $config['upload_path'] = './uploads/images/';
-                $config['allowed_types'] = 'gif|jpg|png';
-                $config['max_size'] = 2048;
-                $config['max_width'] = 360;
-                $config['max_height'] = 360;
-
-                $this->load->library('upload');
-                $this->upload->initialize($config);
-
-                if ($this->upload->do_upload('photo')) {
-                    $itemArray['image'] = $this->upload->data('file_name');
-                } else {
-                    $data['upload_errors'] = $this->upload->display_errors();
-                    $upload_failed = TRUE;
-                }
+            
+            $upload_failed = false;
+            
+            // If the user want to display the image form, we first save fields
+            // values in the session, then redirect him to the image form
+            if(isset($_POST['photoSubmit'])){
+                $this->session->set_userdata("POST", $_POST);
+                
+                redirect(base_url("picture/select_picture"));
             }
+            
             if (isset($_FILES['linked_file']) && $_FILES['linked_file']['name'] != '') {
 
                 // LINKED FILE UPLOADING
@@ -257,7 +258,7 @@ public function index($page = 1)
                 }
 
                 $itemArray["created_by_user_id"] = $_SESSION['user_id'];
-
+                
                 $this->item_model->insert($itemArray);
                 $item_id = $this->db->insert_id();
 
@@ -297,6 +298,24 @@ public function index($page = 1)
 
                 $data['item_id'] = $this->item_model->get_future_id();
 
+                // If the user gets back from another view, get the fields values
+                // which have been saved in session variable.
+                // Then reset this session variable.
+                if(isset($_SESSION['POST'])){
+                    foreach ($_SESSION['POST'] as $key => $value) {
+                        // If it is a tag
+                        if (substr($key, 0, 3) == "tag") {
+                            // put it in the data array
+                            $tag_link = new stdClass();
+                            $tag_link->item_tag_id = substr($key, 3);
+                            $data['tag_links'][] = (object) $tag_link;
+                        }else{
+                            $data[$key] = $value;
+                        }
+                    }
+                    unset($_SESSION['POST']);
+                }
+                
                 $this->display_view('item/form', $data);
             }
         } else {
@@ -305,10 +324,12 @@ public function index($page = 1)
         }
     }
 
-    /***************************************************************************
+    /**
      * Modify an existing item
+     *
+     * @param integer $id
+     * @return void
      */
-
     public function modify($id) {
         // Check if access is allowed
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
@@ -325,24 +346,18 @@ public function index($page = 1)
                 $this->set_validation_rules($id);
 
                 $data['upload_errors'] = "";
-                if (isset($_FILES['photo']) && $_FILES['photo']['name'] != '') {
-                    // IMAGE UPLOADING
-                    $config['upload_path'] = './uploads/images/';
-                    $config['allowed_types'] = 'gif|jpg|png';
-                    $config['max_size'] = 2048;
-                    $config['max_width'] = 360;
-                    $config['max_height'] = 360;
+                
+                $upload_failed = false;
+                
+                // If the user wants to display the image form, we first save fields
+                // values in the session, then redirect him to the image form
+                if(isset($_POST['photoSubmit'])){
+                    $this->session->set_userdata("POST", $_POST);
 
-                    $this->load->library('upload');
-                    $this->upload->initialize($config);
-
-                    if ($this->upload->do_upload('photo')) {
-                        $itemArray['image'] = $this->upload->data('file_name');
-                    } else {
-                        $data['upload_errors'] = $this->upload->display_errors();
-                        $upload_failed = TRUE;
-                    }
+                    redirect(base_url("picture/select_picture"));
+                    exit();
                 }
+                
                 if (isset($_FILES['linked_file']) && $_FILES['linked_file']['name'] != '') {
 
                     // LINKED FILE UPLOADING
@@ -378,9 +393,10 @@ public function index($page = 1)
                             $itemArray[$key] = $value;
                         }
                     }
-
+                    
                     // Execute the changes in the item table
                     $this->item_model->update($id, $itemArray);
+                    
                     redirect("/item/view/" . $id);
                 } else {
                     // Remember checked tags to display them checked again
@@ -416,6 +432,24 @@ public function index($page = 1)
             $this->load->model('item_tag_model');
             $data['item_tags'] = $this->item_tag_model->get_all();
 
+            // If the user gets back from another view, get the fields values
+            // which have been saved in session variable.
+            // Then reset this session variable.
+            if(isset($_SESSION['POST'])){
+                foreach ($_SESSION['POST'] as $key => $value) {
+                    // If it is a tag
+                    if (substr($key, 0, 3) == "tag") {
+                        // put it in the data array
+                        $tag_link = new stdClass();
+                        $tag_link->item_tag_id = substr($key, 3);
+                        $data['tag_links'][] = (object) $tag_link;
+                    }else{
+                        $data[$key] = $value;
+                    }
+                }
+                unset($_SESSION['POST']);
+            }
+            
             $this->display_view('item/form', $data);
         } else {
             // Update is not allowed
@@ -423,11 +457,14 @@ public function index($page = 1)
         }
     }
 
-    /***************************************************************************
+    /**
      * Delete an item
      * ACCESS RESTRICTED FOR ADMINISTRATORS ONLY
+     *
+     * @param integer $id
+     * @param [type] $command
+     * @return void
      */
-
     public function delete($id, $command = NULL) {
         // Check if this is allowed
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= ACCESS_LVL_ADMIN) {
@@ -455,12 +492,12 @@ public function index($page = 1)
         }
     }
 
-    /***************************************************************************
+    /**
      * Create inventory control for one given item
      *
-     * @param $id : the item concerned
+     * @param integer $id
+     * @return void
      */
-
     public function create_inventory_control($id = NULL) {
         // Check if this is allowed
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
@@ -504,12 +541,12 @@ public function index($page = 1)
         }
     }
 
-    /***************************************************************************
+    /**
      * Display inventory controls list for one given item
      *
-     * @param $id : the item concerned
+     * @param integer $id
+     * @return void
      */
-
     public function inventory_controls($id = NULL) {
         if (empty($id)) {
             // No item specified, display items list
@@ -524,12 +561,12 @@ public function index($page = 1)
         $this->display_view('inventory_control/list', $output);
     }
 
-    /***************************************************************************
+    /**
      * Create loan for one given item
      *
-     * @param $id : the item concerned
+     * @param integer $id
+     * @return void
      */
-
     public function create_loan($id = NULL) {
         // Check if this is allowed
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
@@ -582,12 +619,12 @@ public function index($page = 1)
         }
     }
 
-    /***************************************************************************
+    /**
      * Modify some loan
      *
-     * @param $id : the loan
+     * @param integer $id
+     * @return void
      */
-
     public function modify_loan($id = NULL) {
         // Check if this is allowed
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
@@ -640,12 +677,13 @@ public function index($page = 1)
         }
     }
 
-    /***************************************************************************
-     * Display loans list for one given item
-     *
-     * @param $id : the item concerned
-     */
 
+    /**
+     *  Display loans list for one given item
+     *
+     * @param integer $id
+     * @return void
+     */
     public function loans($id = NULL) {
         if (empty($id)) {
             // No item specified, display items list
@@ -664,13 +702,14 @@ public function index($page = 1)
         $this->display_view('loan/list', $output);
     }
 
-    /***************************************************************************
+    /**
      * Delete a loan
      * ACCESS RESTRICTED FOR ADMINISTRATORS ONLY
      *
-     * @param $id : the loan
+     * @param integer $id
+     * @param [type] $command
+     * @return void
      */
-
     public function delete_loan($id, $command = NULL) {
         // Check if this is allowed
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= ACCESS_LVL_ADMIN) {
@@ -695,10 +734,13 @@ public function index($page = 1)
         }
     }
 
-    /***************************************************************************
+    /**
      * Set validation rules for create and update form
+     *
+     *
+     * @param integer $id
+     * @return void
      */
-
     private function set_validation_rules($id = NULL) {
         $this->load->library('form_validation');
 
@@ -706,5 +748,5 @@ public function index($page = 1)
 
         $this->form_validation->set_rules("inventory_prefix", lang('field_inventory_number'), 'required');
     }
-
+    
 }
