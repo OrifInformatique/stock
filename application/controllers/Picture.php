@@ -51,14 +51,24 @@ class Picture extends MY_Controller {
             $this->set_validation_rules();
             
             if($this->form_validation->run()){
+                /*
+                 This will cause problems if someone is uploading multiple images at once.
+                 But then, a bunch of other things will also break, so...
+                */
+                $id = $_SESSION['item_id'];
                 
                 $picture_file = $_POST['cropped_file'];
                 $picture_name = $_POST['cropped_name'];
                 
-                file_put_contents("uploads/images/$picture_name", base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $picture_file)));
+                // Make sure the picture starts with {id}_
+                if (!preg_match('/^'.$id.'_/', $picture_name)) {
+                    $picture_name = $id.'_'.$picture_name;
+                    $_POST['cropped_name'] = $picture_name;
+                }
+                file_put_contents("uploads/images/{$picture_name}", base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $picture_file)));
                 
-                $_SESSION['picture_path'] = $picture_name;
-                
+                $_SESSION['POST']['image'] = $picture_name;
+                $_SESSION['submit_image'] = TRUE;
                 redirect($_SESSION['picture_callback']);
                 exit();
                 

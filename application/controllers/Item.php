@@ -413,6 +413,7 @@ class Item extends MY_Controller {
 
             $data['modify'] = true;
             $data['item_id'] = $id;
+            $_SESSION['item_id'] = $id;
 
             // Load the options
             $this->load->model('stocking_place_model');
@@ -434,7 +435,7 @@ class Item extends MY_Controller {
             // If the user gets back from another view, get the fields values
             // which have been saved in session variable.
             // Then reset this session variable.
-            if(isset($_SESSION['POST'])){
+            if(isset($_SESSION['POST']) && ($_SESSION['submit_image'] ?? FALSE)) {
                 foreach ($_SESSION['POST'] as $key => $value) {
                     // If it is a tag
                     if (substr($key, 0, 3) == "tag") {
@@ -446,8 +447,9 @@ class Item extends MY_Controller {
                         $data[$key] = $value;
                     }
                 }
-                unset($_SESSION['POST']);
             }
+            $_SESSION['submit_image'] = FALSE;
+            unset($_SESSION['POST']);
             
             $this->display_view('item/form', $data);
         } else {

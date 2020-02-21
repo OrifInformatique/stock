@@ -72,3 +72,10 @@ define('DATABASE_DATETIME_FORMAT', 'Y-m-d H:i:s');
  */
 define('IMAGE_UPLOAD_WIDTH', 360);
 define('IMAGE_UPLOAD_HEIGHT', 360);
+
+/*
+ |-------------------------------------------------------------------------
+ | NULL image name
+ |-------------------------------------------------------------------------
+ */
+define('DEFAULT_IMAGE_NAME', 'no_image.png');

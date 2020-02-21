@@ -1,3 +1,10 @@
+<?php
+// Make sure the user cannot modify the default image
+$image = $_SESSION['POST']['image'] ?? '';
+if ($image == DEFAULT_IMAGE_NAME) {
+    $image = '';
+}
+?>
 <form id="form" class="container" method="post" action="add_picture" >
     <?php if (isset($upload_error)) { ?>
     <div class="row alert alert-danger"><?=$upload_error?></div>
@@ -59,10 +66,10 @@ const IMAGE_UPLOAD_HEIGHT = <?= IMAGE_UPLOAD_HEIGHT; ?>;
 //
 function reSelectPhoto(event)
 {
-    var path = "<?= isset($_SESSION['POST']['image']) && !empty($_SESSION['POST']['image'])? $_SESSION['POST']['image'] : "" ?>";
+    var path = "<?= $image ?>";
     
     if(path !== ""){
-        rawImage.src = "<?= base_url("uploads/images/".$_SESSION['POST']['image'])?>";
+        rawImage.src = "<?= base_url("uploads/images/{$image}")?>";
         croppedNameInput.value = path;
         setCropper();
     }
