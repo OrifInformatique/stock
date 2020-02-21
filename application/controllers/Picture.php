@@ -55,14 +55,14 @@ class Picture extends MY_Controller {
                  This will cause problems if someone is uploading multiple images at once.
                  But then, a bunch of other things will also break, so...
                 */
-                $id = $_SESSION['item_id'];
+                $prefix = $_SESSION['picture_prefix'];
                 
                 $picture_file = $_POST['cropped_file'];
                 $picture_name = $_POST['cropped_name'];
                 
                 // Make sure the picture starts with {id}_
-                if (!preg_match('/^'.$id.'_/', $picture_name)) {
-                    $picture_name = $id.'_'.$picture_name;
+                if (!preg_match('/^'.$prefix.'_/', $picture_name)) {
+                    $picture_name = $prefix.'_'.$picture_name;
                     $_POST['cropped_name'] = $picture_name;
                 }
                 file_put_contents("uploads/images/{$picture_name}", base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $picture_file)));
