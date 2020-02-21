@@ -413,7 +413,7 @@ class Item extends MY_Controller {
 
             $data['modify'] = true;
             $data['item_id'] = $id;
-            $_SESSION['item_id'] = $id;
+            $_SESSION['item_id'] = $data['inventory_id'];
 
             // Load the options
             $this->load->model('stocking_place_model');
