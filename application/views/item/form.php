@@ -76,6 +76,8 @@
                     $imagePath = $_SESSION['picture_path'];
                 }else if (isset($image) && $image!='') {
                     $imagePath = $image;
+                }else{
+                    $imagePath = ITEM_NO_IMAGE;
                 }
 
                 if(isset($imagePath)){
@@ -253,10 +255,10 @@ $(document).ready(function() {
 function get(objectName){
     switch (objectName) {
         case "item_groups":
-            return '<?php $array = ""; foreach($item_groups as $item_group) $array .= $item_group->short_name.","; echo "[$array]"; ?>';
+            return <?php $array = ""; foreach($item_groups as $item_group) $array .= "'".$item_group->short_name."',"; echo "[$array]"; ?>;
            
         case "item_tags":
-            return '<?php $array = ""; foreach($item_tags as $item_tag) $array .= $item_tag->short_name.","; echo "[$array]"; ?>';
+            return <?php $array = ""; foreach($item_tags as $item_tag) $array .= "'".$item_tag->short_name."',"; echo "[$array]"; ?>;
            
         case "INVENTORY_PREFIX": 
             return "<?=INVENTORY_PREFIX; ?>" ;
@@ -320,7 +322,7 @@ function createInventoryNo(){
     if(date == "N"){
         date = "00";
     }
-    inventoryNumber = get("INVENTORY_PREFIX") + objectGroups[objectGroupField.value-1] + tagShortName + date;
+    inventoryNumber = get("INVENTORY_PREFIX") + "." + objectGroups[objectGroupField.value-1] + tagShortName + date;
     inventoryNumberField.value = inventoryNumber;
 
     // If inventory_id field is empty, complete it

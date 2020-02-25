@@ -51,6 +51,13 @@ define('FUNCTIONAL_ITEM_CONDITION_ID', 10);
 define('ITEMS_DEFAULT_GROUP', 2);
 
 /*
+|--------------------------------------------------------------------------
+| Default image used for when there is no image assigned to a item
+|--------------------------------------------------------------------------
+*/
+define('ITEM_NO_IMAGE', 'no_image.png');
+
+/*
  |-------------------------------------------------------------------------
  | Number of items show by page
  |-------------------------------------------------------------------------
@@ -72,10 +79,3 @@ define('DATABASE_DATETIME_FORMAT', 'Y-m-d H:i:s');
  */
 define('IMAGE_UPLOAD_WIDTH', 360);
 define('IMAGE_UPLOAD_HEIGHT', 360);
-
-/*
- |-------------------------------------------------------------------------
- | NULL image name
- |-------------------------------------------------------------------------
- */
-define('DEFAULT_IMAGE_NAME', 'no_image.png');

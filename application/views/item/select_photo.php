@@ -1,7 +1,7 @@
 <?php
 // Make sure the user cannot modify the default image
 $image = $_SESSION['POST']['image'] ?? '';
-if ($image == DEFAULT_IMAGE_NAME) {
+if ($image == ITEM_NO_IMAGE) {
     $image = '';
 }
 ?>

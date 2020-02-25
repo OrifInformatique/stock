@@ -78,13 +78,13 @@ class Item_model extends MY_Model
     }
 
     /**
-    * If no image is set, use DEFAULT_IMAGE_NAME constant
+    * If no image is set, use ITEM_NO_IMAGE constant
     */
     protected function get_image($item)
     {		
         if (!is_null($item) && is_null($item->image))
         {
-            $item->image = DEFAULT_IMAGE_NAME;
+            $item->image = ITEM_NO_IMAGE;
         }
 
         return $item;
