@@ -61,7 +61,17 @@ class Admin extends MY_Controller
 
         //username: if changed,
         if ($_POST['username'] != get_object_vars($this->user_model->get($id))['username']) {
-          $this->form_validation->set_rules('username', $this->lang->line('field_username'), "required|callback_unique_username[$id]", $this->lang->line('msg_id_needed')); // not void and unique.
+          $this->form_validation->set_rules(
+            'username',
+            $this->lang->line('field_username'),
+            [
+              "required",
+              "callback_unique_username[{$id}]",
+              "min_length[".USERNAME_MIN_LENGTH."]",
+              "max_length[".USERNAME_MAX_LENGTH."]"
+            ],
+            $this->lang->line('msg_id_needed')
+          ); // not void and unique.
         }
 
         //email: void
@@ -73,7 +83,15 @@ class Admin extends MY_Controller
         // If the password needs to be modified,
         if (isset($_POST['pwd'])) {
           // it needs to be long 6 chars or more and confirmed
-          $this->form_validation->set_rules('pwd', $this->lang->line('field_password'), 'min_length[6]', $this->lang->line('msg_err_pwd_length'));
+          $this->form_validation->set_rules(
+            'pwd',
+            $this->lang->line('field_password'),
+            [
+              'min_length['.PASSWORD_MIN_LENGTH.']',
+              'max_length['.PASSWORD_MAX_LENGTH.']'
+            ],
+            $this->lang->line('msg_err_pwd_length')
+          );
           $this->form_validation->set_rules('pwdagain', $this->lang->line('field_password'), 'matches[pwd]', $this->lang->line('msg_err_pwg_wrong'));
         }
 
@@ -141,7 +159,17 @@ class Admin extends MY_Controller
         // VALIDATION
 
         //username: not void, unique
-        $this->form_validation->set_rules('username', $this->lang->line('field_username'), 'required|callback_unique_username', $this->lang->line('msg_err_id_needed'));
+        $this->form_validation->set_rules(
+          'username',
+          $this->lang->line('field_username'),
+          [
+            "required",
+            "callback_unique_username",
+            "min_length[".USERNAME_MIN_LENGTH."]",
+            "max_length[".USERNAME_MAX_LENGTH."]"
+          ],
+          $this->lang->line('msg_err_id_needed')
+        );
 
         //email: void
         if (isset($_POST['email'])) {
@@ -150,7 +178,16 @@ class Admin extends MY_Controller
         }
 
         //Password: 6 chars or more, confirmed
-        $this->form_validation->set_rules('pwd', $this->lang->line('field_password'), 'required|min_length[6]', $this->lang->line('msg_err_pwd_length'));
+        $this->form_validation->set_rules(
+          'pwd',
+          $this->lang->line('field_password'),
+          [
+            'required',
+            'min_length['.PASSWORD_MIN_LENGTH.']',
+            'max_length['.PASSWORD_MAX_LENGTH.']'
+          ],
+          $this->lang->line('msg_err_pwd_length')
+        );
         $this->form_validation->set_rules('pwdagain', $this->lang->line('field_password'), 'matches[pwd]', $this->lang->line('msg_err_pwg_wrong'));
 
         if($this->form_validation->run() === TRUE)
