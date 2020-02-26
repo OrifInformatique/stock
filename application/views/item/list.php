@@ -162,8 +162,6 @@ function load_items(page, filters){
     $("#no_item_message").toggle(false);
     $("#error_message").toggle(false);
     $("#table_item").toggle(false);
-    $("#list_item").empty();
-    $("#pagination_bottom, #pagination_top").empty();
     
     // URL for ajax call to PHP controller
     url = "<?= base_url("item/load_list_json/")?>"+page+filters;
@@ -178,15 +176,18 @@ function load_items(page, filters){
             
             history.pushState(null, "", "<?= base_url("item/index/")?>"+page+filters);
             
+            // Empty list before filling it
+            $("#list_item").empty();
             if (result.items.length > 0){ 
                 $("#table_item").toggle(true);
                 $.each(result.items, function (i, item) {
                     $("#list_item").append(display_item(item));
                 });
-            }else{ 
+            } else {
                 $("#no_item_message").toggle(true);
             }
             
+            $("#pagination_bottom, #pagination_top").empty();
             $("#pagination_bottom, #pagination_top").append($(result.pagination));
             
             // Change cursor
@@ -198,6 +199,10 @@ function load_items(page, filters){
             history.pushState(null, "", "<?= base_url("item/index/")?>"+page+filters);
         },
         error : function(resultat, statut, erreur){
+            // No item was found, don't show the previous list
+            $("#list_item").empty();
+            $("#pagination_bottom, #pagination_top").empty();
+
             $("#error_message").toggle(true);
             $("#error_message").append(resultat.responseText);
             
