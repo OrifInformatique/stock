@@ -32,6 +32,7 @@ class Item extends MY_Controller {
      * @return void
      */
     public function index($page = 1) {
+        
         // Load list of elements to display as filters
         $this->load->model('item_tag_model');
         $output['item_tags'] = $this->item_tag_model->dropdown('name');
@@ -216,6 +217,7 @@ class Item extends MY_Controller {
             // values in the session, then redirect him to the image form
             if(isset($_POST['photoSubmit'])){
                 $this->session->set_userdata("POST", $_POST);
+                $this->session->set_userdata("item_id",$this->item_model->get_future_id());
                 
                 redirect(base_url("picture/select_picture"));
             }
@@ -243,6 +245,13 @@ class Item extends MY_Controller {
             if ($this->form_validation->run() == TRUE && $upload_failed != TRUE) {
                 // No error, save item
 
+                // Turn Temporaty Image into a final one if there is one
+                if(isset($_SESSION['picture_path'])){
+                    $new_image_path = str_replace("_TMP","",$_SESSION['picture_path']);
+                    rename("uploads/images/".$_SESSION['picture_path'],"uploads/images/".$new_image_path);
+                    $_POST['image'] = $new_image_path;
+                }
+                
                 $linkArray = array();
 
                 $this->load->model('item_tag_link_model');
@@ -264,6 +273,12 @@ class Item extends MY_Controller {
                 foreach ($linkArray as $tag) {
                     $this->item_tag_link_model->insert(array("item_tag_id" => $tag, "item_id" => ($item_id)));
                 }
+                
+                if(isset($_SESSION['picture_path']))
+                {
+                    unset($_SESSION['picture_path']);
+                }
+                
                 redirect("item/view/" . $item_id);
             } else {
                 // Remember checked tags to display them checked again
@@ -352,7 +367,7 @@ class Item extends MY_Controller {
                 // values in the session, then redirect him to the image form
                 if(isset($_POST['photoSubmit'])){
                     $this->session->set_userdata("POST", $_POST);
-
+                    $this->session->set_userdata("item_id", $id);
                     redirect(base_url("picture/select_picture"));
                     exit();
                 }
@@ -379,6 +394,13 @@ class Item extends MY_Controller {
 
                 if ($this->form_validation->run() == TRUE && $upload_failed != TRUE) {
 
+                    // Turn Temporaty Image into a final one if there is one
+                    if(isset($_SESSION['picture_path'])){
+                        $new_image_path = str_replace("_TMP","",$_SESSION['picture_path']);
+                        rename("uploads/images/".$_SESSION['picture_path'],"uploads/images/".$new_image_path);
+                        $_POST['image'] = $new_image_path;
+                    }
+                    
                     // Delete ALL the tags for this object
                     $this->item_tag_link_model->delete_by(array('item_id' => $id));
 
@@ -395,6 +417,11 @@ class Item extends MY_Controller {
                     
                     // Execute the changes in the item table
                     $this->item_model->update($id, $itemArray);
+                    
+                    if(isset($_SESSION['picture_path']))
+                    {
+                        unset($_SESSION['picture_path']);
+                    }
                     
                     redirect("/item/view/" . $id);
                 } else {

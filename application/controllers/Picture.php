@@ -33,8 +33,15 @@ class Picture extends MY_Controller {
         
         $data = array();
         
-        if($errorId == 1){
-            $data['upload_error'] = $this->lang->line('msg_err_photo_upload');
+        switch($errorId)
+        {
+            case 1:
+                $data['upload_error'] = $this->lang->line('msg_err_photo_upload');
+                break;
+            case 0:
+            default:
+                
+                break;
         }
         
         $this->display_view("item/select_photo", $data);
@@ -48,63 +55,38 @@ class Picture extends MY_Controller {
     public function add_picture(){
         
         if(isset($_POST)){
-            $this->set_validation_rules();
             
-            if($this->form_validation->run()){
-                /*
-                 This will cause problems if someone is uploading multiple images at once.
-                 But then, a bunch of other things will also break, so...
-                */
-                $prefix = $_SESSION['picture_prefix'];
-
-                // Grab picture (in base64) and its name
-                $picture_file = $_POST['cropped_file'];
-                $picture_name = $_POST['cropped_name'];
-                // Get the extension for saving in the right format
-                $picture = explode('.', $picture_name);
-                $extension = end($picture);
-
-                // Make sure the picture starts with {id}_picture.{extension}
-                $picture_name = $prefix.'_picture.'.$extension;
-                file_put_contents("uploads/images/{$picture_name}", base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $picture_file)));
+            if(!empty($_POST)){
                 
-                $_SESSION['POST']['image'] = $picture_name;
-                $_SESSION['submit_image'] = TRUE;
-                redirect($_SESSION['picture_callback']);
-                exit();
+                $extension = "";
                 
-            }else{
-                
-                redirect(base_url('picture/get_picture/1'));
-                exit();
+                if(!empty($_FILES['original_file']['type'])){
+                    $extension = $_FILES['original_file']['type'];
+                }else if(isset($_SESSION['POST']['image'])){
+                    $extension = "image/". substr($_SESSION['POST']['image'], strrpos($_SESSION['POST']['image'], '.') + 1);
+                }else
+                $file_type_is_correct = (strpos($extension, "image/") !== false && !empty($extension));
+                if($file_type_is_correct){
+                    $picture_file = $_POST['cropped_file'];
+                    $picture_name = INVENTORY_PREFIX."_".$_SESSION['item_id']."_TMP.png";
+                    file_put_contents("uploads/images/$picture_name", base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $picture_file)));
+                    $_SESSION['picture_path'] = $picture_name;
+                    redirect($_SESSION['picture_callback']);
+                    exit();
+                }else{
+                    $error = "";
+                    if(! $file_type_is_correct){
+                        $error = 1;
+                    }
+                    redirect(base_url("picture/get_picture/$error"));
+                    exit();
+                }
             }
             
         }else{
             redirect(base_url());
             exit();
         }
-    }
-    
-    /**
-     * Check if there is a named file send
-     * 
-     * @return void
-     */
-    private function set_validation_rules(){
-        $config = array(
-            array(
-                'field' => 'cropped_name',
-                'label' => $this->lang->line('field_cropped_name'),
-                'rules' => 'required'
-            ),
-            array(
-                'field' => 'cropped_file',
-                'label' => $this->lang->line('field_cropped_photo'),
-                'rules' => 'required'
-            )
-        );
-        
-        $this->form_validation->set_rules($config);
     }
     
     /**

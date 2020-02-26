@@ -5,7 +5,7 @@ if ($image == ITEM_NO_IMAGE) {
     $image = '';
 }
 ?>
-<form id="form" class="container" method="post" action="add_picture" >
+<form id="form" class="container" method="post" action="add_picture" enctype="multipart/form-data">
     <?php if (isset($upload_error)) { ?>
     <div class="row alert alert-danger"><?=$upload_error?></div>
     <?php } ?>
@@ -21,7 +21,7 @@ if ($image == ITEM_NO_IMAGE) {
     </div>
     <div class="row">
         <!-- Hidden file button, on which a click is simulated when user is clicking on one of the visible buttons -->
-        <input id="imageInput" type="file" accept="image/*" class="btn hidden" />
+        <input id="imageInput" name="original_file" type="file" accept="image/*" class="btn hidden" />
         
         <div class="col-sm-6 form-group">
             <!-- Two buttons to differentiate taking a new picture or importing an existing one -->
