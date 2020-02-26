@@ -56,15 +56,16 @@ class Picture extends MY_Controller {
                  But then, a bunch of other things will also break, so...
                 */
                 $prefix = $_SESSION['picture_prefix'];
-                
+
+                // Grab picture (in base64) and its name
                 $picture_file = $_POST['cropped_file'];
                 $picture_name = $_POST['cropped_name'];
-                
-                // Make sure the picture starts with {id}_
-                if (!preg_match('/^'.$prefix.'_/', $picture_name)) {
-                    $picture_name = $prefix.'_'.$picture_name;
-                    $_POST['cropped_name'] = $picture_name;
-                }
+                // Get the extension for saving in the right format
+                $picture = explode('.', $picture_name);
+                $extension = end($picture);
+
+                // Make sure the picture starts with {id}_picture.{extension}
+                $picture_name = $prefix.'_picture.'.$extension;
                 file_put_contents("uploads/images/{$picture_name}", base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $picture_file)));
                 
                 $_SESSION['POST']['image'] = $picture_name;
