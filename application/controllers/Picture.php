@@ -64,11 +64,12 @@ class Picture extends MY_Controller {
                     $extension = $_FILES['original_file']['type'];
                 }else if(isset($_SESSION['POST']['image'])){
                     $extension = "image/". substr($_SESSION['POST']['image'], strrpos($_SESSION['POST']['image'], '.') + 1);
-                }else
+                }
+                
                 $file_type_is_correct = (strpos($extension, "image/") !== false && !empty($extension));
                 if($file_type_is_correct){
                     $picture_file = $_POST['cropped_file'];
-                    $picture_name = INVENTORY_PREFIX."_".$_SESSION['item_id']."_TMP.png";
+                    $picture_name = $_SESSION['item_id']."_picture_tmp".IMAGE_EXTENSION;
                     file_put_contents("uploads/images/$picture_name", base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $picture_file)));
                     $_SESSION['picture_path'] = $picture_name;
                     redirect($_SESSION['picture_callback']);
@@ -79,6 +80,7 @@ class Picture extends MY_Controller {
                         $error = 1;
                     }
                     redirect(base_url("picture/get_picture/$error"));
+                    //redirect(base_url("picture/get_picture"));
                     exit();
                 }
             }

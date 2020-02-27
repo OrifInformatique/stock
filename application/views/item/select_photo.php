@@ -5,7 +5,7 @@ if ($image == ITEM_NO_IMAGE) {
     $image = '';
 }
 ?>
-<form id="form" class="container" method="post" action="add_picture" enctype="multipart/form-data">
+<form id="form" class="container" method="post" action="<?=base_url('picture/add_picture')?>" enctype="multipart/form-data">
     <?php if (isset($upload_error)) { ?>
     <div class="row alert alert-danger"><?=$upload_error?></div>
     <?php } ?>
