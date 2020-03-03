@@ -13,7 +13,7 @@ class Picture extends MY_Controller {
 
     
     /* MY_Controller variables definition */
-    protected $access_level = "@";
+    protected $access_level = ACCESS_LVL_OBSERVATION;
 
     /**
      * Constructor
@@ -30,7 +30,6 @@ class Picture extends MY_Controller {
      * @return void
      */
     public function get_picture($errorId = 0){
-        
         $data = array();
         
         switch($errorId)
@@ -40,7 +39,6 @@ class Picture extends MY_Controller {
                 break;
             case 0:
             default:
-                
                 break;
         }
         
@@ -53,41 +51,16 @@ class Picture extends MY_Controller {
      * @return void
      */
     public function add_picture(){
-        
         if(isset($_POST)){
-            
             if(!empty($_POST)){
-                
-                $extension = "";
-                
-                if(!empty($_FILES['original_file']['type'])){
-                    $extension = $_FILES['original_file']['type'];
-                }else if(isset($_SESSION['POST']['image'])){
-                    $extension = "image/". substr($_SESSION['POST']['image'], strrpos($_SESSION['POST']['image'], '.') + 1);
-                }
-                
-                $file_type_is_correct = (strpos($extension, "image/") !== false && !empty($extension));
-                if($file_type_is_correct){
-                    $picture_file = $_POST['cropped_file'];
-                    $picture_name = $_SESSION['item_id']."_picture_tmp".IMAGE_EXTENSION;
-                    file_put_contents("uploads/images/$picture_name", base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $picture_file)));
-                    $_SESSION['picture_path'] = $picture_name;
-                    redirect($_SESSION['picture_callback']);
-                    exit();
-                }else{
-                    $error = "";
-                    if(! $file_type_is_correct){
-                        $error = 1;
-                    }
-                    redirect(base_url("picture/get_picture/$error"));
-                    //redirect(base_url("picture/get_picture"));
-                    exit();
-                }
+                $picture_file = $_POST['cropped_file'];
+                $picture_name = $_SESSION['POST']['inventory_id']."_picture_tmp".IMAGE_EXTENSION;
+                file_put_contents("uploads/images/$picture_name", base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $picture_file)));
+                $_SESSION['picture_path'] = $picture_name;
+                redirect($_SESSION['picture_callback']);
             }
-            
         }else{
             redirect(base_url());
-            exit();
         }
     }
     
@@ -98,7 +71,6 @@ class Picture extends MY_Controller {
      * @return void
      */
     public function select_picture(){
-        
         $_SESSION['picture_callback'] = $_SERVER['HTTP_REFERER'];
         
         redirect(base_url('picture/get_picture'));

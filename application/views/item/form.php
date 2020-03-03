@@ -46,7 +46,7 @@
                     <input type="text" class="form-control" name="inventory_id"
                            id="inventory_id"
                            value="<?php if(isset($inventory_id)) {echo set_value('inventory_id',$inventory_id);} else {echo set_value('inventory_id');} ?>"
-                            disabled />
+                            readonly />
                 </div>
             </div>
             <div class="row">

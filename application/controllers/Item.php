@@ -353,9 +353,9 @@ class Item extends MY_Controller {
             if (empty($_POST)) {
                 // get the data from the item with this id,
                 $data = get_object_vars($this->item_model->get($id));
-
                 // including its tags
                 $data['tag_links'] = $this->item_tag_link_model->get_many_by("item_id", $id);
+                
             } else {
                 $this->set_validation_rules($id);
 
@@ -367,7 +367,7 @@ class Item extends MY_Controller {
                 // values in the session, then redirect him to the image form
                 if(isset($_POST['photoSubmit'])){
                     $this->session->set_userdata("POST", $_POST);
-                    $this->session->set_userdata("item_id", $id);
+                    
                     redirect(base_url("picture/select_picture"));
                     exit();
                 }
