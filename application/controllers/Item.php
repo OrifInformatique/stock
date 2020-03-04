@@ -178,7 +178,7 @@ class Item extends MY_Controller {
     public function view($id = NULL) {
 
         if (is_null($id)) {
-            // No item sellected, display items list
+            // No item selected, display items list
             redirect('/item');
         }
 
@@ -207,6 +207,22 @@ class Item extends MY_Controller {
         // Check if this is allowed
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
 
+            $item_id = $this->item_model->get_future_id();
+            $_SESSION['picture_prefix'] = str_pad($item_id, 4, "0",STR_PAD_LEFT);
+            
+            // Check if the user cancelled the form
+            if(isset($_POST['submitCancel'])){
+                $tmp_file = glob("uploads/images/*".IMAGE_TMP_SUFFIX."*")[0];
+                
+                // Check if there is a temporary file, if yes then delete it
+                if($tmp_file != null || $tmp_file != false){
+                    unlink($tmp_file);
+                }
+                
+                redirect(base_url());
+                exit();
+            }
+            
             $this->set_validation_rules();
 
             $data['upload_errors'] = "";
@@ -245,13 +261,6 @@ class Item extends MY_Controller {
             if ($this->form_validation->run() == TRUE && $upload_failed != TRUE) {
                 // No error, save item
 
-                // Turn Temporaty Image into a final one if there is one
-                if(isset($_SESSION['picture_path'])){
-                    $new_image_path = str_replace("_TMP","",$_SESSION['picture_path']);
-                    rename("uploads/images/".$_SESSION['picture_path'],"uploads/images/".$new_image_path);
-                    $_POST['image'] = $new_image_path;
-                }
-                
                 $linkArray = array();
 
                 $this->load->model('item_tag_link_model');
@@ -265,18 +274,20 @@ class Item extends MY_Controller {
                     }
                 }
 
+                // Turn Temporaty Image into a final one if there is one
+                $temp_image_path = $_SESSION["picture_prefix"].IMAGE_PICTURE_SUFFIX.IMAGE_TMP_SUFFIX.IMAGE_EXTENSION;
+                $new_image_path = $_SESSION["picture_prefix"].IMAGE_PICTURE_SUFFIX.IMAGE_EXTENSION;
+                if(file_exists(IMAGES_UPLOADED_PATH.$temp_image_path)){
+                    rename(IMAGES_UPLOADED_PATH.$temp_image_path,IMAGES_UPLOADED_PATH.$new_image_path);
+                    $itemArray['image'] = $new_image_path;
+                }
+                
                 $itemArray["created_by_user_id"] = $_SESSION['user_id'];
                 
                 $this->item_model->insert($itemArray);
-                $item_id = $this->db->insert_id();
 
                 foreach ($linkArray as $tag) {
                     $this->item_tag_link_model->insert(array("item_tag_id" => $tag, "item_id" => ($item_id)));
-                }
-                
-                if(isset($_SESSION['picture_path']))
-                {
-                    unset($_SESSION['picture_path']);
                 }
                 
                 redirect("item/view/" . $item_id);
@@ -329,7 +340,6 @@ class Item extends MY_Controller {
                     }
                     unset($_SESSION['POST']);
                 }
-                
                 $this->display_view('item/form', $data);
             }
         } else {
@@ -347,6 +357,20 @@ class Item extends MY_Controller {
     public function modify($id) {
         // Check if access is allowed
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+            
+            // Check if the user cancelled the form
+            if(isset($_POST['submitCancel'])){
+                $tmp_file = glob("uploads/images/*".IMAGE_TMP_SUFFIX."*")[0];
+                
+                // Check if there is a temporary file, if yes then delete it
+                if($tmp_file != null || $tmp_file != false){
+                    unlink($tmp_file);
+                }
+                
+                redirect(base_url("item/view/$id"));
+                exit();
+            }
+            
             $this->load->model('item_tag_link_model');
 
             // If there is no submit
@@ -394,13 +418,6 @@ class Item extends MY_Controller {
 
                 if ($this->form_validation->run() == TRUE && $upload_failed != TRUE) {
 
-                    // Turn Temporaty Image into a final one if there is one
-                    if(isset($_SESSION['picture_path'])){
-                        $new_image_path = str_replace("_TMP","",$_SESSION['picture_path']);
-                        rename("uploads/images/".$_SESSION['picture_path'],"uploads/images/".$new_image_path);
-                        $_POST['image'] = $new_image_path;
-                    }
-                    
                     // Delete ALL the tags for this object
                     $this->item_tag_link_model->delete_by(array('item_id' => $id));
 
@@ -415,14 +432,16 @@ class Item extends MY_Controller {
                         }
                     }
                     
-                    // Execute the changes in the item table
-                    $this->item_model->update($id, $itemArray);
-                    
-                    if(isset($_SESSION['picture_path']))
-                    {
-                        unset($_SESSION['picture_path']);
+                    // Turn Temporaty Image into a final one if there is one
+                    $temp_image_path = $_SESSION["picture_prefix"].IMAGE_PICTURE_SUFFIX.IMAGE_TMP_SUFFIX.IMAGE_EXTENSION;
+                    $new_image_path = $_SESSION["picture_prefix"].IMAGE_PICTURE_SUFFIX.IMAGE_EXTENSION;
+                    if(file_exists(IMAGES_UPLOADED_PATH.$temp_image_path)){
+                        rename(IMAGES_UPLOADED_PATH.$temp_image_path,IMAGES_UPLOADED_PATH.$new_image_path);
+                        $itemArray['image'] = $new_image_path;
                     }
                     
+                    // Execute the changes in the item table
+                    $this->item_model->update($id, $itemArray);
                     redirect("/item/view/" . $id);
                 } else {
                     // Remember checked tags to display them checked again

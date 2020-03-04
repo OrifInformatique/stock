@@ -2,9 +2,9 @@
     <!-- BUTTONS -->
     <div class="row">
         <div class="form-group col-xs-12">
-            <button type="submit" class="btn btn-success"><?php echo $this->lang->line('btn_save'); ?></button>
-            <a class="btn btn-danger" href="<?php echo base_url(); if(isset($modify)) {echo "item/view/" . $item_id;} ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
-        </div>
+            <button type="submit" class="btn btn-success"><?= $this->lang->line('btn_save'); ?></button>
+            <button type="submit" class="btn btn-danger" name="submitCancel"><?= $this->lang->line('btn_cancel');?></button>
+            </div>
     </div>
 
     <!-- ERROR MESSAGES -->
@@ -46,7 +46,7 @@
                     <input type="text" class="form-control" name="inventory_id"
                            id="inventory_id"
                            value="<?php if(isset($inventory_id)) {echo set_value('inventory_id',$inventory_id);} else {echo set_value('inventory_id');} ?>"
-                            readonly />
+                            disabled />
                 </div>
             </div>
             <div class="row">
@@ -72,8 +72,8 @@
             
             <div class="form-group">
                 <?php 
-                if(isset($_SESSION['picture_path'])){
-                    $imagePath = $_SESSION['picture_path'];
+                if(file_exists(IMAGES_UPLOADED_PATH.$_SESSION['picture_prefix'].IMAGE_PICTURE_SUFFIX.IMAGE_TMP_SUFFIX.IMAGE_EXTENSION)){
+                    $imagePath = $_SESSION['picture_prefix'].IMAGE_PICTURE_SUFFIX.IMAGE_TMP_SUFFIX.IMAGE_EXTENSION;
                 }else if (isset($image) && $image!='') {
                     $imagePath = $image;
                 }else{
@@ -83,7 +83,7 @@
                 if(isset($imagePath)){
                 ?>
                     <img id="picture"
-                         src="<?= base_url('uploads/images/'.$imagePath); ?>"
+                         src="<?= base_url(IMAGES_UPLOADED_PATH.$imagePath); ?>"
                          width="100%"
                          alt="<?= $this->lang->line('field_image'); ?>" />
                 <?php } ?>
@@ -249,7 +249,7 @@ $(document).ready(function() {
     // Refresh the image to prevent display of an old cach image.
     // Changing the src attribute forces browser to update.
     d = new Date();
-    $("#picture").attr("src", "<?= base_url('uploads/images/'.$imagePath); ?>?"+d.getTime());
+    $("#picture").attr("src", "<?= base_url(IMAGES_UPLOADED_PATH.$imagePath); ?>?"+d.getTime());
 });
 
 function get(objectName){

@@ -52,12 +52,13 @@ class Picture extends MY_Controller {
      */
     public function add_picture(){
         if(isset($_POST)){
-            if(!empty($_POST)){
+            if(!empty($_POST && $_POST['cropped_file'] != NULL)){
                 $picture_file = $_POST['cropped_file'];
-                $picture_name = $_SESSION['POST']['inventory_id']."_picture_tmp".IMAGE_EXTENSION;
-                file_put_contents("uploads/images/$picture_name", base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $picture_file)));
-                $_SESSION['picture_path'] = $picture_name;
+                $picture_name = $_SESSION['picture_prefix'].IMAGE_PICTURE_SUFFIX.IMAGE_TMP_SUFFIX.IMAGE_EXTENSION;
+                file_put_contents(IMAGES_UPLOADED_PATH.$picture_name, base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $picture_file)));
                 redirect($_SESSION['picture_callback']);
+            }else{
+                redirect(base_url('picture/get_picture/1'));
             }
         }else{
             redirect(base_url());
