@@ -150,11 +150,12 @@ $(document).ready(function() {
     });
 });
 
-let populating = false;
 
 // ******************************************
 // Load or reload items list corresponding to selected filters
 // ******************************************
+let populating = false;
+
 function load_items(page, filters){
     if (populating) return;
     populating = true;
