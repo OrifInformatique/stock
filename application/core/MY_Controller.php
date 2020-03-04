@@ -7,7 +7,7 @@
  * @copyright   Copyright (c) 2016, Orif <http://www.orif.ch>
  */
 
-class MY_Controller extends CI_Controller
+class MY_Controller extends MX_Controller
 {
 
     /**
@@ -35,7 +35,7 @@ class MY_Controller extends CI_Controller
     protected function ask_for_login()
     {
         $_SESSION['after_login_redirect'] = current_url();
-        redirect("auth/login");
+        redirect("user/auth/login");
     }
 
     

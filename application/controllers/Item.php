@@ -505,7 +505,7 @@ class Item extends MY_Controller {
                 redirect('/item');
             }
 
-            $this->load->model('user_model');
+            $this->load->model('user/user_model');
             $this->load->model('inventory_control_model');
 
             $data['item'] = $this->item_model->get($id);

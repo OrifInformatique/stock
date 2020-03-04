@@ -13,7 +13,7 @@ class Inventory_control_model extends MY_Model
     protected $_table = 'inventory_control';
     protected $primary_key = 'inventory_control_id';
     protected $protected_attributes = ['inventory_control_id'];
-    protected $belongs_to = ['item','controller' => ['primary_key' => 'controller_id', 'model' => 'User_model']];
+    protected $belongs_to = ['item','controller' => ['primary_key' => 'controller_id', 'model' => 'user/User_model']];
     //                               ^        ^ The user who controlled the inventory
 
     /**
