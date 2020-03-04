@@ -59,7 +59,7 @@ class Item extends MY_Controller {
         $this->display_view('item/list', $output);
     }
 
-    private function load_list($page = 1)
+    public function load_list($page = 1)
     {
         // Store URL to make possible to come back later (from item detail for example)
         $_SESSION['items_list_url'] = base_url('item/index/'.$page);
@@ -466,7 +466,7 @@ class Item extends MY_Controller {
      */
     public function delete($id, $command = NULL) {
         // Check if this is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= ACCESS_LVL_ADMIN) {
+        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= $this->config->item('access_lvl_admin')) {
             if (empty($command)) {
                 $data['db'] = 'item';
                 $data['id'] = $id;
@@ -711,7 +711,7 @@ class Item extends MY_Controller {
      */
     public function delete_loan($id, $command = NULL) {
         // Check if this is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= ACCESS_LVL_ADMIN) {
+        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= $this->config->item('access_lvl_admin')) {
             if (empty($command)) {
                 $data['db'] = 'loan';
                 $data['id'] = $id;

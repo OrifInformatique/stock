@@ -8,11 +8,11 @@
 				$update_user = FALSE;
 			} ?>
 		<div class="row" style="margin-top: 5px;">
-			<a href="<?php echo base_url(); ?>user/admin/view_users" class="tab_selected"><?php echo $this->lang->line('admin_tab_users'); ?></a>
-			<a href="<?php echo base_url(); ?>user/admin/view_tags" class="tab_unselected"><?php echo $this->lang->line('admin_tab_tags'); ?></a>
-			<a href="<?php echo base_url(); ?>user/admin/view_stocking_places" class="tab_unselected"><?php echo $this->lang->line('admin_tab_stocking_places'); ?></a>
-			<a href="<?php echo base_url(); ?>user/admin/view_suppliers" class="tab_unselected"><?php echo $this->lang->line('admin_tab_suppliers'); ?></a>
-			<a href="<?php echo base_url(); ?>user/admin/view_item_groups" class="tab_unselected"><?php echo $this->lang->line('admin_tab_item_groups'); ?></a>
+			<a href="<?php echo base_url(); ?>admin/view_users" class="tab_selected"><?php echo $this->lang->line('admin_tab_users'); ?></a>
+			<a href="<?php echo base_url(); ?>admin/view_tags" class="tab_unselected"><?php echo $this->lang->line('admin_tab_tags'); ?></a>
+			<a href="<?php echo base_url(); ?>admin/view_stocking_places" class="tab_unselected"><?php echo $this->lang->line('admin_tab_stocking_places'); ?></a>
+			<a href="<?php echo base_url(); ?>admin/view_suppliers" class="tab_unselected"><?php echo $this->lang->line('admin_tab_suppliers'); ?></a>
+			<a href="<?php echo base_url(); ?>admin/view_item_groups" class="tab_unselected"><?php echo $this->lang->line('admin_tab_item_groups'); ?></a>
 		</div>
     <?php if($update_user) { ?>
     <div class="row alert alert-warning">
@@ -75,7 +75,7 @@
 			<label style="display: inline-block;" for="is_active">Activé </label>
 		</div>
 		<button type="submit" class="btn btn-success"><?php echo $this->lang->line('btn_save'); ?></button>
-		<a class="btn btn-danger" href="<?php echo base_url() . "user/admin/view_users/"; ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
+		<a class="btn btn-danger" href="<?php echo base_url() . "admin/view_users/"; ?>"><?php echo $this->lang->line('btn_cancel'); ?></a>
 	</form>
 	</div>
 </div>

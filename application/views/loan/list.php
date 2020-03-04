@@ -44,7 +44,7 @@
                         $loan->loan_to_user->firstname;} ?>
 
                         <!-- DELETE ACCESS RESTRICTED FOR ADMINISTRATORS ONLY -->
-						<?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= ACCESS_LVL_ADMIN) { ?>
+						<?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= $this->config->item('access_lvl_admin')) { ?>
 				        <a href="<?php echo base_url('/item/delete-loan').'/'.$loan->loan_id ?>" class="close" title="Supprimer le prêt">×</a><?php } ?></td>
                     </div></a></tr>
                 <?php } ?>

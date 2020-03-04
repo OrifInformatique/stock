@@ -19,7 +19,7 @@ class Auth extends MY_Controller {
         parent::__construct();
 
         // Load required items
-        $this->load->library('form_validation')->model('user/user_model');
+        $this->load->library('form_validation')->model('user_model');
 
         // Assign form_validation CI instance to this
         $this->form_validation->CI =& $this;

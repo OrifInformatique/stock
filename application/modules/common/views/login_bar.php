@@ -13,7 +13,7 @@
         <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?>
           
           <!-- ADMIN ACCESS ONLY -->
-          <?php if ($_SESSION['user_access'] >= ACCESS_LVL_MSP) { ?>
+          <?php if ($_SESSION['user_access'] >= $this->config->item('access_lvl_msp')) { ?>
               <a href="<?= base_url("user/admin/"); ?>" ><?= $this->lang->line('btn_admin'); ?></a><br />
           <?php } ?>
           <!-- END OF ADMIN ACCESS -->

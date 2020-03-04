@@ -1,783 +1,260 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
-
 /**
- * Authentication System
+ * User Administraton
  *
- * @author      Jeffrey Mostroso
- * @author      Didier Viret
- * @link        https://github.com/OrifInformatique/stock
- * @copyright   Copyright (c) 2016, Orif <http://www.orif.ch>
+ * @author      Orif (ViDi)
+ * @link        https://github.com/OrifInformatique
+ * @copyright   Copyright (c), Orif (https://www.orif.ch)
+ * @version     2.0
  */
 class Admin extends MY_Controller
 {
-    /* MY_Controller variables definition */
-    protected $access_level = ACCESS_LVL_MSP;
-
     /**
-    * Constructor
-    */
-    public function __construct(){
+     * Constructor
+     */
+    public function __construct()
+    {
+        /* Define controller access level */
+        $this->access_level = $this->config->item('access_lvl_admin');
+
         parent::__construct();
-        $this->load->library('form_validation');
+
+        // Load required items
+        $this->load->library('form_validation')->model(['user_model', 'user_type_model']);
+
+        // Assign form_validation CI instance to this
+        $this->form_validation->CI =& $this;
     }
 
     /**
-    * Menu for admin privileges
-    */
-    public function index()
+     * Displays the list of users
+     *
+     * @param boolean $with_deleted = Display archived users or not
+     * @return void
+     */
+    public function list_user($with_deleted = FALSE)
     {
-      $this->view_users();
-    }
+        if ($with_deleted) {
+            $users = $this->user_model->with_deleted()->get_all();
+        } else {
+            $users = $this->user_model->get_all();
+        }
 
-    /* *********************************************************************************************************
-    USERS
-    ********************************************************************************************************* */
-
-    /**
-    * As the name says, view the users.
-    */
-    public function view_users(){
-
-      $this->load->model('user_model');
-      $this->load->model('user_type_model');
-      $output["users"] = $this->user_model->with("user_type")->get_all();
-      $this->display_view("admin/users/list", $output);
+        $output = array(
+            'users' => $users,
+            'user_types' => $this->user_type_model->dropdown('name'),
+            'with_deleted' => $with_deleted
+        );
+        $this->display_view('user/admin/list_user', $output);
     }
 
     /**
-    * Modify a user
-    * @id = 
-    */
-    public function modify_user($id = NULL)
+     * Adds or modify a user
+     *
+     * @param integer $user_id = The id of the user to modify, leave blank to create a new one
+     * @return void
+     */
+    public function save_user($user_id = 0)
     {
-      $this->load->model('user_model');
+		$oldName = NULL;
+		$oldUsertype = NULL;
+		if (count($_POST) > 0) {
+			$user_id = $this->input->post('id');
+			$oldName = $this->input->post('user_name');
+            if($_SESSION['user_id'] != $user_id) {
+				$oldUsertype = $this->input->post('user_usertype');
+			}
 
-      if(is_null($this->user_model->get($id))) {
-        redirect("user/admin/view_users/");
-      }
+			$this->form_validation->set_rules(
+				'id', 'id',
+				'callback_cb_not_null_user',
+				['cb_not_null_user' => $this->lang->line('msg_err_user_not_exist')]
+			);
+			$this->form_validation->set_rules('user_name', 'lang:user_name',
+				[
+					'required', 'trim',
+					'min_length['.$this->config->item('username_min_length').']',
+					'max_length['.$this->config->item('username_max_length').']',
+					"callback_cb_unique_user[{$user_id}]"
+				],
+				['cb_unique_user' => $this->lang->line('msg_err_user_not_unique')]
+			);
+			$this->form_validation->set_rules('user_usertype', 'lang:user_usertype',
+				['required', 'callback_cb_not_null_user_type'],
+				['cb_not_null_user_type' => $this->lang->line('msg_err_user_type_not_exist')]
+			);
+	
+			if ($user_id == 0) {
+				$this->form_validation->set_rules('user_password', lang('field_password'), [
+					'required', 'trim',
+					'min_length['.$this->config->item('password_min_length').']',
+					'max_length['.$this->config->item('password_max_length').']'
+				]);
+				$this->form_validation->set_rules('user_password_again', $this->lang->line('field_password_confirm'), [
+					'required', 'trim', 'matches[user_password]',
+					'min_length['.$this->config->item('password_min_length').']',
+					'max_length['.$this->config->item('password_max_length').']'
+				]);
+			}
 
-      if (!empty($_POST)) {
-        // VALIDATION
+			if ($this->form_validation->run()) {
+				$user = array(
+					'fk_user_type' => $this->input->post('user_usertype'),
+					'username' => $this->input->post('user_name')
+				);
+				if ($user_id > 0) {
+					$this->user_model->update($user_id, $user);
+				} else {
+					$password = $this->input->post('user_password');
+					$user['password'] = password_hash($password, $this->config->item('password_hash_algorithm'));
+					$this->user_model->insert($user);
+				}
+				redirect('user/admin/list_user');
+			}
+		}
 
-        //username: if changed,
-        if ($_POST['username'] != get_object_vars($this->user_model->get($id))['username']) {
-          $this->form_validation->set_rules('username', $this->lang->line('field_username'), "required|callback_unique_username[$id]", $this->lang->line('msg_id_needed')); // not void and unique.
-        }
+        $output = array(
+            'title' => $this->lang->line('title_user_'.((bool)$user_id ? 'update' : 'new')),
+            'user' => $this->user_model->with_deleted()->get($user_id),
+            'user_types' => $this->user_type_model->dropdown('name'),
+            'user_name' => $oldName,
+            'user_usertype' => $oldUsertype
+		);
 
-        //email: void
-        if (isset($_POST['email'])) {
-          // or valid.
-          $this->form_validation->set_rules('email', $this->lang->line('field_mail'), 'valid_email', $this->lang->line('msg_err_email'));
-        }
-
-        // If the password needs to be modified,
-        if (isset($_POST['pwd'])) {
-          // it needs to be long 6 chars or more and confirmed
-          $this->form_validation->set_rules('pwd', $this->lang->line('field_password'), 'min_length[6]', $this->lang->line('msg_err_pwd_length'));
-          $this->form_validation->set_rules('pwdagain', $this->lang->line('field_password'), 'matches[pwd]', $this->lang->line('msg_err_pwg_wrong'));
-        }
-
-        if($this->form_validation->run() === TRUE)
-        {
-          $userArray["is_active"] = 0;
-
-          foreach($_POST as $forminput => $formoutput) {
-            // Password needs to be hashed first, so it's not the same thing as the other
-            if ($forminput != "pwd" && $forminput != "pwdagain" && $forminput != "is_active" && $forminput != "email") {
-              $userArray[$forminput] = $formoutput;
-            // Do the hash only once…
-            } else if ($forminput == "pwd" && $formoutput != "") {
-              $userArray["password"] = password_hash($formoutput, PASSWORD_HASH_ALGORITHM);
-            } else if ($forminput == "is_active" && $formoutput == "TRUE") {
-              $userArray["is_active"] = 1;
-            } else if ($forminput == "email") {
-              if ($formoutput != "") {
-                  $userArray["email"] = $formoutput;
-              } else {
-                  $userArray["email"] = "";
-              }
-            }
-          }
-          
-          $this->user_model->update($id, $userArray);
-
-          redirect("user/admin/view_users/");
-          exit();
-        }
-      // The values of the user are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
-      } else {
-        $output = get_object_vars($this->user_model->get($id));
-      }
-
-      $this->load->model('user_model');
-      $this->load->model('user_type_model');
-      $output = get_object_vars($this->user_model->get($id));
-      $output["users"] = $this->user_model->get_all();
-      $output["user_types"] = $this->user_type_model->get_all();
-
-      $this->display_view("admin/users/form", $output);
-    }
-
-    public function unique_username($newUsername, $userID) {
-      $this->load->model('user_model');
-
-      // Get this user. If it fails, it doesn't exist, so the username is unique!
-      $user = $this->user_model->get_by('username', $newUsername);
-      
-      if(isset($user->user_id) && $user->user_id != $userID) {
-        $this->form_validation->set_message('unique_username', $this->lang->line('msg_err_id_used'));
-        return FALSE;
-      } else {
-        return TRUE;
-      }
+        $this->display_view('user/admin/save_user', $output);
     }
 
     /**
-    * Create a new user
-    */
-    public function new_user()
+     * Deletes or deactivate a user depending on $action
+     *
+     * @param integer $user_id = ID of the user to affect
+     * @param integer $action = Action to apply on the user:
+     *  - 0 for displaying the confirmation
+     *  - 1 for deactivating (soft delete)
+     *  - 2 for deleting (hard delete)
+     * @return void
+     */
+    public function delete_user($user_id, $action = 0)
     {
-      if (!empty($_POST)) {
-        // VALIDATION
-
-        //username: not void, unique
-        $this->form_validation->set_rules('username', $this->lang->line('field_username'), 'required|callback_unique_username', $this->lang->line('msg_err_id_needed'));
-
-        //email: void
-        if (isset($_POST['email'])) {
-          // or valid
-          $this->form_validation->set_rules('email', $this->lang->line('field_mail'), 'valid_email', $this->lang->line('msg_err_email'));
+        $user = $this->user_model->with_deleted()->get($user_id);
+        if (is_null($user)) {
+            redirect('user/admin/list_user');
         }
 
-        //Password: 6 chars or more, confirmed
-        $this->form_validation->set_rules('pwd', $this->lang->line('field_password'), 'required|min_length[6]', $this->lang->line('msg_err_pwd_length'));
-        $this->form_validation->set_rules('pwdagain', $this->lang->line('field_password'), 'matches[pwd]', $this->lang->line('msg_err_pwg_wrong'));
-
-        if($this->form_validation->run() === TRUE)
-        {
-          $userArray["is_active"] = 0;
-
-          foreach($_POST as $forminput => $formoutput) {
-            // Password needs to be hashed first, so it's not the same thing as the other
-            if ($forminput != "pwd" && $forminput != "pwdagain" && $forminput != "is_active" && $forminput != "email") {
-              $userArray[$forminput] = $formoutput;
-            // Do the hash only once…
-            } else if ($forminput == "pwd" && $formoutput != "") {
-              $userArray["password"] = password_hash($formoutput, PASSWORD_HASH_ALGORITHM);
-            } else if ($forminput == "is_active" && $formoutput == "TRUE") {
-              $userArray["is_active"] = 1;
-            } else if ($forminput == "email") {
-              if ($formoutput != "") {
-                $userArray["email"] = $formoutput;
-              }
-            }
-          }
-
-          $this->load->model('user_model');
-          $this->user_model->insert($userArray);
-
-          redirect("user/admin/view_users/");
-          exit();
+        switch($action) {
+            case 0: // Display confirmation
+                $output = array(
+                    'user' => $user,
+                    'title' => lang('title_user_delete')
+                );
+                $this->display_view('user/admin/delete_user', $output);
+                break;
+            case 1: // Deactivate (soft delete) user
+                if ($_SESSION['user_id'] != $user->id) {
+                    $this->user_model->delete($user_id, FALSE);
+                }
+                redirect('user/admin/list_user');
+            case 2: // Delete user
+                if ($_SESSION['user_id'] != $user->id) {
+                    $this->user_model->delete($user_id, TRUE);
+                }
+                redirect('user/admin/list_user');
+            default: // Do nothing
+                redirect('user/admin/list_user');
         }
-      }
-
-      $this->load->model('user_type_model');
-      $output["user_types"] = $this->user_type_model->get_all();
-
-      $this->display_view("admin/users/form", $output);
-    }
-
-    /**
-    * Delete a user. 
-    * If $action is NULL, a confirmation will be shown.
-    * If it is "d", is_active will be set to 0.
-    * If it is anything else, the user will be deleted. 
-    */
-    public function delete_user($id = NULL, $action = NULL) {
-      $this->load->model('user_model');
-      $deletion_allowed = true;
-      $linked_objects = [];
-      
-      if(is_null($this->user_model->get($id))) {
-        redirect("user/admin/view_users/");
-      }
-      
-      // Check if user is linked to other objects
-      $user = $this->user_model->with_all()->get($id);
-
-      if (!empty($user->items_created) || !empty($user->items_modified) || !empty($user->items_checked)) {
-        $linked_objects[] = lang('delete_linked_items');
-        $deletion_allowed = false;
-      }
-      if (!empty($user->loans_registered)) {
-        $linked_objects[] = lang('delete_linked_loans_registered');
-        $deletion_allowed = false;
-      }
-      if (!empty($user->loans_made)) {
-        $linked_objects[] = lang('delete_linked_loans_made');
-        $deletion_allowed = false;
-      }
-      
-      if($deletion_allowed && $action == "disable") {
-        $this->user_model->update($id, array('is_active' => 0));
-        redirect("user/admin/view_users/");
-        
-      } else if($deletion_allowed && $action == "delete") {
-        $this->user_model->delete($id);
-        redirect("user/admin/view_users/");
-      }
-      
-      $output = get_object_vars($this->user_model->get($id));
-      
-      $output["deletion_allowed"] = $deletion_allowed;
-      $output["linked_objects"] = $linked_objects;
-      $output["action"] = $action;
-            
-      $this->display_view("admin/users/delete", $output);
-    }
-    
-
-    /* *********************************************************************************************************
-    TAGS
-    ********************************************************************************************************* */
-
-    /**
-    * As the name says, view the tags.
-    */
-    public function view_tags()
-    {
-      $this->load->model('item_tag_model');
-      $output["tags"] = $this->item_tag_model->get_all();
-
-      $this->display_view("admin/tags/list", $output);
-    }
-
-    /**
-    * Modify a tag
-    */
-    public function modify_tag($id = NULL)
-    {
-      $this->load->model('item_tag_model');
-
-      if(is_null($this->item_tag_model->get($id))) {
-        redirect("user/admin/view_tags/");
-      }
-
-      if (!empty($_POST)) {
-        // VALIDATION
-
-        //name: if changed,
-          $this->form_validation->set_rules('name', $this->lang->line('field_username'), "required|callback_unique_tagname[$id]", $this->lang->line('msg_err_tag_name_needed')); // not void
-        
-        //short_name: if changed,
-          $this->form_validation->set_rules('short_name', $this->lang->line('field_abbreviation'), "required|callback_unique_tagshort[$id]", $this->lang->line('msg_err_abbreviation')); // not void
-        
-        if($this->form_validation->run() === TRUE) {
-            $this->item_tag_model->update($id, $_POST);
-            
-            redirect("user/admin/view_tags/");
-            exit();
-        }
-      
-      // The values of the tag are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
-      } else {
-        $output = get_object_vars($this->item_tag_model->get($id));
-      }
-
-      $this->load->model('item_tag_model');
-      if(!is_null($this->item_tag_model->get($id))){
-        $output = get_object_vars($this->item_tag_model->get($id));
-        $output["tags"] = $this->item_tag_model->get_all();
-      } else {
-        $output["missing_tag"] = TRUE;
-      }
-
-      $this->display_view("admin/tags/form", $output);
-    }
-
-    /**
-    * Create a new tag
-    */
-    public function new_tag()
-    {
-      if (!empty($_POST)) {
-        // VALIDATION
-
-        //name: not void
-        $this->form_validation->set_rules('name', $this->lang->line('field_username'), 'required|callback_unique_tagname', $this->lang->line('msg_err_tag_name_needed'));
-        
-        //short_name: not void
-        $this->form_validation->set_rules('short_name', $this->lang->line('field_abbreviation'), 'required|callback_unique_tagshort', $this->lang->line('msg_err_abbreviation'));
-
-        if($this->form_validation->run() === TRUE)
-        {
-
-          $this->load->model('item_tag_model');
-          $this->item_tag_model->insert($_POST);
-
-          redirect("user/admin/view_tags/");
-          exit();
-        }
-      }
-
-      $this->display_view("admin/tags/form");
-    }
-
-    public function unique_tagname($newName, $tagID) {
-      $this->load->model('item_tag_model');
-
-      // Get this tag. If it fails, it doesn't exist, so the name is unique!
-      $tag = $this->item_tag_model->get_by('name', $newName);
-      
-      if(isset($tag->item_tag_id) && $tag->item_tag_id != $tagID) {
-        $this->form_validation->set_message('unique_tagname', $this->lang->line('msg_err_username_used'));
-        return FALSE;
-      } else {
-        return TRUE;
-      }
-    }
-    
-    public function unique_tagshort($newShort, $tagID) {
-      $this->load->model('item_tag_model');
-
-      // Get this tag. If it fails, it doesn't exist, so the name is unique!
-      $tag = $this->item_tag_model->get_by('short_name', $newShort);
-      
-      if(isset($tag->item_tag_id) && $tag->item_tag_id != $tagID) {
-        $this->form_validation->set_message('unique_tagshort', $this->lang->line('msg_err_unique_shortname'));
-        return FALSE;
-      } else {
-        return TRUE;
-      }
     }
     
     /**
-    * Delete a tag. 
-    * If $action is NULL, a confirmation will be shown. If it is anything else, the tag will be deleted.
-    */
-    public function delete_tag($id = NULL, $action = NULL) {
-      $this->load->model('item_tag_model');
-      $this->load->model('item_tag_link_model');
-      $this->load->model('item_model');
-
-      if(is_null($this->item_tag_model->get($id))) {
-        redirect("user/admin/view_tags");
-      }
-
-      $filter = array("t" => array($id));
-      $items = $this->item_model->get_filtered($filter);
-
-      if (is_null($action)) {
-        // Display a message to confirm the action
-        $output = get_object_vars($this->item_tag_model->get($id));
-        $output["deletion_allowed"] = !(sizeof($items) > 0 && sizeof($items) < 500); // Do not make the number bigger than the amount of items
-        $output["amount"] = sizeof($items);
-        $output["tags"] = $this->item_tag_model->get_all();
-        $this->display_view("admin/tags/delete", $output);
-      
-      } else {
-        // Action confirmed : delete links and delete tag
-        $this->item_tag_link_model->delete_by('item_tag_id='.$id);
-        $this->item_tag_model->delete($id);
-        redirect("user/admin/view_tags/");
-      }
-    }
-
-    /* *********************************************************************************************************
-    STOCKING PLACES
-    ********************************************************************************************************* */
-
-    /**
-    * As the name says, view the stocking places.
-    */
-    public function view_stocking_places()
+     * Reactivate a disabled user.
+     *
+     * @param integer $user_id = ID of the user to affect
+     * @return void
+     */
+    public function reactivate_user($user_id)
     {
-      $this->load->model('stocking_place_model');
-      $output["stocking_places"] = $this->stocking_place_model->get_all();
-
-      $this->display_view("admin/stocking_places/list", $output);
-    }
-
-    /**
-    * As the name says, modify a stocking place, which id is $id
-    */
-    public function modify_stocking_place($id = NULL)
-    {
-      $this->load->model('stocking_place_model');
-
-      if(is_null($this->stocking_place_model->get($id))){
-        redirect("user/admin/view_stocking_places/");
-      }
-
-      if (!empty($_POST)) {
-        $this->form_validation->set_rules('short', $this->lang->line('field_short_name'), "required|callback_unique_stocking_short[$id]", $this->lang->line('msg_storage_short_needed'));
-        $this->form_validation->set_rules('name', $this->lang->line('field_long_name'), "required|callback_unique_stocking_name[$id]", $this->lang->line('msg_err_storage_long_needed'));
-
-        if ($this->form_validation->run() === TRUE)
-        {
-          $this->stocking_place_model->update($id, $_POST);
-
-          redirect("user/admin/view_stocking_places/");
-          exit();
+        $user = $this->user_model->with_deleted()->get($user_id);
+        if (is_null($user)) {
+            redirect('user/admin/list_user');
+        } else {
+            $this->user_model->undelete($user_id);
+            redirect('user/admin/save_user/'.$user_id);
         }
-      } else {
-        $output = get_object_vars($this->stocking_place_model->get($id));
-      }
-      if(!is_null($this->stocking_place_model->get($id))) {
-        $output = get_object_vars($this->stocking_place_model->get($id));
-        $output["stocking_places"] = $this->stocking_place_model->get_all();
-      }else{
-        $output["missing_stocking_place"] = TRUE;
-      }
-
-      $this->display_view("admin/stocking_places/form", $output);
     }
 
     /**
-    * Create a new stocking_place
-    */
-    public function new_stocking_place()
+     * Displays a form to change a user's password
+     *
+     * @param integer $user_id = ID of the user to update
+     * @return void
+     */
+    public function password_change_user($user_id)
     {
-      if (!empty($_POST)) {
-        // VALIDATION
+		if (count($_POST) > 0) {
+			$this->form_validation->set_rules(
+				'id', 'id',
+				'callback_cb_not_null_user',
+				$this->lang->line('msg_err_user_not_exist')
+			);
+			$this->form_validation->set_rules('user_password_new', lang('field_new_password'), [
+				'required', 'trim',
+				'min_length['.$this->config->item('password_min_length').']',
+				'max_length['.$this->config->item('password_max_length').']'
+			]);
+			$this->form_validation->set_rules('user_password_again', $this->lang->line('field_password_confirm'), [
+				'required', 'trim', 'matches[user_password_new]',
+				'min_length['.$this->config->item('password_min_length').']',
+				'max_length['.$this->config->item('password_max_length').']'
+			]);
 
-        //name: not void
-        $this->form_validation->set_rules('name', $this->lang->line('field_username'), 'required|callback_unique_stocking_name', $this->lang->line('msg_err_stocking_needed'));
-        $this->form_validation->set_rules('short', $this->lang->line('field_short'), 'required|callback_unique_stocking_short', $this->lang->line('msg_err_stocking_short'));
+			if ($this->form_validation->run()) {
+				$password = $this->input->post('user_password_new');
+				$password = password_hash($password, $this->config->item('password_hash_algorithm'));
+				$this->user_model->update($user_id, ['password' => $password]);
+				redirect('user/admin/list_user');
+			}
+		}
 
+        $user = $this->user_model->with_deleted()->get($user_id);
+        if (is_null($user)) redirect('user/admin/list_user');
 
-        if ($this->form_validation->run() === TRUE)
-        {
-          $this->stocking_place_model->insert($_POST);
+        $output = array(
+            'user' => $user,
+            'title' => $this->lang->line('title_user_password_reset')
+        );
 
-          redirect("user/admin/view_stocking_places/");
-          exit();
-        }
-      }
-
-      $this->display_view("admin/stocking_places/form");
-    }
-          
-    public function unique_stocking_name($newName, $stockID) {
-      $this->load->model('stocking_place_model');
-
-      // Search if another group has the same name
-      $group = $this->stocking_place_model->get_by('name', $newName);
-      
-      if(isset($group->stocking_place_id) && $group->stocking_place_id != $stockID) {
-        $this->form_validation->set_message('unique_stocking_name', $this->lang->line('msg_err_stocking_unique'));
-        return FALSE;
-      } else {
-        return TRUE;
-      }
-    }
-    
-    public function unique_stocking_short($newShort, $stockID) {
-      $this->load->model('stocking_place_model');
-
-      // Search if another group has the same name
-      $group = $this->stocking_place_model->get_by('name', $newShort);
-      
-      if(isset($group->stocking_place_id) && $group->stocking_place_id != $stockID) {
-        $this->form_validation->set_message('unique_stocking_short', $this->lang->line('msg_err_stocking_short_unique'));
-        return FALSE;
-      } else {
-        return TRUE;
-      }
-    }
-    
-    /**
-    * Delete the stocking place $id. If $action is null, a confirmation will be shown
-    */
-    public function delete_stocking_place($id = NULL, $action = NULL)
-    {
-      $this->load->model('stocking_place_model');
-      $this->load->model('item_model');
-
-      if(is_null($this->stocking_place_model->get($id))) {
-        redirect("user/admin/view_stocking_places/");
-      }
-      
-      $filter = array('s' => array($id));
-      $items = $this->item_model->get_filtered($filter);
-
-      if (is_null($action)) {
-        $output = get_object_vars($this->stocking_place_model->get($id));
-        $output["stocking_places"] = $this->stocking_place_model->get_all();
-        $output["deletion_allowed"] = (sizeof($items) == 0);
-        $output["amount"] = sizeof($items);
-
-        $this->display_view("admin/stocking_places/delete", $output);
-      } else {
-        $this->stocking_place_model->delete($id);
-        redirect("user/admin/view_stocking_places/");
-      }
-
-    }
-
-    /* *********************************************************************************************************
-    SUPPLIERS
-    ********************************************************************************************************* */
-          
-    /**
-    * As the name says, view the suppliers.
-    */
-    public function view_suppliers()
-    {
-      $this->load->model('supplier_model');
-      $output["suppliers"] = $this->supplier_model->get_all();
-
-      $this->display_view("admin/suppliers/list", $output);
+        $this->display_view('user/admin/password_change_user', $output);
     }
 
     /**
-    * Modify a supplier
-    */
-    public function modify_supplier($id = NULL)
+     * Checks that a username doesn't exist
+     *
+     * @param string $username = Username to check
+     * @param int $user_id = ID of the user if it is an update
+     * @return boolean = TRUE if the username is unique, FALSE otherwise
+     */
+    public function cb_unique_user($username, $user_id) : bool
     {
-      $this->load->model('supplier_model');
-
-      if(is_null($this->supplier_model->get($id))) {
-        redirect("user/admin/view_suppliers/");
-      }
-
-      if (!empty($_POST)) {
-        // VALIDATION
-
-        //name: if changed,
-        $this->form_validation->set_rules('name', $this->lang->line('field_name'), "required|callback_unique_supplier[$id]", $this->lang->line('msg_err_supplier_needed')); // not void
-
-        if (isset($_POST['email'])) {
-          // or valid.
-          $this->form_validation->set_rules('email', $this->lang->line('field_mail'), 'valid_email', $this->lang->line('msg_err_email'));
-        }
-
-        if ($this->form_validation->run() === TRUE)
-        {
-          $this->supplier_model->update($id, $_POST);
-
-          redirect("user/admin/view_suppliers/");
-          exit();
-        }
-      } else {
-        $output = get_object_vars($this->supplier_model->get($id));
-      }
-      
-      if(!is_null($this->supplier_model->get($id))){
-        $output = get_object_vars($this->supplier_model->get($id));
-        $output["suppliers"] = $this->supplier_model->get_all();
-      }else{
-        $output["missing_supplier"] = TRUE;
-      }
-      
-      $this->display_view("admin/suppliers/form", $output);
+        $user = $this->user_model->with_deleted()->get_by('username', $username);
+        return is_null($user) || $user->id == $user_id;
     }
-    
     /**
-    * Create a new supplier
-    */
-    public function new_supplier()
+     * Checks that an user exists
+     *
+     * @param integer $user_id = Id of the user to check
+     * @return boolean = TRUE if the id is 0 or if the user exists, FALSE otherwise
+     */
+    public function cb_not_null_user($user_id) : bool
     {
-      $this->load->model('supplier_model');
-
-      if (!empty($_POST)) {
-        // VALIDATION
-
-        //name: not void
-        $this->form_validation->set_rules('name', $this->lang->line('field_name'), 'required|callback_unique_supplier', $this->lang->line('msg_err_supplier_needed'));
-
-        //email: void
-        if (isset($_POST['email'])) {
-          // or valid
-          $this->form_validation->set_rules('email', $this->lang->line('field_mail'), 'valid_email', $this->lang->line('msg_err_email'));
-        }
-
-        if ($this->form_validation->run() === TRUE)
-        {
-          $this->supplier_model->insert($_POST);
-
-          redirect("user/admin/view_suppliers/");
-          exit();
-        }
-      }
-
-      $this->display_view("admin/suppliers/form");
+        return $user_id == 0 || !is_null($this->user_model->with_deleted()->get($user_id));
     }
-
     /**
-    * Delete a supplier
-    */
-    public function delete_supplier($id = NULL, $action = NULL)
+     * Checks that an user type exists
+     *
+     * @param integer $user_type_id = Id of the user type to check
+     * @return boolean = TRUE if the user type exists, FALSE otherwise
+     */
+    public function cb_not_null_user_type($user_type_id) : bool
     {
-      $this->load->model('supplier_model');
-      $this->load->model('item_model');
-
-      if(is_null($this->supplier_model->get($id))) {
-        redirect("user/admin/view_suppliers/");
-      }
-      
-      // Block deletion if this supplier is used
-      $items = $this->item_model->get_many_by("supplier_id = ".$id);
-      $amount = count($items);
-
-      if (!isset($action)) {
-        $output = get_object_vars($this->supplier_model->get($id));
-        $output["deletion_allowed"] = ($amount < 1);
-        $output["amount"] = $amount;
-
-        $this->display_view("admin/suppliers/delete", $output);
-      } else {
-        // delete it!
-        $this->supplier_model->delete($id);
-        
-        // redirect the user to the updated table
-        redirect("user/admin/view_suppliers/");
-      }
-    }
-
-    public function unique_supplier($newName, $supplierID) {
-      $this->load->model('supplier_model');
-
-      // Search if another group has the same name
-      $group = $this->supplier_model->get_by('name', $newName);
-      
-      if(isset($group->supplier_id) && $group->supplier_id != $supplierID) {
-        $this->form_validation->set_message('unique_supplier', $this->lang->line('msg_err_supplier_unique'));
-        return FALSE;
-      } else {
-        return TRUE;
-      }
-    }
-    
-    /* *********************************************************************************************************
-    ITEM GROUPS
-    ********************************************************************************************************* */
-
-    /**
-    * As the name says, view the item groups.
-    */
-    public function view_item_groups()
-    {
-      $this->load->model('item_group_model');
-      $output["item_groups"] = $this->item_group_model->get_all();
-
-      $this->display_view("admin/item_groups/list", $output);
-    }
-
-    /**
-    * Modify a group
-    */
-    public function modify_item_group($id = NULL)
-    {
-      $this->load->model('item_group_model');
-
-      if(is_null($this->item_group_model->get($id))) {
-        redirect("user/admin/view_item_groups/");
-      }
-
-      if (!empty($_POST)) {
-        $this->form_validation->set_rules('name', lang('field_name'), "required|callback_unique_groupname[$id]", lang('msg_err_item_group_needed'));
-        $this->form_validation->set_rules('short_name', $this->lang->line('field_abbreviation'), "required|callback_unique_groupshort[$id]", $this->lang->line('msg_err_item_group_short'));
-
-        if ($this->form_validation->run() === TRUE) {
-          $this->item_group_model->update($id, $_POST);
-
-          redirect("user/admin/view_item_groups/");
-          exit();
-        }
-      } else {
-        if(!is_null($this->item_group_model->get($id))) {
-          $output = get_object_vars($this->item_group_model->get($id));
-        }
-      }
-      
-      if(!is_null($this->item_group_model->get($id))) {
-        $output["item_groups"] = $this->item_group_model->get_all();
-      }else{
-        $output["missing_item_group"] = TRUE;
-      }
-      $this->display_view("admin/item_groups/form", $output);
-    }
-
-    /**
-    * Create a new group
-    */
-    public function new_item_group()
-    {
-      $this->load->model('item_group_model');
-
-      if (!empty($_POST)) {
-        $this->form_validation->set_rules('name', $this->lang->line('field_username'), 'required|callback_unique_groupname', $this->lang->line('msg_err_unique_groupname'));
-        $this->form_validation->set_rules('short_name', $this->lang->line('field_abbreviation'), 'required|callback_unique_groupshort', $this->lang->line('msg_err_unique_shortname'));
-
-        if ($this->form_validation->run() === TRUE)
-        {
-          $this->item_group_model->insert($_POST);
-
-          redirect("user/admin/view_item_groups/");
-          exit();
-        }
-      }
-
-      $this->display_view("admin/item_groups/form");
-    }
-
-    public function unique_groupname($newName, $groupID) {
-      $this->load->model('item_group_model');
-
-      // Search if another group has the same name
-      $group = $this->item_group_model->get_by('name', $newName);
-      
-      if(isset($group->item_group_id) && $group->item_group_id != $groupID) {
-        $this->form_validation->set_message('unique_groupname', $this->lang->line('msg_err_username_used'));
-        return FALSE;
-      } else {
-        return TRUE;
-      }
-    }
-    
-    public function unique_groupshort($newShortName, $groupID) {
-      $this->load->model('item_group_model');
-
-      // Search if another group has the same short name
-      $group = $this->item_group_model->get_by('short_name', $newShortName);
-      
-      if(isset($group->item_group_id) && $group->item_group_id != $groupID) {
-        $this->form_validation->set_message('unique_groupshort', $this->lang->line('msg_err_unique_shortname'));
-        return FALSE;
-      } else {
-        return TRUE;
-      }
-    }
-    
-    /**
-    * Delete an unused item group
-    */
-    public function delete_item_group($id = NULL, $action = NULL)
-    {
-      $this->load->model('item_group_model');
-      $this->load->model('item_model');
-
-      if(is_null($this->item_group_model->get($id))) {
-        redirect("user/admin/view_item_groups/");
-      }
-
-      $filter = array("g" => array($id));
-      $items = $this->item_model->get_filtered($filter);
-
-      if (!isset($action)) {
-        $output = get_object_vars($this->item_group_model->get($id));
-        $output["item_groups"] = $this->item_group_model->get_all();
-        $output["deletion_allowed"] = (sizeof($items) == 0);
-        $output["amount"] = sizeof($items);
-
-        $this->display_view("admin/item_groups/delete", $output);
-      } else {
-        // delete it!
-        $this->item_group_model->delete($id);
-        
-        // redirect the user to the updated table
-        redirect("user/admin/view_item_groups/");
-      }
+        return !is_null($this->user_type_model->get($user_type_id));
     }
 }
