@@ -154,7 +154,11 @@ $(document).ready(function() {
 // ******************************************
 // Load or reload items list corresponding to selected filters
 // ******************************************
+let populating = false;
+
 function load_items(page, filters){
+    if (populating) return;
+    populating = true;
     // Display "wait" cursor
     $("*").css("cursor", "wait");
     
@@ -178,12 +182,13 @@ function load_items(page, filters){
             
             history.pushState(null, "", "<?= base_url("item/index/")?>"+page+filters);
             
+            // Empty list before filling it
             if (result.items.length > 0){ 
                 $("#table_item").toggle(true);
                 $.each(result.items, function (i, item) {
                     $("#list_item").append(display_item(item));
                 });
-            }else{ 
+            } else {
                 $("#no_item_message").toggle(true);
             }
             
@@ -196,6 +201,7 @@ function load_items(page, filters){
                 load_items( $(this).data("ciPaginationPage"), getFilters());
             });
             history.pushState(null, "", "<?= base_url("item/index/")?>"+page+filters);
+            populating = false;
         },
         error : function(resultat, statut, erreur){
             $("#error_message").toggle(true);
@@ -203,6 +209,7 @@ function load_items(page, filters){
             
             // Display normal cursor
             $("*").css("cursor", "");
+            populating = false;
         }
     });
 }
@@ -266,7 +273,7 @@ function display_item(item){
     row.append('<td>'+item_condition+'<br />'+loan_bootstrap_label+'<br />'+item_localisation+'</td>');
     row.append('<td><a href="'+href+'">'+item_name+'</a><h6>'+item_description+'</h6></td>');
     row.append('<td>'+stocking_place+'</td>');
-    row.append('<td><a href="'+href+'">'+inventory_number+'</a><a href="'+href+'">'+serial_number+'</a></td>');
+    row.append('<td><a href="'+href+'">'+inventory_number+'</a><br><a href="'+href+'">'+serial_number+'</a></td>');
     row.append(delete_item);
     
     return row;

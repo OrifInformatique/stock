@@ -212,6 +212,7 @@ $lang['msg_err_stocking_short_unique']  = 'Un nom court d\'emplacement doit êtr
 $lang['msg_err_username_used']          = 'Ce nom est déjà utilisé';
 $lang['msg_err_photo_upload']           = 'Aucune photo n\'a été ajoutée';
 $lang['msg_no_loan']                    = 'Aucun prêt à afficher';
+$lang['msg_err_not_photo']              = 'Le fichier fournit n\'est pas une image';
 $lang['msg_no_inventory_controls']      = 'Aucun contrôle d\'inventaire';
 $lang['msg_no_item']                    = 'Aucun objet à afficher';
 
