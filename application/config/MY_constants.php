@@ -83,7 +83,7 @@ define('IMAGE_TMP_SUFFIX', '_tmp');
 | Uploaded images path
 |--------------------------------------------------------------------------
 */
-define('IMAGES_UPLOADED_PATH', 'uploads/images/');
+define('IMAGES_UPLOAD_PATH', 'uploads/images/');
 
 /*
  |-------------------------------------------------------------------------

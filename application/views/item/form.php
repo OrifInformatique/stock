@@ -72,7 +72,7 @@
             
             <div class="form-group">
                 <?php 
-                if(file_exists(IMAGES_UPLOADED_PATH.$_SESSION['picture_prefix'].IMAGE_PICTURE_SUFFIX.IMAGE_TMP_SUFFIX.IMAGE_EXTENSION)){
+                if(file_exists(IMAGES_UPLOAD_PATH.$_SESSION['picture_prefix'].IMAGE_PICTURE_SUFFIX.IMAGE_TMP_SUFFIX.IMAGE_EXTENSION)){
                     $imagePath = $_SESSION['picture_prefix'].IMAGE_PICTURE_SUFFIX.IMAGE_TMP_SUFFIX.IMAGE_EXTENSION;
                 }else if (isset($image) && $image!='') {
                     $imagePath = $image;
@@ -83,7 +83,7 @@
                 if(isset($imagePath)){
                 ?>
                     <img id="picture"
-                         src="<?= base_url(IMAGES_UPLOADED_PATH.$imagePath); ?>"
+                         src="<?= base_url(IMAGES_UPLOAD_PATH.$imagePath); ?>"
                          width="100%"
                          alt="<?= $this->lang->line('field_image'); ?>" />
                 <?php } ?>
@@ -249,7 +249,7 @@ $(document).ready(function() {
     // Refresh the image to prevent display of an old cach image.
     // Changing the src attribute forces browser to update.
     d = new Date();
-    $("#picture").attr("src", "<?= base_url(IMAGES_UPLOADED_PATH.$imagePath); ?>?"+d.getTime());
+    $("#picture").attr("src", "<?= base_url(IMAGES_UPLOAD_PATH.$imagePath); ?>?"+d.getTime());
 });
 
 function get(objectName){

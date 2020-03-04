@@ -206,17 +206,21 @@ class Item extends MY_Controller {
     public function create() {
         // Check if this is allowed
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
-
+            // Get new item id and set picture_prefix
             $item_id = $this->item_model->get_future_id();
-            $_SESSION['picture_prefix'] = str_pad($item_id, 4, "0",STR_PAD_LEFT);
+            $_SESSION['picture_prefix'] = str_pad($item_id, INVENTORY_NUMBER_CHARS, "0", STR_PAD_LEFT);
+            
+            // Define image path variables
+            $temp_image_name = $_SESSION["picture_prefix"].IMAGE_PICTURE_SUFFIX.IMAGE_TMP_SUFFIX.IMAGE_EXTENSION;
+            $new_image_name = $_SESSION["picture_prefix"].IMAGE_PICTURE_SUFFIX.IMAGE_EXTENSION;
             
             // Check if the user cancelled the form
             if(isset($_POST['submitCancel'])){
-                $tmp_file = glob("uploads/images/*".IMAGE_TMP_SUFFIX."*")[0];
+                $tmp_image_file = glob(IMAGES_UPLOAD_PATH.$temp_image_name)[0];
                 
                 // Check if there is a temporary file, if yes then delete it
-                if($tmp_file != null || $tmp_file != false){
-                    unlink($tmp_file);
+                if($tmp_image_file != null || $tmp_image_file != false){
+                    unlink($tmp_image_file);
                 }
                 
                 redirect(base_url());
@@ -233,7 +237,7 @@ class Item extends MY_Controller {
             // values in the session, then redirect him to the image form
             if(isset($_POST['photoSubmit'])){
                 $this->session->set_userdata("POST", $_POST);
-                $this->session->set_userdata("item_id",$this->item_model->get_future_id());
+                $this->session->set_userdata("item_id", $item_id);
                 
                 redirect(base_url("picture/select_picture"));
             }
@@ -275,11 +279,9 @@ class Item extends MY_Controller {
                 }
 
                 // Turn Temporaty Image into a final one if there is one
-                $temp_image_path = $_SESSION["picture_prefix"].IMAGE_PICTURE_SUFFIX.IMAGE_TMP_SUFFIX.IMAGE_EXTENSION;
-                $new_image_path = $_SESSION["picture_prefix"].IMAGE_PICTURE_SUFFIX.IMAGE_EXTENSION;
-                if(file_exists(IMAGES_UPLOADED_PATH.$temp_image_path)){
-                    rename(IMAGES_UPLOADED_PATH.$temp_image_path,IMAGES_UPLOADED_PATH.$new_image_path);
-                    $itemArray['image'] = $new_image_path;
+                if(file_exists(IMAGES_UPLOAD_PATH.$temp_image_name)){
+                    rename(IMAGES_UPLOAD_PATH.$temp_image_name,IMAGES_UPLOAD_PATH.$new_image_name);
+                    $itemArray['image'] = $new_image_name;
                 }
                 
                 $itemArray["created_by_user_id"] = $_SESSION['user_id'];
@@ -357,14 +359,17 @@ class Item extends MY_Controller {
     public function modify($id) {
         // Check if access is allowed
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+            // Define image path variables
+            $temp_image_name = $_SESSION["picture_prefix"].IMAGE_PICTURE_SUFFIX.IMAGE_TMP_SUFFIX.IMAGE_EXTENSION;
+            $new_image_name = $_SESSION["picture_prefix"].IMAGE_PICTURE_SUFFIX.IMAGE_EXTENSION;
             
             // Check if the user cancelled the form
             if(isset($_POST['submitCancel'])){
-                $tmp_file = glob("uploads/images/*".IMAGE_TMP_SUFFIX."*")[0];
+                $tmp_image_file = glob(IMAGES_UPLOAD_PATH.$temp_image_name)[0];
                 
-                // Check if there is a temporary file, if yes then delete it
-                if($tmp_file != null || $tmp_file != false){
-                    unlink($tmp_file);
+                // Check if there is a temporary image file, if yes then delete it
+                if($tmp_image_file != null || $tmp_image_file != false){
+                    unlink($tmp_image_file);
                 }
                 
                 redirect(base_url("item/view/$id"));
@@ -432,12 +437,10 @@ class Item extends MY_Controller {
                         }
                     }
                     
-                    // Turn Temporaty Image into a final one if there is one
-                    $temp_image_path = $_SESSION["picture_prefix"].IMAGE_PICTURE_SUFFIX.IMAGE_TMP_SUFFIX.IMAGE_EXTENSION;
-                    $new_image_path = $_SESSION["picture_prefix"].IMAGE_PICTURE_SUFFIX.IMAGE_EXTENSION;
-                    if(file_exists(IMAGES_UPLOADED_PATH.$temp_image_path)){
-                        rename(IMAGES_UPLOADED_PATH.$temp_image_path,IMAGES_UPLOADED_PATH.$new_image_path);
-                        $itemArray['image'] = $new_image_path;
+                    // Turn temporary image into a final one if there is one
+                    if(file_exists(IMAGES_UPLOAD_PATH.$temp_image_name)){
+                        rename(IMAGES_UPLOAD_PATH.$temp_image_name,IMAGES_UPLOAD_PATH.$new_image_name);
+                        $itemArray['image'] = $new_image_name;
                     }
                     
                     // Execute the changes in the item table
