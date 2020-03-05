@@ -36,7 +36,7 @@ if (isset($stocking_places)) {
     <div class="form-input row">
       <div class="col-sm-3">
         <label for="short"><?= lang('field_short_name') ?></label>
-        <input type="text" class="form-control" name="short" id="short" value="<?php if (isset($short)) {echo set_value('short',$short);} else {echo set_value('short');} ?>" />
+        <input type="text" maxlength="<?= STOCKING_SHORT_MAX_LENGHT ?>" class="form-control" name="short" id="short" value="<?php if (isset($short)) {echo set_value('short',$short);} else {echo set_value('short');} ?>" />
       </div>
       <div class="col-sm-9">
         <label for="name"><?= lang('field_long_name') ?></label>

@@ -26,6 +26,20 @@ define('USERNAME_MAX_LENGTH', 45);
 define('PASSWORD_MIN_LENGTH', 6);
 define('PASSWORD_MAX_LENGTH', 72);
 
+ /*
+ |-------------------------------------------------------------------------
+ | Admin short names max lenght
+ |-------------------------------------------------------------------------
+ */
+define('GROUP_SHORT_MAX_LENGHT', 2);
+define('TAG_SHORT_MAX_LENGHT', 3);
+define('STOCKING_SHORT_MAX_LENGHT', 10);
+
+/*
+ |-------------------------------------------------------------------------
+ | Password hash
+ |-------------------------------------------------------------------------
+ */
 define('PASSWORD_HASH_ALGORITHM', PASSWORD_BCRYPT);
 
 /*
