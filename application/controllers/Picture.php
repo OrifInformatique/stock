@@ -71,7 +71,7 @@ class Picture extends MY_Controller {
      * @param string $url the origin url
      * @return void
      */
-    public function select_picture(){
+    public function select_picture() {
         $_SESSION['picture_callback'] = $_SERVER['HTTP_REFERER'];
         
         redirect(base_url('picture/get_picture'));

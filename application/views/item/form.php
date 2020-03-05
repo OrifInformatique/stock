@@ -4,7 +4,7 @@
         <div class="form-group col-xs-12">
             <button type="submit" class="btn btn-success"><?= $this->lang->line('btn_save'); ?></button>
             <button type="submit" class="btn btn-danger" name="submitCancel"><?= $this->lang->line('btn_cancel');?></button>
-            </div>
+        </div>
     </div>
 
     <!-- ERROR MESSAGES -->

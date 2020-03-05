@@ -159,6 +159,7 @@ let populating = false;
 function load_items(page, filters){
     if (populating) return;
     populating = true;
+  
     // Display "wait" cursor
     $("*").css("cursor", "wait");
     
@@ -275,6 +276,7 @@ function display_item(item){
     row.append('<td>'+stocking_place+'</td>');
     row.append('<td><a href="'+href+'">'+inventory_number+'</a><br><a href="'+href+'">'+serial_number+'</a></td>');
     row.append(delete_item);
+    row.append('</tr>');
     
     return row;
 }

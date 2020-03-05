@@ -32,7 +32,6 @@ class Item extends MY_Controller {
      * @return void
      */
     public function index($page = 1) {
-        
         // Load list of elements to display as filters
         $this->load->model('item_tag_model');
         $output['item_tags'] = $this->item_tag_model->dropdown('name');
@@ -226,7 +225,7 @@ class Item extends MY_Controller {
                 redirect(base_url());
                 exit();
             }
-            
+
             $this->set_validation_rules();
 
             $data['upload_errors'] = "";
@@ -287,11 +286,12 @@ class Item extends MY_Controller {
                 $itemArray["created_by_user_id"] = $_SESSION['user_id'];
                 
                 $this->item_model->insert($itemArray);
+                $item_id = $this->db->insert_id();
 
                 foreach ($linkArray as $tag) {
                     $this->item_tag_link_model->insert(array("item_tag_id" => $tag, "item_id" => ($item_id)));
                 }
-                
+
                 redirect("item/view/" . $item_id);
             } else {
                 // Remember checked tags to display them checked again
@@ -342,6 +342,7 @@ class Item extends MY_Controller {
                     }
                     unset($_SESSION['POST']);
                 }
+
                 $this->display_view('item/form', $data);
             }
         } else {
@@ -397,7 +398,7 @@ class Item extends MY_Controller {
                 // values in the session, then redirect him to the image form
                 if(isset($_POST['photoSubmit'])){
                     $this->session->set_userdata("POST", $_POST);
-                    
+
                     redirect(base_url("picture/select_picture"));
                     exit();
                 }
@@ -446,6 +447,7 @@ class Item extends MY_Controller {
                     
                     // Execute the changes in the item table
                     $this->item_model->update($id, $itemArray);
+
                     redirect("/item/view/" . $id);
                 } else {
                     // Remember checked tags to display them checked again
