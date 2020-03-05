@@ -486,7 +486,7 @@ class Item extends MY_Controller {
             // which have been saved in session variable.
             // Then reset this session variable.
             
-            if(isset($_SESSION['POST'])/* && ($_SESSION['submit_image'] ?? FALSE)*/) {
+            if(isset($_SESSION['POST'])) {
                 foreach ($_SESSION['POST'] as $key => $value) {
                     // If it is a tag
                     if (substr($key, 0, 3) == "tag") {
@@ -499,7 +499,6 @@ class Item extends MY_Controller {
                     }
                 }
             }
-            //$_SESSION['submit_image'] = FALSE;
             unset($_SESSION['POST']);
             
             $this->display_view('item/form', $data);
