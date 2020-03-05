@@ -78,16 +78,14 @@ class Item_model extends MY_Model
     }
 
     /**
-    * If no image is set, use "no_image.png" (ITEM_NO_IMAGE constant)
+    * If no image is set, use ITEM_NO_IMAGE constant
     */
     protected function get_image($item)
     {		
-        if (!is_null($item)) {
-			if (is_null($item->image))
-			{
-				$item->image = ITEM_NO_IMAGE;
-			}
-		}
+        if (!is_null($item) && is_null($item->image))
+        {
+            $item->image = ITEM_NO_IMAGE;
+        }
 
         return $item;
     }

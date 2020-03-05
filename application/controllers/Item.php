@@ -62,10 +62,9 @@ class Item extends MY_Controller {
     private function load_list($page = 1)
     {
         // Store URL to make possible to come back later (from item detail for example)
+        $_SESSION['items_list_url'] = base_url('item/index/'.$page);
         if (isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING'])) {
-            $_SESSION['items_list_url'] = current_url().'?'.$_SERVER['QUERY_STRING'];
-        } else {
-            $_SESSION['items_list_url'] = current_url();
+            $_SESSION['items_list_url'] .= '?'.$_SERVER['QUERY_STRING'];
         }
         
         // Get user's search filters and add default values
@@ -178,7 +177,7 @@ class Item extends MY_Controller {
     public function view($id = NULL) {
 
         if (is_null($id)) {
-            // No item sellected, display items list
+            // No item selected, display items list
             redirect('/item');
         }
 
@@ -206,6 +205,26 @@ class Item extends MY_Controller {
     public function create() {
         // Check if this is allowed
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+            // Get new item id and set picture_prefix
+            $item_id = $this->item_model->get_future_id();
+            $_SESSION['picture_prefix'] = str_pad($item_id, INVENTORY_NUMBER_CHARS, "0", STR_PAD_LEFT);
+            
+            // Define image path variables
+            $temp_image_name = $_SESSION["picture_prefix"].IMAGE_PICTURE_SUFFIX.IMAGE_TMP_SUFFIX.IMAGE_EXTENSION;
+            $new_image_name = $_SESSION["picture_prefix"].IMAGE_PICTURE_SUFFIX.IMAGE_EXTENSION;
+            
+            // Check if the user cancelled the form
+            if(isset($_POST['submitCancel'])){
+                $tmp_image_file = glob(IMAGES_UPLOAD_PATH.$temp_image_name)[0];
+                
+                // Check if there is a temporary file, if yes then delete it
+                if($tmp_image_file != null || $tmp_image_file != false){
+                    unlink($tmp_image_file);
+                }
+                
+                redirect(base_url());
+                exit();
+            }
 
             $this->set_validation_rules();
 
@@ -217,6 +236,7 @@ class Item extends MY_Controller {
             // values in the session, then redirect him to the image form
             if(isset($_POST['photoSubmit'])){
                 $this->session->set_userdata("POST", $_POST);
+                $this->session->set_userdata("item_id", $item_id);
                 
                 redirect(base_url("picture/select_picture"));
             }
@@ -257,6 +277,12 @@ class Item extends MY_Controller {
                     }
                 }
 
+                // Turn Temporaty Image into a final one if there is one
+                if(file_exists(IMAGES_UPLOAD_PATH.$temp_image_name)){
+                    rename(IMAGES_UPLOAD_PATH.$temp_image_name,IMAGES_UPLOAD_PATH.$new_image_name);
+                    $itemArray['image'] = $new_image_name;
+                }
+                
                 $itemArray["created_by_user_id"] = $_SESSION['user_id'];
                 
                 $this->item_model->insert($itemArray);
@@ -265,6 +291,7 @@ class Item extends MY_Controller {
                 foreach ($linkArray as $tag) {
                     $this->item_tag_link_model->insert(array("item_tag_id" => $tag, "item_id" => ($item_id)));
                 }
+
                 redirect("item/view/" . $item_id);
             } else {
                 // Remember checked tags to display them checked again
@@ -315,7 +342,7 @@ class Item extends MY_Controller {
                     }
                     unset($_SESSION['POST']);
                 }
-                
+
                 $this->display_view('item/form', $data);
             }
         } else {
@@ -333,15 +360,33 @@ class Item extends MY_Controller {
     public function modify($id) {
         // Check if access is allowed
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+            // Define image path variables
+            $_SESSION['picture_prefix'] = str_pad($id, INVENTORY_NUMBER_CHARS, "0", STR_PAD_LEFT);
+            $temp_image_name = $_SESSION["picture_prefix"].IMAGE_PICTURE_SUFFIX.IMAGE_TMP_SUFFIX.IMAGE_EXTENSION;
+            $new_image_name = $_SESSION["picture_prefix"].IMAGE_PICTURE_SUFFIX.IMAGE_EXTENSION;
+            
+            // Check if the user cancelled the form
+            if(isset($_POST['submitCancel'])){
+                $tmp_image_file = glob(IMAGES_UPLOAD_PATH.$temp_image_name)[0];
+                
+                // Check if there is a temporary image file, if yes then delete it
+                if($tmp_image_file != null || $tmp_image_file != false){
+                    unlink($tmp_image_file);
+                }
+                
+                redirect(base_url("item/view/$id"));
+                exit();
+            }
+            
             $this->load->model('item_tag_link_model');
 
             // If there is no submit
             if (empty($_POST)) {
                 // get the data from the item with this id,
                 $data = get_object_vars($this->item_model->get($id));
-
                 // including its tags
                 $data['tag_links'] = $this->item_tag_link_model->get_many_by("item_id", $id);
+                
             } else {
                 $this->set_validation_rules($id);
 
@@ -394,9 +439,15 @@ class Item extends MY_Controller {
                         }
                     }
                     
+                    // Turn temporary image into a final one if there is one
+                    if(file_exists(IMAGES_UPLOAD_PATH.$temp_image_name)){
+                        rename(IMAGES_UPLOAD_PATH.$temp_image_name,IMAGES_UPLOAD_PATH.$new_image_name);
+                        $itemArray['image'] = $new_image_name;
+                    }
+                    
                     // Execute the changes in the item table
                     $this->item_model->update($id, $itemArray);
-                    
+
                     redirect("/item/view/" . $id);
                 } else {
                     // Remember checked tags to display them checked again
@@ -414,6 +465,7 @@ class Item extends MY_Controller {
 
             $data['modify'] = true;
             $data['item_id'] = $id;
+            $_SESSION['picture_prefix'] = $data['inventory_id'];
 
             // Load the options
             $this->load->model('stocking_place_model');
@@ -435,7 +487,8 @@ class Item extends MY_Controller {
             // If the user gets back from another view, get the fields values
             // which have been saved in session variable.
             // Then reset this session variable.
-            if(isset($_SESSION['POST'])){
+            
+            if(isset($_SESSION['POST'])) {
                 foreach ($_SESSION['POST'] as $key => $value) {
                     // If it is a tag
                     if (substr($key, 0, 3) == "tag") {
@@ -447,8 +500,8 @@ class Item extends MY_Controller {
                         $data[$key] = $value;
                     }
                 }
-                unset($_SESSION['POST']);
             }
+            unset($_SESSION['POST']);
             
             $this->display_view('item/form', $data);
         } else {

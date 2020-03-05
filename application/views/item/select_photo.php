@@ -1,4 +1,11 @@
-<form id="form" class="container" method="post" action="add_picture" >
+<?php
+// Make sure the user cannot modify the default image
+$image = $_SESSION['POST']['image'] ?? '';
+if ($image == ITEM_NO_IMAGE) {
+    $image = '';
+}
+?>
+<form id="form" class="container" method="post" action="<?=base_url('picture/add_picture')?>" enctype="multipart/form-data">
     <?php if (isset($upload_error)) { ?>
     <div class="row alert alert-danger"><?=$upload_error?></div>
     <?php } ?>
@@ -14,7 +21,7 @@
     </div>
     <div class="row">
         <!-- Hidden file button, on which a click is simulated when user is clicking on one of the visible buttons -->
-        <input id="imageInput" type="file" accept="image/*" class="btn hidden" />
+        <input id="imageInput" name="original_file" type="file" accept="image/*" class="btn hidden" />
         
         <div class="col-sm-6 form-group">
             <!-- Two buttons to differentiate taking a new picture or importing an existing one -->
@@ -59,10 +66,10 @@ const IMAGE_UPLOAD_HEIGHT = <?= IMAGE_UPLOAD_HEIGHT; ?>;
 //
 function reSelectPhoto(event)
 {
-    var path = "<?= isset($_SESSION['POST']['image']) && !empty($_SESSION['POST']['image'])? $_SESSION['POST']['image'] : "" ?>";
+    var path = "<?= $image ?>";
     
     if(path !== ""){
-        rawImage.src = "<?= base_url("uploads/images/".$_SESSION['POST']['image'])?>";
+        rawImage.src = "<?= base_url(IMAGES_UPLOAD_PATH.$image)?>";
         croppedNameInput.value = path;
         setCropper();
     }

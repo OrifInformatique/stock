@@ -13,7 +13,7 @@ class Picture extends MY_Controller {
 
     
     /* MY_Controller variables definition */
-    protected $access_level = "@";
+    protected $access_level = ACCESS_LVL_OBSERVATION;
 
     /**
      * Constructor
@@ -30,11 +30,16 @@ class Picture extends MY_Controller {
      * @return void
      */
     public function get_picture($errorId = 0){
-        
         $data = array();
         
-        if($errorId == 1){
-            $data['upload_error'] = $this->lang->line('msg_err_photo_upload');
+        switch($errorId)
+        {
+            case 1:
+                $data['upload_error'] = $this->lang->line('msg_err_photo_upload');
+                break;
+            case 0:
+            default:
+                break;
         }
         
         $this->display_view("item/select_photo", $data);
@@ -46,54 +51,18 @@ class Picture extends MY_Controller {
      * @return void
      */
     public function add_picture(){
-        
         if(isset($_POST)){
-            $this->set_validation_rules();
-            
-            if($this->form_validation->run()){
-                
+            if(!empty($_POST && $_POST['cropped_file'] != NULL)){
                 $picture_file = $_POST['cropped_file'];
-                $picture_name = $_POST['cropped_name'];
-                
-                file_put_contents("uploads/images/$picture_name", base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $picture_file)));
-                
-                $_SESSION['picture_path'] = $picture_name;
-                
+                $picture_name = $_SESSION['picture_prefix'].IMAGE_PICTURE_SUFFIX.IMAGE_TMP_SUFFIX.IMAGE_EXTENSION;
+                file_put_contents(IMAGES_UPLOAD_PATH.$picture_name, base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $picture_file)));
                 redirect($_SESSION['picture_callback']);
-                exit();
-                
             }else{
-                
                 redirect(base_url('picture/get_picture/1'));
-                exit();
             }
-            
         }else{
             redirect(base_url());
-            exit();
         }
-    }
-    
-    /**
-     * Check if there is a named file send
-     * 
-     * @return void
-     */
-    private function set_validation_rules(){
-        $config = array(
-            array(
-                'field' => 'cropped_name',
-                'label' => $this->lang->line('field_cropped_name'),
-                'rules' => 'required'
-            ),
-            array(
-                'field' => 'cropped_file',
-                'label' => $this->lang->line('field_cropped_photo'),
-                'rules' => 'required'
-            )
-        );
-        
-        $this->form_validation->set_rules($config);
     }
     
     /**
@@ -102,8 +71,7 @@ class Picture extends MY_Controller {
      * @param string $url the origin url
      * @return void
      */
-    public function select_picture(){
-        
+    public function select_picture() {
         $_SESSION['picture_callback'] = $_SERVER['HTTP_REFERER'];
         
         redirect(base_url('picture/get_picture'));
