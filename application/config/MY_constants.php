@@ -18,6 +18,15 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 define('INVENTORY_PREFIX', 'ORP');   // first part of inventory number (Orif site prefix)
 define('INVENTORY_NUMBER_CHARS', 4); // number of chars in the ID part (to add leading zeros)
 
+ /*
+ |-------------------------------------------------------------------------
+ | Admin short names max lenght
+ |-------------------------------------------------------------------------
+ */
+define('GROUP_SHORT_MAX_LENGHT', 2);
+define('TAG_SHORT_MAX_LENGHT', 3);
+define('STOCKING_SHORT_MAX_LENGHT', 10);
+
 /*
 |--------------------------------------------------------------------------
 | ID of the "functional" item condition
