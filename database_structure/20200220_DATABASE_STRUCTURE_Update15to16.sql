@@ -17,6 +17,11 @@ SET time_zone = "+00:00";
 --
 ALTER TABLE `loan` CHANGE `loan_to_user_id` `loan_to_user_id` INT(11) NULL;
 
+--
+-- Set short name limit for stocking places at 10 characters
+--
+ALTER TABLE `stocking_place` CHANGE `short` `short` VARCHAR(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
