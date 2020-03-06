@@ -2,6 +2,7 @@
 // Required for config values
 ?>
 <div class="container">
+    <?php $type = 0; include __DIR__.'/../../../../views/admin/admin_bar.php';?>
     <?php
         $attributes = array(
             'id' => 'user_change_password_form',

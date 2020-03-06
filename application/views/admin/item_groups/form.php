@@ -10,14 +10,7 @@ if (isset($item_groups)) {
     <a class="btn btn-danger" href="<?= base_url() . "admin/view_item_groups/"; ?>"><?= lang('btn_cancel'); ?></a>    
   </div>
     
-  <div class="row" >
-    <h3>
-      <a href="<?= base_url(); ?>admin/view_tags" class="tab_unselected"><?= lang('admin_tab_tags'); ?></a>
-      <a href="<?= base_url(); ?>admin/view_stocking_places" class="tab_unselected"><?= lang('admin_tab_stocking_places'); ?></a>
-      <a href="<?= base_url(); ?>admin/view_suppliers" class="tab_unselected"><?= lang('admin_tab_suppliers'); ?></a>
-      <a href="<?= base_url(); ?>admin/view_item_groups" class="tab_selected"><?= lang('admin_tab_item_groups'); ?></a>
-    </h3>
-  </div>
+  <?php $type = 4; include __DIR__.'/../admin_bar.php';?>
     
   <div class="row alert alert-warning">
     <?php if($update) {

@@ -7,19 +7,15 @@
  * @copyright   Copyright (c) Orif (http://www.orif.ch)
  */
 ?>
-<div class="container">
+<div class="container" id="content">
     <div class="row">
-        <div class="col">
-            <h1 class="title-section"><?= lang('title_user_list'); ?></h1>
-        </div>
+        <a href="<?= base_url(); ?>user/admin/save_user/" class="btn btn-success"><?= lang('btn_new'); ?></a>
     </div>
+
+    <?php $type = 0; include __DIR__.'/../../../../views/admin/admin_bar.php';?>
+
     <div class="row">
-        <div class="col-sm-3 text-left">
-            <a href="<?= base_url('user/admin/save_user'); ?>" class="btn btn-primary">
-                <?= lang('btn_new'); ?>
-            </a>
-        </div>
-        <div class="col-sm-9 text-right">
+        <div class="col-sm-12 text-right">
             <label class="btn btn-default form-check-label" for="toggle_deleted">
                 <?= lang('field_deleted_users_display'); ?>
             </label>

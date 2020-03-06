@@ -2,6 +2,7 @@
 ?>
 <div id="page-content-wrapper">
     <div class="container">
+        <?php $type = 0; include __DIR__.'/../../../../views/admin/admin_bar.php';?>
         <div class="row">
             <div class="col-12">
                 <?php if($_SESSION['user_id'] != $user->user_id){ ?>

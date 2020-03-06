@@ -2,6 +2,9 @@
 $update = !is_null($user);
 ?>
 <div class="container">
+    
+    <?php $type = 0; include __DIR__.'/../../../../views/admin/admin_bar.php';?>
+
     <!-- TITLE -->
     <div class="row">
         <div class="col">

@@ -3,14 +3,7 @@
     <a href="<?= base_url(); ?>admin/new_tag/" class="btn btn-success"><?= lang('btn_new'); ?></a>
   </div>
   
-  <div class="row">
-    <h3>
-      <a href="#" onclick="loadPage('admin/view_tags/')" class="tab_selected"><?= lang('admin_tab_tags'); ?></a>
-      <a href="#" onclick="loadPage('admin/view_stocking_places/')" class="tab_unselected"><?= lang('admin_tab_stocking_places'); ?></a>
-      <a href="#" onclick="loadPage('admin/view_suppliers/')" class="tab_unselected"><?= lang('admin_tab_suppliers'); ?></a>
-      <a href="#" onclick="loadPage('admin/view_item_groups/')" class="tab_unselected"><?= lang('admin_tab_item_groups'); ?></a>
-    </h3>
-  </div>
+  <?php $type = 1; include __DIR__.'/../admin_bar.php';?>
   
   <div class="row">
     <table class="table table-striped table-hover">
@@ -29,16 +22,3 @@
     </table>
   </div>
 </div>
-<script type="text/javascript">
-    // Required on each page so that it does load no matter where the user is
-    function loadPage(endOfPageString) {
-        if($('#content').size == 0) {
-            return;
-        }
-        if(endOfPageString == undefined || endOfPageString == null) {
-            endOfPageString = "";
-        }
-        var newUrlForPart = ('<?= base_url(); ?>' + endOfPageString);
-        $('#content').load(newUrlForPart + ' #content');
-    }
-</script>
