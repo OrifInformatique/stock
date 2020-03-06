@@ -35,7 +35,7 @@ if (isset($item_groups)) {
     <div class="form-input row">
       <div class="col-sm-3">
         <label for="short_name"><?= lang('field_abbreviation') ?></label>
-        <input type="text" maxlength="2" class="form-control" name="short_name" id="short_name" value="<?php if (isset($short_name)) {echo set_value('short_name',$short_name);} else {echo set_value('short_name');} ?>" />
+        <input type="text" maxlength="<?= GROUP_SHORT_MAX_LENGHT ?>" class="form-control" name="short_name" id="short_name" value="<?php if (isset($short_name)) {echo set_value('short_name',$short_name);} else {echo set_value('short_name');} ?>" />
       </div>
       <div class="col-sm-9">
         <label for="name"><?= lang('field_name') ?></label>

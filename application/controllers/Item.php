@@ -360,6 +360,7 @@ class Item extends MY_Controller {
         // Check if access is allowed
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
             // Define image path variables
+            $_SESSION['picture_prefix'] = str_pad($id, INVENTORY_NUMBER_CHARS, "0", STR_PAD_LEFT);
             $temp_image_name = $_SESSION["picture_prefix"].IMAGE_PICTURE_SUFFIX.IMAGE_TMP_SUFFIX.IMAGE_EXTENSION;
             $new_image_name = $_SESSION["picture_prefix"].IMAGE_PICTURE_SUFFIX.IMAGE_EXTENSION;
             
@@ -484,7 +485,8 @@ class Item extends MY_Controller {
             // If the user gets back from another view, get the fields values
             // which have been saved in session variable.
             // Then reset this session variable.
-            if(isset($_SESSION['POST']) && ($_SESSION['submit_image'] ?? FALSE)) {
+            
+            if(isset($_SESSION['POST'])) {
                 foreach ($_SESSION['POST'] as $key => $value) {
                     // If it is a tag
                     if (substr($key, 0, 3) == "tag") {
@@ -497,7 +499,6 @@ class Item extends MY_Controller {
                     }
                 }
             }
-            $_SESSION['submit_image'] = FALSE;
             unset($_SESSION['POST']);
             
             $this->display_view('item/form', $data);
