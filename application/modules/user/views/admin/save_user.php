@@ -23,7 +23,7 @@ $update = !is_null($user);
         'name' => 'user_form'
     );
     echo form_open('user/admin/save_user', $attributes, [
-        'id' => $user->id ?? 0
+        'id' => $user->user_id ?? 0
     ]);
     ?>
 
@@ -43,15 +43,15 @@ $update = !is_null($user);
                 <?= form_label(lang('field_user_usertype'), 'user_usertype', ['class' => 'form-label']); ?>
                 <?php
                     $dropdown_options = ['class' => 'form-control', 'id' => 'user_usertype'];
-                    if(isset($user) && $_SESSION['user_id'] == $user->id){
+                    if(isset($user) && $_SESSION['user_id'] == $user->user_id){
                         $dropdown_options['disabled'] = 'disabled';
-                        echo form_hidden('user_usertype', $user_usertype ?? $user->fk_user_type ?? NULL);
+                        echo form_hidden('user_usertype', $user_usertype ?? $user->user_type_id ?? NULL);
                     }
                 ?>
-                <?= form_dropdown('user_usertype', $user_types, $user_usertype ?? $user->fk_user_type ?? NULL, $dropdown_options); ?>
+                <?= form_dropdown('user_usertype', $user_types, $user_usertype ?? $user->user_type_id ?? NULL, $dropdown_options); ?>
             </div>
         </div>
-        <?php if(isset($user) && $_SESSION['user_id'] == $user->id){ ?>
+        <?php if(isset($user) && $_SESSION['user_id'] == $user->user_id){ ?>
             <div class="row">
                 <div class="col-sm-12">
                     <div class="alert alert-info"><?= lang('user_update_usertype_himself') ?></div>
@@ -79,7 +79,7 @@ $update = !is_null($user);
             <div class="row">
                 <!-- RESET PASSWORD FOR EXISTING USER -->
                 <div class="col-12">
-                    <a href="<?= base_url('user/admin/password_change_user/'.$user->id); ?>" >
+                    <a href="<?= base_url('user/admin/password_change_user/'.$user->user_id); ?>" >
                         <?= lang("title_user_password_reset"); ?>
                     </a>
                 </div>
@@ -87,18 +87,18 @@ $update = !is_null($user);
                 <!-- ACTIVATE / DISABLE EXISTING USER -->
                 <?php if ($user->archive) { ?>
                     <div class="col-12">
-                        <a href="<?= base_url('user/admin/reactivate_user/'.$user->id); ?>" >
+                        <a href="<?= base_url('user/admin/reactivate_user/'.$user->user_id); ?>" >
                             <?= lang("user_reactivate"); ?>
                         </a>
                     </div>
                     <div class="col-12">
-                        <a href="<?= base_url('user/admin/delete_user/'.$user->id); ?>" class="text-danger" >
+                        <a href="<?= base_url('user/admin/delete_user/'.$user->user_id); ?>" class="text-danger" >
                             <?= lang("btn_hard_delete"); ?>
                         </a>
                     </div>
                 <?php } else { ?>
                     <div class="col-12">
-                        <a href="<?= base_url('user/admin/delete_user/'.$user->id); ?>" class="text-danger" >
+                        <a href="<?= base_url('user/admin/delete_user/'.$user->user_id); ?>" class="text-danger" >
                             <?= lang("user_delete"); ?>
                         </a>
                     </div>

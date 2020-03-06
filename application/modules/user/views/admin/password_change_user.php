@@ -7,7 +7,7 @@
             'id' => 'user_change_password_form',
             'name' => 'user_change_password_form'
         );
-        echo form_open('user/admin/password_change_user/'.$user->id, $attributes);
+        echo form_open('user/admin/password_change_user/'.$user->user_id, $attributes);
     ?>
     
     <!-- TITLE -->

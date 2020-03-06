@@ -4,7 +4,7 @@
     <div class="container">
         <div class="row">
             <div class="col-12">
-                <?php if($_SESSION['user_id'] != $user->id){ ?>
+                <?php if($_SESSION['user_id'] != $user->user_id){ ?>
                     <div>
                         <h1><?= lang('user').' "'.$user->username.'"' ?></h1>
                         <h4><?= lang('what_to_do')?></h4>
@@ -19,11 +19,11 @@
                         </a>
                         <?php if (!$user->archive) { ?>
                         <a href="<?= base_url(uri_string().'/1'); ?>" class="btn btn-primary">
-                            <?= lang('btn_disable'); ?>
+                            <?= lang('text_disable'); ?>
                         </a>
                         <?php } ?>
                         <a href="<?= base_url(uri_string().'/2'); ?>" class="btn btn-danger">
-                            <?= lang('btn_hard_delete'); ?>
+                            <?= lang('btn_delete'); ?>
                         </a>
                     </div>
                 <?php } else { ?>

@@ -6,6 +6,11 @@
                     <!-- Button for new item -->
                     <a href="<?php echo base_url("item/create/"); ?>"
                             class="btn btn-success"><?php echo html_escape($this->lang->line('btn_new')); ?></a>
+                   
+                <?php if ($_SESSION['user_access'] >= $this->config->item('access_lvl_msp')) { ?>
+                    <a href="<?php echo base_url("admin"); ?>"
+                            class="btn btn-primary"><?php echo html_escape($this->lang->line('btn_admin')); ?></a>
+                <?php } ?>
             </div>
 
     <?php } ?>

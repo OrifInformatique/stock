@@ -5,7 +5,6 @@
   
   <div class="row">
     <h3>
-      <a href="#" onclick="loadPage('admin/view_users/')" class="tab_unselected"><?= lang('admin_tab_users'); ?></a>
       <a href="#" onclick="loadPage('admin/view_tags/')" class="tab_unselected"><?= lang('admin_tab_tags'); ?></a>
       <a href="#" onclick="loadPage('admin/view_stocking_places/')" class="tab_unselected"><?= lang('admin_tab_stocking_places'); ?></a>
       <a href="#" onclick="loadPage('admin/view_suppliers/')" class="tab_selected"><?= lang('admin_tab_suppliers'); ?></a>

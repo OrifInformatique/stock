@@ -26,6 +26,10 @@ class Admin extends MY_Controller
         $this->form_validation->CI =& $this;
     }
 
+    public function index(){
+        $this->list_user();
+    }
+
     /**
      * Displays the list of users
      *
@@ -99,7 +103,7 @@ class Admin extends MY_Controller
 
 			if ($this->form_validation->run()) {
 				$user = array(
-					'fk_user_type' => $this->input->post('user_usertype'),
+					'user_type_id' => $this->input->post('user_usertype'),
 					'username' => $this->input->post('user_name')
 				);
 				if ($user_id > 0) {
@@ -150,12 +154,12 @@ class Admin extends MY_Controller
                 $this->display_view('user/admin/delete_user', $output);
                 break;
             case 1: // Deactivate (soft delete) user
-                if ($_SESSION['user_id'] != $user->id) {
+                if ($_SESSION['user_id'] != $user->user_id) {
                     $this->user_model->delete($user_id, FALSE);
                 }
                 redirect('user/admin/list_user');
             case 2: // Delete user
-                if ($_SESSION['user_id'] != $user->id) {
+                if ($_SESSION['user_id'] != $user->user_id) {
                     $this->user_model->delete($user_id, TRUE);
                 }
                 redirect('user/admin/list_user');
@@ -235,7 +239,7 @@ class Admin extends MY_Controller
     public function cb_unique_user($username, $user_id) : bool
     {
         $user = $this->user_model->with_deleted()->get_by('username', $username);
-        return is_null($user) || $user->id == $user_id;
+        return is_null($user) || $user->user_id == $user_id;
     }
     /**
      * Checks that an user exists

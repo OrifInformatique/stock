@@ -16,7 +16,7 @@
     <div class="row">
         <div class="col-sm-3 text-left">
             <a href="<?= base_url('user/admin/save_user'); ?>" class="btn btn-primary">
-                <?= lang('btn_add_m'); ?>
+                <?= lang('btn_new'); ?>
             </a>
         </div>
         <div class="col-sm-9 text-right">
@@ -41,10 +41,10 @@
         <tbody id="userslist">
             <?php foreach($users as $user) { ?>
                 <tr>
-                    <td><a href="<?= base_url('user/admin/save_user/'.$user->id); ?>"><?= $user->username; ?></td>
-                    <td><?= $user_types[$user->fk_user_type]; ?></td>
+                    <td><a href="<?= base_url('user/admin/save_user/'.$user->user_id); ?>"><?= $user->username; ?></td>
+                    <td><?= $user_types[$user->user_type_id]; ?></td>
                     <td><?= $this->lang->line($user->archive ? 'no' : 'yes'); ?></td>
-                    <td><a href="<?= base_url('user/admin/delete_user/'.$user->id); ?>" class="close">×</td>
+                    <td><a href="<?= base_url('user/admin/delete_user/'.$user->user_id); ?>" class="close">×</td>
                 </tr>
             <?php } ?>
         </tbody>
