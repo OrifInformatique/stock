@@ -34,21 +34,21 @@
                 <div class="row">
                     <!-- TAGS FILTER -->
                     <div id="t" class="col-sm-8 top-margin">
-                        <?= form_label($this->lang->line('field_tags'),'item_conditions-multiselect').form_dropdown('t[]', $item_tags, isset($_GET["t"])?$_GET["t"]:"",'id="item_tags-multiselect" multiple="multiple"');?>
+                        <?= form_label($this->lang->line('field_tags'),'item_conditions-multiselect').form_dropdown('t[]', $item_tags, isset($_GET["t"])?$_GET["t"]:"",'class="selectpicker form-control" id="item_tags-multiselect" multiple="multiple"');?>
                     </div>
                     <!-- GROUPS FILTER -->
                     <div id="g" class="col-sm-4 top-margin">
-                        <?= form_label($this->lang->line('field_group'),'item_groups-multiselect').form_dropdown('g[]', $item_groups, isset($_GET["g"])?$_GET["g"]:"",'id="item_groups-multiselect" multiple="multiple"');?>
+                        <?= form_label($this->lang->line('field_group'),'item_groups-multiselect').form_dropdown('g[]', $item_groups, isset($_GET["g"])?$_GET["g"]:"",'class="selectpicker form-control" id="item_groups-multiselect" multiple="multiple"');?>
                     </div>
                 </div>
                 <div class="row">
                     <!-- STOCKING PLACES FILTER -->
                     <div id="s" class="col-sm-8 top-margin">
-                        <?= form_label($this->lang->line('field_stocking_place'),'stocking_places-multiselect').form_dropdown('s[]', $stocking_places, isset($_GET["s"])?$_GET["s"]:"",'id="stocking_places-multiselect" multiple="multiple"');?>
+                        <?= form_label($this->lang->line('field_stocking_place'),'stocking_places-multiselect').form_dropdown('s[]', $stocking_places, isset($_GET["s"])?$_GET["s"]:"",'class="selectpicker form-control" id="stocking_places-multiselect" multiple="multiple"');?>
                     </div>
                     <!-- CONDITIONS FILTER -->
                     <div id="c" class="col-sm-4 top-margin">
-                        <?= form_label($this->lang->line('field_item_condition'),'item_conditions-multiselect').form_dropdown('c[]', $item_conditions, isset($_GET["c"])?$_GET["c"]:"10",'id="item_conditions-multiselect" multiple="multiple"');?>
+                        <?= form_label($this->lang->line('field_item_condition'),'item_conditions-multiselect').form_dropdown('c[]', $item_conditions, isset($_GET["c"])?$_GET["c"]:"10",'class="selectpicker form-control" id="item_conditions-multiselect" multiple="multiple"');?>
                     </div>
                 </div>
             </div>
@@ -61,13 +61,13 @@
                 <div class="row">
                     <!-- SORT ORDER -->
                     <div id="o" class="col-xs-12 top-margin">
-                        <?= form_label($this->lang->line('field_sort_order'),'sort_order').form_dropdown('o', $sort_order, isset($_GET["o"])?$_GET["o"]:"",'id="sort_order"');?>
+                        <?= form_label($this->lang->line('field_sort_order'),'sort_order').form_dropdown('o', $sort_order, isset($_GET["o"])?$_GET["o"]:"",'class="selectpicker form-control" id="sort_order"');?>
                     </div>
                 </div>
                 <div class="row">
                     <!-- SORTING ASCENDING / DESCENDING -->
                     <div id="ad" class="col-xs-12 top-margin">
-                        <?= form_label($this->lang->line('field_sort_asc_desc'),'sort_asc_desc').form_dropdown('ad', $sort_asc_desc, isset($_GET["ad"])?$_GET["ad"]:"",'id="sort_asc_desc"');?>
+                        <?= form_label($this->lang->line('field_sort_asc_desc'),'sort_asc_desc').form_dropdown('ad', $sort_asc_desc, isset($_GET["ad"])?$_GET["ad"]:"",'class="selectpicker form-control" id="sort_asc_desc"');?>
                     </div>
                 </div>
                 <div class="row">
@@ -114,12 +114,12 @@
 
 <script type="text/javascript">
 $(document).ready(function() {
-        
+    
     // ******************************************
     // Initialize the Bootstrap Multiselect plugin
     // ******************************************
     var no_filter = "<?= html_escape($this->lang->line('field_no_filter')); ?>";
-    $('#item_tags-multiselect').multiselect({
+    /*$('#item_tags-multiselect').multiselect({
         nonSelectedText: no_filter,
         buttonWidth: '100%',
         numberDisplayed: 10
@@ -128,7 +128,7 @@ $(document).ready(function() {
         nonSelectedText: no_filter,
         buttonWidth: '100%',
         numberDisplayed: 5
-    });
+    });*/
     
     
     // ******************************************
@@ -140,7 +140,7 @@ $(document).ready(function() {
     load_items(page, filters);
     
     // Reload items list on filter update
-    $("input[type=checkbox], input[type=radio]").change(function(){
+    $(".selectpicker").change(function(){
         // Load page 1 with new filters
         load_items(1, getFilters());
     });
@@ -221,33 +221,35 @@ function getFilters() {
     
     // Tags filter
     t = "";
-    $.each($("#t .multiselect-container .active input"), function (i, val) { 
-        t+="&t[]="+val.value;
+    $('#t option:selected').each(function(){
+        t += "&t[]=" + this.value;
     });
     
     // Stocking places filter
     s = "";
-    $.each($("#s .multiselect-container .active input"), function (i, val) { 
-        s+="&s[]="+val.value;
+    $("#s option:selected").each(function(){
+        s+="&s[]=" + this.value;
     });
     
     // Groups filter
     g = "";
-    $.each($("#g .multiselect-container .active input"), function (i, val) { 
-        g+="&g[]="+val.value;
+    $("#g option:selected").each(function(){
+        g+="&g[]=" + this.value;
     });
     
     // Conditions filter
     c = "";
-    $.each($("#c .multiselect-container .active input"), function (i, val) { 
-        c+="&c[]="+val.value;
+    $("#c option:selected").each(function(){
+        if ($(this).has('option:selected')){
+            c+="&c[]=" + this.value;
+        }
     });
     
     // Sort order
-    o = $("#o .multiselect-container .active input")[0].value;
+    o = $("#o option:selected")[0].value;
     
     // Sort ascending/descending
-    ad = $("#ad .multiselect-container .active input")[0].value;
+    ad = $("#ad option:selected")[0].value;
     
     return "?ts="+ts+t+g+s+c+"&o="+o+"&ad="+ad;
 }

@@ -42,9 +42,9 @@ class Item extends MY_Controller {
         $this->load->model('stocking_place_model');
         $output['stocking_places'] = $this->stocking_place_model->dropdown('name');
         $output['sort_order'] = array($this->lang->line('sort_order_name'),
-                                        $this->lang->line('sort_order_stocking_place_id'),
-                                        $this->lang->line('sort_order_date'),
-                                        $this->lang->line('sort_order_inventory_number'));
+                                      $this->lang->line('sort_order_stocking_place_id'),
+                                      $this->lang->line('sort_order_date'),
+                                      $this->lang->line('sort_order_inventory_number'));
         $output['sort_asc_desc'] = array($this->lang->line('sort_order_asc'),
                                             $this->lang->line('sort_order_des'));
         // Prepare search filters values to send to the view
