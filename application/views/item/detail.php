@@ -80,41 +80,41 @@
             <p class="bg-primary">&nbsp;<?= html_escape($this->lang->line('text_item_loan_status')); ?></p>
         </div>
         <div class="col-md-4">
-            <div class="row"><div class="col-xs-12">
+            <div class="row"><div class="col-sm-12">
                 <!-- Item condition -->
                 <?php if(!is_null($item->item_condition)){echo $item->item_condition->bootstrap_label;}?>
             </div></div>
-            <div class="row"><div class="col-xs-12">
+            <div class="row"><div class="col-sm-12">
                 <!-- Loan status -->
                 <?= $item->loan_bootstrap_label; ?>
             </div></div>
             <?php if (!is_null($item->current_loan)) { ?>
                 <!-- Current loan -->
-                <div class="row"><div class="col-xs-12">
+                <div class="row"><div class="col-sm-12">
                     <?= html_escape($item->current_loan->item_localisation); ?><br />
                 </div></div>
                 <div class="row">
-                    <div class="col-xs-6">
+                    <div class="col-sm-6">
                         <label><?= lang('field_loan_date'); ?> :&nbsp;</label>
                     </div>
-                    <div class="col-xs-6">
+                    <div class="col-sm-6">
                         <?php if(!empty($item->current_loan->date)){
                             echo databaseToShortDate($item->current_loan->date);
                         }?>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-xs-6">
+                    <div class="col-sm-6">
                         <label><?= $this->lang->line('field_loan_planned_return'); ?> :&nbsp;</label>
                     </div>
-                    <div class="col-xs-6">
+                    <div class="col-sm-6">
                         <?php if(!empty($item->current_loan->planned_return_date)){
                             echo databaseToShortDate($item->current_loan->planned_return_date);
                         }?>
                     </div>
                 </div>
             <?php } ?>
-            <div class="row"><div class="col-xs-12">
+            <div class="row"><div class="col-sm-12">
                 <!-- Button to display loans history -->
                 <?= '<a href="'.base_url('/item/loans/'.$item->item_id).'" '.
                     'class="btn btn-default"  role="button" >'.
@@ -156,7 +156,7 @@
                     } ?>
                 </div>
             </div>
-            <div class="row"><div class="col-xs-12">
+            <div class="row"><div class="col-sm-12">
                 <!-- Button for controls history -->
                 <?= '<br /><a href="'.base_url('/item/inventory_controls/'.$item->item_id).
                      '" class="btn btn-default"  role="button" >'.

@@ -23,40 +23,46 @@ if (isset($suppliers)) {
   <?php if (!empty(validation_errors())) { ?>
     <div class="alert alert-danger"><?= validation_errors(); ?></div>
   <?php } ?>
-  
-  <div class="row">
-    <div class="form-input row">
-      <label for="name"><?= lang('field_name') ?></label>
+
+  <div class="form-group row">
+    <label for="name" class="col-sm-2 col-form-label"><?= lang('field_name') ?></label>
+    <div class="col-sm-10">
       <input type="text" class="form-control" name="name" id="name" value="<?php if (isset($name)) {echo set_value('name',$name);} else {echo set_value('name');} ?>" />
     </div>
-    <br />
-    <div class="form-input row">
-      <label for="name"><?= lang('field_first_adress') ?></label>
+  </div>
+  <div class="form-group row">
+    <label for="name" class="col-sm-2 col-form-label"><?= lang('field_first_adress') ?></label>
+    <div class="col-sm-10">
       <input type="text" class="form-control" name="address_line1" id="address_line1" value="<?php if (isset($address_line1)) {echo set_value('adress_line1',$address_line1);} else {echo set_value('address_line1');} ?>" />
     </div>
-    <br />
-    <div class="form-input row">
-      <label for="name"><?= lang('field_second_adress') ?></label>
+  </div>
+  <div class="form-group row">
+    <label for="name" class="col-sm-2 col-form-label"><?= lang('field_second_adress') ?></label>
+    <div class="col-sm-10">
       <input type="text" class="form-control" name="address_line2" id="address_line2" value="<?php if (isset($address_line2)) {echo set_value('adress_line2',$address_line2);} else {echo set_value('address_line2');} ?>" />
     </div>
-    <br />
-    <div class="form-input row">
-      <label for="name"><?= lang('field_postal_code') ?></label>
+  </div>
+  <div class="form-group row">
+    <label for="name" class="col-sm-2 col-form-label"><?= lang('field_postal_code') ?></label>
+    <div class="col-sm-10">
       <input type="number" min="1000" class="form-control" name="zip" id="zip" value="<?php if (isset($zip)) {echo set_value('zip',$zip);} else {echo set_value('zip');} ?>" />
     </div>
-    <br />
-    <div class="form-input row">
-      <label for="name"><?= lang('field_city') ?></label>
+  </div>
+  <div class="form-group row">
+    <label for="name" class="col-sm-2 col-form-label"><?= lang('field_city') ?></label>
+    <div class="col-sm-10">
       <input type="text" class="form-control" name="city" id="city" value="<?php if (isset($city)) {echo set_value('city',$city);} else {echo set_value('city');} ?>" />
     </div>
-    <br />
-    <div class="form-input row">
-      <label for="name"><?= lang('field_tel') ?></label>
+  </div>
+  <div class="form-group row">
+    <label for="name" class="col-sm-2 col-form-label"><?= lang('field_tel') ?></label>
+    <div class="col-sm-10">
       <input type="text" class="form-control" name="tel" id="tel" value="<?php if (isset($tel)) {echo set_value('tel',$tel);} else {echo set_value('tel');} ?>" />
     </div>
-    <br />
-    <div class="form-input row">
-      <label for="name"><?= lang('field_email') ?></label>
+  </div>
+  <div class="form-group row">
+    <label for="name" class="col-sm-2 col-form-label"><?= lang('field_email') ?></label>
+    <div class="col-sm-10">
       <input type="text" class="form-control" name="email" id="email" value="<?php if (isset($email)) {echo set_value('email',$email);} else {echo set_value('email');} ?>" />
     </div>
   </div>

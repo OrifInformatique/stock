@@ -39,7 +39,7 @@
                 <tr>
                     <td><a href="<?= base_url('user/admin/save_user/'.$user->user_id); ?>"><?= $user->username; ?></td>
                     <td><?= $user_types[$user->user_type_id]; ?></td>
-                    <td><?= $this->lang->line($user->archive ? 'no' : 'yes'); ?></td>
+                    <td><?= $this->lang->line($user->archive ? 'text_no' : 'text_yes'); ?></td>
                     <td><a href="<?= base_url('user/admin/delete_user/'.$user->user_id); ?>" class="close">×</td>
                 </tr>
             <?php } ?>

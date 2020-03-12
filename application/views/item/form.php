@@ -1,7 +1,7 @@
 <form class="container" method="post" enctype="multipart/form-data">
     <!-- BUTTONS -->
     <div class="row">
-        <div class="form-group col-xs-12">
+        <div class="form-group col-sm-12">
             <button type="submit" class="btn btn-success"><?= $this->lang->line('btn_save'); ?></button>
             <button type="submit" class="btn btn-danger" name="submitCancel"><?= $this->lang->line('btn_cancel');?></button>
         </div>
@@ -36,13 +36,13 @@
         </div>
         <div class="col-md-4">
             <div class="row">
-                <div class="form-group col-xs-7">
+                <div class="form-group col-sm-7">
                     <input type="text" class="form-control input-bold" name="inventory_prefix"
                            id="inventory_prefix"
                            placeholder="<?php echo $this->lang->line('field_inventory_number') ?>"
                            value="<?php if(isset($inventory_prefix)) {echo set_value('inventory_prefix',$inventory_prefix);} else {echo set_value('inventory_prefix');} ?>" />
                 </div>
-                <div class="form-group col-xs-5">
+                <div class="form-group col-sm-5">
                     <input type="text" class="form-control" name="inventory_id"
                            id="inventory_id"
                            value="<?php if(isset($inventory_id)) {echo set_value('inventory_id',$inventory_id);} else {echo set_value('inventory_id');} ?>"
@@ -50,7 +50,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="form-group col-xs-12">
+                <div class="form-group col-sm-12">
                     <input type="button" class="form-control btn btn-primary" name="inventory_number_button"
                            value="<?= $this->lang->line('btn_generate_inventory_nb') ?>" onclick="createInventoryNo()">
                 </div>
@@ -60,7 +60,7 @@
 
     <!-- ITEM DETAILS -->
     <div class="row">
-        <div class="col-xs-12">
+        <div class="col-sm-12">
             <p class="bg-primary">&nbsp;<?= $this->lang->line('text_item_detail'); ?></p>
         </div>
     </div>
@@ -117,7 +117,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="form-group col-xs-12">
+                <div class="form-group col-sm-12">
                     <label for="remarks"><?= $this->lang->line('field_remarks'); ?></label>
                     <textarea id="remarks" name="remarks" class="form-control"><?php
                         // Don't move the <php> markups or they will be white spaces in textarea
@@ -128,7 +128,7 @@
         </div>
 
         <!-- Button to display linked file -->
-        <div class="form-group col-xs-12">
+        <div class="form-group col-sm-12">
             <label for="linked_file"><?= $this->lang->line('field_linked_file_upload'); ?></label>
             <input type="file" id="linked_file" name="linked_file" accept=".pdf, .doc, .docx" class="form-control-file" />
         </div>
@@ -136,7 +136,7 @@
 
     <!-- ITEM STATUS, LOAN STATUS AND HISTORY -->
     <div class="row">
-        <div class="col-xs-12">
+        <div class="col-sm-12">
             <p class="bg-primary">&nbsp;<?= $this->lang->line('text_item_loan_status'); ?></p>
         </div>
     </div>
@@ -169,7 +169,7 @@
 
     <!-- ITEM SUPPLIER, BUYING AND WARRANTY INFORMATIONS -->
     <div class="row">
-        <div class="col-xs-12">
+        <div class="col-sm-12">
             <p class="bg-primary">&nbsp;<?= $this->lang->line('text_item_buying_warranty'); ?></p>
         </div>
     </div>
@@ -217,12 +217,12 @@
 
     <!-- ITEM TAGS -->
     <div class="row">
-        <div class="col-xs-12">
+        <div class="col-sm-12">
             <p class="bg-primary">&nbsp;<?= $this->lang->line('text_item_tags'); ?></p>
         </div>
     </div>
     <div class="row">
-        <div class="checkbox col-xs-12">
+        <div class="checkbox col-sm-12">
 			<?php foreach ($item_tags as $item_tag) { ?>
                 <label class="checkbox-inline">
                     <input class="tag-checkbox" type="checkbox" name="tag<?= $item_tag->item_tag_id; ?>" value="<?= $item_tag->item_tag_id; ?>"

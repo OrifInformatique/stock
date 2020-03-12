@@ -18,6 +18,7 @@ class Admin extends MY_Controller
         $this->access_level = $this->config->item('access_lvl_msp');
         parent::__construct();
         $this->load->library('form_validation');
+        $this->form_validation->CI =& $this;
     }
 
     /**
@@ -109,7 +110,7 @@ class Admin extends MY_Controller
           redirect("/admin/view_tags/");
           exit();
         }
-	  }
+	   }
 
       $this->display_view("admin/tags/form");
     }
