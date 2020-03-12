@@ -38,15 +38,15 @@ class Item_condition_model extends MY_Model
     {
         if ($item_condition->item_condition_id == 10)
         {
-            $bootstrap_label = '<span class="label label-success">'; // ITEM DOES WORK
+            $bootstrap_label = '<span class="badge badge-success">'; // ITEM DOES WORK
         } 
         elseif ($item_condition->item_condition_id == 30)
         {
-            $bootstrap_label = '<span class="label label-warning">'; // ITEM DEFECTIVE
+            $bootstrap_label = '<span class="badge badge-warning">'; // ITEM DEFECTIVE
         } 
         elseif ($item_condition->item_condition_id == 40)
         {
-            $bootstrap_label = '<span class="label label-danger">';}  // NO MORE ITEM
+            $bootstrap_label = '<span class="badge badge-danger">';}  // NO MORE ITEM
         else
         {
             $bootstrap_label = '<span>'; // UNKNOWNED VALUE

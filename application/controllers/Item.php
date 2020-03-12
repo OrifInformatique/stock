@@ -149,22 +149,24 @@ class Item extends MY_Controller {
         $config['full_tag_close'] = '</ul>';
 
         $config['first_link'] = '&laquo;';
-        $config['first_tag_open'] = '<li>';
+        $config['first_tag_open'] = '<li class="page-item">';
         $config['first_tag_close'] = '</li>';
 
         $config['last_link'] = '&raquo;';
-        $config['last_tag_open'] = '<li>';
+        $config['last_tag_open'] = '<li class="page-item">';
         $config['last_tag_close'] = '</li>';
 
         $config['next_link'] = FALSE;
         $config['prev_link'] = FALSE;
 
-        $config['cur_tag_open'] = '<li class="active"><a>';
+        $config['cur_tag_open'] = '<li class="page-item active"><a class="page-link" href="#">';
         $config['cur_tag_close'] = '</li></a>';
         $config['num_links'] = 5;
 
-        $config['num_tag_open'] = '<li>';
+        $config['num_tag_open'] = '<li class="page-item">';
         $config['num_tag_close'] = '</li>';
+
+        $config['attributes'] = ['class' => 'page-link'];
         
         return $this->pagination->initialize($config);
     }

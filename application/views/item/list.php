@@ -21,7 +21,7 @@
 
                 <div class="row">
                     <!-- TEXT FILTER -->
-                    <div id="ts" class="col-xs-12 top-margin">
+                    <div id="ts" class="col-sm-12 top-margin">
                     <?php 
                         echo form_label($this->lang->line('field_text_search'), 'text_search');
                         echo form_input('ts', isset($_GET["ts"])?$_GET["ts"]:"", 
@@ -60,19 +60,19 @@
 
                 <div class="row">
                     <!-- SORT ORDER -->
-                    <div id="o" class="col-xs-12 top-margin">
+                    <div id="o" class="col-sm-12 top-margin">
                         <?= form_label($this->lang->line('field_sort_order'),'sort_order').form_dropdown('o', $sort_order, isset($_GET["o"])?$_GET["o"]:"",'class="selectpicker form-control" id="sort_order"');?>
                     </div>
                 </div>
                 <div class="row">
                     <!-- SORTING ASCENDING / DESCENDING -->
-                    <div id="ad" class="col-xs-12 top-margin">
+                    <div id="ad" class="col-sm-12 top-margin">
                         <?= form_label($this->lang->line('field_sort_asc_desc'),'sort_asc_desc').form_dropdown('ad', $sort_asc_desc, isset($_GET["ad"])?$_GET["ad"]:"",'class="selectpicker form-control" id="sort_asc_desc"');?>
                     </div>
                 </div>
                 <div class="row">
                     <!-- RESET FILTERS BUTTON -->
-                    <div class="col-sm-6 col-sm-offset-6 top-margin">
+                    <div class="col-sm-12 text-right">
                         <?= form_label("&nbsp;") ?>
                         <a href="<?= base_url("item/index/")?>" class="btn btn-warning top-margin"><?php echo html_escape($this->lang->line('btn_remove_filters')); ?></a>
                     </div>
@@ -84,7 +84,7 @@
         <!-- END OF FILTERS AND SORT FORM -->
     </form>
 
-    <!-- PAGINATION -->
+    <!-- PAGINATION --><br>
     <div id="pagination_top"></div>
 
     <div class="top-margin table-responsive">
@@ -114,22 +114,6 @@
 
 <script type="text/javascript">
 $(document).ready(function() {
-    
-    // ******************************************
-    // Initialize the Bootstrap Multiselect plugin
-    // ******************************************
-    var no_filter = "<?= html_escape($this->lang->line('field_no_filter')); ?>";
-    /*$('#item_tags-multiselect').multiselect({
-        nonSelectedText: no_filter,
-        buttonWidth: '100%',
-        numberDisplayed: 10
-    });
-    $('#item_conditions-multiselect, #item_groups-multiselect, #stocking_places-multiselect, #sort_order, #sort_asc_desc').multiselect({
-        nonSelectedText: no_filter,
-        buttonWidth: '100%',
-        numberDisplayed: 5
-    });*/
-    
     
     // ******************************************
     // Load items list

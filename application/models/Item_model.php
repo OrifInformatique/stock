@@ -160,10 +160,10 @@ class Item_model extends MY_Model
 
 			if (is_null($item->current_loan)) {
 				// ITEM IS NOT LOANED
-				$bootstrap_label = '<span class="label label-success">'.html_escape($this->lang->line('lbl_loan_status_not_loaned')).'</span>';
+				$bootstrap_label = '<span class="badge badge-success">'.html_escape($this->lang->line('lbl_loan_status_not_loaned')).'</span>';
 			} else {
 				// ITEM IS LOANED
-				$bootstrap_label = '<span class="label label-warning">'.html_escape($this->lang->line('lbl_loan_status_loaned')).'</span>';
+				$bootstrap_label = '<span class="badge badge-warning">'.html_escape($this->lang->line('lbl_loan_status_loaned')).'</span>';
 			}
 			$item->loan_bootstrap_label = $bootstrap_label;
 		}
