@@ -606,9 +606,9 @@ class Item extends MY_Controller {
         }
 
         // Get item object with related inventory controls
-        $output['item'] = $this->item_model->get($id);
-        $output['inventory_controls'] = $this->inventory_control_model->with('controller')
-                ->get_many_by('item_id=' . $id);
+        $output['item'] = $this->item_model->get($id);  //Reverse inventory controls array to display them from the last one
+        $output['inventory_controls'] = array_reverse($this->inventory_control_model->with('controller')
+                ->get_many_by('item_id=' . $id), TRUE);
 
         $this->display_view('inventory_control/list', $output);
     }
@@ -749,7 +749,8 @@ class Item extends MY_Controller {
                 ->get_many_by('item_id', $item->item_id);
 
         $output['item'] = $item;
-        $output['loans'] = $loans;
+        //Reverse loans array to display them from the last one
+        $output['loans'] = array_reverse($loans, TRUE);
 
         $this->display_view('loan/list', $output);
     }
