@@ -1,0 +1,21 @@
+/* ADD CUSTOM STYLES HERE */
+
+/* Login bar styles */
+@media screen and (max-width: 768px) {
+    #login-bar h1 {
+        font-size: 25px;
+    }
+}
+@media screen and (min-width: 768px) {
+    #login-bar h1 {
+        font-size: 30px;
+    }
+}
+
+/* Nav menu style */
+#my-navbar .active {
+    border-bottom: 3px #1a661a solid;
+}
+li.nav-item {
+	margin: 0 10px;
+}
