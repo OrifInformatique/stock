@@ -125,3 +125,6 @@ nb-configuration.xml
 /phpunit*.xml
 /.phpunit.*.cache
 
+# Items linked images and files
+uploads/files/*
+uploads/images/*
