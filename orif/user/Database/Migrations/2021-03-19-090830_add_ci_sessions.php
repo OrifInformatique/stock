@@ -14,7 +14,7 @@ class AddCiSessions extends \CodeIgniter\Database\Migration
     {
         $this->forge->addField([
             'id'=>[
-                'type'              => 'INT',
+                'type'              => 'VARCHAR',
                 'constraint'        => '128',
                 'unsigned'          => true,
             ],
@@ -24,9 +24,9 @@ class AddCiSessions extends \CodeIgniter\Database\Migration
                 'null'              => false,
             ],
             'timestamp'=>[
-                'type'              => 'INT',
+                'type'              => 'TIMESTAMP',
                 'null'              => false,
-                'default'           => 0,
+                'default'           => 'CURRENT_TIMESTAMP',
             ],
             'data'=>[
                 'type'              => 'BLOB',
@@ -35,6 +35,7 @@ class AddCiSessions extends \CodeIgniter\Database\Migration
 
         ]);
         $this->forge->createTable('ci_sessions',true);
+        $this->forge->addKey('timestamp', "ci_sessions_timestamp");
     }
 
     /**
