@@ -20,11 +20,7 @@ class UpdateCiSessions extends \CodeIgniter\Database\Migration
                 'unsigned'   => true,
             ],
 
-            'timestamp' => [
-                'name'      => 'timestamp',
-                'type'      => 'TIMESTAMP',
-                'default'   => 'CURRENT_TIMESTAMP',
-            ]
+            'timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP',
         ];
         
         $this->forge->modifyColumn('ci_sessions', $fields);
