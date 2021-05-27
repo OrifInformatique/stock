@@ -24,9 +24,9 @@ class AddCiSessions extends \CodeIgniter\Database\Migration
                 'null'              => false,
             ],
             'timestamp'=>[
-                'type'              => 'TIMESTAMP',
+                'type'              => 'INT',
                 'null'              => false,
-                'default'           => 'CURRENT_TIMESTAMP',
+                'default'           => 0,
             ],
             'data'=>[
                 'type'              => 'BLOB',
@@ -35,7 +35,6 @@ class AddCiSessions extends \CodeIgniter\Database\Migration
 
         ]);
         $this->forge->createTable('ci_sessions',true);
-        $this->forge->addKey('timestamp', "ci_sessions_timestamp");
     }
 
     /**
