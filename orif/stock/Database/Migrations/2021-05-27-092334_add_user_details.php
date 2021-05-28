@@ -11,23 +11,23 @@ class Adduserdetails extends Migration
 		$this->forge->addField([
 			'id' 		=> [
 				'type' 				=> 'INT',
-				'unsigned' 			=> true,
-				'auto_increment' 	=> true,
+				'constraint'		=> '11',
+				'auto_increment' 	=> true
 			],
 
 			'lastname' 	=> [
 				'type'				=> 'VARCHAR',
-				'constraint'		=> '45',
+				'constraint'		=> '45'
 			],
 
 			'firstname' => [
 				'type'				=> 'VARCHAR',
-				'constraint'		=> '45',
-			],
+				'constraint'		=> '45'
+			]
 		]);
 
 		$this->forge->addKey('id', true);
-		$this->forge->createTable('user_details');
+		$this->forge->createTable('user_details', true);
 	}
 
 	public function down()

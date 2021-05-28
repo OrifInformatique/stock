@@ -12,11 +12,7 @@ class UpdateCiSessions extends \CodeIgniter\Database\Migration
      */
     public function up()
     {
-        $this->forge->modifyColumn('ci_sessions', [
-            'timestamp' => [
-                'type'          => 'TIMESTAMP',
-            ],
-        ]);
+        $this->db->query('ALTER TABLE ci_sessions CHANGE `timestamp` `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL');
     }
 
     /**
