@@ -12,6 +12,7 @@ class UpdateUserType extends Migration
 			'user_type_id' => [
 				'name'				=> 'id',
 				'type'				=> 'INT',
+				'unsigned'          => true,
 				'auto_increment'	=> true
 			],
 		];
