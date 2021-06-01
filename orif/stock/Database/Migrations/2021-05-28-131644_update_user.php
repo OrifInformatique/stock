@@ -21,13 +21,11 @@ class UpdateUser extends Migration
 			'user_id' 		=> [
 				'name'				=> 'id',
 				'type'				=> 'INT',
-				'unsigned'          => true,
 				'auto_increment'	=> true
 			],
 			'user_type_id' 	=> [
 				'name'				=> 'fk_user_type',
 				'type'				=> 'INT',
-				'unsigned'          => true,
 				'after'				=> 'id'
 			],
 		]);
@@ -35,7 +33,6 @@ class UpdateUser extends Migration
 		$this->forge->addColumn('user', [
 			'fk_user_details' => [
 				'type' 			   	=> 'INT',
-				'unsigned'          => true,
 				'after'				=> 'fk_user_type'
 			],
 			'CONSTRAINT fk_user_details FOREIGN KEY (fk_user_details) REFERENCES user_details (id)',
