@@ -25,8 +25,10 @@ class AddCiSessions extends \CodeIgniter\Database\Migration
             ],
             'timestamp'=>[
                 'type'              => 'INT',
+                'constraint'        => '10',
                 'null'              => false,
                 'default'           => 0,
+                'unsigned'          => true,
             ],
             'data'=>[
                 'type'              => 'BLOB',
