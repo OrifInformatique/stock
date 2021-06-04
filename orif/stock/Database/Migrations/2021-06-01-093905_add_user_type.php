@@ -17,6 +17,7 @@ class Add_user_type extends \CodeIgniter\Database\Migration
                 'type'              => 'INT',
                 'constraint'        => '11',
                 'null'              => false,
+                'auto_increment'    => true,
             ],
             'name'=>[
                 'type'              => 'VARCHAR',
@@ -35,8 +36,9 @@ class Add_user_type extends \CodeIgniter\Database\Migration
         $this->forge->addKey('user_type_id', TRUE);
         $this->forge->createTable('user_type', TRUE);
 
-        
-       
+        $seeder = \Config\Database::seeder();
+        $seeder->call('stock\Database\Seeds\AddUserTypeDatas');
+
     }
 
     /**

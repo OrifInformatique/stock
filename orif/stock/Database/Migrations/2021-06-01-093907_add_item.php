@@ -17,6 +17,7 @@ class Add_Item extends \CodeIgniter\Database\Migration
                 'type'              => 'INT',
                 'constraint'        => '11',
                 'null'              => false,
+                'auto_increment'    => true,
             ],
             'inventory_prefix'=>[
                 'type'              => 'VARCHAR',
