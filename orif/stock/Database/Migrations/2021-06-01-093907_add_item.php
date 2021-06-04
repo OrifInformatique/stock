@@ -153,10 +153,7 @@ class Add_Item extends \CodeIgniter\Database\Migration
         
         $this->forge->createTable('item', TRUE);
 
-        
-       /* $seeder=\Config\Database::seeder();
-        $seeder->call('\stock\Database\Seeds\AddUserDatas');
-*/
+
     }
 
     /**

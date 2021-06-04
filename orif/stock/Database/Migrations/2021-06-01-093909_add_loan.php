@@ -70,10 +70,7 @@ class Add_Loan extends \CodeIgniter\Database\Migration
         $this->forge->addForeignKey('loan_to_user_id', 'user', 'user_id');
         $this->forge->createTable('loan', TRUE);
 
-        
-       /* $seeder=\Config\Database::seeder();
-        $seeder->call('\stock\Database\Seeds\AddUserDatas');
-*/
+
     }
 
     /**

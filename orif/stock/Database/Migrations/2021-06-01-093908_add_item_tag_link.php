@@ -35,10 +35,7 @@ class Add_item_tag_link extends \CodeIgniter\Database\Migration
         $this->forge->addForeignKey('item_id', 'item', 'item_id');
         
         $this->forge->createTable('item_tag_link', TRUE);
- 
-       /* $seeder=\Config\Database::seeder();
-        $seeder->call('\stock\Database\Seeds\AddUserDatas');
-*/
+
     }
 
     /**

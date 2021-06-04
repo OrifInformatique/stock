@@ -39,9 +39,7 @@ class Add_Item_group extends \CodeIgniter\Database\Migration
         $this->forge->createTable('item_group', TRUE);
 
         
-       /* $seeder=\Config\Database::seeder();
-        $seeder->call('\stock\Database\Seeds\AddUserDatas');
-*/
+
     }
 
     /**

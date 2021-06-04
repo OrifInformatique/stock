@@ -31,10 +31,6 @@ class Add_Item_condition extends \CodeIgniter\Database\Migration
         
         $this->forge->createTable('item_condition', TRUE);
 
-        
-       /* $seeder=\Config\Database::seeder();
-        $seeder->call('\stock\Database\Seeds\AddUserDatas');
-*/
     }
 
     /**

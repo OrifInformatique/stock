@@ -72,10 +72,7 @@ class Add_supplier extends \CodeIgniter\Database\Migration
         
         
         $this->forge->createTable('supplier', TRUE);
- 
-       /* $seeder=\Config\Database::seeder();
-        $seeder->call('\stock\Database\Seeds\AddUserDatas');
-*/
+
     }
 
     /**

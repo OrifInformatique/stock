@@ -36,9 +36,7 @@ class Add_item_tag extends \CodeIgniter\Database\Migration
         
         $this->forge->createTable('item_tag', TRUE);
  
-       /* $seeder=\Config\Database::seeder();
-        $seeder->call('\stock\Database\Seeds\AddUserDatas');
-*/
+
     }
 
     /**

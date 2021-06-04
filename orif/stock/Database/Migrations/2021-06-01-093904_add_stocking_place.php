@@ -36,10 +36,7 @@ class Add_stocking_place extends \CodeIgniter\Database\Migration
         
         $this->forge->createTable('stocking_place', TRUE);
 
-        
-       /* $seeder=\Config\Database::seeder();
-        $seeder->call('\stock\Database\Seeds\AddUserDatas');
-*/
+
     }
 
     /**

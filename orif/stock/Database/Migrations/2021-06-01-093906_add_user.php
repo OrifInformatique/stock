@@ -68,10 +68,7 @@ class Add_user extends \CodeIgniter\Database\Migration
         $this->forge->addForeignKey('user_type_id', 'user_type', 'user_type_id');
         $this->forge->createTable('user', TRUE);
 
-        
-       /* $seeder=\Config\Database::seeder();
-        $seeder->call('\stock\Database\Seeds\AddUserDatas');
-*/
+
     }
 
     /**

@@ -47,10 +47,7 @@ class Add_InventoryControl extends \CodeIgniter\Database\Migration
         $this->forge->addForeignKey('controller_id', 'user', 'user_id');
         $this->forge->createTable('inventory_control', TRUE);
 
-        
-       /* $seeder=\Config\Database::seeder();
-        $seeder->call('\stock\Database\Seeds\AddUserDatas');
-*/
+
     }
 
     /**
