@@ -60,6 +60,54 @@ class UpdateUser extends Migration
 
 	public function down()
 	{
-		$this->forge->dropTable('user');
+		$this->forge->dropForeignKey('item', 'fk_checked_by_user_id');
+		$this->forge->dropForeignKey('item', 'fk_created_by_user_id');
+		$this->forge->dropForeignKey('item', 'fk_modified_by_user_id');
+
+		$this->forge->dropForeignKey('loan', 'fk_loan_by_user_id');
+		$this->forge->dropForeignKey('loan', 'fk_loan_to_user_id');
+
+		$this->forge->dropForeignKey('inventory_control', 'fk_inventory_control_controller_id');
+
+		$this->forge->dropForeignKey('user', 'fk_user_type_id_idx');
+
+		$this->db->query('ALTER TABLE user CHANGE date_creation created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL');
+
+		$this->forge->modifyColumn('user', [
+			'id' 			=> [
+				'name'				=> 'user_id',
+				'type'				=> 'INT',
+				'auto_increment'	=> true
+			],
+			'fk_user_type' 	=> [
+				'name'				=> 'user_type_id',
+				'type'				=> 'INT',
+				'after'				=> 'created_date'
+			],
+			'archive' 	    => [
+				'name'				=> 'is_active',
+				'type'				=> 'TINYINT',
+				'constraint'		=> '1',
+				'default'			=> '1',
+				'after'				=> 'user_type_id'
+			]
+		]);
+
+		$this->forge->addColumn('user', [
+			'lastname'		=> [
+				'type'				=> 'VARCHAR',
+				'constraint'		=> '45',
+				'null'				=> true,
+				'default'			=> null,
+				'after'				=> 'user_id'
+			],
+			'firstname'		=> [
+				'type'				=> 'VARCHAR',
+				'constraint'		=> '45',
+				'null'				=> true,
+				'default'			=> null,
+				'after'				=> 'lastname'
+			]
+		]);
 	}
 }

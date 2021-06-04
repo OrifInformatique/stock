@@ -20,6 +20,13 @@ class UpdateCiSessions extends \CodeIgniter\Database\Migration
      */
     public function down()
     {
-        $this->forge->dropTable('ci_sessions');
+        $this->forge->modifyColumn('ci_sessions', [
+            'timestamp' => [
+                'type'              => 'INT',
+                'constraint'        => '10',
+                'unsigned'          => true,
+                'default'           => '0'
+            ]
+        ]);
     }
 }

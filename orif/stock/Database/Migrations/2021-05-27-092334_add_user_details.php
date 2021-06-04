@@ -33,5 +33,9 @@ class Adduserdetails extends Migration
 	public function down()
 	{
 		$this->forge->dropTable('user_details');
+
+		$this->forge->dropForeignKey('user', 'fk_user_details');
+
+		$this->forge->dropColumn('user', 'fk_user_details');
 	}
 }
