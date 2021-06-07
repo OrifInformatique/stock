@@ -143,17 +143,20 @@ class Add_Item extends \CodeIgniter\Database\Migration
 
 
         $this->forge->addKey('item_id', TRUE);
-        $this->forge->addForeignKey('supplier_id', 'supplier', 'supplier_id');
-        $this->forge->addForeignKey('created_by_user_id', 'user', 'user_id');
-        $this->forge->addForeignKey('modified_by_user_id', 'user', 'user_id');
-        $this->forge->addForeignKey('checked_by_user_id', 'user', 'user_id');
-        $this->forge->addForeignKey('stocking_place_id', 'stocking_place', 'stocking_place_id');
-        $this->forge->addForeignKey('item_condition_id', 'item_condition', 'item_condition_id');
-        $this->forge->addForeignKey('item_group_id', 'item_group', 'item_group_id');
-        
+
         
         $this->forge->createTable('item', TRUE);
 
+        
+        $this->forge->addColumn('item', [
+			'CONSTRAINT fk_checked_by_user_id FOREIGN KEY (checked_by_user_id) REFERENCES user (user_id)',
+			'CONSTRAINT fk_created_by_user_id FOREIGN KEY (created_by_user_id) REFERENCES user (user_id)',
+			'CONSTRAINT fk_modified_by_user_id FOREIGN KEY (modified_by_user_id) REFERENCES user (user_id)',
+            'CONSTRAINT fk_item_condition_id FOREIGN KEY (item_condition_id) REFERENCES item_condition (item_condition_id)',
+            'CONSTRAINT fk_item_group_id FOREIGN KEY (item_group_id) REFERENCES item_group (item_group_id)',
+            'CONSTRAINT fk_supplier_id FOREIGN KEY (supplier_id) REFERENCES supplier (supplier_id)',
+            'CONSTRAINT fk_stocking_place_id FOREIGN KEY (stocking_place_id) REFERENCES stocking_place (stocking_place_id)'
+		]);
 
     }
 

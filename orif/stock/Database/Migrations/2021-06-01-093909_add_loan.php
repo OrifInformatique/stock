@@ -66,10 +66,17 @@ class Add_Loan extends \CodeIgniter\Database\Migration
 
 
         $this->forge->addKey('loan_id', TRUE);
-        $this->forge->addForeignKey('item_id', 'item', 'item_id');
-        $this->forge->addForeignKey('loan_by_user_id', 'user', 'user_id');
-        $this->forge->addForeignKey('loan_to_user_id', 'user', 'user_id');
+
         $this->forge->createTable('loan', TRUE);
+
+        $this->forge->addColumn('loan', [
+            'CONSTRAINT fk_loan_item_id FOREIGN KEY (item_id) REFERENCES item (item_id)',
+            'CONSTRAINT fk_loan_by_user_id FOREIGN KEY (loan_by_user_id) REFERENCES user (user_id)',
+            'CONSTRAINT fk_loan_to_user_id FOREIGN KEY (loan_to_user_id) REFERENCES user (user_id)'
+        ]);
+
+
+
 
 
     }

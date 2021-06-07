@@ -32,10 +32,15 @@ class Add_item_tag_link extends \CodeIgniter\Database\Migration
         ]);
 
         $this->forge->addKey('item_tag_link_id', TRUE);
-        $this->forge->addForeignKey('item_tag_id', 'item_tag', 'item_tag_id');
-        $this->forge->addForeignKey('item_id', 'item', 'item_id');
-        
+
+
         $this->forge->createTable('item_tag_link', TRUE);
+
+        $this->forge->addColumn('item_tag_link', [
+            'CONSTRAINT fk_item_id FOREIGN KEY (item_id) REFERENCES item (item_id)',
+            'CONSTRAINT fk_item_tag_id FOREIGN KEY (item_tag_id) REFERENCES item_tag (item_tag_id)'
+        ]);
+        
 
     }
 
