@@ -9,7 +9,7 @@
 
 return[
 // Application name
-    'app_title'                      => 'Titre de l\'application',
+    'app_title'                      => 'Section informatique </br> Gestion de stock',
 
 // Page titles
     'page_prefix'                    => 'Packbase V4',
