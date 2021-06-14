@@ -1,4 +1,11 @@
 <?php
+/**
+ * User Module Migration
+ *
+ * @author      Orif (ViDi,AeDa)
+ * @link        https://github.com/OrifInformatique
+ * @copyright   Copyright (c), Orif (https://www.orif.ch)
+ */
 
 namespace Stock\Controllers;
 
@@ -10,6 +17,11 @@ use User\Models\User_model;
 
 class Migrate extends BaseController
 {
+    /**
+     *  Migrate database to the new user module
+     * 
+     *  @return void
+     */
     public function index()
     {
         $users = [];
