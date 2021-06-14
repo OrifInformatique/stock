@@ -42,7 +42,7 @@ class UpdateUser extends Migration
 		$this->forge->dropColumn('user', ['lastname', 'firstname']);
 
 		$this->db->query('ALTER TABLE user CHANGE created_date date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
-		$this->db->query('ALTER TABLE user CHANGE is_active archive TIMESTAMP NULL AFTER email');
+		$this->db->query('ALTER TABLE user CHANGE is_active archive TIMESTAMP NULL DEFAULT NULL AFTER email');
 
 		$this->forge->addColumn('item', [
 			'CONSTRAINT fk_checked_by_user_id FOREIGN KEY (checked_by_user_id) REFERENCES user (id)',
