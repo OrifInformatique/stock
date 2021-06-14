@@ -21,8 +21,10 @@ class Migrate extends BaseController
 
         $userData = $userModelOld->findAll();
 
+        // counts all users in user table
         $size = count($userData);
 
+        // Add all data inside two arrays, to avoid data loss
         for ($i = 0; $i < $size; $i++)
         {
             $users[$i]['lastname']  = $userData[$i]['lastname'];
@@ -39,6 +41,8 @@ class Migrate extends BaseController
             echo $e->getMessage();
         }
 
+        // Inserts data from precendent arrays and then connects foreign key to the correct user 
+        // Because we begin the loop at 1, we need to increment size a single time
         for ($j = 1; $j < $size+1; $j++)
         {
             $userDetails->insert([
@@ -47,6 +51,7 @@ class Migrate extends BaseController
                 'firstname' => $users[$j-1]['firstname']
             ]);
 
+            // Makes sure archive is set on NULL to avoid non-active account
             if ($archive[$j]['archive'] == 1)
             {
                 $userModelNew->save([
@@ -61,7 +66,6 @@ class Migrate extends BaseController
             ]);
         }
 
-        session()->setFlashdata('warning', 'Migrations completed');
         return redirect()->to(base_url());
     }
 }
