@@ -3,6 +3,7 @@
 namespace Stock\Controllers;
 
 use App\Controllers\BaseController;
+use DateTime;
 use Stock\Models\User_details_model;
 use Stock\Models\User_model_old;
 use User\Models\User_model;
@@ -12,6 +13,7 @@ class Migrate extends BaseController
     public function index()
     {
         $users = [];
+        $archive = [];
         $userModelOld = new User_model_old();
         $userModelNew = new User_model();
         $userDetails  = new User_details_model();
@@ -25,6 +27,7 @@ class Migrate extends BaseController
         {
             $users[$i]['lastname']  = $userData[$i]['lastname'];
             $users[$i]['firstname'] = $userData[$i]['firstname'];
+            $archive[$i+1]['archive'] = $userData[$i]['is_active'];
         }
 
         try
@@ -43,6 +46,14 @@ class Migrate extends BaseController
                 'lastname'  => $users[$j-1]['lastname'],
                 'firstname' => $users[$j-1]['firstname']
             ]);
+
+            if ($archive[$j]['archive'] == 1)
+            {
+                $userModelNew->save([
+                    'id'        => $j,
+                    'archive'   => null
+                ]);
+            }
 
             $userModelNew->save([
                 'id'                => $j,
