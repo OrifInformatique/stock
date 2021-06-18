@@ -17,7 +17,7 @@ class Home extends BaseController
 
 	public function index()
 	{
-		$data['title'] = "Welcome";
+		$data['title'] = "";
 
 		/**
          * Display a test of the generic "items_list" view (defined in common module)

@@ -36,7 +36,7 @@ class UpdateUser extends Migration
 				'after'				=> 'fk_user_type'
 			],
 			'CONSTRAINT fk_user_details FOREIGN KEY (fk_user_details) REFERENCES user_details (id)',
-			'CONSTRAINT fk_user_type_id_idx FOREIGN KEY (fk_user_type) REFERENCES user_type (id)'
+			'CONSTRAINT fk_user_type_id FOREIGN KEY (fk_user_type) REFERENCES user_type (id)'
 		]);
 
 		$this->forge->dropColumn('user', ['lastname', 'firstname']);
@@ -69,7 +69,7 @@ class UpdateUser extends Migration
 
 		$this->forge->dropForeignKey('inventory_control', 'fk_inventory_control_controller_id');
 
-		$this->forge->dropForeignKey('user', 'fk_user_type_id_idx');
+		$this->forge->dropForeignKey('user', 'fk_user_type_id');
 
 		$this->db->query('ALTER TABLE user CHANGE date_creation created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL');
 

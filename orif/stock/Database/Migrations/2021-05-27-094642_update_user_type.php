@@ -29,7 +29,7 @@ class UpdateUserType extends Migration
 		]);
 
 		$this->forge->addColumn('user', [
-			'CONSTRAINT fk_user_type_id_idx FOREIGN KEY (user_type_id) REFERENCES user_type (user_type_id)'
+			'CONSTRAINT fk_user_type_id FOREIGN KEY (user_type_id) REFERENCES user_type (user_type_id)'
 		]);
 		
 		$this->forge->addColumn('item', [
