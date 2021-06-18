@@ -10,7 +10,6 @@
 namespace Stock\Controllers;
 
 use App\Controllers\BaseController;
-use DateTime;
 use Stock\Models\User_details_model;
 use Stock\Models\User_model_old;
 use User\Models\User_model;
@@ -53,8 +52,9 @@ class Migrate extends BaseController
             echo $e->getMessage();
         }
 
-        // Inserts data from precendent arrays and then connects foreign key to the correct user 
-        // Because we begin the loop at 1, we need to increment size a single time
+        // Inserts data from precedent arrays and then connects foreign key to the correct user 
+        // Begins at 1, otherwise the first id and fk would be set on 0
+        // That's why $size in incremented by 1 and $users array is decremented by 1
         for ($j = 1; $j < $size+1; $j++)
         {
             $userDetails->insert([
