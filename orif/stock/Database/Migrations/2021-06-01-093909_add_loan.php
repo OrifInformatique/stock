@@ -1,7 +1,7 @@
 <?php
 
 
-namespace stock\Database\Migrations;
+namespace  Stock\Database\Migrations;
 
 
 class Add_Loan extends \CodeIgniter\Database\Migration

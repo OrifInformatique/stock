@@ -1,7 +1,7 @@
 <?php
 
 
-namespace stock\Database\Migrations;
+namespace  Stock\Database\Migrations;
 
 
 class Add_stocking_place extends \CodeIgniter\Database\Migration

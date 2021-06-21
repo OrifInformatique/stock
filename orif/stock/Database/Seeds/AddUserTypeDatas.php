@@ -1,7 +1,7 @@
 <?php
 
 
-namespace stock\Database\Seeds;
+namespace  Stock\Database\Seeds;
 
 
 class AddUserTypeDatas extends \CodeIgniter\Database\Seeder
