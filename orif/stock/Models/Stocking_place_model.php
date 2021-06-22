@@ -1,6 +1,6 @@
 <?php
 /**
- * Model Supplier_model this represents the supplier table
+ * Model Stocking_place this represents the stocking_place table
  *
  * @author      Orif (ViDi,AeDa)
  * @link        https://github.com/OrifInformatique

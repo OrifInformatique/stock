@@ -1,6 +1,6 @@
 <?php
 /**
- * Model Supplier_model this represents the supplier table
+ * Model Iventory_control this represents the iventory_control table
  *
  * @author      Orif (ViDi,AeDa)
  * @link        https://github.com/OrifInformatique
