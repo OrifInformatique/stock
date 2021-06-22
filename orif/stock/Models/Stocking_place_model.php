@@ -1,35 +1,19 @@
-<?php 
-
-//if (!defined('BASEPATH')) exit('No direct script access allowed');
-
+<?php
 /**
- * The Stocking place model
- * 
- * @author      Didier Viret
- * @link        https://github.com/OrifInformatique/stock
- * @copyright   Copyright (c) 2016, Orif <http://www.orif.ch>
+ * Model Supplier_model this represents the supplier table
+ *
+ * @author      Orif (ViDi,AeDa)
+ * @link        https://github.com/OrifInformatique
+ * @copyright   Copyright (c), Orif (https://www.orif.ch)
  */
 
-namespace  Stock\Models;
+namespace Stock\Models;
 
 use CodeIgniter\Model;
 
-
-
-class Stocking_place_model extends BaseModel
+class Stocking_place_model extends Model
 {
-    /* MY_Model variables definition */
-    protected $table = 'stocking_place';
-    protected $primaryKey = 'stocking_place_id';
-    protected $protected_attributes = ['stocking_place_id'];
-    protected $has_many = ['items'];
-
-
-    /**
-    * Constructor
-    */
-    public function __construct()
-    {
-        parent::__construct();
-    }
+    protected $table='stocking_place';
+    protected $primaryKey='stocking_place_id';
+    protected $allowedFields=['name', 'short'];
 }

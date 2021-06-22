@@ -1,35 +1,19 @@
-<?php 
-
-//if (!defined('BASEPATH')) exit('No direct script access allowed');
-
+<?php
 /**
- * The Inventory control model
- * 
- * @author      Didier Viret
- * @link        https://github.com/OrifInformatique/stock
- * @copyright   Copyright (c) 2018, Orif <http://www.orif.ch>
+ * Model Supplier_model this represents the supplier table
+ *
+ * @author      Orif (ViDi,AeDa)
+ * @link        https://github.com/OrifInformatique
+ * @copyright   Copyright (c), Orif (https://www.orif.ch)
  */
 
-
-namespace  Stock\Models;
+namespace Stock\Models;
 
 use CodeIgniter\Model;
 
-
-class Inventory_control_model extends BaseModel
+class Inventory_control_model extends Model
 {
-    /* MY_Model variables definition */
-    protected $table = 'inventory_control';
-    protected $primaryKey = 'inventory_control_id';
-    protected $protected_attributes = ['inventory_control_id'];
-    protected $belongs_to = ['item','controller' => ['primary_key' => 'controller_id', 'model' => 'User_model']];
-    //                               ^        ^ The user who controlled the inventory
-
-    /**
-    * Constructor
-    */
-    public function __construct()
-    {
-        parent::__construct();
-    }
+    protected $table='inventory_control';
+    protected $primaryKey='inventory_control_id';
+    protected $allowedFields=['item_id', 'controller_id', 'date', 'remarks'];
 }
