@@ -7,6 +7,4 @@
  * @copyright   Copyright (c), Orif (https://www.orif.ch)
  */
 
-$routes->add('stock/migrate','\Stock\Controllers\Migrate');
-
 ?>

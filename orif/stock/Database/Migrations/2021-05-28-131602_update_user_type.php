@@ -19,6 +19,7 @@ class UpdateUserType extends Migration
 		]);
 	}
 
+	
 	public function down()
 	{
 		$this->forge->modifyColumn('user_type', [
