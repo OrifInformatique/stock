@@ -1,29 +1,21 @@
-<?php 
-
-
-//if (!defined('BASEPATH')) exit('No direct script access allowed');
-
-
+<?php
 /**
- * The Loan model
- * 
- * @author      Didier Viret
- * @link        https://github.com/OrifInformatique/stock
- * @copyright   Copyright (c) 2016, Orif <http://www.orif.ch>
+ * Model Supplier_model this represents the supplier table
+ *
+ * @author      Orif (ViDi,AeDa)
+ * @link        https://github.com/OrifInformatique
+ * @copyright   Copyright (c), Orif (https://www.orif.ch)
  */
 
-namespace  Stock\Models;
+namespace Stock\Models;
 
 use CodeIgniter\Model;
-use User\Models\User_model;
-
-
 
 class Loan_model extends BaseModel
 {
-    /* MY_Model variables definition */
     protected $table = 'loan';
     protected $primaryKey = 'loan_id';
+<<<<<<< HEAD
     protected $item_model = null;
     protected $user_model = null;
 
@@ -53,4 +45,7 @@ class Loan_model extends BaseModel
         $loan[0]->loaner = $this->user_model->asObject()->where(['id'=>$loan[0]->loan_by_user_id])->find();
         return $loan[0]->loaner;
     }
+=======
+    protected $allowedFields = ['date', 'item_localisation', 'remarks', 'planned_return_date', 'real_return_date', 'item_id', 'loan_by_user_id', 'loan_to_user_id'];
+>>>>>>> 6b278f5c3447a32b2e99b4df7a75b4ccb03bc5ce
 }

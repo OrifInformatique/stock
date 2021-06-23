@@ -1,35 +1,19 @@
 <?php 
-
-//if (!defined('BASEPATH')) exit('No direct script access allowed');
-
 /**
- * The Item tag model
- * 
- * @author      Didier Viret
- * @link        https://github.com/OrifInformatique/stock
- * @copyright   Copyright (c) 2016, Orif <http://www.orif.ch>
+ * Model Item tag this represents the item_tag table
+ *
+ * @author      Orif (ViDi,AeDa,)
+ * @link        https://github.com/OrifInformatique
+ * @copyright   Copyright (c), Orif (https://www.orif.ch)
  */
 
-namespace  Stock\Models;
+namespace Stock\Models;
 
 use CodeIgniter\Model;
 
-
-
-class Item_tag_model extends BaseModel
+class Item_tag_model extends Model
 {
-    /* MY_Model variables definition */
     protected $table = 'item_tag';
     protected $primaryKey = 'item_tag_id';
-    protected $protected_attributes = ['item_tag_id'];
-    protected $has_many = ['item_tag_links'];
-
-
-    /**
-    * Constructor
-    */
-    public function __construct()
-    {
-        parent::__construct();
-    }
+    protected $allowedFields = ['name', 'short_name'];
 }
