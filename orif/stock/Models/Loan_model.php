@@ -2,7 +2,7 @@
 /**
  * Model Supplier_model this represents the supplier table
  *
- * @author      Orif (ViDi,AeDa)
+ * @author      Orif (ViDi, AeDa, RoSi)
  * @link        https://github.com/OrifInformatique
  * @copyright   Copyright (c), Orif (https://www.orif.ch)
  */
@@ -43,8 +43,8 @@ class Loan_model extends BaseModel
             $this->user_model = new User_model();
         }
         var_dump($loan);
-        $loan[0]->loaner = $this->user_model->asObject()->where(['id'=>$loan[0]->loan_by_user_id])->find();
-        return $loan[0]->loaner;
+        $loan->loaner = $this->user_model->asObject()->where(['id'=>$loan->loan_by_user_id])->find();
+        return $loan->loaner;
     }
 
 

@@ -7,7 +7,7 @@ namespace  Stock\Models;
 /**
  * The Item model
  *
- * @author      Didier Viret
+ * @author      Didier Viret, Simão Romano Schindler
  * @link        https://github.com/OrifInformatique/stock
  * @copyright   Copyright (c) 2016, Orif <http://www.orif.ch>
  */
@@ -93,7 +93,7 @@ class Item_model extends Model
         $query = $this->db->query("SELECT * FROM loan WHERE item_id=" . $item->item_id . " AND date <= '" . mysqlDate('now') . "' AND real_return_date IS NULL");
 
 
-        $item->current_loan = $query->getResultObject();
+        $item->current_loan = $query->getRow();
         $item->current_loan->loaner = $this->loan_model->get_loaner($item->current_loan);
         /*
         if (is_null($item->current_loan)) {
