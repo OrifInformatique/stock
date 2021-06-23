@@ -19,7 +19,7 @@ use User\Models\User_model;
 
 
 
-class Loan_model extends Model
+class Loan_model extends BaseModel
 {
     /* MY_Model variables definition */
     protected $table = 'loan';
@@ -43,5 +43,14 @@ class Loan_model extends Model
     public function initialize()
     {
         $this->user_model = new User_model();
+    }
+
+    public function get_loaner($loan){
+        if(is_null($this->user_model)){
+            $this->user_model = new User_model();
+        }
+        var_dump($loan);
+        $loan[0]->loaner = $this->user_model->asObject()->where(['id'=>$loan[0]->loan_by_user_id])->find();
+        return $loan[0]->loaner;
     }
 }
