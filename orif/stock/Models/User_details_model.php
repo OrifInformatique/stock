@@ -13,7 +13,7 @@ use CodeIgniter\Model;
 
 class User_details_model extends Model
 {
-    protected $table='user_details';
-    protected $primaryKey='fk_user';
-    protected $allowedFields=['lastname', 'firstname'];
+    protected $table = 'user_details';
+    protected $primaryKey = 'fk_user';
+    protected $allowedFields = ['lastname', 'firstname'];
 }

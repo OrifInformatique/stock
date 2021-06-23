@@ -13,7 +13,7 @@ use CodeIgniter\Model;
 
 class Stocking_place_model extends Model
 {
-    protected $table='stocking_place';
-    protected $primaryKey='stocking_place_id';
-    protected $allowedFields=['name', 'short'];
+    protected $table = 'stocking_place';
+    protected $primaryKey = 'stocking_place_id';
+    protected $allowedFields = ['name', 'short'];
 }
