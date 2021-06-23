@@ -10,12 +10,13 @@
 namespace Stock\Models;
 
 use CodeIgniter\Model;
+use User\Models\User_model;
 
 class Loan_model extends BaseModel
 {
     protected $table = 'loan';
     protected $primaryKey = 'loan_id';
-<<<<<<< HEAD
+    protected $allowedFields = ['date', 'item_localisation', 'remarks', 'planned_return_date', 'real_return_date', 'item_id', 'loan_by_user_id', 'loan_to_user_id'];
     protected $item_model = null;
     protected $user_model = null;
 
@@ -45,7 +46,7 @@ class Loan_model extends BaseModel
         $loan[0]->loaner = $this->user_model->asObject()->where(['id'=>$loan[0]->loan_by_user_id])->find();
         return $loan[0]->loaner;
     }
-=======
-    protected $allowedFields = ['date', 'item_localisation', 'remarks', 'planned_return_date', 'real_return_date', 'item_id', 'loan_by_user_id', 'loan_to_user_id'];
->>>>>>> 6b278f5c3447a32b2e99b4df7a75b4ccb03bc5ce
+
+
+
 }

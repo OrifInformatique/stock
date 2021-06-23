@@ -83,7 +83,7 @@ class Item_model extends Model
     }
 
 
-    protected function get_current_loan($item) {
+    public function get_current_loan($item) {
       if(!is_null($item)){
         if(is_null($this->loan_model)){
           $this->loan_model = new Loan_model();
@@ -94,7 +94,8 @@ class Item_model extends Model
 
 
         $item->current_loan = $query->getResultObject();
-/*
+        $item->current_loan->loaner = $this->loan_model->get_loaner($item->current_loan);
+        /*
         if (is_null($item->current_loan)) {
           // ITEM IS NOT LOANED
           $bootstrap_label = '<span class="label label-success">'.html_escape($this->lang->line('lbl_loan_status_not_loaned')).'</span>';
@@ -117,13 +118,12 @@ class Item_model extends Model
         if(is_null($item->inventory_control_model)) {
           $this->inventory_control_model = new Inventory_control_model();
         }
-        $where = "item_id=".$item->item_id;
 
         $query = $this->db->query("SELECT * FROM inventory_control WHERE item_id=" . $item->item_id);
-
+        $item->inventory_controls = $query->getResultObject();
        // $inventory_controls->controller = $this->user_model->getResultObject()->where('');
-        $inventory_controls = $this->inventory_control_model->with('controller')
-                                  ->get_many_by($where);
+    /*    $inventory_controls = $this->inventory_control_model->with('controller')
+                                  ->get_many_by($where); */
         $last_control = NULL;
 
         if (!is_null($inventory_controls)){
@@ -142,6 +142,8 @@ class Item_model extends Model
 
       return $item;
     }
+
+    
 
     
 
