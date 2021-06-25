@@ -14,7 +14,7 @@ class Adduserdetails extends Migration
 		// PRIMARY constraint won't be cloned, so we add it manually
 		$this->forge->addColumn('user_details', 'CONSTRAINT user_details PRIMARY KEY (id)');
 
-		// Makes sure id has AUTO INCREMENT and DEFAULT value as none
+		// Makes sure id has AUTO INCREMENT and fk_user has DEFAULT NULL
 		$this->forge->modifyColumn('user_details', [
 			'id'		=> [
 				'type'				=> 'INT',
