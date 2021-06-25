@@ -19,6 +19,10 @@ class Adduserdetails extends Migration
 			'id'		=> [
 				'type'				=> 'INT',
 				'auto_increment'	=> true
+			],
+			'fk_user'	=> [
+				'type'				=> 'INT',
+				'default'			=> null
 			]
 		]);
 	}
