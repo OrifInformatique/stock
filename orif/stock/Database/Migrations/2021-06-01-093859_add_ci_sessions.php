@@ -1,10 +1,10 @@
 <?php
 
 
-namespace User\Database\Migrations;
+namespace  Stock\Database\Migrations;
 
 
-class AddCiSessions extends \CodeIgniter\Database\Migration
+class Add_ci_sessions extends \CodeIgniter\Database\Migration
 {
 
     /**
@@ -14,29 +14,35 @@ class AddCiSessions extends \CodeIgniter\Database\Migration
     {
         $this->forge->addField([
             'id'=>[
-                'type'              => 'INT',
+                'type'              => 'VARCHAR',
                 'constraint'        => '128',
-                'unsigned'          => true,
+                'null'              => false,
+                'auto_increment'    => true
             ],
             'ip_address'=>[
                 'type'              => 'VARCHAR',
                 'constraint'        => '45',
-                'null'              => false,
+                'null'              => false
             ],
             'timestamp'=>[
                 'type'              => 'INT',
                 'constraint'        => '10',
                 'null'              => false,
                 'default'           => 0,
-                'unsigned'          => true,
+                'unsigned'          => true
             ],
             'data'=>[
-                'type'              => 'BLOB',
-                'null'              =>  false,
+                'type'              => 'blob',
+                'null'              => false
             ]
-
         ]);
-        $this->forge->createTable('ci_sessions',true);
+
+        $this->forge->addKey('id', TRUE);
+        
+        
+        $this->forge->createTable('ci_sessions', TRUE);
+ 
+
     }
 
     /**
