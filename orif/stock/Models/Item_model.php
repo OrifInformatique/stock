@@ -84,17 +84,16 @@ class Item_model extends Model
 
 
     public function get_current_loan($item) {
-      if(!is_null($item)){
+
         if(is_null($this->loan_model)){
           $this->loan_model = new Loan_model();
         }
         helper('MY_date');
         
-        $query = $this->db->query("SELECT * FROM loan WHERE item_id=" . $item->item_id . " AND date <= '" . mysqlDate('now') . "' AND real_return_date IS NULL");
+        $where = array('item_id'=>$item['item_id'], 'date<='=>mysqlDate('now'), 'real_return_date is NULL');
 
+        $item['current_loan'] = $this->loan_model->asArray()->where($where)->find();
 
-        $item->current_loan = $query->getRow();
-        $item->current_loan->loaner = $this->loan_model->get_loaner($item->current_loan);
         /*
         if (is_null($item->current_loan)) {
           // ITEM IS NOT LOANED
@@ -106,9 +105,7 @@ class Item_model extends Model
       
         $item->loan_bootstrap_label = $bootstrap_label;
       */
-      }
-  
-      return $item->current_loan;
+      return $item['current_loan'];
       
     }
 

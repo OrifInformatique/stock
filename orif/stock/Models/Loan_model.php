@@ -20,19 +20,7 @@ class Loan_model extends BaseModel
     protected $item_model = null;
     protected $user_model = null;
 
-  //  protected $protected_attributes = ['loan_id'];
-  /*  protected $belongs_to = ['item',
-                             // The user who registered this loan
-                             'loan_by_user' => ['primary_key' => 'loan_by_user_id',
-                                                'model' => 'User_model'],
-                             // The user who borrowed the item
-                             'loan_to_user' => ['primary_key' => 'loan_to_user_id',
-                                                'model' => 'User_model']];
 
-*/
-    /**
-    * Constructor
-    */
     public function initialize()
     {
         $this->user_model = new User_model();
@@ -42,11 +30,25 @@ class Loan_model extends BaseModel
         if(is_null($this->user_model)){
             $this->user_model = new User_model();
         }
-        var_dump($loan);
-        $loan->loaner = $this->user_model->asObject()->where(['id'=>$loan->loan_by_user_id])->find();
-        return $loan->loaner;
+        $loan['loaner'] = $this->user_model->asArray()->where(['id'=>$loan['loan_by_user_id']])->find();
+        return $loan['loaner'];
     }
 
+    public function get_borrower($loan){
+        if(is_null($this->user_model)){
+            $this->user_model = new User_model();
+        }
+        $loan['borrower'] = $this->user_model->asArray()->where(['id'=>$loan['loan_to_user_id']])->find();
+        return $loan['borrower'];
 
+    }
 
+    public function get_item($loan){
+        if(is_null($this->item_model)){
+            $this->item_model = new Item_model();
+        }
+        $loan['item'] = $this->item_model->asArray()->where(['item_id'=>$loan['item_id']])->find();
+        return $loan['item'];
+    }
+   
 }
