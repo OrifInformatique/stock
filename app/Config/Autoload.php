@@ -44,7 +44,8 @@ class Autoload extends AutoloadConfig
 		'Config'      => APPPATH . 'Config',
         'Common'      => ROOTPATH.'orif/common',
         'Welcome'     => ROOTPATH.'orif/welcome',
-        'User'        => ROOTPATH.'orif/user'
+        'User'        => ROOTPATH.'orif/user',
+        'Stock'       => ROOTPATH.'orif/stock'
 	];
 
 	/**
