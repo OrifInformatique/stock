@@ -78,5 +78,19 @@ defined('EXIT_DATABASE')       || define('EXIT_DATABASE', 8); // database error
 defined('EXIT__AUTO_MIN')      || define('EXIT__AUTO_MIN', 9); // lowest automatically-assigned error code
 defined('EXIT__AUTO_MAX')      || define('EXIT__AUTO_MAX', 125); // highest automatically-assigned error code
 
+if (file_exists(ROOTPATH. 'orif')) {
+    $modulesPath = ROOTPATH.'orif/'; 
+    $modules = scandir($modulesPath);
 
-define('DATABASE_DATE_FORMAT', 'Y-m-d');
+    foreach ($modules as $module) {
+        if ($module === '.' || $module === '..') continue;
+        if (is_dir($modulesPath) . '/' . $module) {
+            $constantsPath = $modulesPath . $module . '/Config/Constants.php';
+            if (file_exists($constantsPath)) {
+                require($constantsPath);
+            } else {
+                continue;
+            }
+        }
+    }
+} 

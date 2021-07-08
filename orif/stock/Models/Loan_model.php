@@ -40,7 +40,6 @@ class Loan_model extends BaseModel
         }
         $loan['borrower'] = $this->user_model->asArray()->where(['id'=>$loan['loan_to_user_id']])->find();
         return $loan['borrower'];
-
     }
 
     public function get_item($loan){

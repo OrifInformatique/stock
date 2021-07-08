@@ -84,7 +84,7 @@ class Item_model extends Model
 
 
     public function get_current_loan($item) {
-
+      if(!is_null($item)) {
         if(is_null($this->loan_model)){
           $this->loan_model = new Loan_model();
         }
@@ -105,6 +105,9 @@ class Item_model extends Model
       
         $item->loan_bootstrap_label = $bootstrap_label;
       */
+
+      }
+        
       return $item['current_loan'];
       
     }
@@ -140,8 +143,24 @@ class Item_model extends Model
       return $item;
     }
 
-    
+    protected function get_tags($item){
+      if(is_null($this->item_tag_link_model)){
+        $this->item_tag_link_model = new Item_tag_link_model();
+      }
+      $tag_links = $this->item_tag_link_model->get_tags($item);
+      
+    }
 
+    
+    public function get_image($item)
+    {		
+        if (!is_null($item) && is_null($item['image']))
+        {
+            $item['image'] = ITEM_NO_IMAGE;
+        }
+
+        return $item['image'];
+    }
     
 
 
