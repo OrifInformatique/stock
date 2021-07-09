@@ -19,6 +19,7 @@ use Stock\Models\Stocking_place_model;
 use User\Models\User_model;
 use Stock\Models\Loan_model;
 use Stock\Models\Inventory_control_model;
+use \DateTime;
 
 use CodeIgniter\Model;
 use Stock\Models\MyModel;
@@ -29,23 +30,8 @@ class Item_model extends MyModel
 {
     protected $table = 'item';
     protected $primaryKey = 'item_id';
-    /*
-    protected $protected_attributes = ['item_id'];
-    protected $belongs_to = ['supplier', 'stocking_place', 'item_condition', 'item_group',
-                             'created_by_user' => ['primary_key' => 'created_by_user_id',
-                                                   'model' => 'user_model'],
-                             'modified_by_user' => ['primary_key' => 'modified_by_user_id',
-                                                    'model' => 'user_model'],
-                             'checked_by_user' => ['primary_key' => 'checked_by_user_id',
-                                                   'model' => 'user_model']];
-    protected $has_many = ['item_tag_links', 'loans', 'inventory_controls'];
 
 
-    protected $after_get = ['get_inventory_number', 'get_image',
-                            'get_warranty_status', 'get_current_loan',
-                            'get_last_inventory_control', 'get_tags'];
-
-    */
     /**
     * Constructor
     */
@@ -58,7 +44,20 @@ class Item_model extends MyModel
         $this->item_group_model = new Item_group_model();
         $this->loan_model = new Loan_model();
         $this->inventory_control_model = new Inventory_control_model();
-        // $this->allowedFields[] = 
+    }
+
+
+    /*
+     * Returns the id that will receive the next item
+     */
+    public function get_future_id()
+    {
+        $query = $this->db->query("SHOW TABLE STATUS LIKE 'item'");
+
+        $row = $query->row(0);
+        $value = $row->Auto_increment;
+
+        return $value;
     }
 
     
@@ -85,7 +84,7 @@ class Item_model extends MyModel
 
 
     public function get_current_loan($item) {
-      if(!is_null($item)) {
+
         if(is_null($this->loan_model)){
           $this->loan_model = new Loan_model();
         }
@@ -106,33 +105,38 @@ class Item_model extends MyModel
       
         $item->loan_bootstrap_label = $bootstrap_label;
       */
-
-      }
-        
       return $item['current_loan'];
       
     }
 
+
     protected function get_last_inventory_control($item)
     {
-      if (!is_null($item)) {
-        if(is_null($item->inventory_control_model)) {
+      if (!is_null($item)) 
+      {
+        if(is_null($item->inventory_control_model)) 
+        {
           $this->inventory_control_model = new Inventory_control_model();
         }
 
         $query = $this->db->query("SELECT * FROM inventory_control WHERE item_id=" . $item->item_id);
         $item->inventory_controls = $query->getResultObject();
-       // $inventory_controls->controller = $this->user_model->getResultObject()->where('');
-    /*    $inventory_controls = $this->inventory_control_model->with('controller')
+        $inventory_controls = $item->invetory_controls;
+        /* $inventory_controls->controller = $this->user_model->getResultObject()->where('');
+        $inventory_controls = $this->inventory_control_model->with('controller')
                                   ->get_many_by($where); */
         $last_control = NULL;
 
-        if (!is_null($inventory_controls)){
-          foreach ($inventory_controls as $control) {
+        if (!is_null($inventory_controls))
+        {
+          foreach ($inventory_controls as $control) 
+          {
             // Select the last control (biggest date)
             if (is_null($last_control)) {
               $last_control = $control;
-            } elseif ($control->date > $last_control->date) {
+            } 
+            else if ($control->date > $last_control->date) 
+            {
               $last_control = $control;
             }
           }
@@ -140,49 +144,59 @@ class Item_model extends MyModel
 
         $item->last_inventory_control = $last_control;
       }
-
+      var_dump($item);
+      exit();
       return $item;
     }
 
-    protected function get_tags($item){
-      if(is_null($this->item_tag_link_model)){
-        $this->item_tag_link_model = new Item_tag_link_model();
-      }
-      $tag_links = $this->item_tag_link_model->get_tags($item);
       
-    }
-
-    
-    public function get_image($item)
-    {		
-        if (!is_null($item) && is_null($item['image']))
-        {
-            $item['image'] = ITEM_NO_IMAGE;
-        }
-        return $item['image'];
-    }
-    
-    public function get_inventory_number($item)
+    /**
+    * Calculate a warranty status based on buying date and warranty duration
+    *
+    * Attribute name : warranty_status
+    *
+    * Values :
+    *           0 : NO WARRANTY STATUS (buying date or warranty duration is not set)
+    *           1 : UNDER WARRANTY
+    *           2 : WARRANTY EXPIRES SOON (less than 3 months)
+    *           3 : WARRANTY EXPIRED
+    */
+    protected function get_warranty_status($item)
     {
-        $inventory_id = "";
-        $inventory_number = "";
-
-        if (!is_null($item)) {
-            $inventory_id = $item['item_id'];
-            
-            // Add leading zeros to inventory_id
-            for( $i = strlen($inventory_id) ; $i < INVENTORY_NUMBER_CHARS; $i++) {
-                $inventory_id = "0".$inventory_id;
-            }
-            $inventory_id;
-
-            $inventory_number = $item['inventory_prefix'].".".$inventory_id;
-            $item['inventory_number'] = $inventory_number;
+      if (!is_null($item)) 
+      {
+        if (empty($item->buying_date) || empty($item->warranty_duration))
+        {
+          $item->warranty_status = 0;
         }
+        else
+        {
+          $buying_date = new DateTime($item->buying_date);
+          $current_date = new DateTime("now");
 
-        return $item['inventory_number'];
+          $time_spent = $buying_date->diff($current_date);
+          $months_spent = ($time_spent->y * 12) + $time_spent->m;
+
+          $warranty_left = $item->warranty_duration - $months_spent;
+
+          if ($warranty_left > 3)
+          {
+            // UNDER WARRANTY
+            $item->warranty_status = 1;
+          }
+          elseif ($warranty_left > 0)
+          {
+            // WARRANTY EXPIRES SOON
+            $item->warranty_status = 2;
+          }
+          else
+          {
+            // WARRANTY EXPIRED
+            $item->warranty_status = 3;
+          }
+        }
+      }
+        return $item;
     }
-
-
 
 }
