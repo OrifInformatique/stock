@@ -143,9 +143,27 @@ class Item_model extends Model
 
         $item->last_inventory_control = $last_control;
       }
-      var_dump($item);
-      exit();
       return $item;
+    }
+
+
+    protected function get_tags($item){
+      if(is_null($this->item_tag_link_model)){
+        $this->item_tag_link_model = new Item_tag_link_model();
+      }
+      $tag_links = $this->item_tag_link_model->get_tags($item);
+
+    }
+
+
+    public function get_image($item)
+    {		
+        if (!is_null($item) && is_null($item['image']))
+        {
+            $item['image'] = ITEM_NO_IMAGE;
+        }
+
+        return $item['image'];
     }
 
       
@@ -197,5 +215,5 @@ class Item_model extends Model
       }
         return $item;
     }
-
-}
+  
+  } 
