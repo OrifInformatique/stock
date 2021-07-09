@@ -13,11 +13,12 @@
 
 namespace  Stock\Models;
 
+use Stock\Models\MyModel;
 use CodeIgniter\Model;
 
 
 
-class Item_condition_model extends BaseModel
+class Item_condition_model extends MyModel
 {
     /* MY_Model variables definition */
     protected $table = 'item_condition';

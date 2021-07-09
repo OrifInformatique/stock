@@ -21,10 +21,11 @@ use Stock\Models\Loan_model;
 use Stock\Models\Inventory_control_model;
 
 use CodeIgniter\Model;
+use Stock\Models\MyModel;
 
 
 
-class Item_model extends Model
+class Item_model extends MyModel
 {
     protected $table = 'item';
     protected $primaryKey = 'item_id';
@@ -158,10 +159,30 @@ class Item_model extends Model
         {
             $item['image'] = ITEM_NO_IMAGE;
         }
-
         return $item['image'];
     }
     
+    public function get_inventory_number($item)
+    {
+        $inventory_id = "";
+        $inventory_number = "";
+
+        if (!is_null($item)) {
+            $inventory_id = $item['item_id'];
+            
+            // Add leading zeros to inventory_id
+            for( $i = strlen($inventory_id) ; $i < INVENTORY_NUMBER_CHARS; $i++) {
+                $inventory_id = "0".$inventory_id;
+            }
+            $inventory_id;
+
+            $inventory_number = $item['inventory_prefix'].".".$inventory_id;
+            $item['inventory_number'] = $inventory_number;
+        }
+
+        return $item['inventory_number'];
+    }
+
 
 
 }
