@@ -5,12 +5,12 @@ return[
 /**
  * French translations
  *
- * @author      Didier Viret
+ * @author      Didier Viret, Simão Romano Schindler
  * @link        https://github.com/OrifInformatique/stock
  * @copyright   Copyright (c) 2016, Orif <http://www.orif.ch>
  */
 // Application name
-'app_title'                      => 'Section informatique<br />Gestion de stock',
+'app_title'                      => 'Section informatique<br/>Gestion de stock',
 // Page titles
 'page_prefix'                    => 'Stock',
 'page_item_list'                 => 'Liste des objets',

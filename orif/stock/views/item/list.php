@@ -1,3 +1,4 @@
+
 <div class="container">
 
     <!-- *** ADMIN *** -->
@@ -5,7 +6,7 @@
             <div class="row bottom-margin">
                     <!-- Button for new item -->
                     <a href="<?php echo base_url("item/create/"); ?>"
-                            class="btn btn-success"><?php echo htmlspecialchars(lang('btn_new')); ?></a>
+                            class="btn btn-success"><?php echo htmlspecialchars(lang('MY_application.btn_new')); ?></a>
             </div>
 
     <?php } ?>
@@ -17,16 +18,16 @@
             <!-- FILTERS -->
             <div class="col-sm-8 top-margin">
                 <!-- HEADING -->
-                <p class="bg-primary">&nbsp;<?php echo htmlspecialchars(lang('text_search_filters')); ?></p>
+                <p class="bg-primary">&nbsp;<?php echo htmlspecialchars(lang('MY_application.text_search_filters')); ?></p>
 
                 <div class="row">
                     <!-- TEXT FILTER -->
                     <div id="ts" class="col-xs-12 top-margin">
                     <?php 
-                        echo form_label(lang('field_text_search'), 'text_search');
+                        echo form_label(lang('MY_application.field_text_search'), 'text_search');
                         echo form_input('ts', isset($_GET["ts"])?$_GET["ts"]:"", 
                         'id="text_search" class="form-control"
-                        placeholder="'.lang('field_no_filter').'"');
+                        placeholder="'.lang('MY_application.field_no_filter').'"');
                     ?>
                     </div>
                 </div>
@@ -34,21 +35,21 @@
                 <div class="row">
                     <!-- TAGS FILTER -->
                     <div id="t" class="col-sm-8 top-margin">
-                        <?= form_label(lang('field_tags'),'item_conditions-multiselect').form_dropdown('t[]', $item_tags, isset($_GET["t"])?$_GET["t"]:"",'id="item_tags-multiselect" multiple="multiple"');?>
+                        <?= form_label(lang('MY_application.field_tags'),'item_conditions-multiselect').form_dropdown('t[]', $item_tags, isset($_GET["t"])?$_GET["t"]:"",'id="item_tags-multiselect" multiple="multiple"');?>
                     </div>
                     <!-- GROUPS FILTER -->
                     <div id="g" class="col-sm-4 top-margin">
-                        <?= form_label(lang('field_group'),'item_groups-multiselect').form_dropdown('g[]', $item_groups, isset($_GET["g"])?$_GET["g"]:"",'id="item_groups-multiselect" multiple="multiple"');?>
+                        <?= form_label(lang('MY_application.field_group'),'item_groups-multiselect').form_dropdown('g[]', $item_groups, isset($_GET["g"])?$_GET["g"]:"",'id="item_groups-multiselect" multiple="multiple"');?>
                     </div>
                 </div>
                 <div class="row">
                     <!-- STOCKING PLACES FILTER -->
                     <div id="s" class="col-sm-8 top-margin">
-                        <?= form_label(lang('field_stocking_place'),'stocking_places-multiselect').form_dropdown('s[]', $stocking_places, isset($_GET["s"])?$_GET["s"]:"",'id="stocking_places-multiselect" multiple="multiple"');?>
+                        <?= form_label(lang('MY_application.field_stocking_place'),'stocking_places-multiselect').form_dropdown('s[]', $stocking_places, isset($_GET["s"])?$_GET["s"]:"",'id="stocking_places-multiselect" multiple="multiple"');?>
                     </div>
                     <!-- CONDITIONS FILTER -->
                     <div id="c" class="col-sm-4 top-margin">
-                        <?= form_label(lang('field_item_condition'),'item_conditions-multiselect').form_dropdown('c[]', $item_conditions, isset($_GET["c"])?$_GET["c"]:"10",'id="item_conditions-multiselect" multiple="multiple"');?>
+                        <?= form_label(lang('MY_application.field_item_condition'),'item_conditions-multiselect').form_dropdown('c[]', $item_conditions, isset($_GET["c"])?$_GET["c"]:"10",'id="item_conditions-multiselect" multiple="multiple"');?>
                     </div>
                 </div>
             </div>
@@ -56,25 +57,25 @@
             <!-- SORT ORDER -->
             <div class="col-sm-4 top-margin">
                 <!-- HEADING -->
-                <p class="bg-primary">&nbsp;<?php echo htmlspecialchars(lang('text_sort_order')); ?></p>
+                <p class="bg-primary">&nbsp;<?php echo htmlspecialchars(lang('MY_application.text_sort_order')); ?></p>
 
                 <div class="row">
                     <!-- SORT ORDER -->
                     <div id="o" class="col-xs-12 top-margin">
-                        <?= form_label(lang('field_sort_order'),'sort_order').form_dropdown('o', $sort_order, isset($_GET["o"])?$_GET["o"]:"",'id="sort_order"');?>
+                        <?= form_label(lang('MY_application.field_sort_order'),'sort_order').form_dropdown('o', $sort_order, isset($_GET["o"])?$_GET["o"]:"",'id="sort_order"');?>
                     </div>
                 </div>
                 <div class="row">
                     <!-- SORTING ASCENDING / DESCENDING -->
                     <div id="ad" class="col-xs-12 top-margin">
-                        <?= form_label(lang('field_sort_asc_desc'),'sort_asc_desc').form_dropdown('ad', $sort_asc_desc, isset($_GET["ad"])?$_GET["ad"]:"",'id="sort_asc_desc"');?>
+                        <?= form_label(lang('MY_application.field_sort_asc_desc'),'sort_asc_desc').form_dropdown('ad', $sort_asc_desc, isset($_GET["ad"])?$_GET["ad"]:"",'id="sort_asc_desc"');?>
                     </div>
                 </div>
                 <div class="row">
                     <!-- RESET FILTERS BUTTON -->
                     <div class="col-sm-6 col-sm-offset-6 top-margin">
                         <?= form_label("&nbsp;") ?>
-                        <a href="<?= base_url("item/index/")?>" class="btn btn-warning top-margin"><?php echo htmlspecialchars(lang('btn_remove_filters')); ?></a>
+                        <a href="<?= base_url("item/index/")?>" class="btn btn-warning top-margin"><?php echo htmlspecialchars(lang('MY_application.btn_remove_filters')); ?></a>
                     </div>
                 </div>
             </div>
@@ -90,17 +91,17 @@
     <div class="top-margin table-responsive">
 
         <!-- LIST OF ITEMS -->  
-        <div class="alert alert-warning" id="no_item_message"><?= htmlspecialchars(lang('msg_no_item')); ?></div>
+        <div class="alert alert-warning" id="no_item_message"><?= htmlspecialchars(lang('MY_application.msg_no_item')); ?></div>
         <div class="alert alert-danger" id="error_message"></div>
 
         <table id="table_item" class="table table-striped table-hover">
         <thead>
             <tr>
-                <th><?= htmlspecialchars(lang('header_picture')); ?></th>
-                <th><?= htmlspecialchars(lang('header_status')); ?></th>
-                <th><?= htmlspecialchars(lang('header_item_name')); ?></th>
-                <th nowrap><?= htmlspecialchars(lang('header_stocking_place')); ?></th>
-                <th nowrap><?= htmlspecialchars(lang('header_inventory_nb')).'<br />'.htmlspecialchars(lang('header_serial_nb')); ?></th>
+                <th><?= htmlspecialchars(lang('MY_application.header_picture')); ?></th>
+                <th><?= htmlspecialchars(lang('MY_application.header_status')); ?></th>
+                <th><?= htmlspecialchars(lang('MY_application.header_item_name')); ?></th>
+                <th nowrap><?= htmlspecialchars(lang('MY_application.header_stocking_place')); ?></th>
+                <th nowrap><?= htmlspecialchars(lang('MY_application.header_inventory_nb')).'<br />'.htmlspecialchars(lang('MY_application.header_serial_nb')); ?></th>
             </tr>
         </thead>
         <tbody id="list_item">
@@ -118,7 +119,7 @@ $(document).ready(function() {
     // ******************************************
     // Initialize the Bootstrap Multiselect plugin
     // ******************************************
-    var no_filter = "<?= htmlspecialchars(lang('field_no_filter')); ?>";
+    var no_filter = "<?= htmlspecialchars(lang('MY_application.field_no_filter')); ?>";
     $('#item_tags-multiselect').multiselect({
         nonSelectedText: no_filter,
         buttonWidth: '100%',
@@ -171,7 +172,7 @@ function load_items(page, filters){
     $("#pagination_bottom, #pagination_top").empty();
     
     // URL for ajax call to PHP controller
-    url = "<?= base_url("item/load_list_json/")?>"+page+filters;
+    url = "<?= base_url("Stock/Controllers/Item/load_list_json/")?>"+page+filters;
 
     $.ajax({
         url: url,
@@ -256,7 +257,7 @@ function display_item(item){
     // Item's parameters
     href = '<?= base_url("/item/view/"); ?>'+item["item_id"];
     src_image = '<?= base_url("uploads/images/"); ?>'+item["image"];
-    alt_image = '<?php htmlspecialchars(lang("field_image")); ?>';
+    alt_image = '<?php htmlspecialchars(lang("MY_application.field_image")); ?>';
     item_condition = item["item_condition"]["bootstrap_label"];
     loan_bootstrap_label = item["loan_bootstrap_label"];
     item_localisation = item["current_loan"]!==null?'<br><h6>'+item["current_loan"]["item_localisation"]+'</h6>':"";
