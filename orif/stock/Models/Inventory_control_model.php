@@ -10,8 +10,9 @@
 namespace Stock\Models;
 
 use CodeIgniter\Model;
+use Stock\Models\MyModel;
 
-class Inventory_control_model extends Model
+class Inventory_control_model extends MyModel
 {
     protected $table='inventory_control';
     protected $primaryKey='inventory_control_id';

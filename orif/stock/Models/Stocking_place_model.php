@@ -10,8 +10,9 @@
 namespace Stock\Models;
 
 use CodeIgniter\Model;
+use Stock\Models\MyModel;
 
-class Stocking_place_model extends Model
+class Stocking_place_model extends MyModel
 {
     protected $table = 'stocking_place';
     protected $primaryKey = 'stocking_place_id';

@@ -12,11 +12,11 @@
 
 namespace  Stock\Models;
 
-use CodeIgniter\Model;
+use Stock\Models\MyModel;
 
 
 
-class Item_group_model extends BaseModel
+class Item_group_model extends MyModel
 {
     /* MY_Model variables definition */
     protected $table = 'item_group';

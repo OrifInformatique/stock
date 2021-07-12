@@ -11,8 +11,9 @@ namespace Stock\Models;
 
 use CodeIgniter\Model;
 use User\Models\User_model;
+use Stock\Models\MyModel;
 
-class Loan_model extends BaseModel
+class Loan_model extends MyModel
 {
     protected $table = 'loan';
     protected $primaryKey = 'loan_id';

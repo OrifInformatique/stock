@@ -10,8 +10,9 @@
 namespace Stock\Models;
 
 use CodeIgniter\Model;
+use Stock\Models\MyModel;
 
-class User_details_model extends Model
+class User_details_model extends MyModel
 {
     protected $table = 'user_details';
     protected $primaryKey = 'fk_user';

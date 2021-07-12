@@ -22,10 +22,11 @@ use Stock\Models\Inventory_control_model;
 use \DateTime;
 
 use CodeIgniter\Model;
+use Stock\Models\MyModel;
 
 
 
-class Item_model extends Model
+class Item_model extends MyModel
 {
     protected $table = 'item';
     protected $primaryKey = 'item_id';
