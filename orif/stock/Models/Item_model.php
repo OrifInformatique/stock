@@ -51,12 +51,9 @@ class Item_model extends Model
      */
     public function get_future_id()
     {
-        $query = $this->db->query("SHOW TABLE STATUS LIKE 'item'");
+      $query = $this->db->query("SELECT `auto_increment` FROM INFORMATION_SCHEMA.TABLES WHERE table_name = 'item'");
 
-        $row = $query->row(0);
-        $value = $row->Auto_increment;
-
-        return $value;
+      return $query;
     }
 
     
@@ -113,17 +110,15 @@ class Item_model extends Model
     {
       if (!is_null($item)) 
       {
-        if(is_null($item->inventory_control_model)) 
+        if(is_null($this->inventory_control_model)) 
         {
           $this->inventory_control_model = new Inventory_control_model();
         }
 
-        $query = $this->db->query("SELECT * FROM inventory_control WHERE item_id=" . $item->item_id);
-        $item->inventory_controls = $query->getResultObject();
-        $inventory_controls = $item->invetory_controls;
-        /* $inventory_controls->controller = $this->user_model->getResultObject()->where('');
-        $inventory_controls = $this->inventory_control_model->with('controller')
-                                  ->get_many_by($where); */
+        $query = $this->db->query("SELECT * FROM inventory_control WHERE item_id =" . $item['item_id']);
+        $item['inventory_controls'] = $query->getResultObject();
+        $inventory_controls = $item['inventory_controls'];
+
         $last_control = NULL;
 
         if (!is_null($inventory_controls))
@@ -131,17 +126,18 @@ class Item_model extends Model
           foreach ($inventory_controls as $control) 
           {
             // Select the last control (biggest date)
-            if (is_null($last_control)) {
+            if (is_null($last_control)) 
+            {
               $last_control = $control;
             } 
-            else if ($control->date > $last_control->date) 
+            else if ($control['date'] > $last_control['date']) 
             {
               $last_control = $control;
             }
           }
         }
 
-        $item->last_inventory_control = $last_control;
+        $item['last_inventory_control'] = $last_control;
       }
       return $item;
     }
@@ -182,38 +178,38 @@ class Item_model extends Model
     {
       if (!is_null($item)) 
       {
-        if (empty($item->buying_date) || empty($item->warranty_duration))
+        if (empty($item['buying_date']) || empty($item['warranty_duration']))
         {
-          $item->warranty_status = 0;
+          $item['warranty_status'] = 0;
         }
         else
         {
-          $buying_date = new DateTime($item->buying_date);
+          $buying_date = new DateTime($item['buying_date']);
           $current_date = new DateTime("now");
 
           $time_spent = $buying_date->diff($current_date);
           $months_spent = ($time_spent->y * 12) + $time_spent->m;
 
-          $warranty_left = $item->warranty_duration - $months_spent;
+          $warranty_left = $item['warranty_duration'] - $months_spent;
 
           if ($warranty_left > 3)
           {
             // UNDER WARRANTY
-            $item->warranty_status = 1;
+            $item['warranty_status'] = 1;
           }
           elseif ($warranty_left > 0)
           {
             // WARRANTY EXPIRES SOON
-            $item->warranty_status = 2;
+            $item['warranty_status'] = 2;
           }
           else
           {
             // WARRANTY EXPIRED
-            $item->warranty_status = 3;
+            $item['warranty_status'] = 3;
           }
         }
       }
-        return $item;
+      return $item;
     }
   
-  } 
+} 
