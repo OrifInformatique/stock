@@ -37,7 +37,7 @@ class Add_user_type extends \CodeIgniter\Database\Migration
         $this->forge->createTable('user_type', TRUE);
 
         $seeder = \Config\Database::seeder();
-        $seeder->call(' Stock\Database\Seeds\AddUserTypeDatas');
+        $seeder->call('Stock\Database\Seeds\AddUserTypeDatas');
 
     }
 
