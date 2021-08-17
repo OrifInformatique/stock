@@ -10,7 +10,9 @@
 namespace Stock\Models;
 
 use Stock\Models\MyModel;
-use Stock\Models\Item_model;
+use CodeIgniter\Database\ConnectionInterface;
+use CodeIgniter\Validation\ValidationInterface;
+
 
 class Stocking_place_model extends MyModel
 {
@@ -18,12 +20,27 @@ class Stocking_place_model extends MyModel
     protected $primaryKey = 'stocking_place_id';
     protected $allowedFields = ['name', 'short'];
 
+    /**
+     * Constructor
+     */
+    public function __construct(ConnectionInterface &$db = null, ValidationInterface $validation = null)
+    {
+        parent::__construct($db, $validation);
+        $this->Item_model = new Item_model();
+    }
+
+    /**
+     *  Gets the corresponding items with the primary key
+     *  
+     *  @return array
+     */
     public function getItems($stocking_place_id)
     {
-        $itemModel = new Item_model();
+        if (is_null($this->Item_model))
+            $this->Item_model = new Item_model();
 
-        return $itemModel->asArray()
-                         ->where('stocking_place_id', $stocking_place_id)
-                         ->findAll();
+        return $this->Item_model->asArray()
+                                ->where('stocking_place_id', $stocking_place_id)
+                                ->findAll();
     }
 }

@@ -11,19 +11,37 @@ namespace Stock\Models;
 
 use Stock\Models\MyModel;
 use User\Models\User_model;
+use CodeIgniter\Database\ConnectionInterface;
+use CodeIgniter\Validation\ValidationInterface;
+
 
 class User_details_model extends MyModel
 {
     protected $table = 'user_details';
-    protected $primaryKey = 'fk_user';
-    protected $allowedFields = ['lastname', 'firstname'];
+    protected $primaryKey = 'id';
+    protected $allowedFields = ['fk_user', 'lastname', 'firstname'];
 
+    /**
+     * Constructor
+     */
+    public function __construct(ConnectionInterface &$db = null, ValidationInterface $validation = null)
+    {
+        parent::__construct($db, $validation);
+        $this->User_model = new User_model();
+    }
+
+    /**
+     *  Gets the corresponding user with a foreign key
+     *  
+     *  @return array
+     */
     public function getUser($fk_user)
     {
-        $userModel = new User_model();
+        if (is_null($this->User_model))
+            $this->User_model = new User_model();
 
-        return $userModel->asArray()
-                         ->where('id', $fk_user)
-                         ->first();
+        return $this->User_model->asArray()
+                                ->where('id', $fk_user)
+                                ->first();
     }
 }
