@@ -2,7 +2,7 @@
 /**
  * Model Item_model this represents the Item table
  *
- * @author      Orif (ViDi,SoSi,AeDa)
+ * @author      Orif (ViDi,RoSi,AeDa)
  * @link        https://github.com/OrifInformatique
  * @copyright   Copyright (c), Orif (https://www.orif.ch)
  */
