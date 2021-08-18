@@ -1,60 +1,61 @@
-<?php 
-namespace  Stock\Models;
-
-//if (!defined('BASEPATH')) exit('No direct script access allowed');
-
-
+<?php
 /**
- * The Item model
+ * Model Item_model this represents the Item table
  *
- * @author      Didier Viret, Simão Romano Schindler
- * @link        https://github.com/OrifInformatique/stock
- * @copyright   Copyright (c) 2016, Orif <http://www.orif.ch>
+ * @author      Orif (ViDi,SoSi,AeDa)
+ * @link        https://github.com/OrifInformatique
+ * @copyright   Copyright (c), Orif (https://www.orif.ch)
  */
 
-use Stock\Models\Item_condition_model;
-use Stock\Models\Item_group_model;
-use Stock\Models\Supplier_model;
-use Stock\Models\Stocking_place_model;
-use User\Models\User_model;
-use Stock\Models\Loan_model;
-use Stock\Models\Inventory_control_model;
+namespace  Stock\Models;
+
 use \DateTime;
+use User\Models\User_model;
 
-use CodeIgniter\Model;
 use Stock\Models\MyModel;
-
 
 
 class Item_model extends MyModel
 {
     protected $table = 'item';
     protected $primaryKey = 'item_id';
-
+    protected $allowedFields = ['inventory_prefix', 
+                                'name', 
+                                'description', 
+                                'image', 
+                                'serial_number', 
+                                'buying_price', 
+                                'buying_date', 
+                                'warranty_duration',
+                                'remarks',
+                                'linked_file',
+                                'supplier_ref',
+                                'created_at',
+                                'modified_at',
+                                'checked_at'];                       
 
     /**
-    * Constructor
-    */
+     * Constructor
+     */
     public function initialize()
     {
         $this->user_model = new User_model();
+        $this->loan_model = new Loan_model();
         $this->supplier_model = new Supplier_model();
+        $this->item_group_model = new Item_group_model();
         $this->stocking_place_model = new Stocking_place_model();
         $this->item_condition_model = new Item_condition_model();
-        $this->item_group_model = new Item_group_model();
-        $this->loan_model = new Loan_model();
         $this->inventory_control_model = new Inventory_control_model();
     }
-
 
     /*
      * Returns the id that will receive the next item
      */
-    public function get_future_id()
+    public function getFutureId()
     {
-      $query = $this->db->query("SELECT `auto_increment` FROM INFORMATION_SCHEMA.TABLES WHERE table_name = 'item'");
+      $query = $this->db->query("SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'stock' AND TABLE_NAME = 'item'")->getResultArray();
 
-      return $query;
+      return $query[0]['AUTO_INCREMENT'];
     }
 
     
@@ -212,5 +213,4 @@ class Item_model extends MyModel
       }
       return $item;
     }
-  
 } 
