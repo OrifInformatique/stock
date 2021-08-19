@@ -29,10 +29,18 @@ class Item_model extends MyModel
                                 'warranty_duration',
                                 'remarks',
                                 'linked_file',
+                                'supplier_id',
                                 'supplier_ref',
-                                'created_at',
-                                'modified_at',
-                                'checked_at'];                       
+                                'created_by_user_id',
+                                'created_date',
+                                'modified_by_user_id',
+                                'modified_date',
+                                'checked_by_user_id',
+                                'checked_date',
+                                'stocking_place_id',
+                                'item_condition_id',
+                                'item_group_id'
+                              ];                       
 
     /**
      * Constructor
@@ -108,7 +116,7 @@ class Item_model extends MyModel
     }
 
 
-    protected function get_last_inventory_control($item)
+    protected function getLastInventoryControl($item)
     {
       if (!is_null($item)) 
       {
@@ -176,7 +184,7 @@ class Item_model extends MyModel
     *           2 : WARRANTY EXPIRES SOON (less than 3 months)
     *           3 : WARRANTY EXPIRED
     */
-    protected function get_warranty_status($item)
+    protected function getWarrantyStatus($item)
     {
       if (!is_null($item)) 
       {
