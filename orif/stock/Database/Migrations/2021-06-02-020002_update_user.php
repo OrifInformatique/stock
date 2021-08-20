@@ -8,6 +8,41 @@ class UpdateUser extends Migration
 {
 	public function up()
 	{
+		// Clone wanted rows from user table to user_details table
+		$this->db->query('CREATE TABLE user_details SELECT user_id AS id, user_id AS fk_user, lastname, firstname FROM user');
+
+		// PRIMARY constraint won't be cloned, so we add it manually
+		$this->forge->addColumn('user_details', 'CONSTRAINT user_details PRIMARY KEY (id)');
+
+		// Makes sure id has AUTO INCREMENT and fk_user has DEFAULT NULL
+		$this->forge->modifyColumn('user_details', [
+			'id'		=> [
+				'type'				=> 'INT',
+				'auto_increment'	=> true
+			],
+			'fk_user'	=> [
+				'type'				=> 'INT',
+				'default'			=> null
+			]
+		]);
+
+		// Drop user firstname and lastname from user table as they moved to user_details table
+		$this->forge->dropColumn('user', ['lastname', 'firstname']);
+		
+		
+		// Rename PK user_type_id
+		$this->forge->dropForeignKey('user', 'fk_user_type_id');
+
+		$this->forge->modifyColumn('user_type', [
+			'user_type_id' => [
+				'name'				=> 'id',
+				'type'				=> 'INT',
+				'null'              => false,
+				'auto_increment'	=> true
+			],
+		]);
+
+		// Rename PK user_id and FK user_type_id
 		$this->forge->dropForeignKey('item', 'fk_checked_by_user_id');
 		$this->forge->dropForeignKey('item', 'fk_created_by_user_id');
 		$this->forge->dropForeignKey('item', 'fk_modified_by_user_id');
@@ -30,15 +65,15 @@ class UpdateUser extends Migration
 			],
 		]);
 
-		$this->forge->dropColumn('user', ['lastname', 'firstname']);
-
-		// Makes sure every archive that are on 1 are set on null at the end of migrations
+		// Change is_active bool to archive timestamp
+		// Make sure every active user have archive set to null
 		$this->db->query('UPDATE user SET is_active = NULL WHERE is_active = 1');
-
-		$this->db->query('ALTER TABLE user CHANGE created_date date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
 		$this->db->query('ALTER TABLE user CHANGE is_active archive TIMESTAMP NULL DEFAULT NULL AFTER email');
 
-		// Puts foreign keys back to their original links
+		// Rename created_date timestamp
+		$this->db->query('ALTER TABLE user CHANGE created_date date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+
+		// Restore foreign keys
 		$this->forge->addColumn('item', [
 			'CONSTRAINT fk_checked_by_user_id FOREIGN KEY (checked_by_user_id) REFERENCES user (id)',
 			'CONSTRAINT fk_created_by_user_id FOREIGN KEY (created_by_user_id) REFERENCES user (id)',
@@ -119,5 +154,31 @@ class UpdateUser extends Migration
 		$this->db->query('UPDATE user JOIN user_details ON user.user_id = user_details.fk_user 
 						  SET user.lastname = user_details.lastname, user.firstname = user_details.firstname 
 						  WHERE user_id IN (SELECT fk_user FROM user_details)');
+		
+		$this->forge->dropTable('user_details', true);
+
+		$this->forge->modifyColumn('user_type', [
+			'id'		=> [
+				'name'				=> 'user_type_id',
+				'type'				=> 'INT'
+			]
+		]);
+
+		$this->forge->addColumn('user', [
+			'CONSTRAINT fk_user_type_id FOREIGN KEY (user_type_id) REFERENCES user_type (user_type_id)'
+		]);
+		
+		$this->forge->addColumn('item', [
+			'CONSTRAINT fk_checked_by_user_id FOREIGN KEY (checked_by_user_id) REFERENCES user (user_id)',
+			'CONSTRAINT fk_created_by_user_id FOREIGN KEY (created_by_user_id) REFERENCES user (user_id)',
+			'CONSTRAINT fk_modified_by_user_id FOREIGN KEY (modified_by_user_id) REFERENCES user (user_id)',
+		]);
+
+		$this->forge->addColumn('loan', [
+			'CONSTRAINT fk_loan_by_user_id FOREIGN KEY (loan_by_user_id) REFERENCES user (user_id)',
+			'CONSTRAINT fk_loan_to_user_id FOREIGN KEY (loan_to_user_id) REFERENCES user (user_id)',
+		]);
+
+		$this->forge->addColumn('inventory_control', 'CONSTRAINT fk_inventory_control_controller_id FOREIGN KEY (controller_id) REFERENCES user (user_id)');
 	}
 }
