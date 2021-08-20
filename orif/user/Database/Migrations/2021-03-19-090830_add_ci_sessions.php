@@ -14,7 +14,7 @@ class AddCiSessions extends \CodeIgniter\Database\Migration
     {
         $this->forge->addField([
             'id'=>[
-                'type'              => 'VARCHAR',
+                'type'              => 'INT',
                 'constraint'        => '128',
                 'unsigned'          => true,
             ],
