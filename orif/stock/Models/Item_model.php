@@ -120,7 +120,7 @@ class Item_model extends MyModel
     {
       if (!is_null($item)) 
       {
-        if(is_null($this->inventory_control_model)) 
+        if (is_null($this->inventory_control_model)) 
         {
           $this->inventory_control_model = new Inventory_control_model();
         }
@@ -140,7 +140,7 @@ class Item_model extends MyModel
             {
               $last_control = $control;
             } 
-            else if ($control['date'] > $last_control['date']) 
+            else if ($control->date > $last_control->date) 
             {
               $last_control = $control;
             }
