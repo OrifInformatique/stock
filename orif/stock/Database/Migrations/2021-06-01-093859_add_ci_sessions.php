@@ -16,14 +16,21 @@ class Add_ci_sessions extends \CodeIgniter\Database\Migration
             'id'=>[
                 'type'              => 'VARCHAR',
                 'constraint'        => '128',
-                'null'              => false
+                'null'              => false,
+                'auto_increment'    => true
             ],
             'ip_address'=>[
                 'type'              => 'VARCHAR',
                 'constraint'        => '45',
                 'null'              => false
             ],
-            'timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL',
+            'timestamp'=>[
+                'type'              => 'INT',
+                'constraint'        => '10',
+                'null'              => false,
+                'default'           => 0,
+                'unsigned'          => true
+            ],
             'data'=>[
                 'type'              => 'blob',
                 'null'              => false
@@ -31,7 +38,11 @@ class Add_ci_sessions extends \CodeIgniter\Database\Migration
         ]);
 
         $this->forge->addKey('id', TRUE);
+        
+        
         $this->forge->createTable('ci_sessions', TRUE);
+ 
+
     }
 
     /**
