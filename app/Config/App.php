@@ -23,7 +23,7 @@ class App extends BaseConfig
 	 *
 	 * @var string
 	 */
-	public $baseURL = 'http://stock.local/';
+	public $baseURL = 'http://localhost/ci_packbase_v4/public/';
 
 	/**
 	 * --------------------------------------------------------------------------
