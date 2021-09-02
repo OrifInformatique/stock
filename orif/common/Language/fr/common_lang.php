@@ -9,10 +9,10 @@
 
 return[
 // Application name
-    'app_title'                      => 'Section informatique </br> Gestion de stock',
+    'app_title'                      => 'Titre de l\'application',
 
 // Page titles
-    'page_prefix'                    => 'Stock',
+    'page_prefix'                    => 'Packbase V4',
 
 // Buttons
     'btn_admin'                      => 'Administration',
@@ -25,8 +25,18 @@ return[
     'btn_add'                        => 'Ajouter',
     'btn_new_m'                      => 'Nouveau',
     'btn_new_f'                      => 'Nouvelle',
+    'btn_details'                    => 'Détails',
+    'btn_edit'                       => 'Modifier',
+    'btn_disable'                    => 'Désactiver',
+    'btn_reactivate'                 => 'Réactiver',
+    'btn_show_disabled'              => 'Afficher les éléments désactivés',
+    'btn_delete'                     => 'Supprimer',
+    'btn_search'                     => 'Rechercher',
 
 // Other common texts
     'yes'                            => 'Oui',
-    'no'                             => 'Non'
+    'no'                             => 'Non',
+    'all_m'                          => 'Tous',
+    'all_f'                          => 'Toutes',
+    'reactivate'                     => 'Réactiver'
 ];
