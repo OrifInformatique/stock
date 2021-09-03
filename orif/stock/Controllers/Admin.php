@@ -70,9 +70,9 @@ class Admin extends BaseController
 
       $data['primary_key_field']  = 'item_tag_id';
       $data['btn_create_label']   = lang('stock_lang.btn_add_tag');
-      $data['url_update'] = "items_list/update/";
-      $data['url_delete'] = "items_list/delete/";
-      $data['url_create'] = "items_list/create/";
+      $data['url_update'] = "stock/admin/modify_tag/";
+      $data['url_delete'] = "stock/admin/delete_tag/";
+      $data['url_create'] = "stock/admin/new_tag";
 
       return $this->display_view('Common\Views\items_list', $data);
     }
@@ -233,9 +233,9 @@ class Admin extends BaseController
 
       $data['primary_key_field']  = 'stocking_place_id';
       $data['btn_create_label']   = lang('stock_lang.btn_add_stocking_place');
-      $data['url_update'] = "items_list/update/";
-      $data['url_delete'] = "items_list/delete/";
-      $data['url_create'] = "items_list/create/";
+      $data['url_update'] = "stock/admin/modify_stocking_place/";
+      $data['url_delete'] = "stock/admin/delete_stocking_place/";
+      $data['url_create'] = "stock/admin/new_stocking_place";
 
       return $this->display_view('Common\Views\items_list', $data);
     }
@@ -398,9 +398,9 @@ class Admin extends BaseController
 
       $data['primary_key_field']  = 'supplier_id';
       $data['btn_create_label']   = lang('stock_lang.btn_add_supplier');
-      $data['url_update'] = "items_list/update/";
-      $data['url_delete'] = "items_list/delete/";
-      $data['url_create'] = "items_list/create/";
+      $data['url_update'] = "stock/admin/modify_supplier/";
+      $data['url_delete'] = "stock/admin/delete_supplier/";
+      $data['url_create'] = "stock/admin/new_supplier";
 
       return $this->display_view('Common\Views\items_list', $data);
     }
@@ -549,9 +549,9 @@ class Admin extends BaseController
 
       $data['primary_key_field']  = 'item_group_id';
       $data['btn_create_label']   = lang('stock_lang.btn_add_item_group');
-      $data['url_update'] = "items_list/update/";
-      $data['url_delete'] = "items_list/delete/";
-      $data['url_create'] = "items_list/create/";
+      $data['url_update'] = "stock/admin/modify_item_group/";
+      $data['url_delete'] = "stock/admin/delete_item_group/";
+      $data['url_create'] = "stock/admin/new_item_group";
 
       return $this->display_view('Common\Views\items_list', $data);
     }
