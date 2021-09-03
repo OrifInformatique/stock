@@ -19,5 +19,9 @@ class AdminPanelConfig extends \CodeIgniter\Config\BaseConfig
     */
     public $tabs=[
         ['label'=>'user_lang.title_user_list', 'pageLink'=>'user/admin/list_user'],
+        ['label'=>'stock_lang.title_tags', 'pageLink'=>'stock/admin/view_tags'],
+        ['label'=>'stock_lang.title_stocking_places', 'pageLink'=>'stock/admin/view_stocking_places'],
+        ['label'=>'stock_lang.title_suppliers', 'pageLink'=>'stock/admin/view_suppliers'],
+        ['label'=>'stock_lang.title_item_groups', 'pageLink'=>'stock/admin/view_item_groups'],
     ];
 }
