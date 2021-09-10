@@ -156,12 +156,13 @@ class Item extends BaseController {
         $output['items'] = sortBySubValue($output['items'], $sortValue, $asc);
         
         // Add page title
-        $output['title'] = $this->lang->line('page_item_list');
+        $output['title'] = lang('My_application.page_item_list');
         
         // Pagination
         $items_count = count($output["items"]);
-        $output['pagination'] =  $this->load_pagination($items_count)->create_links();
-        
+        //$output['pagination'] =  $this->load_pagination($items_count)->create_links();
+        $output['pagination'] = $this->load_pagination($items_count);
+
         $output['number_page'] = $page;
         if($output['number_page']>ceil($items_count/ITEMS_PER_PAGE)) $output['number_page']=ceil($items_count/ITEMS_PER_PAGE);
         
@@ -178,8 +179,8 @@ class Item extends BaseController {
     public function load_pagination($nbr_items)
     {
         // Create the pagination
-        $this->load->library('pagination');
-
+        $pager = \Config\Services::pager();
+/*
         $config['base_url'] = base_url('/item/index/');
         $config['total_rows'] = $nbr_items;
         $config['per_page'] = ITEMS_PER_PAGE;
@@ -206,8 +207,12 @@ class Item extends BaseController {
 
         $config['num_tag_open'] = '<li>';
         $config['num_tag_close'] = '</li>';
-        
+    
         return $this->pagination->initialize($config);
+        */
+        
+        return $pager->makeLinks(1, ITEMS_PER_PAGE, $nbr_items);
+
     }
     /**
      * Display details of one single item

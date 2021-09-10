@@ -45,26 +45,26 @@ class Item_condition_model extends MyModel
      * @param [type] $item_condition
      * @return void
      */
-    protected function get_bootstrap_label($item_condition)
+    public function get_bootstrap_label($item)
     {
-        if ($item_condition->item_condition_id == 10)
+        if ($item['item_condition_id'] == 10)
         {
             $bootstrap_label = '<span class="label label-success">'; // ITEM DOES WORK
         } 
-        elseif ($item_condition->item_condition_id == 30)
+        elseif ($item['item_condition_id'] == 30)
         {
             $bootstrap_label = '<span class="label label-warning">'; // ITEM DEFECTIVE
         } 
-        elseif ($item_condition->item_condition_id == 40)
+        elseif ($item['item_condition_id'] == 40)
         {
             $bootstrap_label = '<span class="label label-danger">';}  // NO MORE ITEM
         else
         {
             $bootstrap_label = '<span>'; // UNKNOWNED VALUE
         }
-        $bootstrap_label .= $item_condition->name.'</span>';
+        $bootstrap_label .= $item['name'].'</span>';
 
-        $item_condition->bootstrap_label = $bootstrap_label;
+        $item_condition['bootstrap_label'] = $bootstrap_label;
         return $item_condition;
     }
 }

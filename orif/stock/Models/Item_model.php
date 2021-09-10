@@ -58,25 +58,23 @@ class Item_model extends MyModel
     }
 
     
-    protected function get_item_group_name($item, $short = false){
+    protected function get_item_group($item){
       if ($this->item_group_model==null){
         $this->item_group_model = new Item_group_model();
       }
-      if ($short){
-        $item->group = $this->item_group_model->getWhere(["item_group_id"=>$item->item_group_id])->getRow();
-      }else{
-        $item->group = $this->item_group_model->getWhere(["item_group_id"=>$item->item_group_id])->getRow()->name;
-      }
-      return $item->group;
+      $itemGroup = $this->item_group_model->asArray()->where(["item_group_id"=>$item->item_group_id])->first();
+      return $itemGroup;
     }
 
-    protected function get_item_condition_name($item){
+    protected function get_item_condition($item){
 
       if($this->item_condition_model==null){
         $this->item_condition_model = new Item_condition_model();
       }
-      $item->condition = $this->item_condition_model->getWhere(["item_condition_id"=>$item->item_condition_id])->getRow();
-      return $item->condition;
+      $itemCondition = $this->item_condition_model->get_bootstrap_label($this->item_condition_model->asArray()->where(["item_condition_id"=>$item['item_condition_id']])->first());
+
+
+      return $itemCondition;
     }
 
 
@@ -89,20 +87,18 @@ class Item_model extends MyModel
         
         $where = array('item_id'=>$item['item_id'], 'date<='=>mysqlDate('now'), 'real_return_date is NULL');
 
-        $item['current_loan'] = $this->loan_model->asArray()->where($where)->find();
+        $current_loan = $this->loan_model->asArray()->where($where)->first();
 
-        /*
-        if (is_null($item->current_loan)) {
+        
+        if (is_null($current_loan)) {
           // ITEM IS NOT LOANED
-          $bootstrap_label = '<span class="label label-success">'.html_escape($this->lang->line('lbl_loan_status_not_loaned')).'</span>';
+          $current_loan['bootstrap_label'] = '<span class="label label-success">'.htmlspecialchars(lang('MY_application.lbl_loan_status_not_loaned')).'</span>';
         } else {
           // ITEM IS LOANED
-          $bootstrap_label = '<span class="label label-warning">'.html_escape($this->lang->line('lbl_loan_status_loaned')).'</span>';
+          $current_loan['bootstrap_label'] = '<span class="label label-warning">'.htmlspecialchars(lang('MY_application.lbl_loan_status_loaned')).'</span>';
         } 
       
-        $item->loan_bootstrap_label = $bootstrap_label;
-      */
-      return $item['current_loan'];
+      return $current_loan;
       
     }
 
@@ -213,4 +209,232 @@ class Item_model extends MyModel
       return $item;
     }
   
+
+
+    /**
+     * Searching item(s) in the database depending on filters
+     * @param array $filters The array of filters
+     * @return An array of corresponding items
+     */
+    public function get_filtered($filters){
+
+      if (is_null($this->stocking_place_model)){
+        $this->stocking_place_model = new Stocking_place_model();
+      } 
+
+      if(is_null($this->item_condition_model)){
+        $this->item_condition_model = new Item_condition_model();
+      }
+
+      // Initialize a global WHERE clause for filtering
+      $where_itemsFilters = '';
+
+      /*********************
+      ** TEXT SEARCH FILTER
+      **********************/
+      $where_textSearchFilter = '';
+
+      if (isset($filters['ts']) && $filters['ts']!='') {
+        $text_search_content = $filters['ts'];
+
+        // If the search text is an inventory number, separate the ID from the rest (ID is after the last '.')
+        $inventory_exploded = explode('.', $text_search_content);
+        $inventory_lastPart = end($inventory_exploded);
+
+        if (is_numeric($inventory_lastPart)) {
+          // The last part of the search text is probably the item ID
+          $item_id = intval($inventory_lastPart);
+
+          // The other part(s) compose the inventory_number
+          $inventory_number = '';
+          for ($i = 0; $i < (count($inventory_exploded) - 1); $i++) {
+            if ($i > 0) {
+              $inventory_number .= '.';
+            }
+            $inventory_number .= $inventory_exploded[$i];
+          }
+
+        } else {
+          // The item ID is probably not in the search text.
+          $inventory_number = $text_search_content;
+        }
+
+        // Prepare WHERE clause
+        $where_textSearchFilter .= '(';
+        $where_textSearchFilter .=
+          "name LIKE '%".$text_search_content."%' "
+          ."OR description LIKE '%".$text_search_content."%' "
+          ."OR serial_number LIKE '%".$text_search_content."%' ";
+
+        if (isset($item_id)) {
+          if (isset($inventory_number) && $inventory_number != '') {
+            $where_textSearchFilter .= "OR (item_id = ".$item_id." AND inventory_prefix LIKE '%".$inventory_number."%') ";
+          } else {
+            $where_textSearchFilter .= "OR item_id = ".$item_id." ";
+          }
+        } else {
+          $where_textSearchFilter .= "OR inventory_prefix LIKE '%".$text_search_content."%' ";
+        }
+        $where_textSearchFilter .= ')';
+
+        // Add this part of WHERE clause to the global WHERE clause
+        if ($where_itemsFilters != '')
+        {
+          // Add new filter after existing filters
+          $where_itemsFilters .= ' AND ';
+        }
+        $where_itemsFilters .= $where_textSearchFilter;
+      }
+
+      /*********************
+      ** ITEM CONDITION FILTER
+      ** Default filtering for "functional" items
+      **********************/
+      $where_itemConditionFilter = '';
+
+      if (isset($filters['c'])) {
+        $item_conditions_selection = $filters['c'];
+
+        // Prepare WHERE clause
+        $where_itemConditionFilter .= '(';
+        foreach ($item_conditions_selection as $item_condition_id) {
+          $where_itemConditionFilter .= 'item_condition_id='.$item_condition_id.' OR ';
+        }
+        // Remove the last " OR "
+        $where_itemConditionFilter = substr($where_itemConditionFilter, 0, -4);
+        $where_itemConditionFilter .= ')';
+
+        // Add this part of WHERE clause to the global WHERE clause
+        if ($where_itemsFilters != '')
+        {
+          // Add new filter after existing filters
+          $where_itemsFilters .= ' AND ';
+        }
+        $where_itemsFilters .= $where_itemConditionFilter;
+      }
+
+      /*********************
+      ** ITEM GROUP FILTER
+      **********************/
+      $where_itemGroupFilter = '';
+
+      if (isset($filters['g'])) {
+        $item_groups_selection = $filters['g'];
+
+        // Prepare WHERE clause
+        $where_itemGroupFilter .= '(';
+        foreach ($item_groups_selection as $item_group_id) {
+          $where_itemGroupFilter .= 'item_group_id='.$item_group_id.' OR ';
+        }
+        // Remove the last " OR "
+        $where_itemGroupFilter = substr($where_itemGroupFilter, 0, -4);
+        $where_itemGroupFilter .= ')';
+
+        // Add this part of WHERE clause to the global WHERE clause
+        if ($where_itemsFilters != '')
+        {
+          // Add new filter after existing filters
+          $where_itemsFilters .= ' AND ';
+        }
+        $where_itemsFilters .= $where_itemGroupFilter;
+      }
+
+      /*********************
+      ** STOCKING PLACE FILTER
+      **********************/
+      $where_stockingPlaceFilter = '';
+      if (isset($filters['s'])) {
+        $stocking_places_selection = $filters['s'];
+
+        // Prepare WHERE clause
+        $where_stockingPlaceFilter .= '(';
+        foreach ($stocking_places_selection as $stocking_place_id) {
+          $where_stockingPlaceFilter .= 'stocking_place_id='.$stocking_place_id.' OR ';
+        }
+        // Remove the last " OR "
+        if($where_stockingPlaceFilter != "(") {
+          $where_stockingPlaceFilter = substr($where_stockingPlaceFilter, 0, -4);
+          $where_stockingPlaceFilter .= ')';
+        } else {
+          $where_stockingPlaceFilter .= '';
+        }
+
+        // Add this part of WHERE clause to the global WHERE clause
+        if ($where_itemsFilters != '')
+        {
+          // Add new filter after existing filters
+          $where_itemsFilters .= ' AND ';
+        }
+        $where_itemsFilters .= $where_stockingPlaceFilter;
+      }
+
+      /*********************
+      ** ITEM TAGS FILTER
+      **********************/
+      $where_itemTagsFilter = '';
+
+      if (isset($filters['t'])) {
+        // Get a list of item_tag_link elements
+        $this->load->model('item_tag_link_model');
+        $item_tags_selection = $filters['t'];
+
+        $where_itemTagLinks = '';
+        foreach ($item_tags_selection as $item_tag) {
+          $where_itemTagLinks .= 'item_tag_id='.$item_tag.' OR ';
+        }
+        // Remove the last " OR "
+        $where_itemTagLinks = substr($where_itemTagLinks, 0, -4);
+
+        $item_tag_links = $this->item_tag_link_model->get_many_by($where_itemTagLinks);
+
+        // Prepare WHERE clause for all corresponding items
+        $where_itemTagsFilter .= '(';
+        foreach ($item_tag_links as $item_tag_link) {
+          $where_itemTagsFilter .= 'item_id='.$item_tag_link->item_id.' OR ';
+        }
+        // Remove the last " OR "
+        if($where_itemTagsFilter != "(") {
+          $where_itemTagsFilter = substr($where_itemTagsFilter, 0, -4);
+          $where_itemTagsFilter .= ')';
+        } else {
+          // No item_tag_link found : no item correspond to the filter.
+          // We use "item_id=-1" filter to return no item.
+          $where_itemTagsFilter = 'item_id=-1';
+        }
+
+        // Add this part of WHERE clause to the global WHERE clause
+        if ($where_itemsFilters != '')
+        {
+          // Add new filter after existing filters
+          $where_itemsFilters .= ' AND ';
+        }
+        $where_itemsFilters .= $where_itemTagsFilter;
+      }
+
+
+      /*********************
+      ** GET FILTERED ITEMS
+      **********************/
+      if ($where_itemsFilters == '')
+      {
+        // No filter, get all items
+        $items = $this->asArray()->find();
+      } else {
+        // Get filtered items
+        $items = $this->asArray()->where($where_itemsFilters)->find();
+      }
+
+
+      foreach ($items as &$item){
+        $item['stocking_place'] = $this->stocking_place_model->asArray()->where(['stocking_place_id'=>$item['stocking_place_id']])->first();
+        $item['item_condition'] = $this->item_condition_model->asArray()->where(['item_condition_id'=>$item['item_condition_id']])->first();
+        $item['condition'] = $this->get_item_condition($item);
+        $item['current_loan'] = $this->get_current_loan($item);
+      }
+
+      
+      return $items;
+  }
+
+
 } 

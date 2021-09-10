@@ -13,7 +13,7 @@
     <!-- *** END OF ADMIN *** -->
 
     <!-- FILTERS AND SORT FORM -->
-    <form id="filters" class="" style="overflow: visible;" method="get" action="<?=base_url("item/index/1")?>">
+    <form id="filters" class="" style="overflow: visible;" method="get" action="<?=base_url("item/index/1") . "/"?>">
         <div class="row">
             <!-- FILTERS -->
             <div class="col-sm-8 top-margin">
@@ -75,7 +75,7 @@
                     <!-- RESET FILTERS BUTTON -->
                     <div class="col-sm-6 col-sm-offset-6 top-margin">
                         <?= form_label("&nbsp;") ?>
-                        <a href="<?= base_url("item/index/")?>" class="btn btn-warning top-margin"><?php echo htmlspecialchars(lang('MY_application.btn_remove_filters')); ?></a>
+                        <a href="<?= base_url("item/index/") . "/"?>" class="btn btn-warning top-margin"><?php echo htmlspecialchars(lang('MY_application.btn_remove_filters')); ?></a>
                     </div>
                 </div>
             </div>
@@ -171,8 +171,9 @@ function load_items(page, filters){
     $("#list_item").empty();
     $("#pagination_bottom, #pagination_top").empty();
     
-    // URL for ajax call to PHP controller
-    url = "<?= base_url("Stock/Controllers/Item/load_list_json/")?>"+page+filters;
+
+    // URL for ajax call to PHP controller                      Stock\Controllers\
+    url = "<?= base_url("/Item/load_list_json")?>"+ "/" + page+filters;
 
     $.ajax({
         url: url,
@@ -181,8 +182,8 @@ function load_items(page, filters){
             var result = JSON.parse(response);
             page = result.number_page;
             filters=getFilters();
-            
-            history.pushState(null, "", "<?= base_url("item/index/")?>"+page+filters);
+            console.log(result);
+            history.pushState(null, "", "<?= base_url("item/index/")?>"+ "/"+page+filters);
             
             // Empty list before filling it
             if (result.items.length > 0){ 
@@ -202,7 +203,7 @@ function load_items(page, filters){
             $(".pagination a").click(function(e){
                 load_items( $(this).data("ciPaginationPage"), getFilters());
             });
-            history.pushState(null, "", "<?= base_url("item/index/")?>"+page+filters);
+            history.pushState(null, "", "<?= base_url("item/index/")?>"+ "/" +page+filters);
             populating = false;
         },
         error : function(resultat, statut, erreur){
@@ -256,11 +257,11 @@ function getFilters() {
 function display_item(item){
     // Item's parameters
     href = '<?= base_url("/item/view/"); ?>'+item["item_id"];
-    src_image = '<?= base_url("uploads/images/"); ?>'+item["image"];
+    src_image = '<?= base_url("/images") . "/" ?>'+item["image"];
     alt_image = '<?php htmlspecialchars(lang("MY_application.field_image")); ?>';
-    item_condition = item["item_condition"]["bootstrap_label"];
-    loan_bootstrap_label = item["loan_bootstrap_label"];
-    item_localisation = item["current_loan"]!==null?'<br><h6>'+item["current_loan"]["item_localisation"]+'</h6>':"";
+    item_condition = item["condition"]["bootstrap_label"];
+    loan_bootstrap_label = item["current_loan"]["loan_bootstrap_label"];
+    item_localisation = item["current_loan"]["loan_id"]!==null?'<br><h6>'+item["current_loan"]["item_localisation"]+'</h6>':"";
     item_name = item["name"]; 
     item_description = item["description"];
     stocking_place = "<span>"+item["stocking_place"]["name"]+"</span>";
@@ -279,6 +280,11 @@ function display_item(item){
     row.append(delete_item);
     row.append('</tr>');
     
+
+    if (item['image'] == null){
+        console.log(item);
+    }
+
     return row;
 }
 </script>
