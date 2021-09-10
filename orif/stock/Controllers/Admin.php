@@ -531,34 +531,43 @@ class Admin extends BaseController
     */
     public function modify_item_group($id = NULL)
     {
-      $this->load->model('item_group_model');
-
-      if(is_null($this->item_group_model->get($id))) {
-        redirect("/admin/view_item_groups/");
+      if(is_null($this->item_group_model->withDeleted()->find($id))) 
+      {
+        return redirect()->to("/stock/admin/view_item_groups");
       }
 
-      if (!empty($_POST)) {
-        $this->form_validation->set_rules('name', lang('field_name'), "required|callback_unique_groupname[$id]", lang('msg_err_item_group_needed'));
-        $this->form_validation->set_rules('short_name', $this->lang->line('field_abbreviation'), "required|callback_unique_groupshort[$id]", $this->lang->line('msg_err_item_group_short'));
+      if (!empty($_POST)) 
+      {
+        // VALIDATION
+        $validationRules = [
+          'name'            => 'required|min_length[3]|max_length[45]|is_unique[item_group.name,name,{name}]',
+          'short_name'      => 'required|max_length[2]|is_unique[item_group.short_name,short_name,{short_name}]'
+          ];
 
-        if ($this->form_validation->run() === TRUE) {
-          $this->item_group_model->update($id, $_POST);
-
-          redirect("/admin/view_item_groups/");
-          exit();
+        if($this->validate($validationRules)) 
+        {
+            $this->item_group_model->update($id, $_POST);
+            
+            return redirect()->to('/stock/admin/view_item_groups');
         }
-      } else {
-        if(!is_null($this->item_group_model->get($id))) {
-          $output = get_object_vars($this->item_group_model->get($id));
-        }
+	  
+      // The values of the tag are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
+      } 
+      else 
+      {
+        $output['item_group'] = $this->item_group_model->withDeleted()->find($id);
       }
-      
-      if(!is_null($this->item_group_model->get($id))) {
-        $output["item_groups"] = $this->item_group_model->get_all();
-      }else{
+
+      if(!is_null($this->item_group_model->withDeleted()->find($id)))
+      {
+        $output['item_group'] = $this->item_group_model->withDeleted()->find($id);
+      } 
+      else 
+      {
         $output["missing_item_group"] = TRUE;
       }
-      $this->display_view("admin/item_groups/form", $output);
+
+      $this->display_view('Stock\admin\item_groups\form', $output);
     }
 
     /**
@@ -566,22 +575,23 @@ class Admin extends BaseController
     */
     public function new_item_group()
     {
-      $this->load->model('item_group_model');
+      if (!empty($_POST)) 
+      {
+        // VALIDATION
+        $validationRules = [
+          'name'            => 'required|min_length[2]|max_length[45]|is_unique[stocking_place.name]',
+          'short'           => 'required|max_length[10]|is_unique[stocking_place.short_name]'
+          ];
 
-      if (!empty($_POST)) {
-        $this->form_validation->set_rules('name', $this->lang->line('field_username'), 'required|callback_unique_groupname', $this->lang->line('msg_err_unique_groupname'));
-        $this->form_validation->set_rules('short_name', $this->lang->line('field_abbreviation'), 'required|callback_unique_groupshort', $this->lang->line('msg_err_unique_shortname'));
-
-        if ($this->form_validation->run() === TRUE)
+        if($this->validate($validationRules))
         {
-          $this->item_group_model->insert($_POST);
+          $this->item_groups_model->insert($_POST);
 
-          redirect("/admin/view_item_groups/");
-          exit();
+          return redirect()->to("/stock/admin/view_item_groups");
         }
-      }
+	    }
 
-      $this->display_view("admin/item_groups/form");
+      $this->display_view('Stock\admin\item_groups\form');
     }
 	
     /**
@@ -589,29 +599,31 @@ class Admin extends BaseController
     */
     public function delete_item_group($id = NULL, $action = NULL)
     {
-      $this->load->model('item_group_model');
-      $this->load->model('item_model');
-
-      if(is_null($this->item_group_model->get($id))) {
-        redirect("/admin/view_item_groups/");
+      if(is_null($this->item_group_model->withDeleted()->find($id))) 
+      {
+        return redirect()->to('/stock/admin/view_item_groups');
       }
 
-      $filter = array("g" => array($id));
-      $items = $this->item_model->get_filtered($filter);
+      switch ($action)
+      {
+        case 0:
+          $output = array(
+            'item_group' => $this->item_group_model->withDeleted()->find($id)
+          );
+          $this->display_view('\Stock\admin\item_groups\delete', $output);
+          break;
+          
+          case 1: // Soft Delete item_tag
+            $this->item_group_model->delete($id, FALSE);
+            return redirect()->to('/stock/admin/view_item_groups');
+            break;
 
-      if (!isset($action)) {
-        $output = get_object_vars($this->item_group_model->get($id));
-        $output["item_groups"] = $this->item_group_model->get_all();
-        $output["deletion_allowed"] = (sizeof($items) == 0);
-        $output["amount"] = sizeof($items);
-
-        $this->display_view("admin/item_groups/delete", $output);
-      } else {
-        // delete it!
-        $this->item_group_model->delete($id);
-        
-        // redirect the user to the updated table
-        redirect("/admin/view_item_groups/");
+          case 2: // Delete item_tag_link and item_tag
+            $this->item_group_model->delete($id, TRUE);
+            return redirect()->to('/stock/admin/view_item_groups');
+          
+          default: // Do nothing
+            return redirect()->to('/stock/admin/view_item_groups');
       }
     }
 }

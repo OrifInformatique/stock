@@ -30,6 +30,7 @@ return[
 'btn_delete_stocking_place'             => 'Supprimer ce lieu de stockage',
 'btn_delete_supplier'                   => 'Supprimer ce fournisseur',
 'btn_soft_delete_supplier'              => 'Désactiver ce fournisseur',
+'btn_soft_delete_item_group'            => 'Désactiver ce group d\'objet',
 
 
 // Fields labels
@@ -55,6 +56,8 @@ return[
 'tag'                                   => 'Tag',
 'stocking_place'                        => 'Lieu de stockage',
 'supplier'                              => 'Fournisseur',
+'item_group'                            => 'Group d\'objet',
+
 'tag_deletion_explanation'              => 'La désactivation d\'un tag permet de le rendre inutilisable tout en conservant ses informations dans les archives. ' 
                                                 . 'Cela permet notamment de garder l\'historique de ses actions. <br> <br>' 
                                                 . 'En cas de suppression définitive, toutes les informations concernant ce tag seront supprimées.',
@@ -80,5 +83,15 @@ return[
                                                 . 'Cela permet notamment de garder l\'historique de ses actions. <br> <br>' 
                                                 . 'En cas de suppression définitive, toutes les informations concernant ce fournisseur seront supprimées.',
 'supplier_already_disabled'             => 'Ce fournisseur est déjà désactivé. Voulez-vous le supprimer définitivement ?',
+
+'item_group_already_disabled'           => 'Ce groupe d\'objet est déjà désactivé. Voulez-vous le supprimer définitivement ?',
+'delete_item_group'                     => 'Désactiver ou supprimer ce groupe d\'objet',
+'hard_delete_item_group'                => 'Supprimer définitivement ce groupe d\'objet',
+'reactivate_item_group'                 => 'Réactiver ce groupe d\'objet',
+'item_group_already_disabled'           => 'Ce groupe d\'objet est déjà désactivé. Voulez-vous le supprimer définitivement ?',
+'item_group_deletion_explanation'       => 'La désactivation d\'un groupe d\'objet permet de le rendre inutilisable tout en conservant ses informations dans les archives. ' 
+                                        . 'Cela permet notamment de garder l\'historique de ses actions. <br> <br>' 
+                                        . 'En cas de suppression définitive, toutes les informations concernant ce groupe d\'objet seront supprimées.',
+'item_group_already_disabled'           => 'Ce groupe d\'objet est déjà désactivé. Voulez-vous le supprimer définitivement ?',
 
 ];
