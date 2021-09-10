@@ -438,8 +438,7 @@ class Item_model extends MyModel
 
 
       foreach ($items as &$item){
-        $item['stocking_place'] = $this->stocking_place_model->asArray()->where(['stocking_place_id'=>$item['stocking_place_id']])->first();
-        $item['item_condition'] = $this->item_condition_model->asArray()->where(['item_condition_id'=>$item['item_condition_id']])->first();
+        $item['stocking_place'] = $this->get_stocking_place($item);
         $item['inventory_number'] = $this->get_inventory_number($item);
         $item['condition'] = $this->get_item_condition($item);
         $item['current_loan'] = $this->get_current_loan($item);
@@ -468,6 +467,17 @@ class Item_model extends MyModel
       }
 
       return $inventory_number;
+  }
+
+  protected function get_stocking_place($item){
+
+    if($this->stocking_place_model==null){
+      $this->stocking_place_model = new Stocking_place_model();
+    }
+    $stockingPlace = $this->stocking_place_model->asArray()->where(["stocking_place_id"=>$item['stocking_place_id']])->first();
+
+
+    return $stockingPlace;
   }
 
 
