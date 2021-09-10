@@ -440,12 +440,34 @@ class Item_model extends MyModel
       foreach ($items as &$item){
         $item['stocking_place'] = $this->stocking_place_model->asArray()->where(['stocking_place_id'=>$item['stocking_place_id']])->first();
         $item['item_condition'] = $this->item_condition_model->asArray()->where(['item_condition_id'=>$item['item_condition_id']])->first();
+        $item['inventory_number'] = $this->get_inventory_number($item);
         $item['condition'] = $this->get_item_condition($item);
         $item['current_loan'] = $this->get_current_loan($item);
       }
 
       
       return $items;
+  }
+
+
+  protected function get_inventory_number($item)
+  {
+      $inventory_id = "";
+      $inventory_number = "";
+
+      if (!is_null($item)) {
+          $inventory_id = $item['item_id'];
+          
+          // Add leading zeros to inventory_id
+          for( $i = strlen($inventory_id) ; $i < INVENTORY_NUMBER_CHARS; $i++) {
+              $inventory_id = "0".$inventory_id;
+          }
+          $item['inventory_id'] = $inventory_id;
+
+          $inventory_number = $item['inventory_prefix'].".".$item['inventory_id'];
+      }
+
+      return $inventory_number;
   }
 
 
