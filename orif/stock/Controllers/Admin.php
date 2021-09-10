@@ -12,9 +12,11 @@ use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Stock\Models\Item_tag_model;
+use Stock\Models\Item_tag_link_model;
 use Stock\Models\Stocking_place_model;
 use Stock\Models\Supplier_model;
 use Stock\Models\Item_group_model;
+use Stock\Models\Item_model;
 
 
 class Admin extends BaseController
@@ -24,6 +26,10 @@ class Admin extends BaseController
      */
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
+        // Set Access level before calling parent constructor
+        // Accessibility reserved to admin users
+        $this->access_level=config('\User\Config\UserConfig')->access_lvl_admin;
+
         // Set Access level before calling parent constructor
         parent::initController($request,$response,$logger);
 
@@ -35,9 +41,11 @@ class Admin extends BaseController
 
         // Load required models
         $this->item_tag_model         = new Item_tag_model();
+        $this->item_tag_link_model    = new Item_tag_link_model();
         $this->stocking_place_model   = new Stocking_place_model();
         $this->supplier_model         = new Supplier_model();
         $this->item_group_model       = new Item_group_model();
+        $this->item_model             = new Item_model();
 
         //get db instance
         $this->db = \CodeIgniter\Database\Config::connect();
@@ -82,42 +90,43 @@ class Admin extends BaseController
     */
     public function modify_tag($id = NULL)
     {
-      $this->load->model('item_tag_model');
-
-      if(is_null($this->item_tag_model->get($id))) {
-        redirect("/admin/view_tags/");
+      if(is_null($this->item_tag_model->withDeleted()->find($id))) 
+      {
+        return redirect()->to("/stock/admin/view_tags");
       }
 
-      if (!empty($_POST)) {
+      if (!empty($_POST)) 
+      {
         // VALIDATION
+        $validationRules = [
+          'name'            => 'required|min_length[3]|max_length[45]|is_unique[item_tag.name,item_tag_id,{item_tag_id}]',
+          'short_name'      => 'required|max_length[3]|is_unique[item_tag.short_name,item_tag_id,{item_tag_id}]'
+          ];
 
-        //name: if changed,
-          $this->form_validation->set_rules('name', $this->lang->line('field_username'), "required|callback_unique_tagname[$id]", $this->lang->line('msg_err_tag_name_needed')); // not void
-        
-        //short_name: if changed,
-          $this->form_validation->set_rules('short_name', $this->lang->line('field_abbreviation'), "required|callback_unique_tagshort[$id]", $this->lang->line('msg_err_abbreviation')); // not void
-        
-        if($this->form_validation->run() === TRUE) {
+        if($this->validate($validationRules)) 
+        {
             $this->item_tag_model->update($id, $_POST);
             
-            redirect("/admin/view_tags/");
-            exit();
+            return redirect()->to('/stock/admin/view_tags');
         }
 	  
       // The values of the tag are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
-      } else {
-        $output = get_object_vars($this->item_tag_model->get($id));
+      } 
+      else 
+      {
+        $output['tag'] = $this->item_tag_model->withDeleted()->find($id);
       }
 
-      $this->load->model('item_tag_model');
-      if(!is_null($this->item_tag_model->get($id))){
-        $output = get_object_vars($this->item_tag_model->get($id));
-        $output["tags"] = $this->item_tag_model->get_all();
-      } else {
+      if(!is_null($this->item_tag_model->withDeleted()->find($id)))
+      {
+        $output['tag'] = $this->item_tag_model->withDeleted()->find($id);
+      } 
+      else 
+      {
         $output["missing_tag"] = TRUE;
       }
 
-      $this->display_view("admin/tags/form", $output);
+      $this->display_view('Stock\admin\tags\form', $output);
     }
 
     /**
@@ -125,86 +134,57 @@ class Admin extends BaseController
     */
     public function new_tag()
     {
-      if (!empty($_POST)) {
+      if (!empty($_POST)) 
+      {
         // VALIDATION
+        $validationRules = [
+          'name'            => 'required|min_length[3]|max_length[45]|is_unique[item_tag.name]',
+          'short_name'      => 'required|max_length[3]|is_unique[item_tag.short_name]'
+          ];
 
-        //name: not void
-        $this->form_validation->set_rules('name', $this->lang->line('field_username'), 'required|callback_unique_tagname', $this->lang->line('msg_err_tag_name_needed'));
-        
-        //short_name: not void
-        $this->form_validation->set_rules('short_name', $this->lang->line('field_abbreviation'), 'required|callback_unique_tagshort', $this->lang->line('msg_err_abbreviation'));
-
-        if($this->form_validation->run() === TRUE)
+        if($this->validate($validationRules))
         {
-
-          $this->load->model('item_tag_model');
           $this->item_tag_model->insert($_POST);
 
-          redirect("/admin/view_tags/");
-          exit();
+          return redirect()->to("/stock/admin/view_tags/");
         }
-	  }
+	    }
 
-      $this->display_view("admin/tags/form");
-    }
-
-    public function unique_tagname($newName, $tagID) {
-      $this->load->model('item_tag_model');
-
-      // Get this tag. If it fails, it doesn't exist, so the name is unique!
-      $tag = $this->item_tag_model->get_by('name', $newName);
-      
-      if(isset($tag->item_tag_id) && $tag->item_tag_id != $tagID) {
-        $this->form_validation->set_message('unique_tagname', $this->lang->line('msg_err_username_used'));
-        return FALSE;
-      } else {
-        return TRUE;
-      }
-    }
-	
-    public function unique_tagshort($newShort, $tagID) {
-      $this->load->model('item_tag_model');
-
-      // Get this tag. If it fails, it doesn't exist, so the name is unique!
-      $tag = $this->item_tag_model->get_by('short_name', $newShort);
-      
-      if(isset($tag->item_tag_id) && $tag->item_tag_id != $tagID) {
-        $this->form_validation->set_message('unique_tagshort', $this->lang->line('msg_err_unique_shortname'));
-        return FALSE;
-      } else {
-        return TRUE;
-      }
+      $this->display_view('Stock\admin\tags\form');
     }
     
     /**
     * Delete a tag. 
     * If $action is NULL, a confirmation will be shown. If it is anything else, the tag will be deleted.
     */
-    public function delete_tag($id = NULL, $action = NULL) {
-      $this->load->model('item_tag_model');
-      $this->load->model('item_tag_link_model');
-      $this->load->model('item_model');
-
-      if(is_null($this->item_tag_model->get($id))) {
-        redirect("/admin/view_tags");
+    public function delete_tag($id = NULL, $action = 0) 
+    {
+      if(is_null($this->item_tag_model->withDeleted()->find($id))) 
+      {
+        return redirect()->to('/stock/admin/view_tags');
       }
 
-      $filter = array("t" => array($id));
-      $items = $this->item_model->get_filtered($filter);
+      switch ($action)
+      {
+        case 0:
+          $output = array(
+            'tag' => $this->item_tag_model->withDeleted()->find($id)
+          );
+          $this->display_view('\Stock\admin\tags\delete', $output);
+          break;
+          
+          case 1: // Soft Delete item_tag
+            $this->item_tag_model->delete($id, FALSE);
+            return redirect()->to('/stock/admin/view_tags');
+            break;
 
-      if (is_null($action)) {
-        // Display a message to confirm the action
-        $output = get_object_vars($this->item_tag_model->get($id));
-        $output["deletion_allowed"] = !(sizeof($items) > 0 && sizeof($items) < 500); // Do not make the number bigger than the amount of items
-        $output["amount"] = sizeof($items);
-        $output["tags"] = $this->item_tag_model->get_all();
-        $this->display_view("admin/tags/delete", $output);
-      
-      } else {
-        // Action confirmed : delete links and delete tag
-        $this->item_tag_link_model->delete_by('item_tag_id='.$id);
-        $this->item_tag_model->delete($id);
-        redirect("/admin/view_tags/");
+          case 2: // Delete item_tag_link and item_tag
+            $this->item_tag_link_model->where('item_tag_id', $id)->delete();
+            $this->item_tag_model->delete($id, TRUE);
+            return redirect()->to('/stock/admin/view_tags');
+          
+          default: // Do nothing
+            return redirect()->to('/stock/admin/view_tags');
       }
     }
 
@@ -245,34 +225,43 @@ class Admin extends BaseController
     */
     public function modify_stocking_place($id = NULL)
     {
-      $this->load->model('stocking_place_model');
-
-      if(is_null($this->stocking_place_model->get($id))){
-        redirect("/admin/view_stocking_places/");
+      if (is_null($this->stocking_place_model->find($id))) 
+      {
+        redirect()->to("/admin/view_stocking_places");
       }
 
-      if (!empty($_POST)) {
-        $this->form_validation->set_rules('short', $this->lang->line('field_short_name'), "required|callback_unique_stocking_short[$id]", $this->lang->line('msg_storage_short_needed'));
-        $this->form_validation->set_rules('name', $this->lang->line('field_long_name'), "required|callback_unique_stocking_name[$id]", $this->lang->line('msg_err_storage_long_needed'));
+      if ( ! empty($_POST)) 
+      {
+        // VALIDATION
+        $validationRules = [
+          'name'            => 'required|min_length[3]|max_length[45]|is_unique[stocking_place.name,name,{name}]',
+          'short'           => 'required|max_length[10]|is_unique[stocking_place.short,short,{short}]'
+          ];
 
-        if ($this->form_validation->run() === TRUE)
+        if ($this->validate($validationRules)) 
         {
-          $this->stocking_place_model->update($id, $_POST);
-
-          redirect("/admin/view_stocking_places/");
-          exit();
+            $this->stocking_place_model->update($id, $_POST);
+            
+            return redirect()->to('/stock/admin/view_stocking_places');
         }
-      } else {
-        $output = get_object_vars($this->stocking_place_model->get($id));
+	  
+      // The values of the tag are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
+      } 
+      else 
+      {
+        $output['stocking_place'] = $this->stocking_place_model->withDeleted()->find($id);
       }
-      if(!is_null($this->stocking_place_model->get($id))) {
-        $output = get_object_vars($this->stocking_place_model->get($id));
-        $output["stocking_places"] = $this->stocking_place_model->get_all();
-      }else{
+
+      if(!is_null($this->stocking_place_model->withDeleted()->find($id)))
+      {
+        $output['stocking_place'] = $this->stocking_place_model->withDeleted()->find($id);
+      } 
+      else 
+      {
         $output["missing_stocking_place"] = TRUE;
       }
 
-      $this->display_view("admin/stocking_places/form", $output);
+      $this->display_view('Stock\admin\stocking_places\form', $output);
     }
 
     /**
@@ -280,81 +269,56 @@ class Admin extends BaseController
     */
     public function new_stocking_place()
     {
-      if (!empty($_POST)) {
+      if (!empty($_POST)) 
+      {
         // VALIDATION
+        $validationRules = [
+          'name'            => 'required|min_length[3]|max_length[45]|is_unique[stocking_place.name]',
+          'short'           => 'required|max_length[10]|is_unique[stocking_place.short]'
+          ];
 
-        //name: not void
-        $this->form_validation->set_rules('name', $this->lang->line('field_username'), 'required|callback_unique_stocking_name', $this->lang->line('msg_err_stocking_needed'));
-		$this->form_validation->set_rules('short', $this->lang->line('field_short'), 'required|callback_unique_stocking_short', $this->lang->line('msg_err_stocking_short'));
-
-
-        if ($this->form_validation->run() === TRUE)
+        if($this->validate($validationRules))
         {
           $this->stocking_place_model->insert($_POST);
 
-          redirect("/admin/view_stocking_places/");
-          exit();
+          return redirect()->to("/stock/admin/view_stocking_places");
         }
-      }
+	    }
 
-      $this->display_view("admin/stocking_places/form");
-    }
-          
-    public function unique_stocking_name($newName, $stockID) {
-      $this->load->model('stocking_place_model');
-
-      // Search if another group has the same name
-      $group = $this->stocking_place_model->get_by('name', $newName);
-      
-      if(isset($group->stocking_place_id) && $group->stocking_place_id != $stockID) {
-        $this->form_validation->set_message('unique_stocking_name', $this->lang->line('msg_err_stocking_unique'));
-        return FALSE;
-      } else {
-        return TRUE;
-      }
-    }
-	
-    public function unique_stocking_short($newShort, $stockID) {
-      $this->load->model('stocking_place_model');
-
-      // Search if another group has the same name
-      $group = $this->stocking_place_model->get_by('name', $newShort);
-      
-      if(isset($group->stocking_place_id) && $group->stocking_place_id != $stockID) {
-        $this->form_validation->set_message('unique_stocking_short', $this->lang->line('msg_err_stocking_short_unique'));
-        return FALSE;
-      } else {
-        return TRUE;
-      }
+      $this->display_view('Stock\admin\stocking_places\form');
     }
     
     /**
     * Delete the stocking place $id. If $action is null, a confirmation will be shown
     */
-    public function delete_stocking_place($id = NULL, $action = NULL)
+    public function delete_stocking_place($id = NULL, $action = 0)
     {
-      $this->load->model('stocking_place_model');
-      $this->load->model('item_model');
-
-      if(is_null($this->stocking_place_model->get($id))) {
-        redirect("/admin/view_stocking_places/");
-      }
-      
-      $filter = array('s' => array($id));
-      $items = $this->item_model->get_filtered($filter);
-
-      if (is_null($action)) {
-        $output = get_object_vars($this->stocking_place_model->get($id));
-        $output["stocking_places"] = $this->stocking_place_model->get_all();
-        $output["deletion_allowed"] = (sizeof($items) == 0);
-        $output["amount"] = sizeof($items);
-
-        $this->display_view("admin/stocking_places/delete", $output);
-      } else {
-        $this->stocking_place_model->delete($id);
-        redirect("/admin/view_stocking_places/");
+      if(is_null($this->stocking_place_model->withDeleted()->find($id))) 
+      {
+        return redirect()->to('/stock/admin/view_stocking_places');
       }
 
+      switch ($action)
+      {
+        case 0:
+          $output = array(
+            'stocking_place' => $this->stocking_place_model->withDeleted()->find($id)
+          );
+          $this->display_view('\Stock\admin\stocking_places\delete', $output);
+          break;
+          
+          case 1: // Soft Delete item_tag
+            $this->stocking_place_model->delete($id, FALSE);
+            return redirect()->to('/stock/admin/view_stocking_places');
+            break;
+
+          case 2: // Delete item_tag_link and item_tag
+            $this->stocking_place_model->delete($id, TRUE);
+            return redirect()->to('/stock/admin/view_stocking_places');
+          
+          default: // Do nothing
+            return redirect()->to('/stock/admin/view_stocking_places');
+      }
     }
 
     /* *********************************************************************************************************
@@ -612,34 +576,6 @@ class Admin extends BaseController
       }
 
       $this->display_view("admin/item_groups/form");
-    }
-
-    public function unique_groupname($newName, $groupID) {
-      $this->load->model('item_group_model');
-
-      // Search if another group has the same name
-      $group = $this->item_group_model->get_by('name', $newName);
-      
-      if(isset($group->item_group_id) && $group->item_group_id != $groupID) {
-        $this->form_validation->set_message('unique_groupname', $this->lang->line('msg_err_username_used'));
-        return FALSE;
-      } else {
-        return TRUE;
-      }
-    }
-    
-    public function unique_groupshort($newShortName, $groupID) {
-      $this->load->model('item_group_model');
-
-      // Search if another group has the same short name
-      $group = $this->item_group_model->get_by('short_name', $newShortName);
-      
-      if(isset($group->item_group_id) && $group->item_group_id != $groupID) {
-        $this->form_validation->set_message('unique_groupshort', $this->lang->line('msg_err_unique_shortname'));
-        return FALSE;
-      } else {
-        return TRUE;
-      }
     }
 	
     /**
