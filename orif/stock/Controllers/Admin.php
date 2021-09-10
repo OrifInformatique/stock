@@ -374,42 +374,55 @@ class Admin extends BaseController
     */
     public function modify_supplier($id = NULL)
     {
-      $this->load->model('supplier_model');
-
-      if(is_null($this->supplier_model->get($id))) {
-        redirect("/admin/view_suppliers/");
+      if (is_null($this->supplier_model->withDeleted()->find($id))) 
+      {
+        redirect()->to("/admin/view_suppliers");
       }
 
-      if (!empty($_POST)) {
+      if ( ! empty($_POST)) 
+      {
         // VALIDATION
+        $validationRules = [
+          'name'            => 'required|min_length[3]|max_length[45]|is_unique[supplier.name,name,{name}]',
+          'address_line1'   => 'max_length[100]',
+          'address_line2'   => 'max_length[100]',
+          'zip'             => 'max_length[45]',
+          'city'            => 'max_length[100]',
+          'country'         => 'max_length[45]',
+          'tel'             => 'max_length[45]',
+          ];
 
-        //name: if changed,
-        $this->form_validation->set_rules('name', $this->lang->line('field_name'), "required|callback_unique_supplier[$id]", $this->lang->line('msg_err_supplier_needed')); // not void
+          if ($_POST['email'] != '')
+          {
+            $validationRules = [
+              'email'       => 'max_length[45]|valid_email'
+            ];
+          }
 
-        if (isset($_POST['email'])) {
-          // or valid.
-          $this->form_validation->set_rules('email', $this->lang->line('field_mail'), 'valid_email', $this->lang->line('msg_err_email'));
-        }
-
-        if ($this->form_validation->run() === TRUE)
+        if ($this->validate($validationRules)) 
         {
-          $this->supplier_model->update($id, $_POST);
-
-          redirect("/admin/view_suppliers/");
-          exit();
+            $this->supplier_model->update($id, $_POST);
+            
+            return redirect()->to('/stock/admin/view_suppliers');
         }
-      } else {
-        $output = get_object_vars($this->supplier_model->get($id));
+	  
+      // The values of the tag are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
+      } 
+      else 
+      {
+        $output['supplier'] = $this->supplier_model->withDeleted()->find($id);
       }
-      
-      if(!is_null($this->supplier_model->get($id))){
-        $output = get_object_vars($this->supplier_model->get($id));
-        $output["suppliers"] = $this->supplier_model->get_all();
-      }else{
+
+      if(!is_null($this->supplier_model->withDeleted()->find($id)))
+      {
+        $output['supplier'] = $this->supplier_model->withDeleted()->find($id);
+      } 
+      else 
+      {
         $output["missing_supplier"] = TRUE;
       }
-	  
-      $this->display_view("admin/suppliers/form", $output);
+
+      $this->display_view('Stock\admin\suppliers\form', $output);
     }
 	
     /**
@@ -417,74 +430,67 @@ class Admin extends BaseController
     */
     public function new_supplier()
     {
-      $this->load->model('supplier_model');
-
-      if (!empty($_POST)) {
+      if (!empty($_POST)) 
+      {
         // VALIDATION
+        $validationRules = [
+          'name'            => 'required|min_length[3]|max_length[45]|is_unique[supplier.name,name,{name}]',
+          'address_line1'   => 'max_length[100]',
+          'address_line2'   => 'max_length[100]',
+          'zip'             => 'max_length[45]',
+          'city'            => 'max_length[100]',
+          'country'         => 'max_length[45]',
+          'tel'             => 'max_length[45]',
+          ];
 
-        //name: not void
-        $this->form_validation->set_rules('name', $this->lang->line('field_name'), 'required|callback_unique_supplier', $this->lang->line('msg_err_supplier_needed'));
+          if ($_POST['email'] != '')
+          {
+            $validationRules = [
+              'email'       => 'max_length[45]|valid_email'
+            ];
+          }
 
-        //email: void
-        if (isset($_POST['email'])) {
-          // or valid
-          $this->form_validation->set_rules('email', $this->lang->line('field_mail'), 'valid_email', $this->lang->line('msg_err_email'));
-        }
-
-        if ($this->form_validation->run() === TRUE)
+        if($this->validate($validationRules))
         {
           $this->supplier_model->insert($_POST);
 
-          redirect("/admin/view_suppliers/");
-          exit();
+          return redirect()->to("/stock/admin/view_suppliers");
         }
-      }
+	    }
 
-      $this->display_view("admin/suppliers/form");
+      $this->display_view('Stock\admin\suppliers\form');
     }
 
     /**
     * Delete a supplier
     */
-    public function delete_supplier($id = NULL, $action = NULL)
+    public function delete_supplier($id = NULL, $action = 0)
     {
-      $this->load->model('supplier_model');
-      $this->load->model('item_model');
-
-      if(is_null($this->supplier_model->get($id))) {
-        redirect("/admin/view_suppliers/");
+      if(is_null($this->supplier_model->withDeleted()->find($id))) 
+      {
+        return redirect()->to('/stock/admin/view_suppliers');
       }
-      
-      // Block deletion if this supplier is used
-      $items = $this->item_model->get_many_by("supplier_id = ".$id);
-      $amount = count($items);
 
-      if (!isset($action)) {
-        $output = get_object_vars($this->supplier_model->get($id));
-        $output["deletion_allowed"] = ($amount < 1);
-        $output["amount"] = $amount;
+      switch ($action)
+      {
+        case 0:
+          $output = array(
+            'supplier' => $this->supplier_model->withDeleted()->find($id)
+          );
+          $this->display_view('\Stock\admin\suppliers\delete', $output);
+          break;
+          
+          case 1: // Soft Delete item_tag
+            $this->supplier_model->delete($id, FALSE);
+            return redirect()->to('/stock/admin/view_suppliers');
+            break;
 
-        $this->display_view("admin/suppliers/delete", $output);
-      } else {
-        // delete it!
-        $this->supplier_model->delete($id);
-        
-        // redirect the user to the updated table
-        redirect("/admin/view_suppliers/");
-      }
-    }
-
-    public function unique_supplier($newName, $supplierID) {
-      $this->load->model('supplier_model');
-
-      // Search if another group has the same name
-      $group = $this->supplier_model->get_by('name', $newName);
-      
-      if(isset($group->supplier_id) && $group->supplier_id != $supplierID) {
-        $this->form_validation->set_message('unique_supplier', $this->lang->line('msg_err_supplier_unique'));
-        return FALSE;
-      } else {
-        return TRUE;
+          case 2: // Delete item_tag_link and item_tag
+            $this->supplier_model->delete($id, TRUE);
+            return redirect()->to('/stock/admin/view_suppliers');
+          
+          default: // Do nothing
+            return redirect()->to('/stock/admin/view_suppliers');
       }
     }
     

@@ -24,8 +24,12 @@ return[
 'btn_add_stocking_place'                => 'Ajouter un lieu de stockage',
 'btn_add_supplier'                      => 'Ajouter un fournisseur',
 'btn_add_item_group'                    => 'Ajouter un groupe d\'objet',
+'btn_soft_delete_tag'                   => 'Désactiver ce tag',
 'btn_delete_tag'                        => 'Supprimer ce tag',
+'btn_soft_delete_stocking_place'        => 'Désactiver ce lieu de stockage',
 'btn_delete_stocking_place'             => 'Supprimer ce lieu de stockage',
+'btn_delete_supplier'                   => 'Supprimer ce fournisseur',
+'btn_soft_delete_supplier'              => 'Désactiver ce fournisseur',
 
 
 // Fields labels
@@ -46,25 +50,35 @@ return[
 'admin_new'                             => 'Nouveau...',
 
 // Other texts
+'what_to_do'                            => 'Que souhaitez-vous faire ?',
 'really_delete'                         => 'Voulez-vous vraiment supprimer ce tag?',
 'tag'                                   => 'Tag',
 'stocking_place'                        => 'Lieu de stockage',
+'supplier'                              => 'Fournisseur',
 'tag_deletion_explanation'              => 'La désactivation d\'un tag permet de le rendre inutilisable tout en conservant ses informations dans les archives. ' 
                                                 . 'Cela permet notamment de garder l\'historique de ses actions. <br> <br>' 
                                                 . 'En cas de suppression définitive, toutes les informations concernant ce tag seront supprimées.',
 'tag_already_disabled'                  => 'Ce tag est déjà désactivé. Voulez-vous le supprimer définitivement ?',
 'delete_tag'                            => 'Désactiver ou supprimer ce tag',
-'soft_delete_tag'                       => 'Désactiver ce tag',
 'reactivate_tag'                        => 'Réactiver ce tag',
 'hard_delete_tag'                       => 'Supprimer définitivement ce tag',
+
 'delete_stocking_place'                 => 'Désactiver ou supprimer ce lieu de stockage',
 'hard_delete_stocking_place'            => 'Supprimer définitivement ce lieu de stockage',
-'soft_delete_stocking_place'            => 'Désactiver ce lieu de stockage',
 'reactivate_stocking_place'             => 'Réactiver ce lieu de stockage',
 'stocking_place_already_disabled'       => 'Ce lieu de stockage est déjà désactivé. Voulez-vous le supprimer définitivement ?',
-'stocking_place_deletion_explanation'   => 'La désactivation d\'un tag permet de le rendre inutilisable tout en conservant ses informations dans les archives. ' 
+'stocking_place_deletion_explanation'   => 'La désactivation d\'un lieu de stockage permet de le rendre inutilisable tout en conservant ses informations dans les archives. ' 
+. 'Cela permet notamment de garder l\'historique de ses actions. <br> <br>' 
+. 'En cas de suppression définitive, toutes les informations concernant ce lieu de stockage seront supprimées.',
+
+'supplier_already_disabled'             => 'Ce fournisseur est déjà désactivé. Voulez-vous le supprimer définitivement ?',
+'delete_supplier'                       => 'Désactiver ou supprimer ce fournisseur',
+'hard_delete_supplier'                  => 'Supprimer définitivement ce fournisseur',
+'reactivate_supplier'                   => 'Réactiver ce fournisseur',
+'supplier_already_disabled'             => 'Ce fournisseur est déjà désactivé. Voulez-vous le supprimer définitivement ?',
+'supplier_deletion_explanation'         => 'La désactivation d\'un fournisseur permet de le rendre inutilisable tout en conservant ses informations dans les archives. ' 
                                                 . 'Cela permet notamment de garder l\'historique de ses actions. <br> <br>' 
-                                                . 'En cas de suppression définitive, toutes les informations concernant ce tag seront supprimées.',
-'stocking_place_already_disabled'       => 'Ce lieu de stockage est déjà désactivé. Voulez-vous le supprimer définitivement ?',
+                                                . 'En cas de suppression définitive, toutes les informations concernant ce fournisseur seront supprimées.',
+'supplier_already_disabled'             => 'Ce fournisseur est déjà désactivé. Voulez-vous le supprimer définitivement ?',
 
 ];

@@ -41,7 +41,7 @@ else
           </a>
         </div>
         <div class="col-12 pl-0 pr-0">
-          <a href="<?= base_url('stock/admin/delete_tag/' . $tag['item_tag_id'] . '/0') ?>" class="text-danger">
+          <a href="<?= base_url('stock/admin/delete_tag/' . $tag['item_tag_id']) ?>" class="text-danger">
             <?= lang('stock_lang.hard_delete_tag') ?>
           </a>
         </div>

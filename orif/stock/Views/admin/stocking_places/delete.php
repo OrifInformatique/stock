@@ -13,7 +13,7 @@
             <div class="col-12">
                 <div>
                     <h1><?= lang('stock_lang.stocking_place') . ' ' . esc($stocking_place['name']) . ' "'.esc($stocking_place['short']).'"' ?></h1>
-                    <h4><?= lang('stock_lang.really_delete')?></h4>
+                    <h4><?= lang('stock_lang.what_to_do')?></h4>
                     <div class = "alert alert-info" ><?= lang('stock_lang.stocking_place_deletion_explanation')?></div>
 
                     <?php if ( ! is_null($stocking_place['archive'])): ?>
@@ -28,7 +28,7 @@
 
                     <?php if (is_null($stocking_place['archive'])): ?>
                         <a href="<?= base_url(uri_string().'/1'); ?>" class="btn btn-primary">
-                            <?= lang('stock_lang.soft_delete_stocking_place'); ?>
+                            <?= lang('stock_lang.btn_soft_delete_stocking_place'); ?>
                         </a>
                     <?php endif; ?>
 
