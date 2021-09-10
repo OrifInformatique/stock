@@ -387,7 +387,7 @@ class Item_model extends MyModel
 
       if (isset($filters['t'])) {
         // Get a list of item_tag_link elements
-        $this->load->model('item_tag_link_model');
+        $this->item_tag_link_model = new Item_tag_link_model();
         $item_tags_selection = $filters['t'];
 
         $where_itemTagLinks = '';
