@@ -1,40 +1,36 @@
-<?php 
-
-//if (!defined('BASEPATH')) exit('No direct script access allowed');
-
+<?php
 /**
- * The Item condition model
- * 
- * @author      Didier Viret
- * @link        https://github.com/OrifInformatique/stock
- * @copyright   Copyright (c) 2016, Orif <http://www.orif.ch>
+ * Model Item_condition_model this represents the Item_condition table
+ *
+ * @author      Orif (ViDi,AeDa)
+ * @link        https://github.com/OrifInformatique
+ * @copyright   Copyright (c), Orif (https://www.orif.ch)
  */
 
 
 namespace  Stock\Models;
 
 use Stock\Models\MyModel;
-use CodeIgniter\Model;
-
+use CodeIgniter\Database\ConnectionInterface;
+use CodeIgniter\Validation\ValidationInterface;
 
 
 class Item_condition_model extends MyModel
 {
-    /* MY_Model variables definition */
     protected $table = 'item_condition';
     protected $primaryKey = 'item_condition_id';
-    protected $protected_attributes = ['item_condition_id'];
-    protected $has_many = ['items'];
+    protected $allowedFields = ['name'];
 
     /* MY_Model callback methods */
     protected $after_get = ['get_bootstrap_label'];
 
     /**
-    * Constructor
-    */
-    public function __construct()
+     * Constructor
+     */
+    public function __construct(ConnectionInterface &$db = null, ValidationInterface $validation = null)
     {
-        parent::__construct();
+        parent::__construct($db, $validation);
+        $this->Item_model = new Item_model();
     }
 
     /**
@@ -66,5 +62,20 @@ class Item_condition_model extends MyModel
 
         $item_condition['bootstrap_label'] = $bootstrap_label;
         return $item_condition;
+    }
+
+    /**
+     *  Gets the corresponding items with the primary key
+     *  
+     *  @return array
+     */
+    public function getItems($item_condition_id)
+    {
+        if (is_null($this->Item_model))
+            $this->Item_model = new Item_model();
+
+        return $this->Item_model->asArray()
+                                ->where('item_condition_id', $item_condition_id)
+                                ->findAll();
     }
 }

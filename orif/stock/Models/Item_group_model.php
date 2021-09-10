@@ -1,19 +1,17 @@
-<?php 
-
-//if (!defined('BASEPATH')) exit('No direct script access allowed');
-
+<?php
 /**
- * The Item group model
- * 
- * @author      Didier Viret
- * @link        https://github.com/OrifInformatique/stock
- * @copyright   Copyright (c) 2016, Orif <http://www.orif.ch>
+ * Model Item_group_model this represents the item_group table
+ *
+ * @author      Orif (ViDi,AeDa)
+ * @link        https://github.com/OrifInformatique
+ * @copyright   Copyright (c), Orif (https://www.orif.ch)
  */
 
 namespace  Stock\Models;
 
 use Stock\Models\MyModel;
-
+use CodeIgniter\Database\ConnectionInterface;
+use CodeIgniter\Validation\ValidationInterface;
 
 
 class Item_group_model extends MyModel
@@ -21,15 +19,29 @@ class Item_group_model extends MyModel
     /* MY_Model variables definition */
     protected $table = 'item_group';
     protected $primaryKey = 'item_group_id';
-    protected $protected_attributes = ['item_group_id'];
-    protected $has_many = ['items'];
-
+    protected $allowedFields = ['name', 'short_name'];
 
     /**
-    * Constructor
-    */
-    public function __construct()
+     * Constructor
+     */
+    public function __construct(ConnectionInterface &$db = null, ValidationInterface $validation = null)
     {
-        parent::__construct();
+        parent::__construct($db, $validation);
+        $this->Item_model = new Item_model();
+    }
+
+    /**
+     *  Gets the corresponding items with the primary key
+     *  
+     *  @return array
+     */
+    public function getItems($item_group_id)
+    {
+        if (is_null($this->Item_model))
+            $this->Item_model = new Item_model();
+
+        return $this->Item_model->asArray()
+                                ->where('item_group_id', $item_group_id)
+                                ->findAll();
     }
 }

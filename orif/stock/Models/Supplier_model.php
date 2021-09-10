@@ -9,12 +9,38 @@
 
 namespace Stock\Models;
 
-use CodeIgniter\Model;
 use Stock\Models\MyModel;
+use CodeIgniter\Database\ConnectionInterface;
+use CodeIgniter\Validation\ValidationInterface;
+
 
 class Supplier_model extends MyModel
 {
     protected $table = 'supplier';
     protected $primaryKey = 'supplier_id';
     protected $allowedFields = ['name', 'address_line1', 'address_line2', 'zip', 'city', 'country', 'tel', 'email'];
+
+    /**
+     * Constructor
+     */
+    public function __construct(ConnectionInterface &$db = null, ValidationInterface $validation = null)
+    {
+        parent::__construct($db, $validation);
+        $this->Item_model = new Item_model();
+    }
+
+    /**
+     *  Gets the corresponding items with the primary key
+     *  
+     *  @return array
+     */
+    public function getItems($supplier_id)
+    {
+        if (is_null($this->Item_model))
+            $this->Item_model = new Item_model();
+
+        return $this->Item_model->asArray()
+                                ->where('supplier_id', $supplier_id)
+                                ->findAll();
+    }
 }
