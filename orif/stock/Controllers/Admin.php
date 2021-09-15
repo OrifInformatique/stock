@@ -99,8 +99,8 @@ class Admin extends BaseController
       {
         // VALIDATION
         $validationRules = [
-          'name'            => 'required|min_length[3]|max_length[45]|is_unique[item_tag.name,item_tag_id,{item_tag_id}]',
-          'short_name'      => 'required|max_length[3]|is_unique[item_tag.short_name,item_tag_id,{item_tag_id}]'
+          'name'            => 'required|min_length[3]|max_length[45]|is_unique[item_tag.name,name,{name}]',
+          'short_name'      => 'required|max_length[3]|is_unique[item_tag.short_name,short_name,{short_name}]'
           ];
 
         if($this->validate($validationRules)) 
@@ -307,12 +307,22 @@ class Admin extends BaseController
           $this->display_view('\Stock\admin\stocking_places\delete', $output);
           break;
           
-          case 1: // Soft Delete item_tag
+          case 1: // Soft delete stocking_place
             $this->stocking_place_model->delete($id, FALSE);
             return redirect()->to('/stock/admin/view_stocking_places');
             break;
 
-          case 2: // Delete item_tag_link and item_tag
+          case 2: // Delete stocking_place and update every connected FK to NULL
+            $stocking_place_id = $this->item_model->where('stocking_place_id', $id)->findAll();
+
+            if ( ! is_null($stocking_place_id))
+            {
+              for ($i = 0; $i <= count($stocking_place_id) - 1; $i++)
+              {
+                $this->item_model->update($stocking_place_id[$i]['item_id'], ['stocking_place_id' => null]);
+              }
+            }
+
             $this->stocking_place_model->delete($id, TRUE);
             return redirect()->to('/stock/admin/view_stocking_places');
           
@@ -443,7 +453,7 @@ class Admin extends BaseController
           'tel'             => 'max_length[45]',
           ];
 
-          if ($_POST['email'] != '')
+          if ( ! isset($_POST['email']))
           {
             $validationRules = [
               'email'       => 'max_length[45]|valid_email'
@@ -480,12 +490,22 @@ class Admin extends BaseController
           $this->display_view('\Stock\admin\suppliers\delete', $output);
           break;
           
-          case 1: // Soft Delete item_tag
+          case 1: // Soft delete supplier
             $this->supplier_model->delete($id, FALSE);
             return redirect()->to('/stock/admin/view_suppliers');
             break;
 
-          case 2: // Delete item_tag_link and item_tag
+          case 2: // Delete supplier and update every connected FK to NULL
+            $supplier_id = $this->item_model->where('supplier_id', $id)->findAll();
+
+            if ( ! is_null($supplier_id))
+            {
+              for ($i = 0; $i <= count($supplier_id) - 1; $i++)
+              {
+                $this->item_model->update($supplier_id[$i]['item_id'], ['supplier_id' => null]);
+              }
+            }
+
             $this->supplier_model->delete($id, TRUE);
             return redirect()->to('/stock/admin/view_suppliers');
           
@@ -597,7 +617,7 @@ class Admin extends BaseController
     /**
     * Delete an unused item group
     */
-    public function delete_item_group($id = NULL, $action = NULL)
+    public function delete_item_group($id = NULL, $action = 0)
     {
       if(is_null($this->item_group_model->withDeleted()->find($id))) 
       {
@@ -613,12 +633,22 @@ class Admin extends BaseController
           $this->display_view('\Stock\admin\item_groups\delete', $output);
           break;
           
-          case 1: // Soft Delete item_tag
+          case 1: // Soft delete item_group
             $this->item_group_model->delete($id, FALSE);
             return redirect()->to('/stock/admin/view_item_groups');
             break;
 
-          case 2: // Delete item_tag_link and item_tag
+          case 2: // Delete item_group and update every connected FK to NULL
+            $item_id = $this->item_model->where('item_group_id', $id)->findAll();
+
+            if ( ! is_null($item_id))
+            {
+              for ($i = 0; $i <= count($item_id)-1; $i++)
+              {
+                $this->item_model->update($item_id[$i]['item_id'], ['item_group_id' => null]);
+              }
+            }
+            
             $this->item_group_model->delete($id, TRUE);
             return redirect()->to('/stock/admin/view_item_groups');
           
