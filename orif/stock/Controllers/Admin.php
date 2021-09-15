@@ -60,10 +60,18 @@ class Admin extends BaseController
     /**
     * As the name says, view the tags.
     */
-    public function view_tags()
+    public function view_tags($with_deleted = FALSE)
     {
       $data['items'] = [];
-      $tags = $this->item_tag_model->findAll();
+
+      if ($with_deleted)
+      {
+        $tags = $this->item_tag_model->withDeleted()->findAll();
+      }
+      else
+      {
+        $tags = $this->item_tag_model->findAll();
+      }
 
       $data['list_title'] = lang('stock_lang.title_tags');
         
@@ -188,6 +196,27 @@ class Admin extends BaseController
       }
     }
 
+    /**
+     * Reactivate a disabled stocking_place.
+     *
+     * @param integer $id = ID of the stocking_place to affect
+     * @return void
+     */
+    public function reactivate_tag($id)
+    {
+        $item_tag = $this->item_tag_model->withDeleted()->find($id);
+
+        if (is_null($item_tag)) 
+        {
+            return redirect()->to('/stock/admin/view_tags');
+        } 
+        else 
+        {
+            $this->item_tag_model->withDeleted()->update($id, ['archive' => NULL]);
+            return redirect()->to('/stock/admin/modify_tag/' . $id);
+        }
+    }
+
     /* *********************************************************************************************************
     STOCKING PLACES
     ********************************************************************************************************* */
@@ -195,10 +224,18 @@ class Admin extends BaseController
     /**
     * As the name says, view the stocking places.
     */
-    public function view_stocking_places()
+    public function view_stocking_places($with_deleted = FALSE)
     {
       $data['items'] = [];
-      $stockingPlaces = $this->stocking_place_model->findAll();
+
+      if ($with_deleted)
+      {
+        $stockingPlaces = $this->stocking_place_model->withDeleted()->findAll();
+      }
+      else
+      {
+        $stockingPlaces = $this->stocking_place_model->findAll();
+      }
 
       $data['list_title'] = lang('stock_lang.title_stocking_places');
         
@@ -331,6 +368,27 @@ class Admin extends BaseController
       }
     }
 
+    /**
+     * Reactivate a disabled stocking_place.
+     *
+     * @param integer $id = ID of the stocking_place to affect
+     * @return void
+     */
+    public function reactivate_stocking_place($id)
+    {
+        $stocking_place = $this->stocking_place_model->withDeleted()->find($id);
+
+        if (is_null($stocking_place)) 
+        {
+            return redirect()->to('/stock/admin/view_stocking_places');
+        } 
+        else 
+        {
+            $this->stocking_place_model->withDeleted()->update($id, ['archive' => NULL]);
+            return redirect()->to('/stock/admin/modify_stocking_place/' . $id);
+        }
+    }
+
     /* *********************************************************************************************************
     SUPPLIERS
     ********************************************************************************************************* */
@@ -338,10 +396,18 @@ class Admin extends BaseController
     /**
     * As the name says, view the suppliers.
     */
-    public function view_suppliers()
+    public function view_suppliers($with_deleted = FALSE)
     {
       $data['items'] = [];
-      $suppliers = $this->supplier_model->findAll();
+
+      if ($with_deleted)
+      {
+        $suppliers = $this->supplier_model->withDeleted()->findAll();
+      }
+      else
+      {
+        $suppliers = $this->supplier_model->findAll();
+      }
 
       $data['list_title'] = lang('stock_lang.title_suppliers');
         
@@ -513,6 +579,27 @@ class Admin extends BaseController
             return redirect()->to('/stock/admin/view_suppliers');
       }
     }
+
+    /**
+     * Reactivate a disabled supplier.
+     *
+     * @param integer $id = ID of the supplier to affect
+     * @return void
+     */
+    public function reactivate_supplier($id)
+    {
+        $supplier = $this->supplier_model->withDeleted()->find($id);
+
+        if (is_null($supplier)) 
+        {
+            return redirect()->to('/stock/admin/view_suppliers');
+        } 
+        else 
+        {
+            $this->supplier_model->withDeleted()->update($id, ['archive' => NULL]);
+            return redirect()->to('/stock/admin/modify_supplier/' . $id);
+        }
+    }
     
     /* *********************************************************************************************************
     ITEM GROUPS
@@ -521,10 +608,18 @@ class Admin extends BaseController
     /**
     * As the name says, view the item groups.
     */
-    public function view_item_groups()
+    public function view_item_groups($with_deleted = FALSE)
     {
       $data['items'] = [];
-      $itemGroups = $this->item_group_model->findAll();
+
+      if ($with_deleted)
+      {
+        $itemGroups = $this->item_group_model->withDeleted()->findAll();
+      }
+      else
+      {
+        $itemGroups = $this->item_group_model->findAll();
+      }
 
       $data['list_title'] = lang('stock_lang.title_item_groups');
         
@@ -556,7 +651,7 @@ class Admin extends BaseController
         return redirect()->to("/stock/admin/view_item_groups");
       }
 
-      if (!empty($_POST)) 
+      if ( ! empty($_POST)) 
       {
         // VALIDATION
         $validationRules = [
@@ -578,13 +673,13 @@ class Admin extends BaseController
         $output['item_group'] = $this->item_group_model->withDeleted()->find($id);
       }
 
-      if(!is_null($this->item_group_model->withDeleted()->find($id)))
+      if( ! is_null($this->item_group_model->withDeleted()->find($id)))
       {
         $output['item_group'] = $this->item_group_model->withDeleted()->find($id);
       } 
       else 
       {
-        $output["missing_item_group"] = TRUE;
+        return redirect()->to('/stock/admin/view_item_groups');
       }
 
       $this->display_view('Stock\admin\item_groups\form', $output);
@@ -655,5 +750,26 @@ class Admin extends BaseController
           default: // Do nothing
             return redirect()->to('/stock/admin/view_item_groups');
       }
+    }
+
+    /**
+     * Reactivate a disabled item_group.
+     *
+     * @param integer $id = ID of the item_group to affect
+     * @return void
+     */
+    public function reactivate_item_group($id)
+    {
+        $item_group = $this->item_group_model->withDeleted()->find($id);
+
+        if (is_null($item_group)) 
+        {
+            return redirect()->to('/stock/admin/view_item_groups');
+        } 
+        else 
+        {
+            $this->item_group_model->withDeleted()->update($id, ['archive' => NULL]);
+            return redirect()->to('/stock/admin/modify_item_group/' . $id);
+        }
     }
 }
