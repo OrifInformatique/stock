@@ -319,7 +319,7 @@ class Admin extends BaseController
             {
               for ($i = 0; $i <= count($stocking_place_id) - 1; $i++)
               {
-                $this->item_model->update($stocking_place_id[$i]['item_id'], ['stocking_place_id' => null]);
+                $this->item_model->update($stocking_place_id[$i]['item_id'], ['stocking_place_id' => NULL]);
               }
             }
 
@@ -502,7 +502,7 @@ class Admin extends BaseController
             {
               for ($i = 0; $i <= count($supplier_id) - 1; $i++)
               {
-                $this->item_model->update($supplier_id[$i]['item_id'], ['supplier_id' => null]);
+                $this->item_model->update($supplier_id[$i]['item_id'], ['supplier_id' => Null]);
               }
             }
 
@@ -645,7 +645,7 @@ class Admin extends BaseController
             {
               for ($i = 0; $i <= count($item_id)-1; $i++)
               {
-                $this->item_model->update($item_id[$i]['item_id'], ['item_group_id' => null]);
+                $this->item_model->update($item_id[$i]['item_id'], ['item_group_id' => NULL]);
               }
             }
             
