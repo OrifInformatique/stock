@@ -16,7 +16,9 @@ class Item_tag_model extends MyModel
 {
     protected $table = 'item_tag';
     protected $primaryKey = 'item_tag_id';
-    protected $allowedFields = ['name', 'short_name'];
+    protected $allowedFields = ['name', 'short_name', 'archive'];
+    protected $useSoftDeletes = true;
+    protected $deletedField = 'archive';
 
     public function initialize(){
         $this->item_tag_link_model = new Item_tag_link_model();
