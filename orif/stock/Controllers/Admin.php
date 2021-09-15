@@ -95,12 +95,12 @@ class Admin extends BaseController
         return redirect()->to("/stock/admin/view_tags");
       }
 
-      if (!empty($_POST)) 
+      if ( ! empty($_POST)) 
       {
         // VALIDATION
         $validationRules = [
-          'name'            => 'required|min_length[3]|max_length[45]|is_unique[item_tag.name,name,{name}]',
-          'short_name'      => 'required|max_length[3]|is_unique[item_tag.short_name,short_name,{short_name}]'
+          'name'            => 'required|min_length[3]|max_length[45]|is_unique[item_tag.name,item_tag_id,'.$id.']',
+          'short_name'      => 'required|max_length[3]|is_unique[item_tag.short_name,item_tag_id,'.$id.']'
           ];
 
         if($this->validate($validationRules)) 
@@ -234,8 +234,8 @@ class Admin extends BaseController
       {
         // VALIDATION
         $validationRules = [
-          'name'            => 'required|min_length[3]|max_length[45]|is_unique[stocking_place.name,name,{name}]',
-          'short'           => 'required|max_length[10]|is_unique[stocking_place.short,short,{short}]'
+          'name'            => 'required|min_length[3]|max_length[45]|is_unique[stocking_place.name,stocking_place_id,'.$id.']',
+          'short'           => 'required|max_length[10]|is_unique[stocking_place.short,stocking_place_id,'.$id.']'
           ];
 
         if ($this->validate($validationRules)) 
@@ -393,7 +393,7 @@ class Admin extends BaseController
       {
         // VALIDATION
         $validationRules = [
-          'name'            => 'required|min_length[3]|max_length[45]|is_unique[supplier.name,name,{name}]',
+          'name'            => 'required|min_length[3]|max_length[45]|is_unique[supplier.name,supplier_id,'.$id.']',
           'address_line1'   => 'max_length[100]',
           'address_line2'   => 'max_length[100]',
           'zip'             => 'max_length[45]',
@@ -444,7 +444,7 @@ class Admin extends BaseController
       {
         // VALIDATION
         $validationRules = [
-          'name'            => 'required|min_length[3]|max_length[45]|is_unique[supplier.name,name,{name}]',
+          'name'            => 'required|min_length[3]|max_length[45]|is_unique[supplier.name]',
           'address_line1'   => 'max_length[100]',
           'address_line2'   => 'max_length[100]',
           'zip'             => 'max_length[45]',
@@ -560,8 +560,8 @@ class Admin extends BaseController
       {
         // VALIDATION
         $validationRules = [
-          'name'            => 'required|min_length[3]|max_length[45]|is_unique[item_group.name,name,{name}]',
-          'short_name'      => 'required|max_length[2]|is_unique[item_group.short_name,short_name,{short_name}]'
+          'name'            => 'required|min_length[3]|max_length[45]|is_unique[item_group.name,item_group_id,'.$id.']',
+          'short_name'      => 'required|max_length[2]|is_unique[item_group.short_name,item_group_id,'.$id.']'
           ];
 
         if($this->validate($validationRules)) 
