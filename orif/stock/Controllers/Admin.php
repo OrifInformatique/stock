@@ -125,7 +125,7 @@ class Admin extends BaseController
         $output['tag'] = $this->item_tag_model->withDeleted()->find($id);
       }
 
-      if(!is_null($this->item_tag_model->withDeleted()->find($id)))
+      if( ! is_null($this->item_tag_model->withDeleted()->find($id)))
       {
         $output['tag'] = $this->item_tag_model->withDeleted()->find($id);
       } 
@@ -142,7 +142,7 @@ class Admin extends BaseController
     */
     public function new_tag()
     {
-      if (!empty($_POST)) 
+      if ( ! empty($_POST)) 
       {
         // VALIDATION
         $validationRules = [
@@ -289,7 +289,7 @@ class Admin extends BaseController
         $output['stocking_place'] = $this->stocking_place_model->withDeleted()->find($id);
       }
 
-      if(!is_null($this->stocking_place_model->withDeleted()->find($id)))
+      if( ! is_null($this->stocking_place_model->withDeleted()->find($id)))
       {
         $output['stocking_place'] = $this->stocking_place_model->withDeleted()->find($id);
       } 
@@ -306,7 +306,7 @@ class Admin extends BaseController
     */
     public function new_stocking_place()
     {
-      if (!empty($_POST)) 
+      if ( ! empty($_POST)) 
       {
         // VALIDATION
         $validationRules = [
@@ -489,7 +489,7 @@ class Admin extends BaseController
         $output['supplier'] = $this->supplier_model->withDeleted()->find($id);
       }
 
-      if(!is_null($this->supplier_model->withDeleted()->find($id)))
+      if( ! is_null($this->supplier_model->withDeleted()->find($id)))
       {
         $output['supplier'] = $this->supplier_model->withDeleted()->find($id);
       } 
@@ -506,7 +506,7 @@ class Admin extends BaseController
     */
     public function new_supplier()
     {
-      if (!empty($_POST)) 
+      if ( ! empty($_POST)) 
       {
         // VALIDATION
         $validationRules = [
@@ -690,7 +690,7 @@ class Admin extends BaseController
     */
     public function new_item_group()
     {
-      if (!empty($_POST)) 
+      if ( ! empty($_POST)) 
       {
         // VALIDATION
         $validationRules = [
