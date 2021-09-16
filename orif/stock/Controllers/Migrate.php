@@ -1,8 +1,8 @@
 <?php
 /**
- * Admin controller
+ * Migration controller
  *
- * @author      Orif (ViDi,HeMa)
+ * @author      Orif (ViDi,AeDa)
  * @link        https://github.com/OrifInformatique
  * @copyright   Copyright (c), Orif (https://www.orif.ch)
  */
@@ -40,7 +40,6 @@ class Migrate extends BaseController
         if ( ! empty($_POST))
         {
             // VALIDATION
-
             $validationRules = [
                 'password'  =>  'required|min_length[8]'
             ];
@@ -56,7 +55,7 @@ class Migrate extends BaseController
                     }   
                     catch(Exception $e)
                     {
-                        session()->setFlashdata($e);
+                        return redirect()->to(base_url());
                     }
                 }
             }

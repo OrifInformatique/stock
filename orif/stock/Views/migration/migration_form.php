@@ -3,13 +3,14 @@ $validation=\Config\Services::validation();
 ?>
 
 <div class="container">
-    <form method="post">
+    <?php echo form_open('stock/migrate/toCI4', 'password'); ?>
         <!-- TITLE -->
         <div class="row">
             <div class="col">
                 <h1 class="title-section"><?= lang('migrate_lang.title_migration') ?></h1>
             </div>
         </div>
+
 
         <!-- INFORMATION MESSAGE -->
         <div class="col-12 alert alert-info">
@@ -31,5 +32,5 @@ $validation=\Config\Services::validation();
                 <?= form_submit('send', lang('migrate_lang.btn_send'), ['class' => 'btn btn-primary']); ?>
             </div>
         </div>
-    </form>
+    <?php form_close(); ?>
 </div>
