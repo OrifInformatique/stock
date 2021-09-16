@@ -55,7 +55,7 @@ class Migrate extends BaseController
                     }   
                     catch(Exception $e)
                     {
-                        return redirect()->to(base_url());
+                        session()->setFlashdata('migration-error', lang('migrate_lang.err_msg_migration_failed') . $e);
                     }
                 }
             }

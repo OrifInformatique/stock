@@ -1,5 +1,6 @@
 <?php
-$validation=\Config\Services::validation();
+$session = \Config\Services::session();
+$validation = \Config\Services::validation();
 ?>
 
 <div class="container">
@@ -11,6 +12,12 @@ $validation=\Config\Services::validation();
             </div>
         </div>
 
+        <!-- ERROR MESSAGES -->
+        <?php if ( ! is_null($session->getFlashdata('migration-error'))) : ?>
+            <div class="alert alert-danger text-justify" role="alert">
+                <?= $session->getFlashdata('migration-error'); ?>
+            </div>
+        <?php endif ?>
 
         <!-- INFORMATION MESSAGE -->
         <div class="col-12 alert alert-info">
