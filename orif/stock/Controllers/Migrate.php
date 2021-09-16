@@ -26,6 +26,7 @@ class Migrate extends BaseController
 
         // Load required services
         $this->validation = \Config\Services::validation();
+        $this->migrate = \Config\Services::migrations();
 
         // Load required helpers
         helper('form');
@@ -36,8 +37,6 @@ class Migrate extends BaseController
 
     public function toCI4()
     {
-        $migrate = \Config\Services::migrations();
-
         if ( ! empty($_POST))
         {
             // VALIDATION
@@ -52,7 +51,7 @@ class Migrate extends BaseController
                 {
                     try
                     {
-                        $migrate->setNamespace('Stock')->latest();
+                        $this->migrate->setNamespace('Stock')->latest();
                         return redirect()->to(base_url());
                     }   
                     catch(Exception $e)
@@ -61,7 +60,6 @@ class Migrate extends BaseController
                     }
                 }
             }
-            
         }
 
         $this->display_view('\Stock\Views\migration\migration_form');
