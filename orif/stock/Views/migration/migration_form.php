@@ -36,7 +36,7 @@ $validation = \Config\Services::validation();
         <div class="row">
             <div class="col text-right">
                 <a class="btn btn-default" href="<?= base_url() ?>"><?= lang('common_lang.btn_cancel'); ?></a>
-                <?= form_submit('send', lang('migrate_lang.btn_send'), ['class' => 'btn btn-primary']); ?>
+                <?= form_submit('send', lang('migrate_lang.btn_migrate'), ['class' => 'btn btn-danger']); ?>
             </div>
         </div>
     <?php form_close(); ?>

@@ -12,7 +12,7 @@ return[
 'title_migration'           => 'Migration',
 
 // Buttons
-'btn_send'                  => 'Envoyer',
+'btn_migrate'               => 'Migrer vers CI4',
 
 // Error messages
 'err_msg_migration_failed'  => 'L\'erreur suivante s\'est produite lors de la migration:<br><br>',
