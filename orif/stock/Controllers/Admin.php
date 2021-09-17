@@ -131,7 +131,7 @@ class Admin extends BaseController
       } 
       else 
       {
-        $output["missing_tag"] = TRUE;
+        return redirect()->to('/stock/admin/view_tags');
       }
 
       $this->display_view('Stock\admin\tags\form', $output);
@@ -295,7 +295,7 @@ class Admin extends BaseController
       } 
       else 
       {
-        $output["missing_stocking_place"] = TRUE;
+        return redirect()->to('/stock/admin/view_stocking_places');
       }
 
       $this->display_view('Stock\admin\stocking_places\form', $output);
@@ -495,7 +495,7 @@ class Admin extends BaseController
       } 
       else 
       {
-        $output["missing_supplier"] = TRUE;
+        return redirect()->to('/stock/admin/view_suppliers');
       }
 
       $this->display_view('Stock\admin\suppliers\form', $output);
