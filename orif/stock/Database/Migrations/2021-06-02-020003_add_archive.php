@@ -12,13 +12,10 @@ class AddArchive extends \CodeIgniter\Database\Migration
      */
     public function up()
     {
-        $this->db->query('ALTER TABLE item_tag ADD archive TIMESTAMP NULL DEFAULT NULL');
-
-        $this->db->query('ALTER TABLE stocking_place ADD archive TIMESTAMP NULL DEFAULT NULL');
-
-        $this->db->query('ALTER TABLE supplier ADD archive TIMESTAMP NULL DEFAULT NULL');
-
-        $this->db->query('ALTER TABLE item_group ADD archive TIMESTAMP NULL DEFAULT NULL');
+        $this->forge->addColumn('item_tag', 'archive TIMESTAMP NULL DEFAULT NULL');
+        $this->forge->addColumn('stocking_place', 'archive TIMESTAMP NULL DEFAULT NULL');
+        $this->forge->addColumn('supplier', 'archive TIMESTAMP NULL DEFAULT NULL');
+        $this->forge->addColumn('item_group', 'archive TIMESTAMP NULL DEFAULT NULL');
     }
 
     /**
