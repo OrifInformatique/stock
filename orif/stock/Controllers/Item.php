@@ -161,7 +161,7 @@ class Item extends BaseController {
         // Pagination
         $items_count = count($output["items"]);
         //$output['pagination'] =  $this->load_pagination($items_count)->create_links();
-        $output['pagination'] = $this->load_pagination($items_count);
+        $output['pagination'] = $this->load_pagination($items_count, $page);
 
         $output['number_page'] = $page;
         if($output['number_page']>ceil($items_count/ITEMS_PER_PAGE)) $output['number_page']=ceil($items_count/ITEMS_PER_PAGE);
@@ -176,7 +176,7 @@ class Item extends BaseController {
         echo json_encode($this->load_list($page));
     }
 
-    public function load_pagination($nbr_items)
+    public function load_pagination($nbr_items, $page)
     {
         // Create the pagination
         $pager = \Config\Services::pager();
@@ -211,7 +211,7 @@ class Item extends BaseController {
         return $this->pagination->initialize($config);
         */
         
-        return $pager->makeLinks(1, ITEMS_PER_PAGE, $nbr_items);
+        return $pager->makeLinks($page, ITEMS_PER_PAGE, $nbr_items);
 
     }
     /**

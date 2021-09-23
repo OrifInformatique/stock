@@ -182,7 +182,6 @@ function load_items(page, filters){
             var result = JSON.parse(response);
             page = result.number_page;
             filters=getFilters();
-            console.log(result);
             history.pushState(null, "", "<?= base_url("item/index/")?>"+ "/"+page+filters);
             
             // Empty list before filling it
@@ -195,14 +194,29 @@ function load_items(page, filters){
                 $("#no_item_message").toggle(true);
             }
             
-            $("#pagination_bottom, #pagination_top").append($(result.pagination));
+            $("#pagination_top, #pagination_bottom").html(result.pagination);
             
+
+            links = Array.from(document.getElementById("pagination_top").getElementsByTagName("a"));
+            links.concat(Array.from(document.getElementById("pagination_bottom").getElementsByTagName("a")));
+
+            links.forEach(link=>{
+                href = link.getAttribute("href");
+
+                let pageLinkNumber = parseInt(href.split('=').pop(), 10);                
+
+                link.addEventListener("click", function(){
+                    load_items(pageLinkNumber, getFilters());
+                }) 
+            });
+
             // Change cursor
             $("*").css("cursor", "");
             $(".pagination a").removeAttr("href").css("cursor", "pointer");
-            $(".pagination a").click(function(e){
+           /* $(".pagination a").click(function(e){
                 load_items( $(this).data("ciPaginationPage"), getFilters());
             });
+            */
             history.pushState(null, "", "<?= base_url("item/index/")?>"+ "/" +page+filters);
             populating = false;
         },
@@ -260,8 +274,8 @@ function display_item(item){
     src_image = '<?= base_url("/images") . "/" ?>'+item["image"];
     alt_image = '<?php htmlspecialchars(lang("MY_application.field_image")); ?>';
     item_condition = item["condition"]["bootstrap_label"];
-    loan_bootstrap_label = item["current_loan"]["loan_bootstrap_label"];
-    item_localisation = item["current_loan"]["loan_id"]!==null?'<br><h6>'+item["current_loan"]["item_localisation"]+'</h6>':"";
+    loan_bootstrap_label = item["current_loan"]["bootstrap_label"];
+    item_localisation = item["current_loan"]["loan_id"]!=null ?'<br><h6>'+item["current_loan"]["item_localisation"]+'</h6>':"";
     item_name = item["name"]; 
     item_description = item["description"];
     stocking_place = "<span>"+item["stocking_place"]["name"]+"</span>";
@@ -279,11 +293,6 @@ function display_item(item){
     row.append('<td><a href="'+href+'">'+inventory_number+'</a><br><a href="'+href+'">'+serial_number+'</a></td>');
     row.append(delete_item);
     row.append('</tr>');
-    
-
-    if (item['image'] == null){
-        console.log(item);
-    }
 
     return row;
 }

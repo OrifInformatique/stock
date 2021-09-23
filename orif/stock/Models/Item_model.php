@@ -167,7 +167,7 @@ class Item_model extends MyModel
         {
             $item['image'] = ITEM_NO_IMAGE;
         }
-
+        
         return $item['image'];
     }
 
@@ -442,6 +442,7 @@ class Item_model extends MyModel
         $item['inventory_number'] = $this->get_inventory_number($item);
         $item['condition'] = $this->get_item_condition($item);
         $item['current_loan'] = $this->get_current_loan($item);
+        $item['image'] = $this->get_image($item);
       }
 
       
