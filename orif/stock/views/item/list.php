@@ -196,27 +196,15 @@ function load_items(page, filters){
             
             $("#pagination_top, #pagination_bottom").html(result.pagination);
             
-
-            links = Array.from(document.getElementById("pagination_top").getElementsByTagName("a"));
-            links.concat(Array.from(document.getElementById("pagination_bottom").getElementsByTagName("a")));
-
-            links.forEach(link=>{
-                href = link.getAttribute("href");
-
-                let pageLinkNumber = parseInt(href.split('=').pop(), 10);                
-
-                link.addEventListener("click", function(){
-                    load_items(pageLinkNumber, getFilters());
-                }) 
-            });
-
             // Change cursor
             $("*").css("cursor", "");
-            $(".pagination a").removeAttr("href").css("cursor", "pointer");
-           /* $(".pagination a").click(function(e){
-                load_items( $(this).data("ciPaginationPage"), getFilters());
+            $(".pagination a").css("cursor", "pointer");
+            $(".pagination a").click(function(e){
+                e.preventDefault();
+                let pageLinkNumber = parseInt(e.target.href.split("=").pop(), 10);
+                load_items(pageLinkNumber, getFilters());
             });
-            */
+            
             history.pushState(null, "", "<?= base_url("item/index/")?>"+ "/" +page+filters);
             populating = false;
         },
