@@ -18,7 +18,9 @@ class Supplier_model extends MyModel
 {
     protected $table = 'supplier';
     protected $primaryKey = 'supplier_id';
-    protected $allowedFields = ['name', 'address_line1', 'address_line2', 'zip', 'city', 'country', 'tel', 'email'];
+    protected $allowedFields = ['name', 'address_line1', 'address_line2', 'zip', 'city', 'country', 'tel', 'email', 'archive'];
+    protected $useSoftDeletes = true;
+    protected $deletedField = 'archive';
 
     /**
      * Constructor
