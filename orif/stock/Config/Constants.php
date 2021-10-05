@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /*
 |--------------------------------------------------------------------------
@@ -8,6 +8,16 @@
 | These are constants defined specially for this application.
 |
 */
+
+/**
+ * Array of files in public/images that mustn't be deleted or renamed.
+ */
+define('IMAGES_TO_NOT_DELETE', [
+    'favicon.png',
+    'logo.jpg',
+    'logo.png',
+    'no_image.png',
+]);
 
 /*
 |--------------------------------------------------------------------------
