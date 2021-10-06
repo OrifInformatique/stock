@@ -228,15 +228,25 @@ class Item extends BaseController {
         }
 
         // Get item object and related objects
-        $item = $this->item_model->with('supplier')
+     /*   $item = $this->item_model->with('supplier')
                 ->with('stocking_place')
                 ->with('item_condition')
                 ->with('item_group')
                 ->get($id);
+*/
+        $item = $this->item_model->asArray()->where(["item_id"=>$id])->first();
+        $item['supplier'] = $this->item_model->getSupplier($item);
+        $item['stocking_place'] = $this->item_model->getStockingPlace($item);
+        $item['item_condition'] = $this->item_model->getItemCondition($item);
+        $item['item_group'] = $this->item_model->getItemGroup($item);
+        $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
+        $item['current_loan'] = $this->item_model->getCurrentLoan($item);
+        $item['warranty_status'] = $this->item_model->getWarrantyStatus($item);
+        
 
         if (!is_null($item)) {
             $output['item'] = $item;
-            $this->display_view('item/detail', $output);
+            $this->display_view('Stock\Views\item\detail', $output);
         } else {
             // $id is not valid, display an error message
             $this->display_view('errors/application/inexistent_item');

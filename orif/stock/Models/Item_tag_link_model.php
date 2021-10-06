@@ -31,7 +31,7 @@ class Item_tag_link_model extends MyModel
         $this->item_tag_model = new Item_tag_model();
     }
 
-    public function get_tags($item){
+    public function getTags($item){
         if(is_null($this->item_tag_model)){
             $this->item_tag_model = new Item_tag_model();
         }

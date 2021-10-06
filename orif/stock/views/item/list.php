@@ -258,7 +258,7 @@ function getFilters() {
 
 function display_item(item){
     // Item's parameters
-    href = '<?= base_url("/item/view/"); ?>'+item["item_id"];
+    href = '<?= base_url("/item/view/"); ?>/'+item["item_id"];
     src_image = '<?= base_url("/images") . "/" ?>'+item["image"];
     alt_image = '<?php htmlspecialchars(lang("MY_application.field_image")); ?>';
     item_condition = item["condition"]["bootstrap_label"];

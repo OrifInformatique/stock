@@ -45,8 +45,7 @@ class Item_model extends MyModel
     /**
      * Constructor
      */
-    public function initialize()
-    {
+    public function initialize(){
         $this->user_model = new User_model();
         $this->loan_model = new Loan_model();
         $this->supplier_model = new Supplier_model();
@@ -59,8 +58,7 @@ class Item_model extends MyModel
     /*
      * Returns the id that will receive the next item
      */
-    public function getFutureId()
-    {
+    public function getFutureId(){
       $query = $this->db->query("SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'stock' AND TABLE_NAME = 'item'")->getResultArray();
       
       // Makes sure we select the auto_increment value
@@ -70,15 +68,15 @@ class Item_model extends MyModel
     }
 
     
-    protected function get_item_group($item){
+    public function getItemGroup($item){
       if ($this->item_group_model==null){
         $this->item_group_model = new Item_group_model();
       }
-      $itemGroup = $this->item_group_model->asArray()->where(["item_group_id"=>$item->item_group_id])->first();
+      $itemGroup = $this->item_group_model->asArray()->where(["item_group_id"=>$item['item_group_id']])->first();
       return $itemGroup;
     }
 
-    protected function get_item_condition($item){
+    public function getItemCondition($item){
 
       if($this->item_condition_model==null){
         $this->item_condition_model = new Item_condition_model();
@@ -90,7 +88,7 @@ class Item_model extends MyModel
     }
 
 
-    public function get_current_loan($item) {
+    public function getCurrentLoan($item) {
 
         if(is_null($this->loan_model)){
           $this->loan_model = new Loan_model();
@@ -109,14 +107,12 @@ class Item_model extends MyModel
           // ITEM IS LOANED
           $current_loan['bootstrap_label'] = '<span class="label label-warning">'.htmlspecialchars(lang('MY_application.lbl_loan_status_loaned')).'</span>';
         } 
-      
       return $current_loan;
       
     }
 
 
-    protected function getLastInventoryControl($item)
-    {
+    protected function getLastInventoryControl($item){
       if (!is_null($item)) 
       {
         if (is_null($this->inventory_control_model)) 
@@ -146,28 +142,27 @@ class Item_model extends MyModel
           }
         }
 
-        $item['last_inventory_control'] = $last_control;
       }
-      return $item;
+      return $last_control;
     }
 
 
-    protected function get_tags($item){
+    protected function getTags($item){
       if(is_null($this->item_tag_link_model)){
         $this->item_tag_link_model = new Item_tag_link_model();
       }
-      $tag_links = $this->item_tag_link_model->get_tags($item);
+      $tags = $this->item_tag_link_model->getTags($item);
 
+      return $tags; 
     }
 
 
-    public function get_image($item)
-    {		
+    public function getImage($item){		
         if (!is_null($item) && is_null($item['image']))
         {
             $item['image'] = ITEM_NO_IMAGE;
         }
-        
+
         return $item['image'];
     }
 
@@ -183,13 +178,13 @@ class Item_model extends MyModel
     *           2 : WARRANTY EXPIRES SOON (less than 3 months)
     *           3 : WARRANTY EXPIRED
     */
-    protected function getWarrantyStatus($item)
+    public function getWarrantyStatus($item)
     {
       if (!is_null($item)) 
       {
         if (empty($item['buying_date']) || empty($item['warranty_duration']))
         {
-          $item['warranty_status'] = 0;
+          $warrantyStatus = 0;
         }
         else
         {
@@ -204,21 +199,21 @@ class Item_model extends MyModel
           if ($warranty_left > 3)
           {
             // UNDER WARRANTY
-            $item['warranty_status'] = 1;
+            $warrantyStatus = 1;
           }
           elseif ($warranty_left > 0)
           {
             // WARRANTY EXPIRES SOON
-            $item['warranty_status'] = 2;
+            $warrantyStatus = 2;
           }
           else
           {
             // WARRANTY EXPIRED
-            $item['warranty_status'] = 3;
+            $warrantyStatus = 3;
           }
         }
       }
-      return $item;
+      return $warrantyStatus;
     }
   
 
@@ -438,11 +433,11 @@ class Item_model extends MyModel
 
 
       foreach ($items as &$item){
-        $item['stocking_place'] = $this->get_stocking_place($item);
-        $item['inventory_number'] = $this->get_inventory_number($item);
-        $item['condition'] = $this->get_item_condition($item);
-        $item['current_loan'] = $this->get_current_loan($item);
-        $item['image'] = $this->get_image($item);
+        $item['stocking_place'] = $this->getStockingPlace($item);
+        $item['inventory_number'] = $this->getInventoryNumber($item);
+        $item['condition'] = $this->getItemCondition($item);
+        $item['current_loan'] = $this->getCurrentLoan($item);
+        $item['image'] = $this->getImage($item);
       }
 
       
@@ -450,7 +445,7 @@ class Item_model extends MyModel
   }
 
 
-  protected function get_inventory_number($item)
+  public function getInventoryNumber($item)
   {
       $inventory_id = "";
       $inventory_number = "";
@@ -470,7 +465,7 @@ class Item_model extends MyModel
       return $inventory_number;
   }
 
-  protected function get_stocking_place($item){
+  public function getStockingPlace($item){
 
     if($this->stocking_place_model==null){
       $this->stocking_place_model = new Stocking_place_model();
@@ -479,6 +474,40 @@ class Item_model extends MyModel
 
 
     return $stockingPlace;
+  }
+
+  public function getSupplier($item){
+    if($this->supplier_model==null){
+      $this->supplier_model = new Supplier_model();
+    }
+
+    return $this->supplier_model->asArray()->where(["supplier_id"=>$item['supplier_id']])->first();
+
+  }
+
+
+  protected function getCreator($item){
+    if($this->user_model==null){
+      $this->user_model = new User_model();
+    }
+
+    return $this->user_model->asArray()->where(['id'=>$item['created_by_user_id']])->first();
+  }
+
+  protected function getModifier($item){
+    if($this->user_model==null){
+      $this->user_model = new User_model();
+    }
+
+    return $this->user_model->asArray()->where(['id'=>$item['modified_by_user_id']])->first();
+  }
+
+  protected function getChecker($item){
+    if($this->user_model==null){
+      $this->user_model = new User_model();
+    }
+
+    return $this->user_model->asArray()->where(['id'=>$item['checked_by_user_id']])->first();
   }
 
 

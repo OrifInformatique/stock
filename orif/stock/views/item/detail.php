@@ -1,73 +1,73 @@
 <div id="item_detail" class="container">
     <!-- BUTTONS -->
 	<a href="<?php if (isset($_SESSION['items_list_url'])) {echo $_SESSION['items_list_url'];} else {echo base_url('/item');} ?>"
-       class="btn btn-primary" role="button"><?= $this->lang->line('btn_back_to_list'); ?></a>
+       class="btn btn-primary" role="button"><?= lang('MY_application.btn_back_to_list'); ?></a>
 
     <!-- *** ADMIN *** -->
 	<?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?>
-    	<a href="<?= base_url('item/modify/'.$item->item_id); ?>" class="btn btn-warning" role="button"><?= $this->lang->line('btn_modify'); ?></a>
+    	<a href="<?= base_url('item/modify/'.$item['item_id']); ?>" class="btn btn-warning" role="button"><?= lang('MY_application.btn_modify'); ?></a>
         <?php if($_SESSION['user_access'] >= ACCESS_LVL_ADMIN) { ?>
-    	   <a href="<?= base_url('item/delete/'.$item->item_id); ?>" class="btn btn-danger" role="button"><?= $this->lang->line('btn_delete'); ?></a>
+    	   <a href="<?= base_url('item/delete/'.$item['item_id']); ?>" class="btn btn-danger" role="button"><?= lang('MY_application.btn_delete'); ?></a>
         <?php } ?>
 	<?php } ?>
     <!-- *** END OF ADMIN *** -->
 
     <!-- ITEM NAME AND DESCRIPTION -->
 	<div class="row">
-        <div class="col-md-8"><h3><?= html_escape($item->name); ?></h3></div>
+        <div class="col-md-8"><h3><?= htmlspecialchars($item['name']); ?></h3></div>
         <div class="col-md-4">
-            <h4 class="text-right"><?= $this->lang->line('field_inventory_number_abr').' : '.html_escape($item->inventory_number); ?></h4>
+            <h4 class="text-right"><?= lang('MY_application.field_inventory_number_abr').' : '.htmlspecialchars($item['inventory_number']); ?></h4>
         </div>
     </div>
     <div class="row">
-        <div class="col-md-8"><p><?= html_escape($item->description); ?></p></div>
+        <div class="col-md-8"><p><?= htmlspecialchars($item['description']); ?></p></div>
         <div class="col-md-4"></div>
     </div>
 
     <!-- ITEM DETAILS -->
     <div class="row">
         <div class="col-md-12">
-            <p class="bg-primary">&nbsp;<?= html_escape($this->lang->line('text_item_detail')); ?></p>
+            <p class="bg-primary">&nbsp;<?= htmlspecialchars(lang('MY_application.text_item_detail')); ?></p>
         </div>
         <div class="col-md-4">
             <img id="picture"
-                 src="<?= base_url('uploads/images/'.$item->image); ?>"
+                 src="<?= base_url('uploads/images/'.$item['image']); ?>"
                  width="100%"
-                 alt="<?= $this->lang->line('field_image'); ?>" />
+                 alt="<?= lang('MY_application.field_image'); ?>" />
         </div>
         <div class="col-md-8">
             <div class="row">
                 <div class="col-sm-3">
-                    <label><?= html_escape($this->lang->line('field_group')); ?></label>
+                    <label><?= htmlspecialchars(lang('MY_application.field_group')); ?></label>
                 </div>
                 <div class="col-sm-9">
-                    <?php if(!is_null($item->item_group)){echo html_escape($item->item_group->name);} ?>
+                    <?php if(!is_null($item['item_group'])){echo htmlspecialchars($item['item_group']['name']);} ?>
                 </div>
             </div>
             <div class="row">
                 <div class="col-sm-3">
-                    <label><?= html_escape($this->lang->line('field_serial_number')); ?></label>
+                    <label><?= htmlspecialchars(lang('MY_application.field_serial_number')); ?></label>
                 </div>
                 <div class="col-sm-9">
-                    <?= html_escape($item->serial_number); ?>
+                    <?= htmlspecialchars($item['serial_number']); ?>
                 </div>
             </div>
 
-            <label><?= html_escape($this->lang->line('field_remarks')); ?></label>
-            <p><?= html_escape($item->remarks); ?></p>
+            <label><?= htmlspecialchars(lang('MY_application.field_remarks')); ?></label>
+            <p><?= htmlspecialchars($item['remarks']); ?></p>
 
             <!-- Button to display linked file -->
             <?php
-            if (!empty($item->linked_file)) {
-                echo '<a href="'.base_url('uploads/files/'.$item->linked_file).'" '.
+            if (!empty($item['linked_file'])) {
+                echo '<a href="'.base_url('uploads/files/'.$item['linked_file']).'" '.
                         'class="btn btn-default"  role="button" >'
-                        .$this->lang->line('btn_linked_doc').
+                        .lang('MY_application.btn_linked_doc').
                      '</a>';
             }
             else {
                 echo '<a href="#" '.
                      'class="btn btn-default disabled"  role="button" >'
-                         .$this->lang->line('btn_linked_doc').
+                         .lang('MY_application.btn_linked_doc').
                      '</a>';
             }
             ?>
@@ -77,55 +77,55 @@
     <!-- ITEM STATUS, LOAN STATUS AND HISTORY -->
     <div class="row">
         <div class="col-md-12">
-            <p class="bg-primary">&nbsp;<?= html_escape($this->lang->line('text_item_loan_status')); ?></p>
+            <p class="bg-primary">&nbsp;<?= htmlspecialchars(lang('MY_application.text_item_loan_status')); ?></p>
         </div>
         <div class="col-md-4">
             <div class="row"><div class="col-xs-12">
                 <!-- Item condition -->
-                <?php if(!is_null($item->item_condition)){echo $item->item_condition->bootstrap_label;}?>
+                <?php if(!is_null($item['item_condition'])){echo $item['item_condition']['bootstrap_label'];}?>
             </div></div>
             <div class="row"><div class="col-xs-12">
                 <!-- Loan status -->
-                <?= $item->loan_bootstrap_label; ?>
+                <?= $item['current_loan']['bootstrap_label']; ?>
             </div></div>
-            <?php if (!is_null($item->current_loan)) { ?>
+            <?php if (array_key_exists('loan_id', $item['current_loan'])) { ?>
                 <!-- Current loan -->
                 <div class="row"><div class="col-xs-12">
-                    <?= html_escape($item->current_loan->item_localisation); ?><br />
+                    <?= htmlspecialchars($item['current_loan']['item_localisation']); ?><br />
                 </div></div>
                 <div class="row">
                     <div class="col-xs-6">
                         <label><?= lang('field_loan_date'); ?> :&nbsp;</label>
                     </div>
                     <div class="col-xs-6">
-                        <?php if(!empty($item->current_loan->date)){
-                            echo databaseToShortDate($item->current_loan->date);
+                        <?php if(!empty($item['current_loan']['date'])){
+                            echo databaseToShortDate($item['current_loan']['date']);
                         }?>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-xs-6">
-                        <label><?= $this->lang->line('field_loan_planned_return'); ?> :&nbsp;</label>
+                        <label><?= lang('MY_application.field_loan_planned_return'); ?> :&nbsp;</label>
                     </div>
                     <div class="col-xs-6">
-                        <?php if(!empty($item->current_loan->planned_return_date)){
-                            echo databaseToShortDate($item->current_loan->planned_return_date);
+                        <?php if(!empty($item['current_loan']['planned_return_date'])){
+                            echo databaseToShortDate($item['current_loan']['planned_return_date']);
                         }?>
                     </div>
                 </div>
             <?php } ?>
             <div class="row"><div class="col-xs-12">
                 <!-- Button to display loans history -->
-                <?= '<a href="'.base_url('/item/loans/'.$item->item_id).'" '.
+                <?= '<a href="'.base_url('/item/loans/'.$item['item_id']).'" '.
                     'class="btn btn-default"  role="button" >'.
-                    $this->lang->line('btn_loans_history').
+                    lang('MY_application.btn_loans_history').
                     '</a>';?>
 
                 <!-- Button to create new loan -->
                 <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { 
-                    echo '<a href="'.base_url('/item/create-loan/'.$item->item_id).'" '.
+                    echo '<a href="'.base_url('/item/create-loan/'.$item['item_id']).'" '.
                          'class="btn btn-primary"  role="button" >'.
-                         $this->lang->line('btn_create_loan').'</a>';
+                         lang('MY_application.btn_create_loan').'</a>';
                 }?>
             </div></div>
         </div>
@@ -133,40 +133,40 @@
             <!-- Stocking place -->
             <div class="row">
                 <div class="col-sm-4">
-                    <label><?= html_escape($this->lang->line('field_stocking_place')); ?> :</label>
+                    <label><?= htmlspecialchars(lang('MY_application.field_stocking_place')); ?> :</label>
                 </div>
                 <div class="col-sm-8">
-                    <?php if(!is_null($item->stocking_place)){echo html_escape($item->stocking_place->name);} ?>
+                    <?php if(!is_null($item['stocking_place'])){echo htmlspecialchars($item['stocking_place']['name']);} ?>
                 </div>
             </div>
             <!-- Inventory control -->
             <div class="row">
                 <div class="col-sm-4">
-                    <label><?= html_escape($this->lang->line('field_last_inventory_control')); ?> :</label>
+                    <label><?= htmlspecialchars(lang('MY_application.field_last_inventory_control')); ?> :</label>
                 </div>
                 <div class="col-sm-8">
-                    <?php if(!is_null($item->last_inventory_control)) {
-                        echo databaseToShortDate($item->last_inventory_control->date);
-                        echo ', '.html_escape($item->last_inventory_control->controller->username);
-                        if(!is_null($item->last_inventory_control->remarks)) {
-                            echo '</br >'.html_escape($item->last_inventory_control->remarks);
+                    <?php if(array_key_exists('last_inventory_control', $item)) {
+                        echo databaseToShortDate($item['last_inventory_control']['date']);
+                        echo ', '.htmlspecialchars($item['last_inventory_control']['controller']['username']);
+                        if(!is_null($item['last_inventory_control']['remarks'])) {
+                            echo '</br >'.htmlspecialchars($item['last_inventory_control']['remarks']);
                         }
                     } else {
-                        echo html_escape($this->lang->line('text_none'));
+                        echo htmlspecialchars(lang('MY_application.text_none'));
                     } ?>
                 </div>
             </div>
             <div class="row"><div class="col-xs-12">
                 <!-- Button for controls history -->
-                <?= '<br /><a href="'.base_url('/item/inventory_controls/'.$item->item_id).
+                <?= '<br /><a href="'.base_url('/item/inventory_controls/'.$item['item_id']).
                      '" class="btn btn-default"  role="button" >'.
-                     $this->lang->line('btn_inventory_control_history').'</a>'; ?>
+                     lang('MY_application.btn_inventory_control_history').'</a>'; ?>
 
                 <!-- Button to create new inventory control -->
                 <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { 
-                    echo '<a href="'.base_url('/item/create_inventory_control/'.$item->item_id).
+                    echo '<a href="'.base_url('/item/create_inventory_control/'.$item['item_id']).
                          '" class="btn btn-primary"  role="button" >'.
-                         $this->lang->line('btn_create_inventory_control').'</a>';
+                         lang('MY_application.btn_create_inventory_control').'</a>';
                 }?>
             </div></div>
         </div>
@@ -175,41 +175,41 @@
     <!-- ITEM SUPPLIER, BUYING AND WARRANTY INFORMATIONS -->
     <div class="row">
         <div class="col-md-12">
-            <p class="bg-primary">&nbsp;<?= $this->lang->line('text_item_buying_warranty'); ?></p>
+            <p class="bg-primary">&nbsp;<?= lang('MY_application.text_item_buying_warranty'); ?></p>
         </div>
         <div class="col-md-4">
-            <label><?= $this->lang->line('field_supplier'); ?> :&nbsp;</label>
-            <?php if(!is_null($item->supplier)){echo $item->supplier->name;} ?><br />
-            <label><?= $this->lang->line('field_supplier_ref'); ?> :&nbsp;</label>
-            <?= html_escape($item->supplier_ref); ?>
+            <label><?= lang('MY_application.field_supplier'); ?> :&nbsp;</label>
+            <?php if(!is_null($item['supplier'])){echo $item['supplier']['name'];} ?><br />
+            <label><?= lang('MY_application.field_supplier_ref'); ?> :&nbsp;</label>
+            <?= htmlspecialchars($item['supplier_ref']); ?>
         </div>
         <div class="col-md-4">
-            <label><?= $this->lang->line('field_buying_price'); ?> :&nbsp;</label>
-            <?= $item->buying_price; ?><br />
+            <label><?= lang('MY_application.field_buying_price'); ?> :&nbsp;</label>
+            <?= $item['buying_price']; ?><br />
 
-            <label><?= $this->lang->line('field_buying_date'); ?> :&nbsp;</label>
+            <label><?= lang('MY_application.field_buying_date'); ?> :&nbsp;</label>
             <?php
-            if (!empty($item->buying_date))
+            if (!empty($item['buying_date']))
             {
-                echo databaseToShortDate($item->buying_date);
+                echo databaseToShortDate($item['buying_date']);
             }
             ?>
         </div>
         <div class="col-md-4">
-            <label><?= $this->lang->line('field_warranty_duration'); ?> :&nbsp;</label>
-            <?php if (!empty($item->warranty_duration)) {
-                      echo $item->warranty_duration.' '.$this->lang->line('text_months');} ?><br />
+            <label><?= lang('MY_application.field_warranty_duration'); ?> :&nbsp;</label>
+            <?php if (!empty($item['warranty_duration'])) {
+                      echo $item['warranty_duration'].' '.lang('MY_application.text_months');} ?><br />
 
             <?php //CHANGE LABEL COLOR BASED ON WARRANTY STATUS
-            if ($item->warranty_status == 1) {
+            if ($item['warranty_status'] == 1) {
                 echo '<span class="label label-success" >';} // UNDER WARRANTY
-            elseif ($item->warranty_status == 2) {
+            elseif ($item['warranty_status'] == 2) {
                 echo '<span class="label label-warning" >';} // WARRANTY EXPIRES SOON
-            elseif ($item->warranty_status == 3) {
+            elseif ($item['warranty_status'] == 3) {
                 echo '<span class="label label-danger" >';}  // WARRANTY EXPIRED
             else {echo '<span>';}
-
-                echo $this->lang->line('text_warranty_status')[$item->warranty_status]; ?>
+                error_log(json_encode($item['supplier']), 3, "C:\Users\RoSi\Documents\logsPHP.txt");
+                echo lang('MY_application.text_warranty_status.' . $item['warranty_status']); ?>
             </span>
         </div>
     </div>
@@ -217,13 +217,13 @@
     <!-- ITEM TAGS -->
     <div class="row">
         <div class="col-md-12">
-            <p class="bg-primary">&nbsp;<?= $this->lang->line('field_tags'); ?></p>
+            <p class="bg-primary">&nbsp;<?= lang('MY_application.field_tags'); ?></p>
         </div>
         <div class="col-md-12">
             <?php
-            if (!empty($item->tags))
+            if (!empty($item['tags']))
             {
-                foreach($item->tags as $tag)
+                foreach($item['tags'] as $tag)
                 {
                     echo '<span class="label label-default">'.$tag."</span>\n";
                 }
@@ -237,6 +237,6 @@ $(document).ready(function() {
     // Refresh the image to prevent display of an old cach image.
     // Changing the src attribute forces browser to update.
     d = new Date();
-    $("#picture").attr("src", "<?= base_url('uploads/images/'.$item->image); ?>?"+d.getTime());
+    $("#picture").attr("src", "<?= base_url('uploads/images/'.$item['image']); ?>?"+d.getTime());
 });
 </script>
