@@ -75,20 +75,28 @@ class Admin extends BaseController
 
       $data['list_title'] = lang('stock_lang.title_tags');
         
-      $data['columns'] = ['name' => lang('stock_lang.field_name'),
-                          'short_name' => lang('stock_lang.field_short_name')
+      $data['columns'] = ['name'        => lang('stock_lang.field_name'),
+                          'short_name'  => lang('stock_lang.field_short_name'),
+                          'archive'     => lang('stock_lang.field_active')
                          ];
                           
       foreach ($tags as $tag)
       {
-        array_push($data['items'], ['item_tag_id' => $tag['item_tag_id'], 'name' => $tag['name'], 'short_name' => $tag['short_name']]);
+        array_push($data['items'], [
+          'item_tag_id' => $tag['item_tag_id'], 
+          'name' => $tag['name'], 
+          'short_name' => $tag['short_name'], 
+          'archive' => lang($tag['archive'] ? 'common_lang.no' : 'common_lang.yes')
+        ]);
       }
 
       $data['primary_key_field']  = 'item_tag_id';
       $data['btn_create_label']   = lang('stock_lang.btn_add_tag');
+      $data['field_display_deleted'] = lang("stock_lang.field_deleted_tags");
       $data['url_update'] = "stock/admin/modify_tag/";
       $data['url_delete'] = "stock/admin/delete_tag/";
       $data['url_create'] = "stock/admin/new_tag";
+      $data['url_view']   = "view_tags";
 
       return $this->display_view('Common\Views\items_list', $data);
     }
@@ -239,20 +247,28 @@ class Admin extends BaseController
 
       $data['list_title'] = lang('stock_lang.title_stocking_places');
         
-      $data['columns'] = ['name' => lang('stock_lang.field_name'),
-                          'short_name' => lang('stock_lang.field_short_name')
+      $data['columns'] = ['name'        => lang('stock_lang.field_name'),
+                          'short_name'  => lang('stock_lang.field_short_name'),
+                          'archive'     => lang('stock_lang.field_active')
                          ];
                           
       foreach ($stockingPlaces as $stockingPlace)
       {
-        array_push($data['items'], ['stocking_place_id' => $stockingPlace['stocking_place_id'], 'name' => $stockingPlace['name'], 'short_name' => $stockingPlace['short']]);
+        array_push($data['items'], [
+          'stocking_place_id' => $stockingPlace['stocking_place_id'], 
+          'name' => $stockingPlace['name'], 
+          'short_name' => $stockingPlace['short'], 
+          'archive' => lang($stockingPlace['archive'] ? 'common_lang.no' : 'common_lang.yes')
+        ]);
       }
 
       $data['primary_key_field']  = 'stocking_place_id';
       $data['btn_create_label']   = lang('stock_lang.btn_add_stocking_place');
+      $data['field_display_deleted'] = lang("stock_lang.field_deleted_stocking_places");
       $data['url_update'] = "stock/admin/modify_stocking_place/";
       $data['url_delete'] = "stock/admin/delete_stocking_place/";
       $data['url_create'] = "stock/admin/new_stocking_place";
+      $data['url_view']   = "view_stocking_places";
 
       return $this->display_view('Common\Views\items_list', $data);
     }
@@ -418,7 +434,8 @@ class Admin extends BaseController
                           'city'            => lang('stock_lang.field_city'),
                           'country'         => lang('stock_lang.field_country'),
                           'tel'             => lang('stock_lang.field_tel'),
-                          'email'           => lang('stock_lang.field_email')
+                          'email'           => lang('stock_lang.field_email'),
+                          'archive'         => lang('stock_lang.field_active')
                          ];
                           
       foreach ($suppliers as $supplier)
@@ -432,15 +449,18 @@ class Admin extends BaseController
             'city'            => $supplier['city'],
             'country'         => $supplier['country'],
             'tel'             => $supplier['tel'],
-            'email'           => $supplier['email']
+            'email'           => $supplier['email'],
+            'archive'         => lang($supplier['archive'] ? 'common_lang.no' : 'common_lang.yes')
         ]);
       }
 
       $data['primary_key_field']  = 'supplier_id';
       $data['btn_create_label']   = lang('stock_lang.btn_add_supplier');
+      $data['field_display_deleted'] = lang("stock_lang.field_deleted_suppliers");
       $data['url_update'] = "stock/admin/modify_supplier/";
       $data['url_delete'] = "stock/admin/delete_supplier/";
       $data['url_create'] = "stock/admin/new_supplier";
+      $data['url_view']   = "view_suppliers";
 
       return $this->display_view('Common\Views\items_list', $data);
     }
@@ -623,20 +643,28 @@ class Admin extends BaseController
 
       $data['list_title'] = lang('stock_lang.title_item_groups');
         
-      $data['columns'] = ['name' => lang('stock_lang.field_name'),
-                          'short_name' => lang('stock_lang.field_short_name')
+      $data['columns'] = ['name'        => lang('stock_lang.field_name'),
+                          'short_name'  => lang('stock_lang.field_short_name'),
+                          'archive'     => lang('stock_lang.field_active')
                          ];
                           
       foreach ($itemGroups as $itemGroup)
       {
-        array_push($data['items'], ['item_group_id' => $itemGroup['item_group_id'], 'name' => $itemGroup['name'], 'short_name' => $itemGroup['short_name']]);
+        array_push($data['items'], [
+          'item_group_id' => $itemGroup['item_group_id'], 
+          'name' => $itemGroup['name'], 
+          'short_name' => $itemGroup['short_name'], 
+          'archive' => lang($itemGroup['archive'] ? 'common_lang.no' : 'common_lang.yes')
+        ]);
       }
 
       $data['primary_key_field']  = 'item_group_id';
       $data['btn_create_label']   = lang('stock_lang.btn_add_item_group');
+      $data['field_display_deleted'] = lang("stock_lang.field_deleted_item_groups");
       $data['url_update'] = "stock/admin/modify_item_group/";
       $data['url_delete'] = "stock/admin/delete_item_group/";
       $data['url_create'] = "stock/admin/new_item_group";
+      $data['url_view']   = "view_item_groups";
 
       return $this->display_view('Common\Views\items_list', $data);
     }

@@ -34,6 +34,7 @@ return[
 
 
 // Fields labels
+'field_active'                          => 'Activé',
 'field_name'                            => 'Nom',
 'field_short_name'                      => 'Nom court',
 'field_first_address_line'              => 'Première ligne d\'adresse',
@@ -43,6 +44,11 @@ return[
 'field_country'                         => 'Pays',
 'field_tel'                             => 'Téléphone',
 'field_email'                           => 'E-mail',
+'field_deleted_tags'                    => 'Afficher les tags désactivés',
+'field_deleted_stocking_places'         => 'Afficher les lieux de stockage désactivés',
+'field_deleted_suppliers'               => 'Afficher les fournisseurs désactivés',
+'field_deleted_item_groups'             => 'Afficher les groupes d\'objets désactivés',
+'field_display_deleted_default'         => 'Afficher les objets désactivés',
 
 // Admin other labels   
 'admin_modify'                          => 'Modification',
