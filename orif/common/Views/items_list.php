@@ -17,6 +17,8 @@
      *                     String containing the name of the primary key of the items.
      *                     Used to construct the links to details/update/delete controllers.
      *                     If not set, "id" is used by default.
+     * @param field_display_deleted :
+     *                     String displayed before the soft delete checkbox
      * @param btn_create_label :
      *                     Label for the "create" button. If not set, default label is used.
      * @param url_detail : Link to the controller method wich displays item's details.
