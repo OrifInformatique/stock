@@ -7,4 +7,6 @@
  * @copyright   Copyright (c), Orif (https://www.orif.ch)
  */
 
+$routes->add('stock/admin/(:any)','\Stock\Controllers\Admin::$1');
+
 ?>
