@@ -29,7 +29,10 @@
      *                     If not set, no "delete" link will be displayed.
      * @param url_create : Link to the controller method wich displays a form to create a new item.
      *                     If not set, no "create" button will be displayed.
-     * @param url_view   : If not set, no "Display soft deleted" button will be displayed.
+     * @param url_view   : Link to the view.
+     *                     If not set, no "Display soft deleted" button will be displayed.
+     * @param url_path   : Path to the module and it's controller.
+     *                     Has to be set if soft delete is on.
      * 
      * EXAMPLE TO CALL THIS VIEW FROM ANY CONTROLLER :
      *   $data['list_title'] = "Test items_list view";
@@ -52,6 +55,7 @@
      *   $data['url_delete'] = "items_list/delete/";
      *   $data['url_create'] = "items_list/create/";
      *   $data['url_view']   = "items_list";
+     *   $data['url_path']   = "stock/items_list";
      *
 	 *	 $this->display_view('Common\Views\items_list', $data);
      */
@@ -70,9 +74,19 @@
         $field_display_deleted = lang("stock_lang.field_display_deleted_default");
     }
 
-    // If with_deleted variable isn't sent as a parameter, use default
+    // If no with_deleted variable is sent as a parameter, use default value
     if (!isset($with_deleted)) {
         $with_deleted = false;
+    }
+
+    // If no url_view variable is sent as a parameter, use default value
+    if (!isset($url_view)) {
+        $url_view = null;
+    }
+
+    // If no url_path variable is sent as a parameter, use default value
+    if (!isset($url_path)) {
+        $url_path = null;
     }
 ?>
 
@@ -161,7 +175,7 @@
 $(document).ready(function(){
     $('#toggle_deleted').change(e => {
         let checked = e.currentTarget.checked;
-        $.post('<?=base_url();?>/stock/admin/<?= $url_view == null ? "" : $url_view ?>/'+(+checked), {}, data => {
+        $.post('<?= base_url(); ?>/<?= $url_path == null ? "" : $url_path ?>/<?= $url_view == null ? "" : $url_view ?>/'+(+checked), {}, data => {
             $('#itemList').empty();
             $('#itemList')[0].innerHTML = $(data).find('#itemList')[0].innerHTML;
         });

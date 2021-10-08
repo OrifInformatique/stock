@@ -97,7 +97,8 @@ class Admin extends BaseController
       $data['url_delete'] = "stock/admin/delete_tag/";
       $data['url_create'] = "stock/admin/new_tag";
       $data['url_view']   = "view_tags";
-
+      $data['url_path']   = "stock/admin";
+      
       return $this->display_view('Common\Views\items_list', $data);
     }
 
@@ -269,6 +270,7 @@ class Admin extends BaseController
       $data['url_delete'] = "stock/admin/delete_stocking_place/";
       $data['url_create'] = "stock/admin/new_stocking_place";
       $data['url_view']   = "view_stocking_places";
+      $data['url_path']   = "stock/admin";
 
       return $this->display_view('Common\Views\items_list', $data);
     }
@@ -461,6 +463,7 @@ class Admin extends BaseController
       $data['url_delete'] = "stock/admin/delete_supplier/";
       $data['url_create'] = "stock/admin/new_supplier";
       $data['url_view']   = "view_suppliers";
+      $data['url_path']   = "stock/admin";
 
       return $this->display_view('Common\Views\items_list', $data);
     }
@@ -665,6 +668,7 @@ class Admin extends BaseController
       $data['url_delete'] = "stock/admin/delete_item_group/";
       $data['url_create'] = "stock/admin/new_item_group";
       $data['url_view']   = "view_item_groups";
+      $data['url_path']   = "stock/admin";
 
       return $this->display_view('Common\Views\items_list', $data);
     }
