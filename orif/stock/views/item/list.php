@@ -6,7 +6,7 @@
             <div class="row bottom-margin">
                     <!-- Button for new item -->
                     <a href="<?php echo base_url("item/create/"); ?>"
-                            class="btn btn-success"><?php echo htmlspecialchars(lang('MY_application.btn_new')); ?></a>
+                            class="btn btn-success mb-3"><?php echo htmlspecialchars(lang('MY_application.btn_new')); ?></a>
             </div>
 
     <?php } ?>
@@ -22,7 +22,7 @@
 
                 <div class="row">
                     <!-- TEXT FILTER -->
-                    <div id="ts" class="col-xs-12 top-margin">
+                    <div id="ts" class="col-sm-12 top-margin">
                     <?php 
                         echo form_label(lang('MY_application.field_text_search'), 'text_search');
                         echo form_input('ts', isset($_GET["ts"])?$_GET["ts"]:"", 
@@ -61,23 +61,22 @@
 
                 <div class="row">
                     <!-- SORT ORDER -->
-                    <div id="o" class="col-xs-12 top-margin">
+                    <div id="o" class="col-sm-12 top-margin">
                         <?= form_label(lang('MY_application.field_sort_order'),'sort_order').form_dropdown('o', $sort_order, isset($_GET["o"])?$_GET["o"]:"",'id="sort_order"');?>
                     </div>
                 </div>
                 <div class="row">
                     <!-- SORTING ASCENDING / DESCENDING -->
-                    <div id="ad" class="col-xs-12 top-margin">
+                    <div id="ad" class="col-sm-12 top-margin">
                         <?= form_label(lang('MY_application.field_sort_asc_desc'),'sort_asc_desc').form_dropdown('ad', $sort_asc_desc, isset($_GET["ad"])?$_GET["ad"]:"",'id="sort_asc_desc"');?>
                     </div>
                 </div>
-                <div class="row">
                     <!-- RESET FILTERS BUTTON -->
-                    <div class="col-sm-6 col-sm-offset-6 top-margin">
+                    <div class="text-right d-flex flex-column">
                         <?= form_label("&nbsp;") ?>
                         <a href="<?= base_url("item/index/") . "/"?>" class="btn btn-warning top-margin"><?php echo htmlspecialchars(lang('MY_application.btn_remove_filters')); ?></a>
                     </div>
-                </div>
+
             </div>
         </div>
 
