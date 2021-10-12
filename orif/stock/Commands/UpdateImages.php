@@ -23,7 +23,7 @@ class UpdateImages extends BaseCommand
             if (is_null($item['image']) || preg_match('/^\d{4}_picture\.png$/', $item['image'])) continue;
 
             $old_image = $item['image'];
-            $new_image = str_pad($item['item_id'], INVENTORY_NUMBER_CHARS, '0', STR_PAD_LEFT) . '_picture.png';
+            $new_image = str_pad($item['item_id'], 4, '0', STR_PAD_LEFT) . '_picture.png';
 
             if (in_array($old_image, IMAGES_TO_NOT_DELETE)) {
                 // Copy the important image to not break the site
