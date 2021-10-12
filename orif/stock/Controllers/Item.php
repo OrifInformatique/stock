@@ -578,14 +578,11 @@ class Item extends BaseController {
                 $this->item_model->update($id, array("description" => "FAC"));
 
                 $item = $this->item_model->find($id);
-                // Make sure we don't delete an important file
-                if (!in_array($item['image'], IMAGES_TO_NOT_DELETE)) {
-                    $items = $this->item_model->asArray()->where('image', $item['image'])->findAll();
-                    // Change this if soft deleting items is enabled
-                    // Check if any other item uses this image
-                    if (count($items) < 2) {
-                        unlink(ROOTPATH.'public/images/'.$item['image']);
-                    }
+                $items = $this->item_model->asArray()->where('image', $item['image'])->findAll();
+                // Change this if soft deleting items is enabled
+                // Check if any other item uses this image
+                if (count($items) < 2) {
+                    unlink(ROOTPATH.IMAGES_UPLOAD_PATH.$item['image']);
                 }
 
                 $this->item_tag_link_model->delete_by(array('item_id' => $id));
@@ -596,7 +593,6 @@ class Item extends BaseController {
             }
         } else {
             // Access is not allowed
-            //$this->ask_for_login();
             redirect('/item');
         }
     }
