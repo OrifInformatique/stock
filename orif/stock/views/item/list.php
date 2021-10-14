@@ -122,11 +122,13 @@ $(document).ready(function() {
     $('#item_tags-multiselect').multiselect({
         nonSelectedText: no_filter,
         buttonWidth: '100%',
+        buttonClass: 'btn btn-outline-primary',
         numberDisplayed: 10
     });
     $('#item_conditions-multiselect, #item_groups-multiselect, #stocking_places-multiselect, #sort_order, #sort_asc_desc').multiselect({
         nonSelectedText: no_filter,
         buttonWidth: '100%',
+        buttonClass: 'btn btn-outline-primary',
         numberDisplayed: 5
     });
     
