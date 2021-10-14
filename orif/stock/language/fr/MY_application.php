@@ -1,6 +1,6 @@
-<?php 
+<?php
 
-return[ 
+return[
 
 /**
  * French translations
@@ -225,5 +225,7 @@ return[
 'text_no'                        => 'Non',
 'text_disable'                   => 'Désactiver',
 
-
+// Image cleaning
+'admin_command_clean_images'    => 'Êtes-vous sûr de vouloir renommer les images utilisées et supprimer les autres',
+'admin_command_clean_images_success' => 'Les images utilisées ont été renommées et les autres supprimées.',
  ];

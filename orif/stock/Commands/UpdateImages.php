@@ -25,8 +25,10 @@ class UpdateImages extends BaseCommand
             $old_image = $item['image'];
             $new_image = str_pad($item['item_id'], 4, '0', STR_PAD_LEFT) . '_picture.png';
 
-            if (in_array($old_image, IMAGES_TO_NOT_DELETE)) {
-                // Copy the important image to not break the site
+            $same_image_items = $itemModel->asArray()->where('image', $old_image)->find();
+
+            if (in_array($old_image, IMAGES_TO_NOT_DELETE) || count($same_image_items) >= 2) {
+                // Copy the important image to not break the site or the other item
                 copy($imagesPath.$old_image, $imagesPath.$new_image);
             } else {
                 // Change the image's name to a correct one
