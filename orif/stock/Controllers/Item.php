@@ -273,7 +273,7 @@ class Item extends BaseController {
 
             // Check if the user cancelled the form
             if(isset($_POST['submitCancel'])){
-                $tmp_image_file = glob(IMAGES_UPLOAD_PATH.$temp_image_name)[0];
+                $tmp_image_file = glob($config('\Stock\Config\StockConfig')->images_upload_path.$temp_image_name)[0];
 
                 // Check if there is a temporary file, if yes then delete it
                 if($tmp_image_file != null || $tmp_image_file != false){
@@ -336,8 +336,8 @@ class Item extends BaseController {
                 }
 
                 // Turn Temporaty Image into a final one if there is one
-                if(file_exists(IMAGES_UPLOAD_PATH.$temp_image_name)){
-                    rename(IMAGES_UPLOAD_PATH.$temp_image_name,IMAGES_UPLOAD_PATH.$new_image_name);
+                if(file_exists($config('\Stock\Config\StockConfig')->images_upload_path.$temp_image_name)){
+                    rename($config('\Stock\Config\StockConfig')->images_upload_path.$temp_image_name,$config('\Stock\Config\StockConfig')->images_upload_path.$new_image_name);
                     $itemArray['image'] = $new_image_name;
                 }
 
@@ -425,7 +425,7 @@ class Item extends BaseController {
 
             // Check if the user cancelled the form
             if(isset($_POST['submitCancel'])){
-                $tmp_image_file = glob(IMAGES_UPLOAD_PATH.$temp_image_name)[0];
+                $tmp_image_file = glob($config('\Stock\Config\StockConfig')->images_upload_path.$temp_image_name)[0];
 
                 // Check if there is a temporary image file, if yes then delete it
                 if($tmp_image_file != null || $tmp_image_file != false){
@@ -498,8 +498,8 @@ class Item extends BaseController {
                     }
 
                     // Turn temporary image into a final one if there is one
-                    if(file_exists(IMAGES_UPLOAD_PATH.$temp_image_name)){
-                        rename(IMAGES_UPLOAD_PATH.$temp_image_name,IMAGES_UPLOAD_PATH.$new_image_name);
+                    if(file_exists($config('\Stock\Config\StockConfig')->images_upload_path.$temp_image_name)){
+                        rename($config('\Stock\Config\StockConfig')->images_upload_path.$temp_image_name,$config('\Stock\Config\StockConfig')->images_upload_path.$new_image_name);
                         $itemArray['image'] = $new_image_name;
                     }
 
@@ -592,7 +592,7 @@ class Item extends BaseController {
                 // Change this if soft deleting items is enabled
                 // Check if any other item uses this image
                 if (count($items) < 2) {
-                    unlink(ROOTPATH.IMAGES_UPLOAD_PATH.$item['image']);
+                    unlink(ROOTPATH.$config('\Stock\Config\StockConfig')->images_upload_path.$item['image']);
                 }
 
                 $this->item_tag_link_model->delete_by(array('item_id' => $id));

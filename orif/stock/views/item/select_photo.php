@@ -69,7 +69,7 @@ function reSelectPhoto(event)
     var path = "<?= $image ?>";
     
     if(path !== ""){
-        rawImage.src = "<?= base_url(IMAGES_UPLOAD_PATH.$image)?>";
+        rawImage.src = "<?= base_url($config('\Stock\Config\StockConfig')->images_upload_path.$image)?>";
         croppedNameInput.value = path;
         setCropper();
     }

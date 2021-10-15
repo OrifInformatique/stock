@@ -216,7 +216,7 @@ stock/application/views/item/view_single.php
                                         echo '<tr><td style="padding:10px" colspan="2">';
                                         
                                         echo '<img src="'.
-                                        base_url().'uploads/images/'.$item['image'].
+                                        base_url().config('\Stock\Config\StockConfig')->images_upload_path.$item['image'].
                                         '" alt="Image de l\'article" style="width:256px;height:256px;">';
                                         
                                         echo '</td></tr>';
@@ -236,7 +236,7 @@ stock/application/views/item/view_single.php
                                             echo '<td style="padding:10px">';
                                         
                                             echo '<a href="'.
-                                                base_url().'uploads/images/'.$item['image'].
+                                                base_url().config('\Stock\Config\StockConfig')->images_upload_path.$item['image'].
                                                 '" download>Exporter image</a>';
                                             
                                             echo '</td>';
