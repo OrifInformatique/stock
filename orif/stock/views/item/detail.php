@@ -31,7 +31,7 @@
         </div>
         <div class="col-md-4">
             <img id="picture"
-                 src="<?= base_url($config('\Stock\Config\StockConfig')->images_upload_path.$item['image']); ?>"
+                 src="<?= base_url(config('\Stock\Config\StockConfig')->images_upload_path.$item['image']); ?>"
                  width="100%"
                  alt="<?= lang('MY_application.field_image'); ?>" />
         </div>
