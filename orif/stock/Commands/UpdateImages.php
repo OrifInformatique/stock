@@ -16,7 +16,7 @@ class UpdateImages extends BaseCommand
     {
         $itemModel = new Item_model;
         $items = $itemModel->asArray()->findAll();
-        $imagesPath = ROOTPATH.$config('\Stock\Config\StockConfig')->images_upload_path;
+        $imagesPath = ROOTPATH.config('\Stock\Config\StockConfig')->images_upload_path;
 
         foreach ($items as $item) {
             // Ignore item with no images, and those with correctly named images
