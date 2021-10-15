@@ -10,7 +10,7 @@ return[
  * @copyright   Copyright (c) 2016, Orif <http://www.orif.ch>
  */
 // Application name
-'app_title'                      => 'Section informatique<br/>Gestion de stock',
+'app_title'                      => 'Section informatique<br />Gestion de stock',
 // Page titles
 'page_prefix'                    => 'Stock',
 'page_item_list'                 => 'Liste des objets',

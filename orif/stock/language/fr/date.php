@@ -64,5 +64,4 @@ return[
 'UP13'    => "(UTC +13:00) Heure normale des Îles Phénix, heure Tonga",
 'UP14'    => "(UTC +14:00) Heure normale des Îles Line",
 
-
  ];

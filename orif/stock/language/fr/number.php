@@ -14,7 +14,5 @@ return[
 'megabyte_abbr' => 'Mo',
 'kilobyte_abbr' => 'Ko',
 'bytes' => 'Octets',
-'test' => 'Test',
 
-
- ];
+];

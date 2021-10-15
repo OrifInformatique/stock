@@ -29,5 +29,4 @@ return[
 'email_smtp_data_failure'     => "Impossible d'envoyer les données : %s",
 'email_exit_status'           => "Code de retour : %s",
 
-
  ];
