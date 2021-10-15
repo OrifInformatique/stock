@@ -13,12 +13,12 @@ $pager->setSurroundCount(2);
 		<?php if ($pager->hasPrevious()) : ?>
 			<li>
 				<a href="<?= $pager->getFirst() ?>" aria-label="<?= lang('Pager.first') ?>">
-					<span aria-hidden="true"><?= lang('Pager.first') ?></span>
+					<?= lang('Pager.first') ?>
 				</a>
 			</li>
 			<li>
 				<a href="<?= $pager->getPrevious() ?>" aria-label="<?= lang('Pager.previous') ?>">
-					<span aria-hidden="true"><?= lang('Pager.previous') ?></span>
+					<?= lang('Pager.previous') ?>
 				</a>
 			</li>
 		<?php endif ?>
@@ -34,12 +34,12 @@ $pager->setSurroundCount(2);
 		<?php if ($pager->hasNext()) : ?>
 			<li>
 				<a href="<?= $pager->getNext() ?>" aria-label="<?= lang('Pager.next') ?>">
-					<span aria-hidden="true"><?= lang('Pager.next') ?></span>
+					<?= lang('Pager.next') ?>
 				</a>
 			</li>
 			<li>
 				<a href="<?= $pager->getLast() ?>" aria-label="<?= lang('Pager.last') ?>">
-					<span aria-hidden="true"><?= lang('Pager.last') ?></span>
+					<?= lang('Pager.last') ?>
 				</a>
 			</li>
 		<?php endif ?>
