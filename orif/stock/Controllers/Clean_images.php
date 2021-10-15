@@ -17,11 +17,10 @@ use \CodeIgniter\CLI\Commands;
  * @copyright   Copyright (c) 2021, Orif <http://www.orif.ch>
  */
 class Clean_images extends BaseController {
-    //protected $access_level = ACCESS_LVL_ADMIN;
-    protected $access_level = '*';
+    protected $access_level = ACCESS_LVL_ADMIN;
 
     public function initController(RequestInterface $request, REsponseInterface $response, LoggerInterface $logger) {
-        $this->access_level = '*';
+        $this->access_level = ACCESS_LVL_ADMIN;
         parent::initController($request, $response, $logger);
     }
 
@@ -31,7 +30,7 @@ class Clean_images extends BaseController {
 
     public function delete() {
         (new UpdateImages($this->logger, new Commands))->run([]);
-        //command('stock:update_images'); // Redirects to /localhost
+        
         return $this->display_view('Stock\Views\admin\clean_images\success');
     }
 }
