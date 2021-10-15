@@ -27,8 +27,8 @@ class UpdateImages extends BaseCommand
 
             $same_image_items = $itemModel->asArray()->where('image', $old_image)->find();
 
-            if (in_array($old_image, IMAGES_TO_NOT_DELETE) || count($same_image_items) >= 2) {
-                // Copy the important image to not break the site or the other item
+            if (count($same_image_items) >= 2) {
+                // Copy the image to not break the other item
                 copy($imagesPath.$old_image, $imagesPath.$new_image);
             } else {
                 // Change the image's name to a correct one
@@ -41,8 +41,7 @@ class UpdateImages extends BaseCommand
 
         foreach (new DirectoryIterator($imagesPath) as $file_info) {
             // Not checking for correctly named images, as it doesn't need to be in use to be named so
-            if ($file_info->isDot() || $file_info->isDir()
-                || in_array($file_info->getFilename(), IMAGES_TO_NOT_DELETE)) continue;
+            if ($file_info->isDot() || $file_info->isDir()) continue;
 
             // It's gonna give an array anyway, so we ask for one in case there is something
             $item = $itemModel->asArray()->where('image', $file_info->getFilename())->find();
