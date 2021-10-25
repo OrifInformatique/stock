@@ -211,12 +211,12 @@ stock/application/views/item/view_single.php
                                 
                                 <table class="grey_round_border" style="width:auto;">
                                 <?php 
-                                    if(isset($item['image']))
+                                    if(isset($item['image_path']))
                                     {
                                         echo '<tr><td style="padding:10px" colspan="2">';
                                         
                                         echo '<img src="'.
-                                        base_url().config('\Stock\Config\StockConfig')->images_upload_path.$item['image'].
+                                        base_url().config('\Stock\Config\StockConfig')->$item['image_path'].
                                         '" alt="Image de l\'article" style="width:256px;height:256px;">';
                                         
                                         echo '</td></tr>';
@@ -231,12 +231,12 @@ stock/application/views/item/view_single.php
                                                 base_url().'item/upload/'.$item['item_id'].
                                                 '">Importer image</a>';
                                         }
-                                        if(isset($item['image']))
+                                        if(isset($item['image_path']))
                                         {
                                             echo '<td style="padding:10px">';
                                         
                                             echo '<a href="'.
-                                                base_url().config('\Stock\Config\StockConfig')->images_upload_path.$item['image'].
+                                                base_url().config('\Stock\Config\StockConfig')->images_upload_path.$item['image_path'].
                                                 '" download>Exporter image</a>';
                                             
                                             echo '</td>';

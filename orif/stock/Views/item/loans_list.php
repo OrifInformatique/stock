@@ -111,7 +111,7 @@ function load_items(page){
 function display_item(item){
     // Item's parameters
     href = '<?= base_url("/item/view/"); ?>/'+item["item_id"];
-    src_image = '<?= base_url(config('\Stock\Config\StockConfig')->images_upload_path) . "/" ?>'+item["image"];
+    src_image = '<?= base_url(); ?>/'+item["image_path"];
     alt_image = '<?php htmlspecialchars(lang("MY_application.field_image")); ?>';
     item_condition = item["condition"]["bootstrap_label"];
     item_localisation = item["current_loan"]["loan_id"]!=null ?'<br><h6>'+item["current_loan"]["item_localisation"]+'</h6>':"";
