@@ -121,7 +121,6 @@ function display_item(item){
     date_end = item['loan']['planned_return_date'];
     inventory_number = item["inventory_number"];
     serial_number = item["serial_number"];
-    delete_item = '<?php if(isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] == true && $_SESSION["user_access"] >= ACCESS_LVL_ADMIN) { echo "<td><a href=\"".base_url("/item/delete/"); ?>/'+item["item_id"]+'" class=\"close\" title=\"Supprimer l\'objet\">×</a></td> <?php } ?>';
 
     // Create formatted table row and return it
     var row = $("<tr>");
@@ -133,7 +132,6 @@ function display_item(item){
     row.append('<td>'+date_start+'</td>');
     row.append('<td>'+date_end+'</td>');
     row.append('<td><a href="'+href+'">'+inventory_number+'</a><br><a href="'+href+'">'+serial_number+'</a></td>');
-    row.append(delete_item);
     row.append('</tr>');
 
     return row;
