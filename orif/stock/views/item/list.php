@@ -71,13 +71,13 @@
                         <?= form_label(lang('MY_application.field_sort_asc_desc'),'sort_asc_desc').form_dropdown('ad', $sort_asc_desc, isset($_GET["ad"])?$_GET["ad"]:"",'id="sort_asc_desc"');?>
                     </div>
                 </div>
-                    <!-- RESET FILTERS BUTTON -->
-                    <div class="text-right d-flex">
+                    <!-- RESET FILTERS AND DISPLAY LOANS BUTTONS -->
+                    <div class="text-right">
                         <?= form_label("&nbsp;") ?>
                     </div>
-                    <div class="text-right d-flex">
-                        <a href="<?= base_url("item/index/") . "/"?>" class="btn col-7 btn-warning"><?php echo htmlspecialchars(lang('MY_application.btn_remove_filters')); ?></a>
-                        <a href="<?= base_url("item/list_loans/") . "/"?>" class="btn col-5 btn-primary"><?php echo htmlspecialchars(lang('MY_application.btn_to_loans')); ?></a>
+                    <div class="text-right">
+                        <a href="<?= base_url("item/index/") . "/"?>" class="btn btn-default"><?php echo htmlspecialchars(lang('MY_application.btn_remove_filters')); ?></a>
+                        <a href="<?= base_url("item/list_loans/") . "/"?>" class="btn btn-primary"><?php echo htmlspecialchars(lang('MY_application.btn_to_loans')); ?></a>
                     </div>
 
             </div>

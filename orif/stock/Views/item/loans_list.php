@@ -115,7 +115,6 @@ function display_item(item){
     stocking_place = "<span>"+item["stocking_place"]["name"]+"</span>";
     inventory_number = item["inventory_number"];
     serial_number = item["serial_number"];
-    delete_item = '<?php if(isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] == true && $_SESSION["user_access"] >= ACCESS_LVL_ADMIN) { echo "<td><a href=\"".base_url("/item/delete/"); ?>/'+item["item_id"]+'" class=\"close\" title=\"Supprimer l\'objet\">×</a></td> <?php } ?>';
 
     // Create formatted table row and return it
     var row = $("<tr>");
@@ -126,7 +125,6 @@ function display_item(item){
     row.append('<td><a href="'+href+'">'+item_name+'</a><h6>'+item_description+'</h6></td>');
     row.append('<td>'+stocking_place+'</td>');
     row.append('<td><a href="'+href+'">'+inventory_number+'</a><br><a href="'+href+'">'+serial_number+'</a></td>');
-    row.append(delete_item);
     row.append('</tr>');
 
     return row;
