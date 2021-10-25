@@ -864,6 +864,8 @@ class Item extends BaseController {
      * @return array
      */
     public function load_list_loans($page = 1) {
+        helper('MY_date');
+
         // Store URL to make possible to come back later (from item detail for example)
         $_SESSION['items_list_url'] = base_url('item/index/'.$page);
         if (isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING'])) {
@@ -924,10 +926,11 @@ class Item extends BaseController {
             $item['is_late'] = in_array($item['item_id'], $late_item_ids);
             $loan = $this->loan_model->where('item_id', $item['item_id'])->orderBy('date', 'desc')->first();
             if (!isset($loan['planned_return_date']) || is_null($loan['planned_return_date'])) {
-                $date = new DateTime($loan['date']);
-                $date = $date->add(new DateInterval('P3M'));
-                $loan['planned_return_date'] = $date->format('Y-m-d');
+                $loan['planned_return_date'] = '';
+            } else {
+                $loan['planned_return_date'] = databaseToShortDate($loan['planned_return_date']);
             }
+            $loan['date'] = databaseToShortDate($loan['date']);
 
             $item['loan'] = $loan;
         });
