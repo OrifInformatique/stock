@@ -23,7 +23,7 @@
                 <div class="row">
                     <!-- TEXT FILTER -->
                     <div id="ts" class="col-sm-12 top-margin">
-                    <?php 
+                    <?php
                         echo form_label(lang('MY_application.field_text_search'), 'text_search');
                         echo form_input('ts', isset($_GET["ts"])?$_GET["ts"]:"",
                         'id="text_search" class="form-control"
@@ -72,9 +72,12 @@
                     </div>
                 </div>
                     <!-- RESET FILTERS BUTTON -->
-                    <div class="text-right d-flex flex-column">
+                    <div class="text-right d-flex">
                         <?= form_label("&nbsp;") ?>
-                        <a href="<?= base_url("item/index/") . "/"?>" class="btn btn-warning top-margin"><?php echo htmlspecialchars(lang('MY_application.btn_remove_filters')); ?></a>
+                    </div>
+                    <div class="text-right d-flex">
+                        <a href="<?= base_url("item/index/") . "/"?>" class="btn col-7 btn-warning"><?php echo htmlspecialchars(lang('MY_application.btn_remove_filters')); ?></a>
+                        <a href="<?= base_url("item/list_loans/") . "/"?>" class="btn col-5 btn-primary"><?php echo htmlspecialchars(lang('MY_application.btn_to_loans')); ?></a>
                     </div>
 
             </div>

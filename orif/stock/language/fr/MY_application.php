@@ -164,6 +164,7 @@ return[
 'btn_linked_doc'                 => 'Voir document',
 'btn_create_inventory_control'   => 'Nouveau contrôle',
 'btn_inventory_control_history'  => 'Historique contrôles',
+'btn_to_loans'                   => 'Prêts en cours',
 'btn_loans_history'              => 'Historique des prêts',
 'btn_create_loan'                => 'Ajouter un prêt',
 'btn_submit_filters'             => 'Appliquer filtres et tri',
