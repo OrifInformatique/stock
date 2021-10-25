@@ -16,6 +16,7 @@ return[
 'page_item_list'                 => 'Liste des objets',
 'page_login'                     => 'Connexion',
 'page_password_change'           => 'Modification du mot de passe',
+'page_active_loans_list'         => 'Liste des prêts en cours',
 // Date and time formats
 'date_format_short'              => 'd.m.Y',
 'datetime_format_short'          => 'd.m.Y H:i',
