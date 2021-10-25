@@ -895,7 +895,7 @@ class Item extends BaseController {
         $items = $this->item_model->get_filtered(['c' => [10, 30, 40]]);
         $items = array_filter($items, function($item) use ($loans) { return in_array($item['item_id'], $loans); });
 
-        // Sort items, separate late loans and others, then sort by id
+        // Sort items, separate late loans and others, then sort by name
         usort($items, function($a, $b) use ($late_items) {
             $late_a = in_array($a['item_id'], $late_items);
             $late_b = in_array($b['item_id'], $late_items);
