@@ -3,6 +3,10 @@
 	<a href="<?= $_SESSION['items_list_url'] ?: base_url('/item'); ?>"
         class="btn btn-primary" role="button"><?= lang('MY_application.btn_back_to_list'); ?></a>
 
+    <!-- HEADER -->
+    <div><h1 class="title-section"><?= lang('MY_application.page_active_loans_list') ?></h1></div>
+
+
     <!-- PAGINATION -->
     <div id="pagination_top"></div>
 
