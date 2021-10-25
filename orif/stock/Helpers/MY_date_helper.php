@@ -1,7 +1,7 @@
-<?php 
+<?php
 /**
  * Add some functions to the basic CodeIgniter Date Helper
- * 
+ *
  * @author      Didier Viret
  * @link        https://github.com/OrifInformatique/stock
  * @copyright   Copyright (c) 2016, Orif <http://www.orif.ch>
@@ -83,7 +83,7 @@ function databaseToShortDate($date)
     if (!empty($date) && $date!='0000-00-00')
     {
         return date_format(date_create_from_format(DATABASE_DATE_FORMAT, $date),
-                           lang('date_format_short'));
+                           lang('MY_application.date_format_short'));
     }
     else
     {

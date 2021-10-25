@@ -23,6 +23,7 @@ class StockConfig extends BaseConfig
     public $functional_item_condition   =   10;
     public $items_default_group         =   2;
     public $item_no_image               =   'no_image.png';
+    public $item_no_image_path          =   'images/';
     public $image_extension             =   '.png';
     public $image_picture_suffix        =   '_picture';
     public $image_tmp_suffix            =   '_tmp';

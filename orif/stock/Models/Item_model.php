@@ -162,13 +162,24 @@ class Item_model extends MyModel
     public function getImage($item){
         if (!is_null($item) && is_null($item['image']))
         {
-            $item['image'] = ITEM_NO_IMAGE;
+            $item['image'] = config('\Stock\Config\StockConfig')->item_no_image;
         }
 
         return $item['image'];
     }
 
+    public function getImagePath($item){		
+      if (!is_null($item) && ($item['image'] == config('\Stock\Config\StockConfig')->item_no_image))
+      {
+          return config('\Stock\Config\StockConfig')->item_no_image_path.config('\Stock\Config\StockConfig')->item_no_image;
+      }
+      else
+      {
+          return config('\Stock\Config\StockConfig')->images_upload_path.$item['image'];
+      }
+  }
 
+      
     /**
     * Calculate a warranty status based on buying date and warranty duration
     *
@@ -440,6 +451,7 @@ class Item_model extends MyModel
         $item['condition'] = $this->getItemCondition($item);
         $item['current_loan'] = $this->getCurrentLoan($item);
         $item['image'] = $this->getImage($item);
+        $item['image_path'] = $this->getImagePath($item);
       }
 
 

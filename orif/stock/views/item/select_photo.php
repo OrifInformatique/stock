@@ -1,7 +1,7 @@
 <?php
 // Make sure the user cannot modify the default image
 $image = $_SESSION['POST']['image'] ?? '';
-if ($image == ITEM_NO_IMAGE) {
+if ($image == config('\Stock\Config\StockConfig')->item_no_image) {
     $image = '';
 }
 ?>
