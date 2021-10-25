@@ -36,6 +36,7 @@ class UpdateImages extends BaseCommand
             }
 
             $item['image'] = $new_image;
+            $item['image_path'] = $itemModel->getImagePath($item);
             $itemModel->update($item['item_id'], $item);
         }
 

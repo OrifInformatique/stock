@@ -31,7 +31,7 @@
         </div>
         <div class="col-md-4">
             <img id="picture"
-                 src="<?= base_url(config('\Stock\Config\StockConfig')->images_upload_path.$item['image']); ?>"
+                 src="<?= base_url($item['image_path']); ?>"
                  width="100%"
                  alt="<?= lang('MY_application.field_image'); ?>" />
         </div>
@@ -237,6 +237,6 @@ $(document).ready(function() {
     // Refresh the image to prevent display of an old cach image.
     // Changing the src attribute forces browser to update.
     d = new Date();
-    $("#picture").attr("src", "<?= base_url(config('\Stock\Config\StockConfig')->images_upload_path.$item['image']); ?>?"+d.getTime());
+    $("#picture").attr("src", "<?= base_url($item['image_path']); ?>?"+d.getTime());
 });
 </script>
