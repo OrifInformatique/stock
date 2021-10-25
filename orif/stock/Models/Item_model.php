@@ -160,7 +160,7 @@ class Item_model extends MyModel
     public function getImage($item){		
         if (!is_null($item) && is_null($item['image']))
         {
-            $item['image'] = ITEM_NO_IMAGE;
+            $item['image'] = config('\Stock\Config\StockConfig')->item_no_image;
         }
 
         return $item['image'];
