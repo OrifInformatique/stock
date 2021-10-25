@@ -890,19 +890,19 @@ class Item extends BaseController {
 
             return $date < $now;
         });
-        $late_items = array_map(function($loan) { return $loan['item_id']; }, $late_items);
-        $loans = array_map(function($loan) { return $loan['item_id']; }, $loans);
+        $late_item_ids = array_map(function($loan) { return $loan['item_id']; }, $late_items);
+        $items_loans = array_map(function($loan) { return $loan['item_id']; }, $loans);
         $items = $this->item_model->get_filtered(['c' => [10, 30, 40]]);
-        $items = array_filter($items, function($item) use ($loans) { return in_array($item['item_id'], $loans); });
+        $items = array_filter($items, function($item) use ($items_loans) { return in_array($item['item_id'], $items_loans); });
 
         // Sort items, separate late loans and others, then sort by name
-        usort($items, function($a, $b) use ($late_items) {
-            $late_a = in_array($a['item_id'], $late_items);
-            $late_b = in_array($b['item_id'], $late_items);
+        usort($items, function($a, $b) use ($late_item_ids) {
+            $late_a = in_array($a['item_id'], $late_item_ids);
+            $late_b = in_array($b['item_id'], $late_item_ids);
             if ($late_a != $late_b) {
                 return $late_b <=> $late_a;
             } else {
-                return $b['name'] <=> $a['name'];
+                return strtolower($a['name']) <=> strtolower($b['name']);
             }
         });
 
@@ -919,9 +919,17 @@ class Item extends BaseController {
         // Keep only the slice of items corresponding to the current page
         $items = array_slice($items, ($number_page-1)*ITEMS_PER_PAGE, ITEMS_PER_PAGE);
 
-        // Add to the item whether it is late
-        array_walk($items, function(&$item) use ($late_items) {
-            $item['is_late'] = in_array($item['item_id'], $late_items);
+        // Add to the item whether it is late, the starting date, and the end date
+        array_walk($items, function(&$item) use ($late_item_ids) {
+            $item['is_late'] = in_array($item['item_id'], $late_item_ids);
+            $loan = $this->loan_model->where('item_id', $item['item_id'])->orderBy('date', 'desc')->first();
+            if (!isset($loan['planned_return_date']) || is_null($loan['planned_return_date'])) {
+                $date = new DateTime($loan['date']);
+                $date = $date->add(new DateInterval('P3M'));
+                $loan['planned_return_date'] = $date->format('Y-m-d');
+            }
+
+            $item['loan'] = $loan;
         });
 
         return [

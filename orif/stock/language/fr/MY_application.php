@@ -114,6 +114,8 @@ return[
 'header_suppliers_country'       => 'Pays',
 'header_suppliers_phone'         => 'Téléphone',
 'header_suppliers_email'         => 'E-mail',
+'header_loan_date_start'         => 'Date de prêt',
+'header_loan_date_end'           => 'Date de retour prévu',
 // Admin labels
 'admin_tab_users'                => 'Utilisateurs',
 'admin_tab_tags'                 => 'Tags',
