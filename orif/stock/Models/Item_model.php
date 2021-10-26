@@ -19,13 +19,13 @@ class Item_model extends MyModel
 {
     protected $table = 'item';
     protected $primaryKey = 'item_id';
-    protected $allowedFields = ['inventory_prefix', 
-                                'name', 
-                                'description', 
-                                'image', 
-                                'serial_number', 
-                                'buying_price', 
-                                'buying_date', 
+    protected $allowedFields = ['inventory_prefix',
+                                'name',
+                                'description',
+                                'image',
+                                'serial_number',
+                                'buying_price',
+                                'buying_date',
                                 'warranty_duration',
                                 'remarks',
                                 'linked_file',
@@ -40,7 +40,7 @@ class Item_model extends MyModel
                                 'stocking_place_id',
                                 'item_condition_id',
                                 'item_group_id'
-                              ];                       
+                              ];
 
     /**
      * Constructor
@@ -60,14 +60,14 @@ class Item_model extends MyModel
      */
     public function getFutureId(){
       $query = $this->db->query("SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'stock' AND TABLE_NAME = 'item'")->getResultArray();
-      
+
       // Makes sure we select the auto_increment value
       $value = $query[0]['AUTO_INCREMENT'];
 
       return $value;
     }
 
-    
+
     public function getItemGroup($item){
       if ($this->item_group_model==null){
         $this->item_group_model = new Item_group_model();
@@ -94,28 +94,30 @@ class Item_model extends MyModel
           $this->loan_model = new Loan_model();
         }
         helper('MY_date');
-        
-        $where = array('item_id'=>$item['item_id'], 'date<='=>mysqlDate('now'), 'real_return_date is NULL');
 
-        $current_loan = $this->loan_model->asArray()->where($where)->first();
+        $current_loan = $this->loan_model->asArray()
+          ->where('item_id', $item['item_id'])
+          ->where('date <=', mysqlDate('now'))
+          ->where('real_return_date is NULL')
+          ->first();
 
-        
+
         if (is_null($current_loan)) {
           // ITEM IS NOT LOANED
           $current_loan['bootstrap_label'] = '<span class="label label-success">'.htmlspecialchars(lang('MY_application.lbl_loan_status_not_loaned')).'</span>';
         } else {
           // ITEM IS LOANED
           $current_loan['bootstrap_label'] = '<span class="label label-warning">'.htmlspecialchars(lang('MY_application.lbl_loan_status_loaned')).'</span>';
-        } 
+        }
       return $current_loan;
-      
+
     }
 
 
     protected function getLastInventoryControl($item){
-      if (!is_null($item)) 
+      if (!is_null($item))
       {
-        if (is_null($this->inventory_control_model)) 
+        if (is_null($this->inventory_control_model))
         {
           $this->inventory_control_model = new Inventory_control_model();
         }
@@ -128,14 +130,14 @@ class Item_model extends MyModel
 
         if (!is_null($inventory_controls))
         {
-          foreach ($inventory_controls as $control) 
+          foreach ($inventory_controls as $control)
           {
             // Select the last control (biggest date)
-            if (is_null($last_control)) 
+            if (is_null($last_control))
             {
               $last_control = $control;
-            } 
-            else if ($control->date > $last_control->date) 
+            }
+            else if ($control->date > $last_control->date)
             {
               $last_control = $control;
             }
@@ -153,10 +155,11 @@ class Item_model extends MyModel
       }
       $tags = $this->item_tag_link_model->getTags($item);
 
-      return $tags; 
+      return $tags;
     }
 
-    public function getImage($item){		
+
+    public function getImage($item){
         if (!is_null($item) && is_null($item['image']))
         {
             $item['image'] = config('\Stock\Config\StockConfig')->item_no_image;
@@ -190,7 +193,7 @@ class Item_model extends MyModel
     */
     public function getWarrantyStatus($item)
     {
-      if (!is_null($item)) 
+      if (!is_null($item))
       {
         if (empty($item['buying_date']) || empty($item['warranty_duration']))
         {
@@ -225,7 +228,7 @@ class Item_model extends MyModel
       }
       return $warrantyStatus;
     }
-  
+
 
 
     /**
@@ -237,7 +240,7 @@ class Item_model extends MyModel
 
       if (is_null($this->stocking_place_model)){
         $this->stocking_place_model = new Stocking_place_model();
-      } 
+      }
 
       if(is_null($this->item_condition_model)){
         $this->item_condition_model = new Item_condition_model();
@@ -451,7 +454,7 @@ class Item_model extends MyModel
         $item['image_path'] = $this->getImagePath($item);
       }
 
-      
+
       return $items;
   }
 
@@ -463,7 +466,7 @@ class Item_model extends MyModel
 
       if (!is_null($item)) {
           $inventory_id = $item['item_id'];
-          
+
           // Add leading zeros to inventory_id
           for( $i = strlen($inventory_id) ; $i < INVENTORY_NUMBER_CHARS; $i++) {
               $inventory_id = "0".$inventory_id;
@@ -522,4 +525,4 @@ class Item_model extends MyModel
   }
 
 
-} 
+}
