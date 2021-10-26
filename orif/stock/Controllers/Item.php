@@ -22,6 +22,8 @@ use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use PSR\Log\LoggerInterface;
 use App\Controllers\BaseController;
+use DateInterval;
+use DateTime;
 use Stock\Models\Item_model;
 use Stock\Models\Loan_model;
 use Stock\Models\Item_tag_model;
@@ -29,10 +31,6 @@ use Stock\Models\Item_condition_model;
 use Stock\Models\Item_group_model;
 use Stock\Models\Item_tag_link_model;
 use Stock\Models\Stocking_place_model;
-
-
-
-
 
 class Item extends BaseController {
 
@@ -244,7 +242,7 @@ class Item extends BaseController {
         $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
         $item['current_loan'] = $this->item_model->getCurrentLoan($item);
         $item['warranty_status'] = $this->item_model->getWarrantyStatus($item);
-        
+
 
         if (!is_null($item)) {
             $output['item'] = $item;
@@ -807,14 +805,15 @@ class Item extends BaseController {
 
         // Get item object and related loans
         $item = $this->item_model->get($id);
-        $loans = $this->loan_model->with('loan_by_user')
+        /*$loans = $this->loan_model->with('loan_by_user')
                 ->with('loan_to_user')
-                ->get_many_by('item_id', $item->item_id);
+                ->get_many_by('item_id', $item->item_id);*/
+        $loans = $this->loan_model->where('item_id', $item->item_id);
 
         $output['item'] = $item;
         $output['loans'] = $loans;
 
-        $this->display_view('loan/list', $output);
+        $this->display_view('Stock\Views\loan\list', $output);
     }
 
     /**
@@ -847,6 +846,111 @@ class Item extends BaseController {
             // Access is not allowed
             $this->ask_for_login();
         }
+    }
+
+    /**
+     * Displays the list for all active loans
+     *
+     * @return void
+     */
+    public function list_loans() {
+        $this->display_view('Stock\Views\item\loans_list');
+    }
+
+    /**
+     * Loads the list of loands
+     *
+     * @param integer $page
+     * @return array
+     */
+    public function load_list_loans($page = 1) {
+        helper('MY_date');
+
+        // Store URL to make possible to come back later (from item detail for example)
+        $_SESSION['items_list_url'] = base_url('item/index/'.$page);
+        if (isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING'])) {
+            $_SESSION['items_list_url'] .= '?'.$_SERVER['QUERY_STRING'];
+        }
+
+        // Sanitize $page parameter
+        if (empty($page) || !is_numeric($page) || $page<1) {
+            $page = 1;
+        }
+
+        // Get item(s) with loans
+        $loans = $this->loan_model->where('real_return_date', NULL);
+        $loans = $loans->findAll();
+        $now = new DateTime();
+        $late_items = array_filter($loans, function($loan) use ($now) {
+            // If possible compare with a planned date, otherwise use +3 months
+            if (isset($loan['planned_return_date']) && !is_null($loan['planned_return_date'])) {
+                $date = new DateTime($loan['planned_return_date']);
+            } else {
+                $date = new DateTime($loan['date']);
+                $date = $date->add(new DateInterval('P3M'));
+            }
+
+            return $date < $now;
+        });
+        $late_item_ids = array_map(function($loan) { return $loan['item_id']; }, $late_items);
+        $items_loans = array_map(function($loan) { return $loan['item_id']; }, $loans);
+        $items = $this->item_model->get_filtered(['c' => [10, 30, 40]]);
+        $items = array_filter($items, function($item) use ($items_loans) { return in_array($item['item_id'], $items_loans); });
+
+        // Sort items, separate late loans and others, then sort by name
+        usort($items, function($a, $b) use ($late_item_ids) {
+            $late_a = in_array($a['item_id'], $late_item_ids);
+            $late_b = in_array($b['item_id'], $late_item_ids);
+            if ($late_a != $late_b) {
+                return $late_b <=> $late_a;
+            } else {
+                return strtolower($a['name']) <=> strtolower($b['name']);
+            }
+        });
+
+        // Add page title
+        $title = lang('My_application.page_item_list');
+
+        // Pagination
+        $items_count = count($items);
+        $pagination = $this->load_pagination($items_count, $page);
+
+        $number_page = $page;
+        if($number_page > ceil($items_count/ITEMS_PER_PAGE)) $number_page = ceil($items_count/ITEMS_PER_PAGE);
+
+        // Keep only the slice of items corresponding to the current page
+        $items = array_slice($items, ($number_page-1)*ITEMS_PER_PAGE, ITEMS_PER_PAGE);
+
+        // Add to the item whether it is late, the starting date, and the end date
+        array_walk($items, function(&$item) use ($late_item_ids) {
+            $item['is_late'] = in_array($item['item_id'], $late_item_ids);
+            $loan = $this->loan_model->where('item_id', $item['item_id'])->orderBy('date', 'desc')->first();
+            if (!isset($loan['planned_return_date']) || is_null($loan['planned_return_date'])) {
+                $loan['planned_return_date'] = '';
+            } else {
+                $loan['planned_return_date'] = databaseToShortDate($loan['planned_return_date']);
+            }
+            $loan['date'] = databaseToShortDate($loan['date']);
+
+            $item['loan'] = $loan;
+        });
+
+        return [
+            'items' => $items,
+            'title' => $title,
+            'pagination' => $pagination,
+            'number_page' => $number_page,
+        ];
+    }
+
+    /**
+     * Displays the JSON version of the result of `load_list_loans`
+     *
+     * @param integer $page
+     * @return void
+     */
+    public function load_list_loans_json($page = 1) {
+        echo json_encode($this->load_list_loans($page));
     }
 
     /**

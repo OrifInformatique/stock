@@ -77,7 +77,7 @@
                 }else if (isset($image) && $image!='') {
                     $imagePath = $image;
                 }else{
-                    $imagePath = ITEM_NO_IMAGE;
+                    $imagePath = config('\Stock\Config\StockConfig')->item_no_image;
                 }
 
                 if(isset($imagePath)){
