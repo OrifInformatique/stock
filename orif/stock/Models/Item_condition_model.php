@@ -45,15 +45,15 @@ class Item_condition_model extends MyModel
     {
         if ($item['item_condition_id'] == 10)
         {
-            $bootstrap_label = '<span class="label label-success">'; // ITEM DOES WORK
-        } 
+            $bootstrap_label = '<span class="badge badge-success">'; // ITEM DOES WORK
+        }
         elseif ($item['item_condition_id'] == 30)
         {
-            $bootstrap_label = '<span class="label label-warning">'; // ITEM DEFECTIVE
-        } 
+            $bootstrap_label = '<span class="badge badge-warning">'; // ITEM DEFECTIVE
+        }
         elseif ($item['item_condition_id'] == 40)
         {
-            $bootstrap_label = '<span class="label label-danger">';}  // NO MORE ITEM
+            $bootstrap_label = '<span class="badge badge-danger">';}  // NO MORE ITEM
         else
         {
             $bootstrap_label = '<span>'; // UNKNOWNED VALUE
@@ -66,7 +66,7 @@ class Item_condition_model extends MyModel
 
     /**
      *  Gets the corresponding items with the primary key
-     *  
+     *
      *  @return array
      */
     public function getItems($item_condition_id)
