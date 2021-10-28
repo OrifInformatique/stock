@@ -31,7 +31,7 @@
         </div>
         <div class="col-md-4">
             <img id="picture"
-                 src="<?= base_url('uploads/images/'.$item['image']); ?>"
+                 src="<?= base_url('images/'.$item['image']); ?>"
                  width="100%"
                  alt="<?= lang('MY_application.field_image'); ?>" />
         </div>
@@ -147,6 +147,7 @@
                 <div class="col-sm-8">
                     <?php if(array_key_exists('last_inventory_control', $item)) {
                         echo databaseToShortDate($item['last_inventory_control']['date']);
+                        echo htmlspecialchars(json_encode($item['last_inventory_control']['controller']));
                         echo ', '.htmlspecialchars($item['last_inventory_control']['controller']['username']);
                         if(!is_null($item['last_inventory_control']['remarks'])) {
                             echo '</br >'.htmlspecialchars($item['last_inventory_control']['remarks']);
@@ -208,7 +209,6 @@
             elseif ($item['warranty_status'] == 3) {
                 echo '<span class="label label-danger" >';}  // WARRANTY EXPIRED
             else {echo '<span>';}
-                error_log(json_encode($item['supplier']), 3, "C:\Users\RoSi\Documents\logsPHP.txt");
                 echo lang('MY_application.text_warranty_status.' . $item['warranty_status']); ?>
             </span>
         </div>
@@ -237,6 +237,6 @@ $(document).ready(function() {
     // Refresh the image to prevent display of an old cach image.
     // Changing the src attribute forces browser to update.
     d = new Date();
-    $("#picture").attr("src", "<?= base_url('uploads/images/'.$item['image']); ?>?"+d.getTime());
+    $("#picture").attr("src", "<?= base_url('images/'.$item['image']); ?>?"+d.getTime());
 });
 </script>

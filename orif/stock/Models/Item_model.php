@@ -112,7 +112,7 @@ class Item_model extends MyModel
     }
 
 
-    protected function getLastInventoryControl($item){
+    public function getLastInventoryControl($item){
       if (!is_null($item)) 
       {
         if (is_null($this->inventory_control_model)) 
@@ -120,9 +120,7 @@ class Item_model extends MyModel
           $this->inventory_control_model = new Inventory_control_model();
         }
 
-        $query = $this->db->query("SELECT * FROM inventory_control WHERE item_id =" . $item['item_id']);
-        $item['inventory_controls'] = $query->getResultObject();
-        $inventory_controls = $item['inventory_controls'];
+        $inventory_controls = $this->inventory_control_model->asArray()->where('item_id',$item["item_id"])->find();
 
         $last_control = NULL;
 
@@ -135,9 +133,10 @@ class Item_model extends MyModel
             {
               $last_control = $control;
             } 
-            else if ($control->date > $last_control->date) 
+            else if ($control['date'] > $last_control['date']) 
             {
               $last_control = $control;
+              $last_control['controller'] = $this->inventory_control_model->getUser($last_control['controller_id']);
             }
           }
         }

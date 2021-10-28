@@ -242,6 +242,8 @@ class Item extends BaseController {
         $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
         $item['current_loan'] = $this->item_model->getCurrentLoan($item);
         $item['warranty_status'] = $this->item_model->getWarrantyStatus($item);
+        $item['image'] = $this->item_model->getImage($item);
+        $item['last_inventory_control'] = $this->item_model->getLastInventoryControl($item);
         
 
         if (!is_null($item)) {
