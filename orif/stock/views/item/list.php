@@ -6,7 +6,7 @@
             <div class="row bottom-margin">
                     <!-- Button for new item -->
                     <a href="<?php echo base_url("item/create/"); ?>"
-                            class="btn btn-success"><?php echo htmlspecialchars(lang('MY_application.btn_new')); ?></a>
+                            class="btn btn-success mb-3"><?php echo htmlspecialchars(lang('MY_application.btn_new')); ?></a>
             </div>
 
     <?php } ?>
@@ -22,10 +22,10 @@
 
                 <div class="row">
                     <!-- TEXT FILTER -->
-                    <div id="ts" class="col-xs-12 top-margin">
-                    <?php 
+                    <div id="ts" class="col-sm-12 top-margin">
+                    <?php
                         echo form_label(lang('MY_application.field_text_search'), 'text_search');
-                        echo form_input('ts', isset($_GET["ts"])?$_GET["ts"]:"", 
+                        echo form_input('ts', isset($_GET["ts"])?$_GET["ts"]:"",
                         'id="text_search" class="form-control"
                         placeholder="'.lang('MY_application.field_no_filter').'"');
                     ?>
@@ -61,27 +61,29 @@
 
                 <div class="row">
                     <!-- SORT ORDER -->
-                    <div id="o" class="col-xs-12 top-margin">
+                    <div id="o" class="col-sm-12 top-margin">
                         <?= form_label(lang('MY_application.field_sort_order'),'sort_order').form_dropdown('o', $sort_order, isset($_GET["o"])?$_GET["o"]:"",'id="sort_order"');?>
                     </div>
                 </div>
                 <div class="row">
                     <!-- SORTING ASCENDING / DESCENDING -->
-                    <div id="ad" class="col-xs-12 top-margin">
+                    <div id="ad" class="col-sm-12 top-margin">
                         <?= form_label(lang('MY_application.field_sort_asc_desc'),'sort_asc_desc').form_dropdown('ad', $sort_asc_desc, isset($_GET["ad"])?$_GET["ad"]:"",'id="sort_asc_desc"');?>
                     </div>
                 </div>
-                <div class="row">
-                    <!-- RESET FILTERS BUTTON -->
-                    <div class="col-sm-6 col-sm-offset-6 top-margin">
+                    <!-- RESET FILTERS AND DISPLAY LOANS BUTTONS -->
+                    <div class="text-right">
                         <?= form_label("&nbsp;") ?>
-                        <a href="<?= base_url("item/index/") . "/"?>" class="btn btn-warning top-margin"><?php echo htmlspecialchars(lang('MY_application.btn_remove_filters')); ?></a>
                     </div>
-                </div>
+                    <div class="text-right">
+                        <a href="<?= base_url("item/index/") . "/"?>" class="btn btn-default"><?php echo htmlspecialchars(lang('MY_application.btn_remove_filters')); ?></a>
+                        <a href="<?= base_url("item/list_loans/") . "/"?>" class="btn btn-primary"><?php echo htmlspecialchars(lang('MY_application.btn_to_loans')); ?></a>
+                    </div>
+
             </div>
         </div>
 
-        
+
         <!-- END OF FILTERS AND SORT FORM -->
     </form>
 
@@ -90,7 +92,7 @@
 
     <div class="top-margin table-responsive">
 
-        <!-- LIST OF ITEMS -->  
+        <!-- LIST OF ITEMS -->
         <div class="alert alert-warning" id="no_item_message"><?= htmlspecialchars(lang('MY_application.msg_no_item')); ?></div>
         <div class="alert alert-danger" id="error_message"></div>
 
@@ -115,7 +117,7 @@
 
 <script type="text/javascript">
 $(document).ready(function() {
-        
+
     // ******************************************
     // Initialize the Bootstrap Multiselect plugin
     // ******************************************
@@ -123,15 +125,17 @@ $(document).ready(function() {
     $('#item_tags-multiselect').multiselect({
         nonSelectedText: no_filter,
         buttonWidth: '100%',
+        buttonClass: 'btn btn-outline-primary',
         numberDisplayed: 10
     });
     $('#item_conditions-multiselect, #item_groups-multiselect, #stocking_places-multiselect, #sort_order, #sort_asc_desc').multiselect({
         nonSelectedText: no_filter,
         buttonWidth: '100%',
+        buttonClass: 'btn btn-outline-primary',
         numberDisplayed: 5
     });
-    
-    
+
+
     // ******************************************
     // Load items list
     // ******************************************
@@ -139,7 +143,7 @@ $(document).ready(function() {
     page = location.pathname.split("/").pop();
     filters = location.search;
     load_items(page, filters);
-    
+
     // Reload items list on filter update
     $("input[type=checkbox], input[type=radio]").change(function(){
         // Load page 1 with new filters
@@ -160,17 +164,17 @@ let populating = false;
 function load_items(page, filters){
     if (populating) return;
     populating = true;
-  
+
     // Display "wait" cursor
     $("*").css("cursor", "wait");
-    
+
     // Hide or empty elements
     $("#no_item_message").toggle(false);
     $("#error_message").toggle(false);
     $("#table_item").toggle(false);
     $("#list_item").empty();
     $("#pagination_bottom, #pagination_top").empty();
-    
+
 
     // URL for ajax call to PHP controller                      Stock\Controllers\
     url = "<?= base_url("/Item/load_list_json")?>"+ "/" + page+filters;
@@ -183,9 +187,9 @@ function load_items(page, filters){
             page = result.number_page;
             filters=getFilters();
             history.pushState(null, "", "<?= base_url("item/index/")?>"+ "/"+page+filters);
-            
+
             // Empty list before filling it
-            if (result.items.length > 0){ 
+            if (result.items.length > 0){
                 $("#table_item").toggle(true);
                 $.each(result.items, function (i, item) {
                     $("#list_item").append(display_item(item));
@@ -193,9 +197,9 @@ function load_items(page, filters){
             } else {
                 $("#no_item_message").toggle(true);
             }
-            
+
             $("#pagination_top, #pagination_bottom").html(result.pagination);
-            
+
             // Change cursor
             $("*").css("cursor", "");
             $(".pagination a").css("cursor", "pointer");
@@ -204,14 +208,14 @@ function load_items(page, filters){
                 let pageLinkNumber = parseInt(e.target.href.split("=").pop(), 10);
                 load_items(pageLinkNumber, getFilters());
             });
-            
+
             history.pushState(null, "", "<?= base_url("item/index/")?>"+ "/" +page+filters);
             populating = false;
         },
         error : function(resultat, statut, erreur){
             $("#error_message").toggle(true);
             $("#error_message").append(resultat.responseText);
-            
+
             // Display normal cursor
             $("*").css("cursor", "");
             populating = false;
@@ -222,58 +226,58 @@ function load_items(page, filters){
 function getFilters() {
     // Text search filter
     ts = $("#ts input").val();
-    
+
     // Tags filter
     t = "";
-    $.each($("#t .multiselect-container .active input"), function (i, val) { 
+    $.each($("#t .multiselect-container .active input"), function (i, val) {
         t+="&t[]="+val.value;
     });
-    
+
     // Stocking places filter
     s = "";
-    $.each($("#s .multiselect-container .active input"), function (i, val) { 
+    $.each($("#s .multiselect-container .active input"), function (i, val) {
         s+="&s[]="+val.value;
     });
-    
+
     // Groups filter
     g = "";
-    $.each($("#g .multiselect-container .active input"), function (i, val) { 
+    $.each($("#g .multiselect-container .active input"), function (i, val) {
         g+="&g[]="+val.value;
     });
-    
+
     // Conditions filter
     c = "";
-    $.each($("#c .multiselect-container .active input"), function (i, val) { 
+    $.each($("#c .multiselect-container .active input"), function (i, val) {
         c+="&c[]="+val.value;
     });
-    
+
     // Sort order
     o = $("#o .multiselect-container .active input")[0].value;
-    
+
     // Sort ascending/descending
     ad = $("#ad .multiselect-container .active input")[0].value;
-    
+
     return "?ts="+ts+t+g+s+c+"&o="+o+"&ad="+ad;
 }
 
 function display_item(item){
     // Item's parameters
     href = '<?= base_url("/item/view/"); ?>/'+item["item_id"];
-    src_image = '<?= base_url("/images") . "/" ?>'+item["image"];
+    src_image = '<?= base_url(); ?>/'+item["image_path"];
     alt_image = '<?php htmlspecialchars(lang("MY_application.field_image")); ?>';
     item_condition = item["condition"]["bootstrap_label"];
     loan_bootstrap_label = item["current_loan"]["bootstrap_label"];
     item_localisation = item["current_loan"]["loan_id"]!=null ?'<br><h6>'+item["current_loan"]["item_localisation"]+'</h6>':"";
-    item_name = item["name"]; 
+    item_name = item["name"];
     item_description = item["description"];
     stocking_place = "<span>"+item["stocking_place"]["name"]+"</span>";
     inventory_number = item["inventory_number"];
     serial_number = item["serial_number"];
-    delete_item = '<?php if(isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] == true && $_SESSION["user_access"] >= ACCESS_LVL_ADMIN) { echo "<td><a href=\"".base_url("/item/delete/"); ?>'+item["item_id"]+'" class=\"close\" title=\"Supprimer l\'objet\">×</a></td> <?php } ?>';
- 
+    delete_item = '<?php if(isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] == true && $_SESSION["user_access"] >= ACCESS_LVL_ADMIN) { echo "<td><a href=\"".base_url("/item/delete/"); ?>/'+item["item_id"]+'" class=\"close\" title=\"Supprimer l\'objet\">×</a></td> <?php } ?>';
+
     // Create formatted table row and return it
     var row = $("<tr>");
-    
+
     row.append('<td><a href="'+href+'" style="display:block"><img src="'+src_image+'" width="100px" alt="'+alt_image+'" /></a></td>');
     row.append('<td>'+item_condition+'<br />'+loan_bootstrap_label+'<br />'+item_localisation+'</td>');
     row.append('<td><a href="'+href+'">'+item_name+'</a><h6>'+item_description+'</h6></td>');

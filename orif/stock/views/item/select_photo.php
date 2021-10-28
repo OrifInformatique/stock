@@ -1,7 +1,7 @@
 <?php
 // Make sure the user cannot modify the default image
 $image = $_SESSION['POST']['image'] ?? '';
-if ($image == ITEM_NO_IMAGE) {
+if ($image == config('\Stock\Config\StockConfig')->item_no_image) {
     $image = '';
 }
 ?>
@@ -69,7 +69,7 @@ function reSelectPhoto(event)
     var path = "<?= $image ?>";
     
     if(path !== ""){
-        rawImage.src = "<?= base_url(IMAGES_UPLOAD_PATH.$image)?>";
+        rawImage.src = "<?= base_url(config('\Stock\Config\StockConfig')->images_upload_path.$image)?>";
         croppedNameInput.value = path;
         setCropper();
     }
