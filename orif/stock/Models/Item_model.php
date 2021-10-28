@@ -101,20 +101,19 @@ class Item_model extends MyModel
           ->where('real_return_date is NULL')
           ->first();
 
-
         if (is_null($current_loan)) {
           // ITEM IS NOT LOANED
-          $current_loan['bootstrap_label'] = '<span class="label label-success">'.htmlspecialchars(lang('MY_application.lbl_loan_status_not_loaned')).'</span>';
+          $current_loan['bootstrap_label'] = '<span class="badge badge-success">'.htmlspecialchars(lang('MY_application.lbl_loan_status_not_loaned')).'</span>';
         } else {
           // ITEM IS LOANED
-          $current_loan['bootstrap_label'] = '<span class="label label-warning">'.htmlspecialchars(lang('MY_application.lbl_loan_status_loaned')).'</span>';
+          $current_loan['bootstrap_label'] = '<span class="badge badge-warning">'.htmlspecialchars(lang('MY_application.lbl_loan_status_loaned')).'</span>';
         }
       return $current_loan;
 
     }
 
 
-    protected function getLastInventoryControl($item){
+    public function getLastInventoryControl($item){
       if (!is_null($item))
       {
         if (is_null($this->inventory_control_model))
@@ -122,9 +121,7 @@ class Item_model extends MyModel
           $this->inventory_control_model = new Inventory_control_model();
         }
 
-        $query = $this->db->query("SELECT * FROM inventory_control WHERE item_id =" . $item['item_id']);
-        $item['inventory_controls'] = $query->getResultObject();
-        $inventory_controls = $item['inventory_controls'];
+        $inventory_controls = $this->inventory_control_model->asArray()->where('item_id',$item["item_id"])->find();
 
         $last_control = NULL;
 
@@ -137,9 +134,10 @@ class Item_model extends MyModel
             {
               $last_control = $control;
             }
-            else if ($control->date > $last_control->date)
+            else if ($control['date'] > $last_control['date'])
             {
               $last_control = $control;
+              $last_control['controller'] = $this->inventory_control_model->getUser($last_control['controller_id']);
             }
           }
         }
@@ -157,7 +155,6 @@ class Item_model extends MyModel
 
       return $tags;
     }
-
 
     public function getImage($item){
         if (!is_null($item) && is_null($item['image']))

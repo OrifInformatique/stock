@@ -230,12 +230,7 @@ class Item extends BaseController {
         }
 
         // Get item object and related objects
-        /*$item = $this->item_model->with('supplier')
-                ->with('stocking_place')
-                ->with('item_condition')
-                ->with('item_group')
-                ->get($id);*/
-
+        $this->inventory_control_model = new Inventory_control_model();
         $item = $this->item_model->asArray()->where(["item_id"=>$id])->first();
         $item['supplier'] = $this->item_model->getSupplier($item);
         $item['stocking_place'] = $this->item_model->getStockingPlace($item);
@@ -244,8 +239,10 @@ class Item extends BaseController {
         $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
         $item['current_loan'] = $this->item_model->getCurrentLoan($item);
         $item['warranty_status'] = $this->item_model->getWarrantyStatus($item);
-        $item['image_path'] = $this->item_model->getImagePath($item);
         $item['tags'] = $this->item_model->getTags($item);
+        $item['image'] = $this->item_model->getImagePath($item);
+        $item['last_inventory_control'] = $this->item_model->getLastInventoryControl($item);
+        $item['last_inventory_control']['controller'] = $this->inventory_control_model->getUser($item['last_inventory_control']['controller_id']);
 
         if (!is_null($item)) {
             $output['item'] = $item;
