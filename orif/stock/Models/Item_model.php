@@ -101,13 +101,12 @@ class Item_model extends MyModel
           ->where('real_return_date is NULL')
           ->first();
 
-
         if (is_null($current_loan)) {
           // ITEM IS NOT LOANED
-          $current_loan['bootstrap_label'] = '<span class="label label-success">'.htmlspecialchars(lang('MY_application.lbl_loan_status_not_loaned')).'</span>';
+          $current_loan['bootstrap_label'] = '<span class="badge badge-success">'.htmlspecialchars(lang('MY_application.lbl_loan_status_not_loaned')).'</span>';
         } else {
           // ITEM IS LOANED
-          $current_loan['bootstrap_label'] = '<span class="label label-warning">'.htmlspecialchars(lang('MY_application.lbl_loan_status_loaned')).'</span>';
+          $current_loan['bootstrap_label'] = '<span class="badge badge-warning">'.htmlspecialchars(lang('MY_application.lbl_loan_status_loaned')).'</span>';
         }
       return $current_loan;
 
@@ -158,7 +157,6 @@ class Item_model extends MyModel
       return $tags;
     }
 
-
     public function getImage($item){
         if (!is_null($item) && is_null($item['image']))
         {
@@ -168,7 +166,7 @@ class Item_model extends MyModel
         return $item['image'];
     }
 
-    public function getImagePath($item){		
+    public function getImagePath($item){
       if (!is_null($item) && ($item['image'] == config('\Stock\Config\StockConfig')->item_no_image))
       {
           return config('\Stock\Config\StockConfig')->item_no_image_path.config('\Stock\Config\StockConfig')->item_no_image;
@@ -179,7 +177,7 @@ class Item_model extends MyModel
       }
   }
 
-      
+
     /**
     * Calculate a warranty status based on buying date and warranty duration
     *
