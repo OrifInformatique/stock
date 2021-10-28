@@ -95,7 +95,7 @@
                 </div></div>
                 <div class="row">
                     <div class="col-xs-6">
-                        <label><?= lang('field_loan_date'); ?> :&nbsp;</label>
+                        <label><?= lang('MY_application.field_loan_date'); ?> :&nbsp;</label>
                     </div>
                     <div class="col-xs-6">
                         <?php if(!empty($item['current_loan']['date'])){
@@ -122,8 +122,8 @@
                     '</a>';?>
 
                 <!-- Button to create new loan -->
-                <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { 
-                    echo '<a href="'.base_url('/item/create-loan/'.$item['item_id']).'" '.
+                <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+                    echo '<a href="'.base_url('/item/create_loan/'.$item['item_id']).'" '.
                          'class="btn btn-primary"  role="button" >'.
                          lang('MY_application.btn_create_loan').'</a>';
                 }?>
@@ -163,7 +163,7 @@
                      lang('MY_application.btn_inventory_control_history').'</a>'; ?>
 
                 <!-- Button to create new inventory control -->
-                <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { 
+                <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
                     echo '<a href="'.base_url('/item/create_inventory_control/'.$item['item_id']).
                          '" class="btn btn-primary"  role="button" >'.
                          lang('MY_application.btn_create_inventory_control').'</a>';
@@ -208,7 +208,6 @@
             elseif ($item['warranty_status'] == 3) {
                 echo '<span class="label label-danger" >';}  // WARRANTY EXPIRED
             else {echo '<span>';}
-                error_log(json_encode($item['supplier']), 3, "C:\Users\RoSi\Documents\logsPHP.txt");
                 echo lang('MY_application.text_warranty_status.' . $item['warranty_status']); ?>
             </span>
         </div>
@@ -225,7 +224,7 @@
             {
                 foreach($item['tags'] as $tag)
                 {
-                    echo '<span class="label label-default">'.$tag."</span>\n";
+                    echo '<span class="label label-default">'.$tag[0]['name']."</span>\n";
                 }
             }
             ?>

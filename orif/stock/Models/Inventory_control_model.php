@@ -32,7 +32,7 @@ class Inventory_control_model extends MyModel
 
     /**
      *  Gets the corresponding item with a foreign key
-     *  
+     *
      *  @return array
      */
     public function getItem($fk_item)
@@ -47,7 +47,7 @@ class Inventory_control_model extends MyModel
 
     /**
      *  Gets the corresponding user with a foreign key
-     *  
+     *
      *  @return array
      */
     public function getUser($fk_user)
@@ -55,7 +55,8 @@ class Inventory_control_model extends MyModel
         if (is_null($this->User_model))
             $this->User_model = new User_model();
 
-        return $this->User_model->asArray()
+        return $this->User_model->withDeleted()
+                                ->asArray()
                                 ->where('id', $fk_user)
                                 ->first();
     }

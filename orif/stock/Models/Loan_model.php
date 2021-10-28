@@ -31,7 +31,7 @@ class Loan_model extends MyModel
         if(is_null($this->user_model)){
             $this->user_model = new User_model();
         }
-        $loan['loaner'] = $this->user_model->asArray()->where(['id'=>$loan['loan_by_user_id']])->find();
+        $loan['loaner'] = $this->user_model->withDeleted()->asArray()->find($loan['loan_by_user_id']);
         return $loan['loaner'];
     }
 
@@ -39,7 +39,7 @@ class Loan_model extends MyModel
         if(is_null($this->user_model)){
             $this->user_model = new User_model();
         }
-        $loan['borrower'] = $this->user_model->asArray()->where(['id'=>$loan['loan_to_user_id']])->find();
+        $loan['borrower'] = $this->user_model->withDeleted()->asArray()->find($loan['loan_to_user_id']);
         return $loan['borrower'];
     }
 
@@ -50,5 +50,5 @@ class Loan_model extends MyModel
         $loan['item'] = $this->item_model->asArray()->where(['item_id'=>$loan['item_id']])->find();
         return $loan['item'];
     }
-   
+
 }

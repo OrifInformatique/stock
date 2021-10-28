@@ -149,7 +149,7 @@ class Item_model extends MyModel
     }
 
 
-    protected function getTags($item){
+    public function getTags($item){
       if(is_null($this->item_tag_link_model)){
         $this->item_tag_link_model = new Item_tag_link_model();
       }
@@ -168,7 +168,7 @@ class Item_model extends MyModel
         return $item['image'];
     }
 
-    public function getImagePath($item){		
+    public function getImagePath($item){
       if (!is_null($item) && ($item['image'] == config('\Stock\Config\StockConfig')->item_no_image))
       {
           return config('\Stock\Config\StockConfig')->item_no_image_path.config('\Stock\Config\StockConfig')->item_no_image;
@@ -179,7 +179,7 @@ class Item_model extends MyModel
       }
   }
 
-      
+
     /**
     * Calculate a warranty status based on buying date and warranty duration
     *

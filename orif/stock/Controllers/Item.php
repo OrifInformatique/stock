@@ -24,6 +24,7 @@ use PSR\Log\LoggerInterface;
 use App\Controllers\BaseController;
 use DateInterval;
 use DateTime;
+use Stock\Models\Inventory_control_model;
 use Stock\Models\Item_model;
 use Stock\Models\Loan_model;
 use Stock\Models\Item_tag_model;
@@ -31,6 +32,7 @@ use Stock\Models\Item_condition_model;
 use Stock\Models\Item_group_model;
 use Stock\Models\Item_tag_link_model;
 use Stock\Models\Stocking_place_model;
+use User\Models\User_model;
 
 class Item extends BaseController {
 
@@ -180,7 +182,7 @@ class Item extends BaseController {
     {
         // Create the pagination
         $pager = \Config\Services::pager();
-/*
+        /*
         $config['base_url'] = base_url('/item/index/');
         $config['total_rows'] = $nbr_items;
         $config['per_page'] = ITEMS_PER_PAGE;
@@ -228,12 +230,12 @@ class Item extends BaseController {
         }
 
         // Get item object and related objects
-     /*   $item = $this->item_model->with('supplier')
+        /*$item = $this->item_model->with('supplier')
                 ->with('stocking_place')
                 ->with('item_condition')
                 ->with('item_group')
-                ->get($id);
-*/
+                ->get($id);*/
+
         $item = $this->item_model->asArray()->where(["item_id"=>$id])->first();
         $item['supplier'] = $this->item_model->getSupplier($item);
         $item['stocking_place'] = $this->item_model->getStockingPlace($item);
@@ -242,7 +244,8 @@ class Item extends BaseController {
         $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
         $item['current_loan'] = $this->item_model->getCurrentLoan($item);
         $item['warranty_status'] = $this->item_model->getWarrantyStatus($item);
-
+        $item['image_path'] = $this->item_model->getImagePath($item);
+        $item['tags'] = $this->item_model->getTags($item);
 
         if (!is_null($item)) {
             $output['item'] = $item;
@@ -619,11 +622,12 @@ class Item extends BaseController {
                 redirect('/item');
             }
 
-            $this->load->model('user_model');
-            $this->load->model('inventory_control_model');
+            $this->user_model = new User_model();
+            $this->inventory_control_model = new Inventory_control_model();
 
-            $data['item'] = $this->item_model->get($id);
-            $data['controller'] = $this->user_model->get($_SESSION['user_id']);
+            $data['item'] = $this->item_model->find($id);
+            $data['item']['inventory_number'] = $this->item_model->getInventoryNumber($data['item']);
+            $data['controller'] = $this->user_model->find($_SESSION['user_id']);
 
             if (isset($_POST['date']) && $_POST['date'] != '') {
                 $data['date'] = $_POST['date'];
@@ -638,19 +642,19 @@ class Item extends BaseController {
             }
 
             if (isset($_POST['submit'])) {
-                $inventory_control->item_id = $id;
-                $inventory_control->controller_id = $_SESSION['user_id'];
-                $inventory_control->date = $data['date'];
-                $inventory_control->remarks = $data['remarks'];
+                $inventory_control['item_id'] = $id;
+                $inventory_control['controller_id'] = $_SESSION['user_id'];
+                $inventory_control['date'] = $data['date'];
+                $inventory_control['remarks'] = $data['remarks'];
 
                 $this->inventory_control_model->insert($inventory_control);
-                redirect("item/view/" . $id);
+                return redirect()->to("/item/view/".$id);
             } else {
-                $this->display_view('inventory_control/form', $data);
+                $this->display_view('Stock\Views\inventory_control\form', $data);
             }
         } else {
             // Access is not allowed
-            $this->ask_for_login();
+            redirect('/item');
         }
     }
 
@@ -665,13 +669,18 @@ class Item extends BaseController {
             // No item specified, display items list
             redirect('/item');
         }
+        $this->inventory_control_model = new Inventory_control_model();
+        helper('MY_date');
 
         // Get item object with related inventory controls
-        $output['item'] = $this->item_model->get($id);
-        $output['inventory_controls'] = $this->inventory_control_model->with('controller')
-                ->get_many_by('item_id=' . $id);
+        $output['item'] = $this->item_model->find($id);
+        $output['inventory_controls'] = $this->inventory_control_model->where('item_id='.$id)->findAll();
+        $output['item']['inventory_number'] = $this->item_model->getInventoryNumber($output['item']);
+        array_walk($output['inventory_controls'], function(&$control) {
+            $control['controller'] = $this->inventory_control_model->getUser($control['controller_id']);
+        });
 
-        $this->display_view('inventory_control/list', $output);
+        $this->display_view('Stock\Views\inventory_control\list', $output);
     }
 
     /**
@@ -689,21 +698,17 @@ class Item extends BaseController {
             }
 
             // Get item object and related loans
-            $item = $this->item_model->get($id);
-            $loans = $this->loan_model->with('loan_by_user')
-                    ->with('loan_to_user')
-                    ->get_many_by('item_id', $item->item_id);
+            $item = $this->item_model->find($id);
 
             $data['item'] = $item;
-            $data['loans'] = $loans;
             $data['item_id'] = $id;
 
             // Test input
-            $this->load->library('form_validation');
+            $validation = \Config\Services::validation();
 
-            $this->form_validation->set_rules("date", "Date du prêt", 'required', array('required' => "La date du prêt doit être fournie"));
+            $validation->setRule("date", "Date du prêt", 'required', array('required' => "La date du prêt doit être fournie"));
 
-            if ($this->form_validation->run() === TRUE) {
+            if ($validation->run($_POST) === TRUE) {
                 $loanArray = $_POST;
 
                 if ($loanArray["planned_return_date"] == 0 || $loanArray["planned_return_date"] == "0000-00-00" || $loanArray["planned_return_date"] == "") {
@@ -716,19 +721,17 @@ class Item extends BaseController {
 
                 $loanArray["item_id"] = $id;
 
-                $loanArray["loan_to_user_id"] = null;
                 $loanArray["loan_by_user_id"] = $this->session->user_id;
 
                 $this->loan_model->insert($loanArray);
 
-                header("Location: " . base_url() . "item/loans/" . $id);
-                exit();
+                return redirect()->to("/item/loans/".$id);
             } else {
-                $this->display_view('loan/form', $data);
+                $this->display_view('Stock\Views\loan\form', $data);
             }
         } else {
             // Access is not allowed
-            $this->ask_for_login();
+            redirect('/item');
         }
     }
 
@@ -742,15 +745,15 @@ class Item extends BaseController {
         // Check if this is allowed
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
             // get the data from the loan with this id (to fill the form or to get the concerned item)
-            $data = get_object_vars($this->loan_model->get($id));
+            $data = $this->loan_model->find($id);
 
             if (!empty($_POST)) {
                 // test input
-                $this->load->library('form_validation');
+                $validation = \Config\Services::validation();
 
-                $this->form_validation->set_rules("date", "Date du prêt", 'required', array('required' => "La date du prêt doit être fournie"));
+                $validation->setRule("date", "Date du prêt", 'required', array('required' => "La date du prêt doit être fournie"));
 
-                if ($this->form_validation->run() === TRUE) {
+                if ($validation->run($_POST) === TRUE) {
                     //Declarations
 
                     $loanArray = $_POST;
@@ -766,27 +769,14 @@ class Item extends BaseController {
                     // Execute the changes in the item table
                     $this->loan_model->update($id, $loanArray);
 
-                    redirect("/item/loans/" . $data["item_id"]);
-                    exit();
-                } else {
-                    // Load the options
-                    $this->load->model('stocking_place_model');
-                    $data['stocking_places'] = $this->stocking_place_model->get_all();
-                    $this->load->model('supplier_model');
-                    $data['suppliers'] = $this->supplier_model->get_all();
-                    $this->load->model('item_group_model');
-                    $data['item_groups'] = $this->item_group_model->get_all();
-
-                    // Load the tags
-                    $this->load->model('item_tag_model');
-
-                    $data['item_tags'] = $this->item_tag_model->get_all();
+                    var_dump($data);
+                    return redirect()->to("/item/loans/".$data["item_id"]);
                 }
             }
-            $this->display_view('loan/form', $data);
+            $this->display_view('Stock\Views\loan\form', $data);
         } else {
             // Access is not allowed
-            $this->ask_for_login();
+            redirect("/item");
         }
     }
 
@@ -804,11 +794,14 @@ class Item extends BaseController {
         }
 
         // Get item object and related loans
-        $item = $this->item_model->get($id);
-        /*$loans = $this->loan_model->with('loan_by_user')
-                ->with('loan_to_user')
-                ->get_many_by('item_id', $item->item_id);*/
-        $loans = $this->loan_model->where('item_id', $item->item_id);
+        $item = $this->item_model->find($id);
+        $loans = $this->loan_model->where('item_id', $item['item_id'])->findAll();
+        array_walk($loans, function(&$loan) {
+            $loan['loan_by_user'] = $this->loan_model->get_loaner($loan);
+            if (!is_null($loan['loan_to_user_id'])) {
+                $loan['loan_to_user'] = $this->loan_model->get_borrower($loan);
+            }
+        });
 
         $output['item'] = $item;
         $output['loans'] = $loans;
@@ -831,20 +824,18 @@ class Item extends BaseController {
                 $data['db'] = 'loan';
                 $data['id'] = $id;
 
-                $this->display_view('item/confirm_delete', $data);
+                $this->display_view('Stock\Views\item\confirm_delete', $data);
             } else {
-                $this->load->model("loan_model");
-
                 // get the data from the loan with this id (to fill the form or to get the concerned item)
-                $data = get_object_vars($this->loan_model->get($id));
+                $data = $this->loan_model->find($id);
 
                 $this->loan_model->delete($id);
 
-                redirect("/item/loans/" . $data["item_id"]);
+                return redirect()->to("/item/loans/" . $data["item_id"]);
             }
         } else {
             // Access is not allowed
-            $this->ask_for_login();
+            redirect('/item');
         }
     }
 
