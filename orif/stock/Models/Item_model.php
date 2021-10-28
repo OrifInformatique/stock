@@ -95,10 +95,11 @@ class Item_model extends MyModel
         }
         helper('MY_date');
 
-        $where = array('item_id'=>$item['item_id'], 'date<='=>mysqlDate('now'), 'real_return_date is NULL');
-
-        $current_loan = $this->loan_model->asArray()->where($where)->first();
-
+        $current_loan = $this->loan_model->asArray()
+          ->where('item_id', $item['item_id'])
+          ->where('date <=', mysqlDate('now'))
+          ->where('real_return_date is NULL')
+          ->first();
 
         if (is_null($current_loan)) {
           // ITEM IS NOT LOANED
