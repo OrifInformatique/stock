@@ -6,7 +6,7 @@
     <!-- *** ADMIN *** -->
 	<?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?>
     	<a href="<?= base_url('item/modify/'.$item['item_id']); ?>" class="btn btn-warning" role="button"><?= lang('MY_application.btn_modify'); ?></a>
-        <?php if($_SESSION['user_access'] >= ACCESS_LVL_ADMIN) { ?>
+        <?php if($_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_admin) { ?>
     	   <a href="<?= base_url('item/delete/'.$item['item_id']); ?>" class="btn btn-danger" role="button"><?= lang('MY_application.btn_delete'); ?></a>
         <?php } ?>
 	<?php } ?>

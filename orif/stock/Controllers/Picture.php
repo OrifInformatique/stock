@@ -1,6 +1,6 @@
 <?php
 
-namespace  Stock\Controllers;
+namespace Stock\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\RequestInterface;
@@ -56,7 +56,7 @@ class Picture extends BaseController {
             if (!empty($_POST) && $_POST['cropped_file'] != NULL) {
                 $picture_file = $_POST['cropped_file'];
                 $picture_name = $_SESSION['picture_prefix'].IMAGE_PICTURE_SUFFIX.IMAGE_TMP_SUFFIX.IMAGE_EXTENSION;
-                file_put_contents(IMAGES_UPLOAD_PATH.$picture_name, base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $picture_file)));
+                file_put_contents(config('\Stock\Config\StockConfig')->images_uploads_path.$picture_name, base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $picture_file)));
                 return redirect()->to($_SESSION['picture_callback']);
             } else {
                 return redirect()->to(base_url('picture/get_picture/1'));

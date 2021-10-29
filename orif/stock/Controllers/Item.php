@@ -55,6 +55,7 @@ class Item extends BaseController {
         $this->item_condition_model = new Item_condition_model();
         $this->item_group_model = new Item_group_model();
         $this->stocking_place_model = new Stocking_place_model();
+        $this->config = config('\Stock\Config\StockConfig');
         helper('sort');
         helper('form');
     }
@@ -105,7 +106,7 @@ class Item extends BaseController {
         $filters = $_GET;
         if (!isset($filters['c'])) {
             // No condition selected for filtering, default filtering for "functional" items
-            $filters['c'] = array(FUNCTIONAL_ITEM_CONDITION_ID);
+            $filters['c'] = array($this->config->functional_item_condition);
         }
 
         // Sanitize $page parameter
@@ -157,10 +158,10 @@ class Item extends BaseController {
         $output['pagination'] = $this->load_pagination($items_count, $page);
 
         $output['number_page'] = $page;
-        if($output['number_page']>ceil($items_count/ITEMS_PER_PAGE)) $output['number_page']=ceil($items_count/ITEMS_PER_PAGE);
+        if($output['number_page']>ceil($items_count/$this->config->items_per_page)) $output['number_page']=ceil($items_count/$this->config->items_per_page);
 
         // Keep only the slice of items corresponding to the current page
-        $output["items"] = array_slice($output["items"], ($output['number_page']-1)*ITEMS_PER_PAGE, ITEMS_PER_PAGE);
+        $output["items"] = array_slice($output["items"], ($output['number_page']-1)*$this->config->items_per_page, $this->config->items_per_page);
 
         return $output;
     }
@@ -176,7 +177,7 @@ class Item extends BaseController {
         /*
         $config['base_url'] = base_url('/item/index/');
         $config['total_rows'] = $nbr_items;
-        $config['per_page'] = ITEMS_PER_PAGE;
+        $config['per_page'] = $this->config->items_per_page;
         $config['use_page_numbers'] = TRUE;
         $config['reuse_query_string'] = TRUE;
 
@@ -204,7 +205,7 @@ class Item extends BaseController {
         return $this->pagination->initialize($config);
         */
 
-        return $pager->makeLinks($page, ITEMS_PER_PAGE, $nbr_items);
+        return $pager->makeLinks($page, $this->config->items_per_page, $nbr_items);
 
     }
 
@@ -256,15 +257,15 @@ class Item extends BaseController {
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
             // Get new item id and set picture_prefix
             $item_id = $this->item_model->getFutureId();
-            $_SESSION['picture_prefix'] = str_pad($item_id, INVENTORY_NUMBER_CHARS, "0", STR_PAD_LEFT);
+            $_SESSION['picture_prefix'] = str_pad($item_id, $this->config->inventory_number_chars, "0", STR_PAD_LEFT);
 
             // Define image path variables
-            $temp_image_name = $_SESSION["picture_prefix"].IMAGE_PICTURE_SUFFIX.IMAGE_TMP_SUFFIX.IMAGE_EXTENSION;
-            $new_image_name = $_SESSION["picture_prefix"].IMAGE_PICTURE_SUFFIX.IMAGE_EXTENSION;
+            $temp_image_name = $_SESSION["picture_prefix"].$this->config->image_picture_suffix.$this->config->image_tmp_suffix.$this->config->image_extension;
+            $new_image_name = $_SESSION["picture_prefix"].$this->config->image_picture_suffix.$this->config->image_extension;
 
             // Check if the user cancelled the form
             if(isset($_POST['submitCancel'])){
-                $tmp_image_file = glob(config('\Stock\Config\StockConfig')->images_upload_path.$temp_image_name)[0];
+                $tmp_image_file = glob($this->config->images_upload_path.$temp_image_name)[0];
 
                 // Check if there is a temporary file, if yes then delete it
                 if($tmp_image_file != null || $tmp_image_file != false){
@@ -330,8 +331,8 @@ class Item extends BaseController {
                 }
 
                 // Turn Temporaty Image into a final one if there is one
-                if(file_exists(config('\Stock\Config\StockConfig')->images_upload_path.$temp_image_name)){
-                    rename(config('\Stock\Config\StockConfig')->images_upload_path.$temp_image_name,config('\Stock\Config\StockConfig')->images_upload_path.$new_image_name);
+                if(file_exists($this->config->images_upload_path.$temp_image_name)){
+                    rename($this->config->images_upload_path.$temp_image_name, $this->config->images_upload_path.$new_image_name);
                     $itemArray['image'] = $new_image_name;
                 }
 
@@ -402,13 +403,13 @@ class Item extends BaseController {
         // Check if access is allowed
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
             // Define image path variables
-            $_SESSION['picture_prefix'] = str_pad($id, INVENTORY_NUMBER_CHARS, "0", STR_PAD_LEFT);
-            $temp_image_name = $_SESSION["picture_prefix"].IMAGE_PICTURE_SUFFIX.IMAGE_TMP_SUFFIX.IMAGE_EXTENSION;
-            $new_image_name = $_SESSION["picture_prefix"].IMAGE_PICTURE_SUFFIX.IMAGE_EXTENSION;
+            $_SESSION['picture_prefix'] = str_pad($id, $this->config->inventory_number_chars, "0", STR_PAD_LEFT);
+            $temp_image_name = $_SESSION["picture_prefix"].$this->config->image_picture_suffix.$this->config->image_tmp_suffix.$this->config->image_extension;
+            $new_image_name = $_SESSION["picture_prefix"].$this->config->image_picture_suffix.$this->config->image_extension;
 
             // Check if the user cancelled the form
             if(isset($_POST['submitCancel'])){
-                $tmp_image_file = glob(config('\Stock\Config\StockConfig')->images_upload_path.$temp_image_name)[0];
+                $tmp_image_file = glob($this->config->images_upload_path.$temp_image_name)[0];
 
                 // Check if there is a temporary image file, if yes then delete it
                 if($tmp_image_file != null || $tmp_image_file != false){
@@ -483,8 +484,8 @@ class Item extends BaseController {
                     }
 
                     // Turn temporary image into a final one if there is one
-                    if(file_exists(config('\Stock\Config\StockConfig')->images_upload_path.$temp_image_name)){
-                        rename(config('\Stock\Config\StockConfig')->images_upload_path.$temp_image_name,config('\Stock\Config\StockConfig')->images_upload_path.$new_image_name);
+                    if(file_exists($this->config->images_upload_path.$temp_image_name)){
+                        rename($this->config->images_upload_path.$temp_image_name, $this->config->images_upload_path.$new_image_name);
                         $itemArray['image'] = $new_image_name;
                     }
 
@@ -560,7 +561,7 @@ class Item extends BaseController {
      */
     public function delete($id, $command = NULL) {
         // Check if this is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= ACCESS_LVL_ADMIN) {
+        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_admin) {
             if (empty($command)) {
                 $data['db'] = 'item';
                 $data['id'] = $id;
@@ -570,12 +571,12 @@ class Item extends BaseController {
                 $this->item_model->update($id, array("description" => "FAC"));
 
                 $item = $this->item_model->find($id);
-                if (!is_null($item['image']) && $item['image'] != config('Stock\Config\StockConfig')->item_no_image) {
+                if (!is_null($item['image']) && $item['image'] != $this->config->item_no_image) {
                     $items = $this->item_model->asArray()->where('image', $item['image'])->findAll();
                     // Change this if soft deleting items is enabled
                     // Check if any other item uses this image
                     if (count($items) < 2) {
-                        unlink(ROOTPATH.config('\Stock\Config\StockConfig')->images_upload_path.$item['image']);
+                        unlink(ROOTPATH.$this->config->images_upload_path.$item['image']);
                     }
                 }
 
@@ -614,7 +615,7 @@ class Item extends BaseController {
             if (isset($_POST['date']) && $_POST['date'] != '') {
                 $data['date'] = $_POST['date'];
             } else {
-                $data['date'] = date('Y-m-d');
+                $data['date'] = date($this->config->database_date_format);
             }
 
             if (isset($_POST['remarks'])) {
@@ -800,7 +801,7 @@ class Item extends BaseController {
      */
     public function delete_loan($id, $command = NULL) {
         // Check if this is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= ACCESS_LVL_ADMIN) {
+        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_admin) {
             if (empty($command)) {
                 $data['db'] = 'loan';
                 $data['id'] = $id;
@@ -888,10 +889,10 @@ class Item extends BaseController {
         $pagination = $this->load_pagination($items_count, $page);
 
         $number_page = $page;
-        if($number_page > ceil($items_count/ITEMS_PER_PAGE)) $number_page = ceil($items_count/ITEMS_PER_PAGE);
+        if($number_page > ceil($items_count/$this->config->items_per_page)) $number_page = ceil($items_count/$this->config->items_per_page);
 
         // Keep only the slice of items corresponding to the current page
-        $items = array_slice($items, ($number_page-1)*ITEMS_PER_PAGE, ITEMS_PER_PAGE);
+        $items = array_slice($items, ($number_page-1)*$this->config->items_per_page, $this->config->items_per_page);
 
         // Add to the item whether it is late, the starting date, and the end date
         array_walk($items, function(&$item) use ($late_item_ids) {

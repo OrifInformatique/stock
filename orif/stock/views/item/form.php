@@ -1,3 +1,6 @@
+<?php
+$config = config('\Stock\Config\StockConfig');
+?>
 <form class="container" method="post" enctype="multipart/form-data">
     <!-- BUTTONS -->
     <div class="row">
@@ -73,16 +76,17 @@
 
             <div class="form-group">
                 <?php
-                if(file_exists(config('\Stock\Config\StockConfig')->images_upload_path.$_SESSION['picture_prefix'].IMAGE_PICTURE_SUFFIX.IMAGE_TMP_SUFFIX.IMAGE_EXTENSION)){
-                    $imagePath = $_SESSION['picture_prefix'].IMAGE_PICTURE_SUFFIX.IMAGE_TMP_SUFFIX.IMAGE_EXTENSION;
+                $temp_path = $_SESSION['picture_prefix'].$config->image_picture_suffix.$config->image_tp_suffix.$config->image_extension;
+                if(file_exists($config->images_upload_path.$temp_path)){
+                    $imagePath = $temp_path;
                 }else if (isset($image) && $image!='') {
                     $imagePath = $image;
                 }else{
-                    $imagePath = config('\Stock\Config\StockConfig')->item_no_image;
+                    $imagePath = $config->item_no_image;
                 }
                 ?>
                     <img id="picture"
-                         src="<?= base_url(config('\Stock\Config\StockConfig')->images_upload_path.$imagePath); ?>"
+                         src="<?= base_url($config->images_upload_path.$imagePath); ?>"
                          width="100%"
                          alt="<?= lang('MY_application.field_image'); ?>" />
             </div>
@@ -104,7 +108,7 @@
                         echo form_dropdown('item_group_id', $item_groups_name, $item_group_id, 'class="form-control" id="item_group_id"');
                     } else {
                         // No group selected
-                        echo form_dropdown('item_group_id', $item_groups_name, ITEMS_DEFAULT_GROUP, 'class="form-control" id="item_group_id"');
+                        echo form_dropdown('item_group_id', $item_groups_name, $config->items_default_group, 'class="form-control" id="item_group_id"');
                     }
                     ?>
                 </div>
@@ -247,7 +251,7 @@ $(document).ready(function() {
     // Refresh the image to prevent display of an old cach image.
     // Changing the src attribute forces browser to update.
     d = new Date();
-    $("#picture").attr("src", "<?= base_url(config('\Stock\Config\StockConfig')->images_upload_path.$imagePath); ?>?"+d.getTime());
+    $("#picture").attr("src", "<?= base_url($config->images_upload_path.$imagePath); ?>?"+d.getTime());
 });
 
 function get(objectName){
@@ -259,10 +263,10 @@ function get(objectName){
             return <?php $array = ""; foreach($item_tags as $item_tag) $array .= "'".$item_tag->short_name."',"; echo "[$array]"; ?>;
 
         case "INVENTORY_PREFIX":
-            return "<?=INVENTORY_PREFIX; ?>" ;
+            return "<?=$config->inventory_prefix; ?>" ;
 
         case "INVENTORY_NUMBER_CHARS":
-            return "<?=INVENTORY_NUMBER_CHARS; ?>" ;
+            return "<?=$config->inventory_number_chars; ?>" ;
 
         case "item_id":
             return "<?= $item_id; ?>" ;

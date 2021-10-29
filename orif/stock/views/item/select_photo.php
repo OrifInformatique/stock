@@ -60,8 +60,8 @@ var cropper = null;
 var croppedImage = null;
 
 // Define image upload dimensions
-const IMAGE_UPLOAD_WIDTH = <?= IMAGE_UPLOAD_WIDTH; ?>;
-const IMAGE_UPLOAD_HEIGHT = <?= IMAGE_UPLOAD_HEIGHT; ?>;
+const IMAGE_UPLOAD_WIDTH = <?= config('\Stock\Config\StockConfig')->image_upload_width; ?>;
+const IMAGE_UPLOAD_HEIGHT = <?= config('\Stock\Config\StockConfig')->image_upload_height; ?>;
 
 //
 function reSelectPhoto(event)
