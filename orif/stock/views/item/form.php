@@ -76,7 +76,7 @@ $config = config('\Stock\Config\StockConfig');
 
             <div class="form-group">
                 <?php
-                $temp_path = $_SESSION['picture_prefix'].$config->image_picture_suffix.$config->image_tp_suffix.$config->image_extension;
+                $temp_path = $_SESSION['picture_prefix'].$config->image_picture_suffix.$config->image_tmp_suffix.$config->image_extension;
                 if(file_exists($config->images_upload_path.$temp_path)){
                     $imagePath = $temp_path;
                 }else if (isset($image) && $image!='') {
