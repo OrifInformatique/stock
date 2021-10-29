@@ -19,3 +19,8 @@
 li.nav-item {
 	margin: 0 10px;
 }
+
+/* Items list style */
+#list_item .item {
+    padding: .75rem;
+}
