@@ -145,7 +145,7 @@
                     <label><?= htmlspecialchars(lang('MY_application.field_last_inventory_control')); ?> :</label>
                 </div>
                 <div class="col-sm-8">
-                    <?php if(array_key_exists('last_inventory_control', $item)) {
+                    <?php if(!is_null($item['last_inventory_control'])) {
                         echo databaseToShortDate($item['last_inventory_control']['date']);
                         echo ', '.htmlspecialchars($item['last_inventory_control']['controller']['username']);
                         if(!is_null($item['last_inventory_control']['remarks'])) {

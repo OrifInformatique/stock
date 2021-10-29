@@ -166,7 +166,7 @@ class Item_model extends MyModel
     }
 
     public function getImagePath($item){
-      if (!is_null($item) && ($item['image'] == config('\Stock\Config\StockConfig')->item_no_image))
+      if (!is_null($item) && ($item['image'] == config('\Stock\Config\StockConfig')->item_no_image || is_null($item['image'])))
       {
           return config('\Stock\Config\StockConfig')->item_no_image_path.config('\Stock\Config\StockConfig')->item_no_image;
       }
@@ -174,7 +174,7 @@ class Item_model extends MyModel
       {
           return config('\Stock\Config\StockConfig')->images_upload_path.$item['image'];
       }
-  }
+    }
 
 
     /**
@@ -453,7 +453,7 @@ class Item_model extends MyModel
 
 
       return $items;
-  }
+    }
 
 
   public function getInventoryNumber($item)

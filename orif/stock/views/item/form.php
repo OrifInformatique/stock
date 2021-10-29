@@ -2,19 +2,20 @@
     <!-- BUTTONS -->
     <div class="row">
         <div class="form-group col-xs-12">
-            <button type="submit" class="btn btn-success"><?= $this->lang->line('btn_save'); ?></button>
-            <button type="submit" class="btn btn-danger" name="submitCancel"><?= $this->lang->line('btn_cancel');?></button>
+            <button type="submit" class="btn btn-success"><?= lang('MY_application.btn_save'); ?></button>
+            <button type="submit" class="btn btn-danger" name="submitCancel"><?= lang('MY_application.btn_cancel');?></button>
         </div>
     </div>
 
     <!-- ERROR MESSAGES -->
     <div class="row">
     <?php
-        if (!empty(validation_errors()) || !empty($upload_errors)) {
-            echo '<div class="alert alert-danger">'.validation_errors();
-            if (isset($upload_errors)) {
-                echo $upload_errors;
-            } 
+        if ((isset($errors) && !empty($errors)) || (isset($upload_errors) && !empty($upload_errors))) {
+            if ((isset($errors) && !empty($errors)) && (isset($upload_errors) && !empty($upload_errors))) $errors = array_merge($errors, $upload_errors);
+            echo '<div class="alert alert-danger">';
+            if (isset($errors) && !empty($errors)) {
+                echo implode('<br>', array_values($errors));
+            }
             echo '</div>';
         }
     ?>
@@ -25,12 +26,12 @@
         <div class="col-md-8">
             <div class="form-group">
                 <input type="text" class="form-control input-bold" name="name"
-                        placeholder="<?= $this->lang->line('field_item_name') ?>"
+                        placeholder="<?= lang('MY_application.field_item_name') ?>"
                         value="<?php if(isset($name)) {echo set_value('name',$name);} else {echo set_value('name');} ?>" />
             </div>
             <div class="form-group">
                 <input type="text" class="form-control" name="description"
-                        placeholder="<?= $this->lang->line('field_item_description') ?>"
+                        placeholder="<?= lang('MY_application.field_item_description') ?>"
                         value="<?php if(isset($description)) {echo set_value('description',$description);} else {echo set_value('description');} ?>" />
             </div>
         </div>
@@ -39,7 +40,7 @@
                 <div class="form-group col-xs-7">
                     <input type="text" class="form-control input-bold" name="inventory_prefix"
                            id="inventory_prefix"
-                           placeholder="<?php echo $this->lang->line('field_inventory_number') ?>"
+                           placeholder="<?php echo lang('MY_application.field_inventory_number') ?>"
                            value="<?php if(isset($inventory_prefix)) {echo set_value('inventory_prefix',$inventory_prefix);} else {echo set_value('inventory_prefix');} ?>" />
                 </div>
                 <div class="form-group col-xs-5">
@@ -52,7 +53,7 @@
             <div class="row">
                 <div class="form-group col-xs-12">
                     <input type="button" class="form-control btn btn-primary" name="inventory_number_button"
-                           value="<?= $this->lang->line('btn_generate_inventory_nb') ?>" onclick="createInventoryNo()">
+                           value="<?= lang('MY_application.btn_generate_inventory_nb') ?>" onclick="createInventoryNo()">
                 </div>
             </div>
         </div>
@@ -61,17 +62,17 @@
     <!-- ITEM DETAILS -->
     <div class="row">
         <div class="col-xs-12">
-            <p class="bg-primary">&nbsp;<?= $this->lang->line('text_item_detail'); ?></p>
+            <p class="bg-primary">&nbsp;<?= lang('MY_application.text_item_detail'); ?></p>
         </div>
     </div>
     <div class="row">
         <div class="col-md-4">
             <div class="form-group">
-                <input name="photoSubmit" type="submit" value="<?= $this->lang->line('field_add_modify_photo')?>" class="btn btn-default" />
+                <input name="photoSubmit" type="submit" value="<?= lang('MY_application.field_add_modify_photo')?>" class="btn btn-default" />
             </div>
-            
+
             <div class="form-group">
-                <?php 
+                <?php
                 if(file_exists(config('\Stock\Config\StockConfig')->images_upload_path.$_SESSION['picture_prefix'].IMAGE_PICTURE_SUFFIX.IMAGE_TMP_SUFFIX.IMAGE_EXTENSION)){
                     $imagePath = $_SESSION['picture_prefix'].IMAGE_PICTURE_SUFFIX.IMAGE_TMP_SUFFIX.IMAGE_EXTENSION;
                 }else if (isset($image) && $image!='') {
@@ -79,16 +80,13 @@
                 }else{
                     $imagePath = config('\Stock\Config\StockConfig')->item_no_image;
                 }
-
-                if(isset($imagePath)){
                 ?>
                     <img id="picture"
                          src="<?= base_url(config('\Stock\Config\StockConfig')->images_upload_path.$imagePath); ?>"
                          width="100%"
-                         alt="<?= $this->lang->line('field_image'); ?>" />
-                <?php } ?>
+                         alt="<?= lang('MY_application.field_image'); ?>" />
             </div>
-            
+
             <div class="form-group">
                 <input type="hidden" id="image" name="image" value="<?php if(isset($imagePath)){ echo $imagePath; }?>"/>
             </div>
@@ -96,7 +94,7 @@
         <div class="col-md-8">
             <div class="row">
                 <div class="form-group col-md-4">
-                    <label for="item_group_id"><?= $this->lang->line('field_group'); ?>&nbsp;</label>
+                    <label for="item_group_id"><?= lang('MY_application.field_group'); ?>&nbsp;</label>
                     <?php
                     if (isset($_POST['item_group_id'])) {
                         // A group has allready been selected, keep it selected
@@ -111,17 +109,17 @@
                     ?>
                 </div>
                 <div class="form-group col-md-8">
-                    <label for="serial_number"><?= $this->lang->line('field_serial_number'); ?>&nbsp;</label>
+                    <label for="serial_number"><?= lang('MY_application.field_serial_number'); ?>&nbsp;</label>
                     <input type="text" id="serial_number" name="serial_number" class="form-control"
                             value="<?php if(isset($serial_number)) {echo set_value('serial_number',$serial_number);} else {echo set_value('serial_number');} ?>" />
                 </div>
             </div>
             <div class="row">
                 <div class="form-group col-xs-12">
-                    <label for="remarks"><?= $this->lang->line('field_remarks'); ?></label>
+                    <label for="remarks"><?= lang('MY_application.field_remarks'); ?></label>
                     <textarea id="remarks" name="remarks" class="form-control"><?php
                         // Don't move the <php> markups or they will be white spaces in textarea
-                        if(isset($remarks)) {echo set_value('remarks',$remarks);} else {echo set_value('remarks');} 
+                        if(isset($remarks)) {echo set_value('remarks',$remarks);} else {echo set_value('remarks');}
                     ?></textarea>
                 </div>
             </div>
@@ -129,7 +127,7 @@
 
         <!-- Button to display linked file -->
         <div class="form-group col-xs-12">
-            <label for="linked_file"><?= $this->lang->line('field_linked_file_upload'); ?></label>
+            <label for="linked_file"><?= lang('MY_application.field_linked_file_upload'); ?></label>
             <input type="file" id="linked_file" name="linked_file" accept=".pdf, .doc, .docx" class="form-control-file" />
         </div>
     </div>
@@ -137,31 +135,31 @@
     <!-- ITEM STATUS, LOAN STATUS AND HISTORY -->
     <div class="row">
         <div class="col-xs-12">
-            <p class="bg-primary">&nbsp;<?= $this->lang->line('text_item_loan_status'); ?></p>
+            <p class="bg-primary">&nbsp;<?= lang('MY_application.text_item_loan_status'); ?></p>
         </div>
     </div>
     <div class="row">
         <div class="form-group col-md-4">
-            <label for="item_condition_id"><?= $this->lang->line('text_item_condition'); ?></label>
+            <label for="item_condition_id"><?= lang('MY_application.text_item_condition'); ?></label>
             <select id="item_condition_id" name="item_condition_id" class="form-control"><?php
                 foreach ($condishes as $item_condition) {
-                    ?><option value="<?= $item_condition->item_condition_id; ?>" <?php
-                        if (isset($item_condition_id) && $item_condition_id == $item_condition->item_condition_id) {
+                    ?><option value="<?= $item_condition['item_condition_id']; ?>" <?php
+                        if (isset($item_condition_id) && $item_condition_id == $item_condition['item_condition_id']) {
                             echo "selected";
                         }
-                    ?> ><?= $item_condition->name; ?></option><?php
+                    ?> ><?= $item_condition['name']; ?></option><?php
                 } ?>
             </select>
         </div>
         <div class="form-group col-md-4">
-            <label for="stocking_place_id"><?= $this->lang->line('field_stocking_place'); ?></label>
+            <label for="stocking_place_id"><?= lang('MY_application.field_stocking_place'); ?></label>
 			<select id="stocking_place_id" name="stocking_place_id" class="form-control"><?php
-				foreach ($stocking_places as $stocking_place) { 
-				?><option value="<?= $stocking_place->stocking_place_id; ?>" <?php
-                    if (isset($stocking_place_id) && $stocking_place_id == $stocking_place->stocking_place_id) {
+				foreach ($stocking_places as $stocking_place) {
+				?><option value="<?= $stocking_place['stocking_place_id']; ?>" <?php
+                    if (isset($stocking_place_id) && $stocking_place_id == $stocking_place['stocking_place_id']) {
                         echo "selected";
                     }
-                ?> ><?= $stocking_place->name; ?></option><?php
+                ?> ><?= $stocking_place['name']; ?></option><?php
 				} ?>
 			</select>
         </div>
@@ -170,44 +168,44 @@
     <!-- ITEM SUPPLIER, BUYING AND WARRANTY INFORMATIONS -->
     <div class="row">
         <div class="col-xs-12">
-            <p class="bg-primary">&nbsp;<?= $this->lang->line('text_item_buying_warranty'); ?></p>
+            <p class="bg-primary">&nbsp;<?= lang('MY_application.text_item_buying_warranty'); ?></p>
         </div>
     </div>
     <div class="row">
         <div class ="col-md-4">
             <div class="form-group">
-                <label for="supplier_id"><?= $this->lang->line('field_supplier'); ?></label>
+                <label for="supplier_id"><?= lang('MY_application.field_supplier'); ?></label>
                 <select id="supplier_id" name="supplier_id" class="form-control"><?php
-                    foreach ($suppliers as $supplier) { 
-    				?><option value="<?= $supplier->supplier_id; ?>" <?php
-                        if (isset($supplier_id) && $supplier_id == $supplier->supplier_id) {
+                    foreach ($suppliers as $supplier) {
+    				?><option value="<?= $supplier['supplier_id']; ?>" <?php
+                        if (isset($supplier_id) && $supplier_id == $supplier['supplier_id']) {
                             echo "selected";
                         }
-                    ?> ><?= $supplier->name; ?></option><?php
+                    ?> ><?= $supplier['name']; ?></option><?php
     				} ?>
                 </select>
             </div>
             <div class="form-group">
-                <label for="supplier_ref"><?= $this->lang->line('field_supplier_ref'); ?></label>
+                <label for="supplier_ref"><?= lang('MY_application.field_supplier_ref'); ?></label>
                 <input type="text" id="supplier_ref" name="supplier_ref" class="form-control"
                        value="<?php if(isset($supplier_ref)) {echo set_value('supplier_ref',$supplier_ref);} else {echo set_value('supplier_ref');} ?>" />
             </div>
         </div>
         <div class="col-md-4">
             <div class="form-group">
-                <label for="buying_price"><?= $this->lang->line('field_buying_price'); ?></label>
-                <input type="number" id="buying_price" name="buying_price" class="form-control" min="0" step="0.05" 
+                <label for="buying_price"><?= lang('MY_application.field_buying_price'); ?></label>
+                <input type="number" id="buying_price" name="buying_price" class="form-control" min="0" step="0.05"
                        value="<?php if(isset($buying_price)) {echo set_value('buying_price',$buying_price);} else {echo set_value('buying_price');} ?><?= set_value('buying_price'); ?>" />
             </div>
             <div class="form-group">
-                <label for="buying_date"><?= $this->lang->line('field_buying_date'); ?></label>
+                <label for="buying_date"><?= lang('MY_application.field_buying_date'); ?></label>
                 <input type="date" id="buying_date" name="buying_date" class="form-control"
                        value="<?php if(isset($buying_date)) {echo set_value('buying_date',$buying_date);} else {echo set_value('buying_date', date('Y-m-d'));} ?>" onblur="change_warranty()" />
             </div>
         </div>
         <div class="col-md-4">
             <div class="form-group">
-                <label for="warranty_duration"><?= $this->lang->line('field_warranty_duration'); ?></label>
+                <label for="warranty_duration"><?= lang('MY_application.field_warranty_duration'); ?></label>
                 <input type="number" id="warranty_duration" name="warranty_duration" class="form-control" min="0" max="1000"
                        value="<?php if(isset($warranty_duration)) {echo set_value('warranty_duration',$warranty_duration);} else {echo set_value('warranty_duration');} ?>" onblur="change_warranty()" />
             </div>
@@ -218,19 +216,19 @@
     <!-- ITEM TAGS -->
     <div class="row">
         <div class="col-xs-12">
-            <p class="bg-primary">&nbsp;<?= $this->lang->line('text_item_tags'); ?></p>
+            <p class="bg-primary">&nbsp;<?= lang('MY_application.text_item_tags'); ?></p>
         </div>
     </div>
     <div class="row">
         <div class="checkbox col-xs-12">
 			<?php foreach ($item_tags as $item_tag) { ?>
                 <label class="checkbox-inline">
-                    <input class="tag-checkbox" type="checkbox" name="tag<?= $item_tag->item_tag_id; ?>" value="<?= $item_tag->item_tag_id; ?>"
+                    <input class="tag-checkbox" type="checkbox" name="tag<?= $item_tag['item_tag_id']; ?>" value="<?= $item_tag['item_tag_id']; ?>"
                         <?php
                         // Check the checkbox if tag is assigned to this item
                         if (isset($tag_links)) {
                             foreach ($tag_links as $tag_link) {
-                                if ($tag_link->item_tag_id == $item_tag->item_tag_id){
+                                if ($tag_link['item_tag_id'] == $item_tag['item_tag_id']){
                                     echo 'checked';
                                 }
                             }
@@ -238,7 +236,7 @@
                         ?>
                     />
 
-                    <?= $item_tag->name; ?>
+                    <?= $item_tag['name']; ?>
                 </label>
 			<?php } ?>
         </div>
@@ -256,19 +254,19 @@ function get(objectName){
     switch (objectName) {
         case "item_groups":
             return <?php $array = ""; foreach($item_groups as $item_group) $array .= "'".$item_group->short_name."',"; echo "[$array]"; ?>;
-           
+
         case "item_tags":
             return <?php $array = ""; foreach($item_tags as $item_tag) $array .= "'".$item_tag->short_name."',"; echo "[$array]"; ?>;
-           
-        case "INVENTORY_PREFIX": 
+
+        case "INVENTORY_PREFIX":
             return "<?=INVENTORY_PREFIX; ?>" ;
-           
+
         case "INVENTORY_NUMBER_CHARS":
             return "<?=INVENTORY_NUMBER_CHARS; ?>" ;
-           
+
         case "item_id":
             return "<?= $item_id; ?>" ;
-        
+
     }
 }
 
@@ -288,36 +286,36 @@ function change_warranty() {
 	if (remaining_months > 3)
 	{
 		// Under warranty
-		span_garantie.innerHTML = "<?= $this->lang->line('text_warranty_status')[1]; ?>";
+		span_garantie.innerHTML = "<?= lang('MY_application.text_warranty_status')[1]; ?>";
 		span_garantie.class = "label label-success";
 	}
 	else if (remaining_months > 0)
 	{
 		// Warranty expires soon
-		span_garantie.innerHTML = "<?= $this->lang->line('text_warranty_status')[2]; ?>";
+		span_garantie.innerHTML = "<?= lang('MY_application.text_warranty_status')[2]; ?>";
 		span_garantie.class = "label label-warning";
 	}
 	else
 	{
 		// Warranty expired
-		span_garantie.innerHTML = "<?= $this->lang->line('text_warranty_status')[3]; ?>";
+		span_garantie.innerHTML = "<?= lang('MY_application.text_warranty_status')[3]; ?>";
 		span_garantie.class = "label label-danger";
 	}
 }
 
 function createInventoryNo(){
-    
+
     var objectGroupField = document.getElementById('item_group_id');
-    
+
     var objectGroups = get("item_groups");
-          
+
     var tagShortName = getFirstTagShortName();
     var buyingDateField = document.getElementById('buying_date');
     var date = new Date(buyingDateField.value).getFullYear();
     var inventoryNumberField = document.getElementById('inventory_prefix');
     var inventoryNumber = "";
     var inventoryIdField = document.getElementById('inventory_id');
-    
+
     date = date.toString().slice(2,4);
     if(date == "N"){
         date = "00";
