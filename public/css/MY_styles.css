@@ -23,4 +23,12 @@ li.nav-item {
 /* Items list style */
 #list_item .item {
     padding: .75rem;
+    margin-bottom: 1.5rem;
+}
+#list_item .item .item_picture img  {
+    width: 100%;
+    margin-bottom: 15px;
+}
+#list_item .item_picture img {
+
 }
