@@ -113,7 +113,7 @@ class Item_model extends MyModel
     }
 
 
-    protected function getLastInventoryControl($item){
+    public function getLastInventoryControl($item){
       if (!is_null($item))
       {
         if (is_null($this->inventory_control_model))
@@ -133,8 +133,8 @@ class Item_model extends MyModel
             if (is_null($last_control))
             {
               $last_control = $control;
-            } 
-            else if ($control['date'] > $last_control['date']) 
+            }
+            else if ($control['date'] > $last_control['date'])
             {
               $last_control = $control;
               $last_control['controller'] = $this->inventory_control_model->getUser($last_control['controller_id']);
@@ -147,7 +147,7 @@ class Item_model extends MyModel
     }
 
 
-    protected function getTags($item){
+    public function getTags($item){
       if(is_null($this->item_tag_link_model)){
         $this->item_tag_link_model = new Item_tag_link_model();
       }
@@ -166,7 +166,7 @@ class Item_model extends MyModel
     }
 
     public function getImagePath($item){
-      if (!is_null($item) && ($item['image'] == config('\Stock\Config\StockConfig')->item_no_image))
+      if (!is_null($item) && ($item['image'] == config('\Stock\Config\StockConfig')->item_no_image || is_null($item['image'])))
       {
           return config('\Stock\Config\StockConfig')->item_no_image_path.config('\Stock\Config\StockConfig')->item_no_image;
       }
@@ -174,7 +174,7 @@ class Item_model extends MyModel
       {
           return config('\Stock\Config\StockConfig')->images_upload_path.$item['image'];
       }
-  }
+    }
 
 
     /**
@@ -453,7 +453,7 @@ class Item_model extends MyModel
 
 
       return $items;
-  }
+    }
 
 
   public function getInventoryNumber($item)

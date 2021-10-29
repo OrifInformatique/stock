@@ -46,11 +46,11 @@ function mysqlDate($date)
 {
     if (empty($date) || strtolower($date) == 'now')
     {
-        return date(DATABASE_DATE_FORMAT);
+        return date(config('\Stock\Config\StockConfig')->database_date_format);
     }
     else
     {
-        return date_format($date, DATABASE_DATE_FORMAT);
+        return date_format($date, config('\Stock\Config\StockConfig')->database_date_format);
     }
 }
 
@@ -63,11 +63,11 @@ function mysqlDateTime($date)
 {
     if (empty($date) || strtolower($date) == 'now')
     {
-        return date(DATABASE_DATETIME_FORMAT);
+        return date(config('\Stock\Config\StockConfig')->database_datetime_format);
     }
     else
     {
-        return date_format($date, DATABASE_DATETIME_FORMAT);
+        return date_format($date, config('\Stock\Config\StockConfig')->database_datetime_format);
     }
 }
 
@@ -82,7 +82,7 @@ function databaseToShortDate($date)
 {
     if (!empty($date) && $date!='0000-00-00')
     {
-        return date_format(date_create_from_format(DATABASE_DATE_FORMAT, $date),
+        return date_format(date_create_from_format(config('\Stock\Config\StockConfig')->database_date_format, $date),
                            lang('MY_application.date_format_short'));
     }
     else

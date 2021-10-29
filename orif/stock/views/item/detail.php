@@ -6,7 +6,7 @@
     <!-- *** ADMIN *** -->
 	<?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?>
     	<a href="<?= base_url('item/modify/'.$item['item_id']); ?>" class="btn btn-warning" role="button"><?= lang('MY_application.btn_modify'); ?></a>
-        <?php if($_SESSION['user_access'] >= ACCESS_LVL_ADMIN) { ?>
+        <?php if($_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_admin) { ?>
     	   <a href="<?= base_url('item/delete/'.$item['item_id']); ?>" class="btn btn-danger" role="button"><?= lang('MY_application.btn_delete'); ?></a>
         <?php } ?>
 	<?php } ?>
@@ -31,7 +31,7 @@
         </div>
         <div class="col-md-4">
             <img id="picture"
-                 src="<?= base_url('images/'.$item['image']); ?>"
+                 src="<?= base_url($item['image']); ?>"
                  width="100%"
                  alt="<?= lang('MY_application.field_image'); ?>" />
         </div>
@@ -95,7 +95,7 @@
                 </div></div>
                 <div class="row">
                     <div class="col-xs-6">
-                        <label><?= lang('field_loan_date'); ?> :&nbsp;</label>
+                        <label><?= lang('MY_application.field_loan_date'); ?> :&nbsp;</label>
                     </div>
                     <div class="col-xs-6">
                         <?php if(!empty($item['current_loan']['date'])){
@@ -122,8 +122,8 @@
                     '</a>';?>
 
                 <!-- Button to create new loan -->
-                <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { 
-                    echo '<a href="'.base_url('/item/create-loan/'.$item['item_id']).'" '.
+                <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+                    echo '<a href="'.base_url('/item/create_loan/'.$item['item_id']).'" '.
                          'class="btn btn-primary"  role="button" >'.
                          lang('MY_application.btn_create_loan').'</a>';
                 }?>
@@ -145,9 +145,8 @@
                     <label><?= htmlspecialchars(lang('MY_application.field_last_inventory_control')); ?> :</label>
                 </div>
                 <div class="col-sm-8">
-                    <?php if(array_key_exists('last_inventory_control', $item)) {
+                    <?php if(!is_null($item['last_inventory_control'])) {
                         echo databaseToShortDate($item['last_inventory_control']['date']);
-                        echo htmlspecialchars(json_encode($item['last_inventory_control']['controller']));
                         echo ', '.htmlspecialchars($item['last_inventory_control']['controller']['username']);
                         if(!is_null($item['last_inventory_control']['remarks'])) {
                             echo '</br >'.htmlspecialchars($item['last_inventory_control']['remarks']);
@@ -164,7 +163,7 @@
                      lang('MY_application.btn_inventory_control_history').'</a>'; ?>
 
                 <!-- Button to create new inventory control -->
-                <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { 
+                <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
                     echo '<a href="'.base_url('/item/create_inventory_control/'.$item['item_id']).
                          '" class="btn btn-primary"  role="button" >'.
                          lang('MY_application.btn_create_inventory_control').'</a>';
@@ -225,7 +224,7 @@
             {
                 foreach($item['tags'] as $tag)
                 {
-                    echo '<span class="label label-default">'.$tag."</span>\n";
+                    echo '<span class="label label-default">'.$tag[0]['name']."</span>\n";
                 }
             }
             ?>
@@ -237,6 +236,6 @@ $(document).ready(function() {
     // Refresh the image to prevent display of an old cach image.
     // Changing the src attribute forces browser to update.
     d = new Date();
-    $("#picture").attr("src", "<?= base_url('images/'.$item['image']); ?>?"+d.getTime());
+    $("#picture").attr("src", "<?= base_url($item['image']); ?>?"+d.getTime());
 });
 </script>

@@ -16,33 +16,33 @@ if ($image == config('\Stock\Config\StockConfig')->item_no_image) {
             <img id="image" style="height:auto; width:100%;" />
         </div>
     </div>
-    <div class="hidden">
+    <div style="display: none;">
         <img id="canvas" width="360" height="360" />
     </div>
     <div class="row">
         <!-- Hidden file button, on which a click is simulated when user is clicking on one of the visible buttons -->
         <input id="imageInput" name="original_file" type="file" accept="image/*" class="btn hidden" />
-        
+
         <div class="col-sm-6 form-group">
             <!-- Two buttons to differentiate taking a new picture or importing an existing one -->
-            <input id="cameraImport" type="button" value="<?= $this->lang->line("field_take_photo"); ?>" class="btn btn-default" />
-            <input id="imageImport" type="button" value="<?= $this->lang->line("field_import_photo"); ?>" class="btn btn-default" />
+            <input id="cameraImport" type="button" value="<?= lang("MY_application.field_take_photo"); ?>" class="btn btn-default" />
+            <input id="imageImport" type="button" value="<?= lang("MY_application.field_import_photo"); ?>" class="btn btn-default" />
         </div>
 
         <!-- Hidden fields used to store the cropped image's data -->
         <input id="croppedFile" name="cropped_file" type="hidden" />
         <input id='croppedName' name='cropped_name' type="hidden" />
-        
+
         <div class="col-sm-6 form-group">
             <!-- Save / cancel Buttons -->
-            <input type="submit" value="<?= $this->lang->line('field_validate_photo'); ?>" class="btn btn-success" />
-            <a href="<?= $_SESSION['picture_callback'] ?>" class="btn btn-danger"><?= $this->lang->line('btn_cancel'); ?></a>
+            <input type="submit" value="<?= lang('MY_application.field_validate_photo'); ?>" class="btn btn-success" />
+            <a href="<?= $_SESSION['picture_callback'] ?>" class="btn btn-danger"><?= lang('MY_application.btn_cancel'); ?></a>
         </div>
     </div>
 </form>
 
-<link href="<?=base_url("assets/css/cropper/cropper.css");?>" rel="stylesheet">
-<script src="<?=base_url("assets/js/external/cropper/cropper.js");?>" type="module"></script>
+<link href="<?=base_url("css/cropper/cropper.css");?>" rel="stylesheet">
+<script src="<?=base_url("js/external/cropper/cropper.js");?>" type="module"></script>
 
 <script>
 // Get every HTML element required for the code
@@ -60,14 +60,14 @@ var cropper = null;
 var croppedImage = null;
 
 // Define image upload dimensions
-const IMAGE_UPLOAD_WIDTH = <?= IMAGE_UPLOAD_WIDTH; ?>;
-const IMAGE_UPLOAD_HEIGHT = <?= IMAGE_UPLOAD_HEIGHT; ?>;
+const IMAGE_UPLOAD_WIDTH = <?= config('\Stock\Config\StockConfig')->image_upload_width; ?>;
+const IMAGE_UPLOAD_HEIGHT = <?= config('\Stock\Config\StockConfig')->image_upload_height; ?>;
 
 //
 function reSelectPhoto(event)
 {
     var path = "<?= $image ?>";
-    
+
     if(path !== ""){
         rawImage.src = "<?= base_url(config('\Stock\Config\StockConfig')->images_upload_path.$image)?>";
         croppedNameInput.value = path;
@@ -79,18 +79,18 @@ function reSelectPhoto(event)
 function showPhoto(origin){
     var reader = new FileReader();
     var file;
-    
+
     reader.onload = setPhoto;
-    
+
     file = btnImageInput.files[0];
-    
+
     reader.readAsDataURL(file);
 }
 
 // Set the photo taken with the user's camera / imported from the user's files
 function setPhoto(event){
     rawImage.src = event.target.result;
-    
+
     setCropper(event);
 }
 
@@ -105,17 +105,18 @@ form.addEventListener("submit", cropImage);
 
 // Setup a Cropper with a 1:1 aspect ratio
 function setCropper(event){
-    
+
     if(cropper !== null){
         cropper.destroy();
     }
-    
+
     cropper = new Cropper(image, {
         aspectRatio : 1,
         autoCropArea: 1.0,
-        preview: '.img-preview',
         minCanvasWidth: IMAGE_UPLOAD_WIDTH,
         minCanvasHeight: IMAGE_UPLOAD_HEIGHT,
+        minContainerWidth: IMAGE_UPLOAD_WIDTH,
+        minContainerHeight: IMAGE_UPLOAD_HEIGHT,
         movable: false,
         rotatable: false,
         scalable: false,
@@ -140,11 +141,11 @@ function cropImage(event){
         croppedImage = cropper.getCroppedCanvas({width: IMAGE_UPLOAD_WIDTH, height: IMAGE_UPLOAD_HEIGHT, imageSmoothingQuality: "high"});
         canvas.src = croppedImage.toDataURL("image/png");
         croppedFileInput.value = canvas.src;
-        
+
         if(croppedNameInput.value == ""){
-            croppedNameInput.value = btnImageInput.files[0].name;   
+            croppedNameInput.value = btnImageInput.files[0].name;
         }
-        
+
         return false;
     }
 }

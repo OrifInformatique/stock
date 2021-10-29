@@ -24,6 +24,7 @@ use PSR\Log\LoggerInterface;
 use App\Controllers\BaseController;
 use DateInterval;
 use DateTime;
+use Stock\Models\Inventory_control_model;
 use Stock\Models\Item_model;
 use Stock\Models\Loan_model;
 use Stock\Models\Item_tag_model;
@@ -31,6 +32,8 @@ use Stock\Models\Item_condition_model;
 use Stock\Models\Item_group_model;
 use Stock\Models\Item_tag_link_model;
 use Stock\Models\Stocking_place_model;
+use Stock\Models\Supplier_model;
+use User\Models\User_model;
 
 class Item extends BaseController {
 
@@ -40,23 +43,22 @@ class Item extends BaseController {
     /**
      * Constructor
      */
-    public function initController(RequestInterface $request, REsponseInterface $response, LoggerInterface $logger) {
+    public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger) {
         $this->access_level = "*";
         parent::initController($request, $response, $logger);
 
         $this->item_model = new Item_model();
         $this->loan_model = new Loan_model();
         $this->item_tag_link_model = new Item_tag_link_model();
+        $this->inventory_control_model = new Inventory_control_model();
+        $this->item_tag_model = new Item_tag_model();
+        $this->item_condition_model = new Item_condition_model();
+        $this->item_group_model = new Item_group_model();
+        $this->stocking_place_model = new Stocking_place_model();
+        $this->config = config('\Stock\Config\StockConfig');
         helper('sort');
         helper('form');
     }
-
-    /*{
-        parent::__construct();
-        $this->load->model('item_model');
-        $this->load->model('loan_model');
-        $this->load->helper('sort');
-    }*/
 
     /**
      * Display items list, with filtering
@@ -67,19 +69,12 @@ class Item extends BaseController {
     public function index($page = 1) {
         // Load list of elements to display as filters
 
-        $this->item_tag_model = new Item_tag_model();
-        //$this->load->model('item_tag_model');
         $output['item_tags'] = $this->item_tag_model->dropdown('name');
 
-        $this->item_condition_model = new Item_condition_model();
-        //$this->load->model('item_condition_model');
         $output['item_conditions'] = $this->item_condition_model->dropdown('name');
 
-        $this->item_group_model = new Item_group_model();
-        //$this->load->model('item_group_model');
         $output['item_groups'] = $this->item_group_model->dropdown('name');
 
-        $this->stocking_place_model = new Stocking_place_model();
         $output['stocking_places'] = $this->stocking_place_model->dropdown('name');
         $output['sort_order'] = array(lang('MY_application.sort_order_name'),
                                         lang('MY_application.sort_order_stocking_place_id'),
@@ -96,7 +91,6 @@ class Item extends BaseController {
         if (!isset($output["o"])) $output["o"] = '';
         if (!isset($output["ad"])) $output["ad"] = '';
         // Send the data to the View
-       // $this->display_view('item/list', $output);
         return $this->display_view('Stock\Views\item\list', $output);
     }
 
@@ -112,7 +106,7 @@ class Item extends BaseController {
         $filters = $_GET;
         if (!isset($filters['c'])) {
             // No condition selected for filtering, default filtering for "functional" items
-            $filters['c'] = array(FUNCTIONAL_ITEM_CONDITION_ID);
+            $filters['c'] = array($this->config->functional_item_condition);
         }
 
         // Sanitize $page parameter
@@ -164,10 +158,10 @@ class Item extends BaseController {
         $output['pagination'] = $this->load_pagination($items_count, $page);
 
         $output['number_page'] = $page;
-        if($output['number_page']>ceil($items_count/ITEMS_PER_PAGE)) $output['number_page']=ceil($items_count/ITEMS_PER_PAGE);
+        if($output['number_page']>ceil($items_count/$this->config->items_per_page)) $output['number_page']=ceil($items_count/$this->config->items_per_page);
 
         // Keep only the slice of items corresponding to the current page
-        $output["items"] = array_slice($output["items"], ($output['number_page']-1)*ITEMS_PER_PAGE, ITEMS_PER_PAGE);
+        $output["items"] = array_slice($output["items"], ($output['number_page']-1)*$this->config->items_per_page, $this->config->items_per_page);
 
         return $output;
     }
@@ -180,10 +174,10 @@ class Item extends BaseController {
     {
         // Create the pagination
         $pager = \Config\Services::pager();
-/*
+        /*
         $config['base_url'] = base_url('/item/index/');
         $config['total_rows'] = $nbr_items;
-        $config['per_page'] = ITEMS_PER_PAGE;
+        $config['per_page'] = $this->config->items_per_page;
         $config['use_page_numbers'] = TRUE;
         $config['reuse_query_string'] = TRUE;
 
@@ -211,9 +205,10 @@ class Item extends BaseController {
         return $this->pagination->initialize($config);
         */
 
-        return $pager->makeLinks($page, ITEMS_PER_PAGE, $nbr_items);
+        return $pager->makeLinks($page, $this->config->items_per_page, $nbr_items);
 
     }
+
     /**
      * Display details of one single item
      *
@@ -228,31 +223,27 @@ class Item extends BaseController {
         }
 
         // Get item object and related objects
-     /*   $item = $this->item_model->with('supplier')
-                ->with('stocking_place')
-                ->with('item_condition')
-                ->with('item_group')
-                ->get($id);
-*/
         $item = $this->item_model->asArray()->where(["item_id"=>$id])->first();
-        $item['supplier'] = $this->item_model->getSupplier($item);
-        $item['stocking_place'] = $this->item_model->getStockingPlace($item);
-        $item['item_condition'] = $this->item_model->getItemCondition($item);
-        $item['item_group'] = $this->item_model->getItemGroup($item);
-        $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
-        $item['current_loan'] = $this->item_model->getCurrentLoan($item);
-        $item['warranty_status'] = $this->item_model->getWarrantyStatus($item);
-        $item['image'] = $this->item_model->getImage($item);
-        $item['last_inventory_control'] = $this->item_model->getLastInventoryControl($item);
-        
-
 
         if (!is_null($item)) {
+            $item['supplier'] = $this->item_model->getSupplier($item);
+            $item['stocking_place'] = $this->item_model->getStockingPlace($item);
+            $item['item_condition'] = $this->item_model->getItemCondition($item);
+            $item['item_group'] = $this->item_model->getItemGroup($item);
+            $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
+            $item['current_loan'] = $this->item_model->getCurrentLoan($item);
+            $item['warranty_status'] = $this->item_model->getWarrantyStatus($item);
+            $item['tags'] = $this->item_model->getTags($item);
+            $item['image'] = $this->item_model->getImagePath($item);
+            $item['last_inventory_control'] = $this->item_model->getLastInventoryControl($item);
+            if (!is_null($item['last_inventory_control'])) {
+                $item['last_inventory_control']['controller'] = $this->inventory_control_model->getUser($item['last_inventory_control']['controller_id']);
+            }
             $output['item'] = $item;
             $this->display_view('Stock\Views\item\detail', $output);
         } else {
             // $id is not valid, display an error message
-            $this->display_view('errors/application/inexistent_item');
+            $this->display_view('Stock\Views\errors\application\inexistent_item');
         }
     }
 
@@ -265,27 +256,26 @@ class Item extends BaseController {
         // Check if this is allowed
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
             // Get new item id and set picture_prefix
-            $item_id = $this->item_model->get_future_id();
-            $_SESSION['picture_prefix'] = str_pad($item_id, INVENTORY_NUMBER_CHARS, "0", STR_PAD_LEFT);
+            $item_id = $this->item_model->getFutureId();
+            $_SESSION['picture_prefix'] = str_pad($item_id, $this->config->inventory_number_chars, "0", STR_PAD_LEFT);
 
             // Define image path variables
-            $temp_image_name = $_SESSION["picture_prefix"].IMAGE_PICTURE_SUFFIX.IMAGE_TMP_SUFFIX.IMAGE_EXTENSION;
-            $new_image_name = $_SESSION["picture_prefix"].IMAGE_PICTURE_SUFFIX.IMAGE_EXTENSION;
+            $temp_image_name = $_SESSION["picture_prefix"].$this->config->image_picture_suffix.$this->config->image_tmp_suffix.$this->config->image_extension;
+            $new_image_name = $_SESSION["picture_prefix"].$this->config->image_picture_suffix.$this->config->image_extension;
 
             // Check if the user cancelled the form
             if(isset($_POST['submitCancel'])){
-                $tmp_image_file = glob(config('\Stock\Config\StockConfig')->images_upload_path.$temp_image_name)[0];
+                $tmp_image_file = glob($this->config->images_upload_path.$temp_image_name)[0];
 
                 // Check if there is a temporary file, if yes then delete it
                 if($tmp_image_file != null || $tmp_image_file != false){
                     unlink($tmp_image_file);
                 }
 
-                redirect(base_url());
-                exit();
+                return redirect()->to(base_url());
             }
 
-            $this->set_validation_rules();
+            $validation = $this->set_validation_rules();
 
             $data['upload_errors'] = "";
 
@@ -294,38 +284,42 @@ class Item extends BaseController {
             // If the user want to display the image form, we first save fields
             // values in the session, then redirect him to the image form
             if(isset($_POST['photoSubmit'])){
-                $this->session->set_userdata("POST", $_POST);
-                $this->session->set_userdata("item_id", $item_id);
+                $_SESSION['POST'] = $_POST;
+                $_SESSION['item_id'] = $item_id;
 
-                redirect(base_url("picture/select_picture"));
+                return redirect()->to(base_url("picture/select_picture"));
             }
 
             if (isset($_FILES['linked_file']) && $_FILES['linked_file']['name'] != '') {
 
                 // LINKED FILE UPLOADING
-                $config['upload_path'] = './uploads/files/';
-                $config['allowed_types'] = 'pdf|doc|docx';
-                $config['max_size'] = 2048;
-                $config['max_width'] = 0;
-                $config['max_height'] = 0;
+                $upload_path = '../../public/uploads/files/';
+                $allowed_types = [
+                    'application/pdf', //pdf
+                    'application/msword', //doc
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document', //docx
+                ];
+                $max_size = 2 * 1024 * 1024; //2MB max
 
-                $this->load->library('upload');
-                $this->upload->initialize($config);
+                $file = $this->request->getFile('linked_file');
 
-                if ($this->upload->do_upload('linked_file')) {
-                    $itemArray['linked_file'] = $this->upload->data('file_name');
+                if (!is_null($file) && $file->isValid() && $file->getSize() <= $max_size && in_array($file->getMimeType(), $allowed_types)) {
+                    $file->store($upload_path);
+                    $itemArray['linked_file'] = $file->getName();
                 } else {
-                    $data['upload_errors'] = $this->upload->display_errors();
-                    $upload_failed = TRUE;
+                    $upload_failed = true;
+                    $data['upload_errors'] = [];
+                    // Manually shove in the errors, as the upload library is no longer a thing
+                    if (is_null($file) || !$file->isValid()) $data['upload_errors'][] = lang('upload.upload_file_partial');
+                    if (!is_null($file) && $file->getSize() > $max_size) $data['upload_errors'][] = lang('upload.upload_file_exceeds_form_limit');
+                    if (!is_null($file) && !in_array($file->getMimeType(), $allowed_types)) $data['upload_errors'][] = lang('upload.upload_invalid_filetype');
                 }
             }
 
-            if ($this->form_validation->run() == TRUE && $upload_failed != TRUE) {
+            if (!empty($_POST) && $validation->run($_POST) == TRUE && $upload_failed != TRUE) {
                 // No error, save item
 
                 $linkArray = array();
-
-                $this->load->model('item_tag_link_model');
 
                 foreach ($_POST as $key => $value) {
                     if (substr($key, 0, 3) == "tag") {
@@ -337,76 +331,65 @@ class Item extends BaseController {
                 }
 
                 // Turn Temporaty Image into a final one if there is one
-                if(file_exists(config('\Stock\Config\StockConfig')->images_upload_path.$temp_image_name)){
-                    rename(config('\Stock\Config\StockConfig')->images_upload_path.$temp_image_name,config('\Stock\Config\StockConfig')->images_upload_path.$new_image_name);
+                if(file_exists($this->config->images_upload_path.$temp_image_name)){
+                    rename($this->config->images_upload_path.$temp_image_name, $this->config->images_upload_path.$new_image_name);
                     $itemArray['image'] = $new_image_name;
                 }
 
                 $itemArray["created_by_user_id"] = $_SESSION['user_id'];
 
-                $this->item_model->insert($itemArray);
-                $item_id = $this->db->insert_id();
+                $item_id = $this->item_model->insert($itemArray);
 
                 foreach ($linkArray as $tag) {
                     $this->item_tag_link_model->insert(array("item_tag_id" => $tag, "item_id" => ($item_id)));
                 }
 
-                redirect("item/view/" . $item_id);
+                return redirect()->to("/item/view/" . $item_id);
             } else {
                 // Remember checked tags to display them checked again
-                foreach ($_POST as $key => $value) {
+                $tags = $_POST;
+                if(isset($_SESSION['POST'])){
+                    // If the user gets back from another view, get the fields values
+                    // which have been saved in session variable.
+                    // Then reset this session variable.
+                    $tags = $_SESSION['POST'];
+                    unset($_SESSION['POST']);
+                }
+                foreach ($tags as $key => $value) {
                     // If it is a tag
                     if (substr($key, 0, 3) == "tag") {
                         // put it in the data array
-                        $tag_link = new stdClass();
-                        $tag_link->item_tag_id = substr($key, 3);
-                        $data['tag_links'][] = (object) $tag_link;
+                        $tag_link = [];
+                        $tag_link['item_tag_id'] = substr($key, 3);
+                        $data['tag_links'][] = $tag_link;
+                    } else {
+                        $data[$key] = $value;
                     }
                 }
 
+                $this->supplier_model = new Supplier_model();
+
                 // Load the comboboxes options
-                $this->load->model('stocking_place_model');
-                $data['stocking_places'] = $this->stocking_place_model->get_all();
-                $this->load->model('supplier_model');
-                $data['suppliers'] = $this->supplier_model->get_all();
-                $this->load->model('item_group_model');
+                $data['stocking_places'] = $this->stocking_place_model->findAll();
+                $data['suppliers'] = $this->supplier_model->findAll();
                 $data['item_groups_name'] = $this->item_group_model->dropdown('name');
 
                 // Load item groups
-                $data['item_groups'] = $this->item_group_model->get_all();
+                $data['item_groups'] = $this->item_group_model->findAll();
 
-                $this->load->model('item_condition_model');
-                $data['condishes'] = $this->item_condition_model->get_all();
+                $data['condishes'] = $this->item_condition_model->findAll();
 
                 // Load the tags
-                $this->load->model('item_tag_model');
-                $data['item_tags'] = $this->item_tag_model->get_all();
+                $data['item_tags'] = $this->item_tag_model->findAll();
 
-                $data['item_id'] = $this->item_model->get_future_id();
+                $data['item_id'] = $this->item_model->getFutureId();
+                $data['errors'] = $validation->getErrors();
 
-                // If the user gets back from another view, get the fields values
-                // which have been saved in session variable.
-                // Then reset this session variable.
-                if(isset($_SESSION['POST'])){
-                    foreach ($_SESSION['POST'] as $key => $value) {
-                        // If it is a tag
-                        if (substr($key, 0, 3) == "tag") {
-                            // put it in the data array
-                            $tag_link = new stdClass();
-                            $tag_link->item_tag_id = substr($key, 3);
-                            $data['tag_links'][] = (object) $tag_link;
-                        }else{
-                            $data[$key] = $value;
-                        }
-                    }
-                    unset($_SESSION['POST']);
-                }
-
-                $this->display_view('item/form', $data);
+                $this->display_view('Stock\Views\item\form', $data);
             }
         } else {
             // Access is not allowed
-            $this->ask_for_login();
+            redirect("item/");
         }
     }
 
@@ -420,34 +403,31 @@ class Item extends BaseController {
         // Check if access is allowed
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
             // Define image path variables
-            $_SESSION['picture_prefix'] = str_pad($id, INVENTORY_NUMBER_CHARS, "0", STR_PAD_LEFT);
-            $temp_image_name = $_SESSION["picture_prefix"].IMAGE_PICTURE_SUFFIX.IMAGE_TMP_SUFFIX.IMAGE_EXTENSION;
-            $new_image_name = $_SESSION["picture_prefix"].IMAGE_PICTURE_SUFFIX.IMAGE_EXTENSION;
+            $_SESSION['picture_prefix'] = str_pad($id, $this->config->inventory_number_chars, "0", STR_PAD_LEFT);
+            $temp_image_name = $_SESSION["picture_prefix"].$this->config->image_picture_suffix.$this->config->image_tmp_suffix.$this->config->image_extension;
+            $new_image_name = $_SESSION["picture_prefix"].$this->config->image_picture_suffix.$this->config->image_extension;
 
             // Check if the user cancelled the form
             if(isset($_POST['submitCancel'])){
-                $tmp_image_file = glob(config('\Stock\Config\StockConfig')->images_upload_path.$temp_image_name)[0];
+                $tmp_image_file = glob($this->config->images_upload_path.$temp_image_name)[0];
 
                 // Check if there is a temporary image file, if yes then delete it
                 if($tmp_image_file != null || $tmp_image_file != false){
                     unlink($tmp_image_file);
                 }
 
-                redirect(base_url("item/view/$id"));
-                exit();
+                return redirect()->to(base_url("item/view/".$id));
             }
-
-            $this->load->model('item_tag_link_model');
 
             // If there is no submit
             if (empty($_POST)) {
                 // get the data from the item with this id,
-                $data = get_object_vars($this->item_model->get($id));
+                $data = $this->item_model->find($id);
                 // including its tags
-                $data['tag_links'] = $this->item_tag_link_model->get_many_by("item_id", $id);
+                $data['tag_links'] = $this->item_tag_link_model->where("item_id", $id)->findAll();
 
             } else {
-                $this->set_validation_rules($id);
+                $validation = $this->set_validation_rules();
 
                 $data['upload_errors'] = "";
 
@@ -456,36 +436,41 @@ class Item extends BaseController {
                 // If the user wants to display the image form, we first save fields
                 // values in the session, then redirect him to the image form
                 if(isset($_POST['photoSubmit'])){
-                    $this->session->set_userdata("POST", $_POST);
+                    $_SESSION['POST'] = $_POST;
 
-                    redirect(base_url("picture/select_picture"));
-                    exit();
+                    return redirect()->to(base_url("picture/select_picture"));
                 }
 
                 if (isset($_FILES['linked_file']) && $_FILES['linked_file']['name'] != '') {
 
                     // LINKED FILE UPLOADING
-                    $config['upload_path'] = './uploads/files/';
-                    $config['allowed_types'] = 'pdf|doc|docx';
-                    $config['max_size'] = 2048;
-                    $config['max_width'] = 0;
-                    $config['max_height'] = 0;
+                    $upload_path = '../../public/uploads/files/';
+                    $allowed_types = [
+                        'application/pdf', //pdf
+                        'application/msword', //doc
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document', //docx
+                    ];
+                    $max_size = 2 * 1024 * 1024; //2MB max
 
-                    $this->load->library('upload');
-                    $this->upload->initialize($config);
+                    $file = $this->request->getFile('linked_file');
 
-                    if ($this->upload->do_upload('linked_file')) {
-                        $itemArray['linked_file'] = $this->upload->data('file_name');
+                    if (!is_null($file) && $file->isValid() && $file->getSize() <= $max_size && in_array($file->getMimeType(), $allowed_types)) {
+                        $file->store($upload_path);
+                        $itemArray['linked_file'] = $file->getName();
                     } else {
-                        $data['upload_errors'] = $this->upload->display_errors();
-                        $upload_failed = TRUE;
+                        $upload_failed = true;
+                        $data['upload_errors'] = [];
+                        // Manually shove in the errors, as the upload library is no longer a thing
+                        if (is_null($file) || !$file->isValid()) $data['upload_errors'][] = lang('upload.upload_file_partial');
+                        if (!is_null($file) && $file->getSize() > $max_size) $data['upload_errors'][] = lang('upload.upload_file_exceeds_form_limit');
+                        if (!is_null($file) && !in_array($file->getMimeType(), $allowed_types)) $data['upload_errors'][] = lang('upload.upload_invalid_filetype');
                     }
                 }
 
-                if ($this->form_validation->run() == TRUE && $upload_failed != TRUE) {
+                if ($validation->run($_POST) == TRUE && $upload_failed != TRUE) {
 
                     // Delete ALL the tags for this object
-                    $this->item_tag_link_model->delete_by(array('item_id' => $id));
+                    $this->item_tag_link_model->where('item_id', $id)->delete();
 
                     foreach ($_POST as $key => $value) {
                         // If it is a tag, since their keys are tag1, tag2, …
@@ -499,24 +484,24 @@ class Item extends BaseController {
                     }
 
                     // Turn temporary image into a final one if there is one
-                    if(file_exists(config('\Stock\Config\StockConfig')->images_upload_path.$temp_image_name)){
-                        rename(config('\Stock\Config\StockConfig')->images_upload_path.$temp_image_name,config('\Stock\Config\StockConfig')->images_upload_path.$new_image_name);
+                    if(file_exists($this->config->images_upload_path.$temp_image_name)){
+                        rename($this->config->images_upload_path.$temp_image_name, $this->config->images_upload_path.$new_image_name);
                         $itemArray['image'] = $new_image_name;
                     }
 
                     // Execute the changes in the item table
                     $this->item_model->update($id, $itemArray);
 
-                    redirect("/item/view/" . $id);
+                    return redirect()->to("/item/view/" . $id);
                 } else {
                     // Remember checked tags to display them checked again
                     foreach ($_POST as $key => $value) {
                         // If it is a tag, since their keys are tag1, tag2, …
                         if (substr($key, 0, 3) == "tag") {
                             // put it in the data array
-                            $tag_link = new stdClass();
-                            $tag_link->item_tag_id = substr($key, 3);
-                            $data['tag_links'][] = (object) $tag_link;
+                            $tag_link = [];
+                            $tag_link['item_tag_id'] = substr($key, 3);
+                            $data['tag_links'][] = $tag_link;
                         }
                     }
                 }
@@ -524,24 +509,21 @@ class Item extends BaseController {
 
             $data['modify'] = true;
             $data['item_id'] = $id;
-            $_SESSION['picture_prefix'] = $data['inventory_id'];
+            //$_SESSION['picture_prefix'] = $data['inventory_id'];
 
             // Load the options
-            $this->load->model('stocking_place_model');
-            $data['stocking_places'] = $this->stocking_place_model->get_all();
-            $this->load->model('supplier_model');
-            $data['suppliers'] = $this->supplier_model->get_all();
-            $this->load->model('item_group_model');
+            $this->supplier_model = new Supplier_model();
+
+            $data['stocking_places'] = $this->stocking_place_model->findAll();
+            $data['suppliers'] = $this->supplier_model->findAll();
             $data['item_groups_name'] = $this->item_group_model->dropdown('name');
-            $this->load->model('item_condition_model');
-            $data['condishes'] = $this->item_condition_model->get_all();
+            $data['condishes'] = $this->item_condition_model->findAll();
 
             // Load item groups
-            $data['item_groups'] = $this->item_group_model->get_all();
+            $data['item_groups'] = $this->item_group_model->findAll();
 
             // Load the tags
-            $this->load->model('item_tag_model');
-            $data['item_tags'] = $this->item_tag_model->get_all();
+            $data['item_tags'] = $this->item_tag_model->findAll();
 
             // If the user gets back from another view, get the fields values
             // which have been saved in session variable.
@@ -552,9 +534,9 @@ class Item extends BaseController {
                     // If it is a tag
                     if (substr($key, 0, 3) == "tag") {
                         // put it in the data array
-                        $tag_link = new stdClass();
-                        $tag_link->item_tag_id = substr($key, 3);
-                        $data['tag_links'][] = (object) $tag_link;
+                        $tag_link = [];
+                        $tag_link['item_tag_id'] = substr($key, 3);
+                        $data['tag_links'][] = $tag_link;
                     }else{
                         $data[$key] = $value;
                     }
@@ -562,10 +544,10 @@ class Item extends BaseController {
             }
             unset($_SESSION['POST']);
 
-            $this->display_view('item/form', $data);
+            $this->display_view('Stock\Views\item\form', $data);
         } else {
             // Update is not allowed
-            $this->ask_for_login();
+            redirect('/item');
         }
     }
 
@@ -579,7 +561,7 @@ class Item extends BaseController {
      */
     public function delete($id, $command = NULL) {
         // Check if this is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= ACCESS_LVL_ADMIN) {
+        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_admin) {
             if (empty($command)) {
                 $data['db'] = 'item';
                 $data['id'] = $id;
@@ -589,15 +571,17 @@ class Item extends BaseController {
                 $this->item_model->update($id, array("description" => "FAC"));
 
                 $item = $this->item_model->find($id);
-                $items = $this->item_model->asArray()->where('image', $item['image'])->findAll();
-                // Change this if soft deleting items is enabled
-                // Check if any other item uses this image
-                if (count($items) < 2) {
-                    unlink(ROOTPATH.config('\Stock\Config\StockConfig')->images_upload_path.$item['image']);
+                if (!is_null($item['image']) && $item['image'] != $this->config->item_no_image) {
+                    $items = $this->item_model->asArray()->where('image', $item['image'])->findAll();
+                    // Change this if soft deleting items is enabled
+                    // Check if any other item uses this image
+                    if (count($items) < 2) {
+                        unlink(ROOTPATH.$this->config->images_upload_path.$item['image']);
+                    }
                 }
 
-                $this->item_tag_link_model->delete_by(array('item_id' => $id));
-                $this->loan_model->delete_by(array('item_id' => $id));
+                $this->item_tag_link_model->where('item_id', $id)->delete();
+                $this->loan_model->where('item_id', $id)->delete();
                 $this->item_model->delete($id);
 
                 redirect('/item');
@@ -622,16 +606,16 @@ class Item extends BaseController {
                 redirect('/item');
             }
 
-            $this->load->model('user_model');
-            $this->load->model('inventory_control_model');
+            $this->user_model = new User_model();
 
-            $data['item'] = $this->item_model->get($id);
-            $data['controller'] = $this->user_model->get($_SESSION['user_id']);
+            $data['item'] = $this->item_model->find($id);
+            $data['item']['inventory_number'] = $this->item_model->getInventoryNumber($data['item']);
+            $data['controller'] = $this->user_model->find($_SESSION['user_id']);
 
             if (isset($_POST['date']) && $_POST['date'] != '') {
                 $data['date'] = $_POST['date'];
             } else {
-                $data['date'] = date('Y-m-d');
+                $data['date'] = date($this->config->database_date_format);
             }
 
             if (isset($_POST['remarks'])) {
@@ -641,19 +625,19 @@ class Item extends BaseController {
             }
 
             if (isset($_POST['submit'])) {
-                $inventory_control->item_id = $id;
-                $inventory_control->controller_id = $_SESSION['user_id'];
-                $inventory_control->date = $data['date'];
-                $inventory_control->remarks = $data['remarks'];
+                $inventory_control['item_id'] = $id;
+                $inventory_control['controller_id'] = $_SESSION['user_id'];
+                $inventory_control['date'] = $data['date'];
+                $inventory_control['remarks'] = $data['remarks'];
 
                 $this->inventory_control_model->insert($inventory_control);
-                redirect("item/view/" . $id);
+                return redirect()->to("/item/view/".$id);
             } else {
-                $this->display_view('inventory_control/form', $data);
+                $this->display_view('Stock\Views\inventory_control\form', $data);
             }
         } else {
             // Access is not allowed
-            $this->ask_for_login();
+            redirect('/item');
         }
     }
 
@@ -668,13 +652,17 @@ class Item extends BaseController {
             // No item specified, display items list
             redirect('/item');
         }
+        helper('MY_date');
 
         // Get item object with related inventory controls
-        $output['item'] = $this->item_model->get($id);
-        $output['inventory_controls'] = $this->inventory_control_model->with('controller')
-                ->get_many_by('item_id=' . $id);
+        $output['item'] = $this->item_model->find($id);
+        $output['inventory_controls'] = $this->inventory_control_model->where('item_id='.$id)->findAll();
+        $output['item']['inventory_number'] = $this->item_model->getInventoryNumber($output['item']);
+        array_walk($output['inventory_controls'], function(&$control) {
+            $control['controller'] = $this->inventory_control_model->getUser($control['controller_id']);
+        });
 
-        $this->display_view('inventory_control/list', $output);
+        $this->display_view('Stock\Views\inventory_control\list', $output);
     }
 
     /**
@@ -692,21 +680,17 @@ class Item extends BaseController {
             }
 
             // Get item object and related loans
-            $item = $this->item_model->get($id);
-            $loans = $this->loan_model->with('loan_by_user')
-                    ->with('loan_to_user')
-                    ->get_many_by('item_id', $item->item_id);
+            $item = $this->item_model->find($id);
 
             $data['item'] = $item;
-            $data['loans'] = $loans;
             $data['item_id'] = $id;
 
             // Test input
-            $this->load->library('form_validation');
+            $validation = \Config\Services::validation();
 
-            $this->form_validation->set_rules("date", "Date du prêt", 'required', array('required' => "La date du prêt doit être fournie"));
+            $validation->setRule("date", "Date du prêt", 'required', array('required' => "La date du prêt doit être fournie"));
 
-            if ($this->form_validation->run() === TRUE) {
+            if ($validation->run($_POST) === TRUE) {
                 $loanArray = $_POST;
 
                 if ($loanArray["planned_return_date"] == 0 || $loanArray["planned_return_date"] == "0000-00-00" || $loanArray["planned_return_date"] == "") {
@@ -719,19 +703,17 @@ class Item extends BaseController {
 
                 $loanArray["item_id"] = $id;
 
-                $loanArray["loan_to_user_id"] = null;
                 $loanArray["loan_by_user_id"] = $this->session->user_id;
 
                 $this->loan_model->insert($loanArray);
 
-                header("Location: " . base_url() . "item/loans/" . $id);
-                exit();
+                return redirect()->to("/item/loans/".$id);
             } else {
-                $this->display_view('loan/form', $data);
+                $this->display_view('Stock\Views\loan\form', $data);
             }
         } else {
             // Access is not allowed
-            $this->ask_for_login();
+            redirect('/item');
         }
     }
 
@@ -745,15 +727,15 @@ class Item extends BaseController {
         // Check if this is allowed
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
             // get the data from the loan with this id (to fill the form or to get the concerned item)
-            $data = get_object_vars($this->loan_model->get($id));
+            $data = $this->loan_model->find($id);
 
             if (!empty($_POST)) {
                 // test input
-                $this->load->library('form_validation');
+                $validation = \Config\Services::validation();
 
-                $this->form_validation->set_rules("date", "Date du prêt", 'required', array('required' => "La date du prêt doit être fournie"));
+                $validation->setRule("date", "Date du prêt", 'required', array('required' => "La date du prêt doit être fournie"));
 
-                if ($this->form_validation->run() === TRUE) {
+                if ($validation->run($_POST) === TRUE) {
                     //Declarations
 
                     $loanArray = $_POST;
@@ -769,27 +751,14 @@ class Item extends BaseController {
                     // Execute the changes in the item table
                     $this->loan_model->update($id, $loanArray);
 
-                    redirect("/item/loans/" . $data["item_id"]);
-                    exit();
-                } else {
-                    // Load the options
-                    $this->load->model('stocking_place_model');
-                    $data['stocking_places'] = $this->stocking_place_model->get_all();
-                    $this->load->model('supplier_model');
-                    $data['suppliers'] = $this->supplier_model->get_all();
-                    $this->load->model('item_group_model');
-                    $data['item_groups'] = $this->item_group_model->get_all();
-
-                    // Load the tags
-                    $this->load->model('item_tag_model');
-
-                    $data['item_tags'] = $this->item_tag_model->get_all();
+                    var_dump($data);
+                    return redirect()->to("/item/loans/".$data["item_id"]);
                 }
             }
-            $this->display_view('loan/form', $data);
+            $this->display_view('Stock\Views\loan\form', $data);
         } else {
             // Access is not allowed
-            $this->ask_for_login();
+            redirect("/item");
         }
     }
 
@@ -807,11 +776,14 @@ class Item extends BaseController {
         }
 
         // Get item object and related loans
-        $item = $this->item_model->get($id);
-        /*$loans = $this->loan_model->with('loan_by_user')
-                ->with('loan_to_user')
-                ->get_many_by('item_id', $item->item_id);*/
-        $loans = $this->loan_model->where('item_id', $item->item_id);
+        $item = $this->item_model->find($id);
+        $loans = $this->loan_model->where('item_id', $item['item_id'])->findAll();
+        array_walk($loans, function(&$loan) {
+            $loan['loan_by_user'] = $this->loan_model->get_loaner($loan);
+            if (!is_null($loan['loan_to_user_id'])) {
+                $loan['loan_to_user'] = $this->loan_model->get_borrower($loan);
+            }
+        });
 
         $output['item'] = $item;
         $output['loans'] = $loans;
@@ -829,25 +801,23 @@ class Item extends BaseController {
      */
     public function delete_loan($id, $command = NULL) {
         // Check if this is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= ACCESS_LVL_ADMIN) {
+        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_admin) {
             if (empty($command)) {
                 $data['db'] = 'loan';
                 $data['id'] = $id;
 
-                $this->display_view('item/confirm_delete', $data);
+                $this->display_view('Stock\Views\item\confirm_delete', $data);
             } else {
-                $this->load->model("loan_model");
-
                 // get the data from the loan with this id (to fill the form or to get the concerned item)
-                $data = get_object_vars($this->loan_model->get($id));
+                $data = $this->loan_model->find($id);
 
                 $this->loan_model->delete($id);
 
-                redirect("/item/loans/" . $data["item_id"]);
+                return redirect()->to("/item/loans/" . $data["item_id"]);
             }
         } else {
             // Access is not allowed
-            $this->ask_for_login();
+            redirect('/item');
         }
     }
 
@@ -919,10 +889,10 @@ class Item extends BaseController {
         $pagination = $this->load_pagination($items_count, $page);
 
         $number_page = $page;
-        if($number_page > ceil($items_count/ITEMS_PER_PAGE)) $number_page = ceil($items_count/ITEMS_PER_PAGE);
+        if($number_page > ceil($items_count/$this->config->items_per_page)) $number_page = ceil($items_count/$this->config->items_per_page);
 
         // Keep only the slice of items corresponding to the current page
-        $items = array_slice($items, ($number_page-1)*ITEMS_PER_PAGE, ITEMS_PER_PAGE);
+        $items = array_slice($items, ($number_page-1)*$this->config->items_per_page, $this->config->items_per_page);
 
         // Add to the item whether it is late, the starting date, and the end date
         array_walk($items, function(&$item) use ($late_item_ids) {
@@ -961,14 +931,15 @@ class Item extends BaseController {
      *
      *
      * @param integer $id
-     * @return void
+     * @return mixed
      */
-    private function set_validation_rules($id = NULL) {
-        $this->load->library('form_validation');
+    private function set_validation_rules() {
+        $validation = \Config\Services::validation();
 
-        $this->form_validation->set_rules("name", $this->lang->line('field_item_name'), 'required');
+        $validation->setRule("name", lang('MY_application.field_item_name'), 'required');
+        $validation->setRule("inventory_prefix", lang('MY_application.field_inventory_number'), 'required');
 
-        $this->form_validation->set_rules("inventory_prefix", lang('field_inventory_number'), 'required');
+        return $validation;
     }
 
 }

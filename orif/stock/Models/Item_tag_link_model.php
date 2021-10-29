@@ -1,10 +1,10 @@
-<?php 
+<?php
 
 //if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
  * The Item tag link model
- * 
+ *
  * @author      Didier Viret, Simão Romano Schindler
  * @link        https://github.com/OrifInformatique/stock
  * @copyright   Copyright (c) 2016, Orif <http://www.orif.ch>
@@ -38,10 +38,12 @@ class Item_tag_link_model extends MyModel
         $tags = array();
         $tagIDs = $this->asArray()->where(['item_id'=>$item['item_id']])->findColumn('item_tag_id');
 
-        foreach ($tagIDs as $tagID){
-            array_push($tags, $this->item_tag_model->asArray()->where(['item_tag_id'=>$tagID])->find());
+        if (!is_null($tagIDs)) {
+            foreach ($tagIDs as $tagID){
+                array_push($tags, $this->item_tag_model->asArray()->where(['item_tag_id'=>$tagID])->find());
+            }
         }
-        
+
         return $tags;
     }
 
@@ -52,10 +54,12 @@ class Item_tag_link_model extends MyModel
         $items = array();
         $itemsIDs = $this->asArray()->where(['item_tag_id'=>$tag['item_tag_id']])->findColumn('item_id');
 
-        foreach ($itemsIDs as $itemID){
-            array_push($items, $this->item_model->asArray()->where(['item_id'=>$itemID])->find());
+        if (!is_null($itemsIDs)) {
+            foreach ($itemsIDs as $itemID){
+                array_push($items, $this->item_model->asArray()->where(['item_id'=>$itemID])->find());
+            }
         }
-        
+
         return $items;
     }
 }
