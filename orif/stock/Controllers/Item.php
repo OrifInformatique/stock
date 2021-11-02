@@ -578,7 +578,7 @@ class Item extends BaseController {
                     // Change this if soft deleting items is enabled
                     // Check if any other item uses this image
                     if (count($items) < 2) {
-                        unlink(ROOTPATH.$this->config->images_upload_path.$item['image']);
+                        unlink(ROOTPATH.'public/'.$this->config->images_upload_path.$item['image']);
                     }
                 }
 
@@ -586,7 +586,7 @@ class Item extends BaseController {
                 $this->loan_model->where('item_id', $id)->delete();
                 $this->item_model->delete($id);
 
-                redirect('/item');
+                return redirect()->to('/item');
             }
         } else {
             // Access is not allowed
