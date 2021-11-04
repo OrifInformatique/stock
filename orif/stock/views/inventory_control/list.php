@@ -1,5 +1,5 @@
 <div class="container">
-    <?php $item_page = base_url('item/view/').$item['item_id']; ?>
+    <?php $item_page = base_url('item/view/'.$item['item_id']); ?>
 
     <!-- BUTTONS -->
     <a href="<?= $item_page ?>" class="btn btn-primary" role="button"><?= lang('MY_application.btn_back_to_object'); ?></a>
