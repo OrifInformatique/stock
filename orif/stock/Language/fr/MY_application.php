@@ -1,11 +1,11 @@
-<?php 
+<?php
 
-return[ 
+return[
 
 /**
  * French translations
  *
- * @author      Didier Viret
+ * @author      Didier Viret, Simão Romano Schindler
  * @link        https://github.com/OrifInformatique/stock
  * @copyright   Copyright (c) 2016, Orif <http://www.orif.ch>
  */
@@ -16,6 +16,7 @@ return[
 'page_item_list'                 => 'Liste des objets',
 'page_login'                     => 'Connexion',
 'page_password_change'           => 'Modification du mot de passe',
+'page_active_loans_list'         => 'Liste des prêts en cours',
 // Date and time formats
 'date_format_short'              => 'd.m.Y',
 'datetime_format_short'          => 'd.m.Y H:i',
@@ -113,6 +114,8 @@ return[
 'header_suppliers_country'       => 'Pays',
 'header_suppliers_phone'         => 'Téléphone',
 'header_suppliers_email'         => 'E-mail',
+'header_loan_date_start'         => 'Prêt',
+'header_loan_date_end'           => 'Retour prévu',
 // Admin labels
 'admin_tab_users'                => 'Utilisateurs',
 'admin_tab_tags'                 => 'Tags',
@@ -164,10 +167,11 @@ return[
 'btn_linked_doc'                 => 'Voir document',
 'btn_create_inventory_control'   => 'Nouveau contrôle',
 'btn_inventory_control_history'  => 'Historique contrôles',
+'btn_to_loans'                   => 'Liste des prêts',
 'btn_loans_history'              => 'Historique des prêts',
 'btn_create_loan'                => 'Ajouter un prêt',
 'btn_submit_filters'             => 'Appliquer filtres et tri',
-'btn_remove_filters'             => 'Supprimer filtres et tri',
+'btn_remove_filters'             => 'Supprimer les filtres',
 'btn_all'                        => 'Tout',
 'btn_none'                       => 'Rien',
 'btn_generate_inventory_nb'      => 'Générer un No d\'inventaire',
@@ -225,5 +229,7 @@ return[
 'text_no'                        => 'Non',
 'text_disable'                   => 'Désactiver',
 
-
+// Image cleaning
+'admin_command_clean_images'    => 'Êtes-vous sûr de vouloir renommer les images utilisées et supprimer les autres',
+'admin_command_clean_images_success' => 'Les images utilisées ont été renommées et les autres supprimées.',
  ];

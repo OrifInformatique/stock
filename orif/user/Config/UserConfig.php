@@ -14,8 +14,8 @@ class UserConfig extends BaseConfig
 {
     /* Access levels */
     public $access_lvl_guest            =   1;
-    public $access_lvl_registered       =   2;
-    public $access_lvl_admin            =   4;
+    public $access_lvl_registered       =   8;
+    public $access_lvl_admin            =   16;
     
     /* Validation rules */
     public $username_min_length         =   3;
