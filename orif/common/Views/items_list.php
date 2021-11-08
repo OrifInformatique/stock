@@ -1,5 +1,5 @@
 <?php
-   /** @author      Orif, section informatique (ViDi)
+   /** @author      Orif, section informatique (ViDi, AeDa)
      * @link        https://github.com/OrifInformatique
      * @copyright   Copyright (c), Orif (https://www.orif.ch)
      * 
@@ -12,13 +12,14 @@
      *                     Key is the name of the corresponding items property in items subarrays.
      *                     Value is the header to display for each column.
      * @param with_deleted : 
-     *                     Bool used to display soft deleted items of the list or not (default should be false).
+     *                     Bool used to display or not the soft deleted items of the list.
+     *                     If null, the "Display disabled items" checkbox won't be displayed.
+     * @param display_deleted_label :
+     *                     String for the label displayed near the soft delete checkbox.
      * @param primary_key_field :
      *                     String containing the name of the primary key of the items.
      *                     Used to construct the links to details/update/delete controllers.
      *                     If not set, "id" is used by default.
-     * @param field_display_deleted :
-     *                     String displayed before the soft delete checkbox
      * @param btn_create_label :
      *                     Label for the "create" button. If not set, default label is used.
      * @param url_detail : Link to the controller method wich displays item's details.
@@ -29,23 +30,35 @@
      *                     If not set, no "delete" link will be displayed.
      * @param url_create : Link to the controller method wich displays a form to create a new item.
      *                     If not set, no "create" button will be displayed.
-     * @param url_view   : Link to the view.
-     *                     If not set, no "Display soft deleted" button will be displayed.
-     * @param url_path   : Path to the module and it's controller.
-     *                     Has to be set if soft delete is on.
+     * @param url_getView: Link used to dynamically update the view's content with javascript.
+     *                     It should call a method wich returns the view's content.
+     *                     If not set, the "Display disabled items" checkbox won't be displayed.
      * 
-     * EXAMPLE TO CALL THIS VIEW FROM ANY CONTROLLER :
+     * EXAMPLE METHOD TO CALL THIS VIEW FROM ANY CONTROLLER :
+     * 
+     * public function display_items($with_deleted = false) {
      *   $data['list_title'] = "Test items_list view";
      *   
      *   $data['columns'] = ['name' => 'Name',
      *                       'inventory_nb' => 'Inventory nb',
      *                       'buying_date' => 'Buying date',
      *                       'warranty_duration' => 'Warranty duration'];
+     * 
+     *   // Assume these are active items
      *   $data['items'] = [
      *       ['id' => '1', 'name' => 'Item 1', 'inventory_nb' => 'ITM0001', 'buying_date' => '01/01/2020', 'warranty_duration' => '12 months'],
      *       ['id' => '2', 'name' => 'Item 2', 'inventory_nb' => 'ITM0002', 'buying_date' => '01/02/2020', 'warranty_duration' => '12 months'],
      *       ['id' => '3', 'name' => 'Item 3', 'inventory_nb' => 'ITM0003', 'buying_date' => '01/03/2020', 'warranty_duration' => '12 months']
      *   ];
+     * 
+     *   if ($with_deleted) {
+     *       // Assume these are soft_deleted items
+     *       $data['items'] = array_merge($data['items'], [
+     *           ['id' => '10', 'name' => 'Item 10', 'inventory_nb' => 'ITM0010', 'buying_date' => '01/01/2020', 'warranty_duration' => '12 months'],
+     *           ['id' => '11', 'name' => 'Item 11', 'inventory_nb' => 'ITM0011', 'buying_date' => '01/02/2020', 'warranty_duration' => '12 months'],
+     *           ['id' => '12', 'name' => 'Item 12', 'inventory_nb' => 'ITM0012', 'buying_date' => '01/03/2020', 'warranty_duration' => '12 months']
+     *       ]);
+     *   }
      *
      *   $data['primary_key_field']  = 'id';
      *   $data['btn_create_label']   = 'Add an item';
@@ -54,62 +67,57 @@
      *   $data['url_update'] = "items_list/update/";
      *   $data['url_delete'] = "items_list/delete/";
      *   $data['url_create'] = "items_list/create/";
-     *   $data['url_view']   = "items_list";
-     *   $data['url_path']   = "stock/items_list";
+     *   $data['url_getView'] = "items_list/display_items";
      *
-	 *	 $this->display_view('Common\Views\items_list', $data);
+	 *	 return $this->display_view('Common\Views\items_list', $data);
+     * }
      */
 
     // If no primary key field name is sent as parameter, suppose it is "id"
     if (!isset($primary_key_field)) {
         $primary_key_field = "id";
     }
+
     // If no label for create button is sent as parameter, use default label
     if (!isset($btn_create_label)) {
         $btn_create_label = lang('common_lang.btn_add');
     }
 
-    // If no label for display deleted checkbox button is sent as a parameter, use default label
-    if (!isset($field_display_deleted)) {
-        $field_display_deleted = lang("stock_lang.field_display_deleted_default");
+    // If no label for display deleted checkbox is sent as parameter, use default label
+    if (!isset($display_deleted_label)) {
+        $display_deleted_label = lang('common_lang.btn_show_disabled');
     }
 
-    // If no with_deleted variable is sent as a parameter, use default value
+    // If no with_deleted variable is sent as parameter, set it to null
     if (!isset($with_deleted)) {
-        $with_deleted = false;
+        $with_deleted = null;
     }
 
-    // If no url_view variable is sent as a parameter, use default value
-    if (!isset($url_view)) {
-        $url_view = null;
-    }
-
-    // If no url_path variable is sent as a parameter, use default value
-    if (!isset($url_path)) {
-        $url_path = null;
+    // If no url_getView variable is sent as parameter, set it to null
+    if (!isset($url_getView)) {
+        $url_getView = null;
     }
 ?>
 
 <div class="items_list container">
     <div class="row mb-2">
-        <div class="col-sm-8 text-left">
+        <div class="text-left col-12">
             <!-- Display list title if defined defined -->
-            <?= isset($list_title) ? '<h1>'.esc($list_title).'</h1>' : '' ?>
+            <?= isset($list_title) ? '<h3>'.esc($list_title).'</h3>' : '' ?>
         </div>
-        <div class="col-sm-6">
+        <div class="col-sm-6 text-left">
             <!-- Display the "create" button if url_create is defined -->
             <?php if(isset($url_create)) { ?>
                 <a class="btn btn-primary" href="<?= site_url(esc($url_create)) ?>"><?= esc($btn_create_label) ?></a>
             <?php } ?>
         </div>
         <div class="col-sm-6 text-right">
-            <?php if (isset($url_view)) { ?>
-            <label class="btn btn-default form-check-label" for="toggle_deleted">
-                <?= lang($field_display_deleted); ?>
-            </label>
-            <?= form_checkbox('toggle_deleted', '', $with_deleted, [
-                'id' => 'toggle_deleted'
-            ]); ?>
+            <!-- Display the "with_deleted" checkbox if with_deleted and url_getView variables are defined -->
+            <?php if (isset($with_deleted) && isset($url_getView)) { ?>
+                <label class="btn btn-default form-check-label" for="toggle_deleted">
+                    <?= lang($display_deleted_label); ?>
+                </label>
+                <?= form_checkbox('toggle_deleted', '', $with_deleted, ['id' => 'toggle_deleted']); ?>
             <?php } ?>
         </div>
     </div>
@@ -129,7 +137,7 @@
                     <?php } ?>
                 </tr>
             </thead>
-            <tbody id="itemList">
+            <tbody id="itemsList">
                 <!-- One table row for each item -->
                 <?php foreach ($items as $itemEntity): ?>
                 <tr>
@@ -170,14 +178,18 @@
     </div>
 </div>
 
-<!-- JQuery script to display soft deleted items of the list -->
+<!-- JQuery script to refresh items list after user action -->
 <script>
 $(document).ready(function(){
+
+    // "Display disabled items" checkbox value change
     $('#toggle_deleted').change(e => {
         let checked = e.currentTarget.checked;
-        $.post('<?= base_url(); ?>/<?= $url_path == null ? "" : $url_path ?>/<?= $url_view == null ? "" : $url_view ?>/'+(+checked), {}, data => {
-            $('#itemList').empty();
-            $('#itemList')[0].innerHTML = $(data).find('#itemList')[0].innerHTML;
+
+        // Get view content corresponding to the new parameters and replace current displayed content
+        $.post('<?= base_url($url_getView); ?>/'+(+checked), {}, data => {
+            $('#itemsList').empty();
+            $('#itemsList')[0].innerHTML = $(data).find('#itemsList')[0].innerHTML;
         });
     });
 });
