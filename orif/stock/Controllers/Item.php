@@ -219,7 +219,7 @@ class Item extends BaseController {
 
         if (is_null($id)) {
             // No item selected, display items list
-            redirect('/item');
+            return redirect()->to('/item');
         }
 
         // Get item object and related objects
@@ -389,7 +389,7 @@ class Item extends BaseController {
             }
         } else {
             // Access is not allowed
-            redirect("item/");
+            return redirect()->to("item/");
         }
     }
 
@@ -549,7 +549,7 @@ class Item extends BaseController {
             $this->display_view('Stock\Views\item\form', $data);
         } else {
             // Update is not allowed
-            redirect('/item');
+            return redirect()->to('/item');
         }
     }
 
@@ -590,7 +590,7 @@ class Item extends BaseController {
             }
         } else {
             // Access is not allowed
-            redirect('/item');
+            return redirect()->to('/item');
         }
     }
 
@@ -605,7 +605,7 @@ class Item extends BaseController {
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
             if (empty($id)) {
                 // No item specified, display items list
-                redirect('/item');
+                return redirect()->to('/item');
             }
 
             $this->user_model = new User_model();
@@ -639,7 +639,7 @@ class Item extends BaseController {
             }
         } else {
             // Access is not allowed
-            redirect('/item');
+            return redirect()->to('/item');
         }
     }
 
@@ -652,7 +652,7 @@ class Item extends BaseController {
     public function inventory_controls($id = NULL) {
         if (empty($id)) {
             // No item specified, display items list
-            redirect('/item');
+            return redirect()->to('/item');
         }
         helper('MY_date');
 
@@ -678,7 +678,7 @@ class Item extends BaseController {
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
             if (empty($id)) {
                 // No item specified, display items list
-                redirect('/item');
+                return redirect()->to('/item');
             }
 
             // Get item object and related loans
@@ -715,7 +715,7 @@ class Item extends BaseController {
             }
         } else {
             // Access is not allowed
-            redirect('/item');
+            return redirect()->to('/item');
         }
     }
 
@@ -760,7 +760,7 @@ class Item extends BaseController {
             $this->display_view('Stock\Views\loan\form', $data);
         } else {
             // Access is not allowed
-            redirect("/item");
+            return redirect()->to("/item");
         }
     }
 
@@ -774,7 +774,7 @@ class Item extends BaseController {
     public function loans($id = NULL) {
         if (empty($id)) {
             // No item specified, display items list
-            redirect('/item');
+            return redirect()->to('/item');
         }
 
         // Get item object and related loans
@@ -820,7 +820,7 @@ class Item extends BaseController {
             }
         } else {
             // Access is not allowed
-            redirect('/item');
+            return redirect()->to('/item');
         }
     }
 
