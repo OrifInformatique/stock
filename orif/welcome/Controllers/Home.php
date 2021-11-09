@@ -13,6 +13,8 @@ class Home extends BaseController
     {
         parent::initController($request, $response, $logger);
         $this->session=\Config\Services::session();
+
+        helper('form');
     }
 
 	public function index()
