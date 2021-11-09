@@ -2,13 +2,14 @@
 <div class="container">
 
     <!-- *** ADMIN *** -->
-    <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?>
-            <div class="row bottom-margin">
-                    <!-- Button for new item -->
-                    <a href="<?php echo base_url("item/create/"); ?>"
-                            class="btn btn-success mb-3"><?php echo htmlspecialchars(lang('MY_application.btn_new')); ?></a>
+    <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= ACCESS_LVL_OBSERVATION) { ?>
+        <div class="row bottom-margin">
+            <div class="col-12">
+                <!-- Button for new item -->
+                <a href="<?php echo base_url("item/create/"); ?>"
+                        class="btn btn-success mb-3"><?php echo htmlspecialchars(lang('MY_application.btn_new')); ?></a>
             </div>
-
+        </div>
     <?php } ?>
     <!-- *** END OF ADMIN *** -->
 
