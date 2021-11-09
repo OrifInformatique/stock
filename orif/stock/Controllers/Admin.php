@@ -60,35 +60,33 @@ class Admin extends BaseController
     /**
     * As the name says, view the tags.
     */
-    public function view_tags($with_deleted = FALSE)
+    public function view_tags($with_deleted = false)
     {
-      $data['items'] = [];
-
       if ($with_deleted)
       {
-        $tags = $this->item_tag_model->withDeleted()->findAll();
+        $data['items'] = $this->item_tag_model->withDeleted()->findAll();
+
+        // Add the "active" info for each tag
+        foreach ($data['items'] as &$tag)
+        {
+          $tag['active'] = isset($tag['archive']) ? lang('common_lang.no') : lang('common_lang.yes');
+        }
+        $data['columns'] = ['name'      => lang('stock_lang.field_name'),
+                            'short_name'  => lang('stock_lang.field_short_name'),
+                            'active'      => lang('stock_lang.field_active'),
+                           ];
       }
       else
       {
-        $tags = $this->item_tag_model->findAll();
+        $data['items'] = $this->item_tag_model->findAll();
+
+        $data['columns'] = ['name'        => lang('stock_lang.field_name'),
+                            'short_name'  => lang('stock_lang.field_short_name'),
+                           ];
       }
 
+      // Prepare datas for common module generic items_list view
       $data['list_title'] = lang('stock_lang.title_tags');
-        
-      $data['columns'] = ['name'        => lang('stock_lang.field_name'),
-                          'short_name'  => lang('stock_lang.field_short_name'),
-                          'archive'     => lang('stock_lang.field_active')
-                         ];
-                          
-      foreach ($tags as $tag)
-      {
-        array_push($data['items'], [
-          'item_tag_id' => $tag['item_tag_id'], 
-          'name' => $tag['name'], 
-          'short_name' => $tag['short_name'], 
-          'archive' => lang($tag['archive'] ? 'common_lang.no' : 'common_lang.yes')
-        ]);
-      }
 
       $data['primary_key_field']  = 'item_tag_id';
       $data['btn_create_label']   = lang('stock_lang.btn_add_tag');
@@ -96,8 +94,8 @@ class Admin extends BaseController
       $data['url_update'] = "stock/admin/modify_tag/";
       $data['url_delete'] = "stock/admin/delete_tag/";
       $data['url_create'] = "stock/admin/new_tag";
-      $data['url_view']   = "view_tags";
-      $data['url_path']   = "stock/admin";
+      $data['url_getView'] = "stock/admin/view_tags";
+      $data['with_deleted'] = $with_deleted;
       
       return $this->display_view('Common\Views\items_list', $data);
     }
@@ -235,33 +233,31 @@ class Admin extends BaseController
     */
     public function view_stocking_places($with_deleted = FALSE)
     {
-      $data['items'] = [];
-
       if ($with_deleted)
       {
-        $stockingPlaces = $this->stocking_place_model->withDeleted()->findAll();
+        $data['items'] = $this->stocking_place_model->withDeleted()->findAll();
+
+        // Add the "active" info for each stocking place
+        foreach ($data['items'] as &$stocking_place)
+        {
+          $stocking_place['active'] = isset($stocking_place['archive']) ? lang('common_lang.no') : lang('common_lang.yes');
+        }
+        $data['columns'] = ['name'   => lang('stock_lang.field_name'),
+                            'short'  => lang('stock_lang.field_short_name'),
+                            'active' => lang('stock_lang.field_active'),
+                           ];
       }
       else
       {
-        $stockingPlaces = $this->stocking_place_model->findAll();
+        $data['items'] = $this->stocking_place_model->findAll();
+
+        $data['columns'] = ['name'  => lang('stock_lang.field_name'),
+                            'short' => lang('stock_lang.field_short_name'),
+                           ];
       }
 
+      // Prepare datas for common module generic items_list view
       $data['list_title'] = lang('stock_lang.title_stocking_places');
-        
-      $data['columns'] = ['name'        => lang('stock_lang.field_name'),
-                          'short_name'  => lang('stock_lang.field_short_name'),
-                          'archive'     => lang('stock_lang.field_active')
-                         ];
-                          
-      foreach ($stockingPlaces as $stockingPlace)
-      {
-        array_push($data['items'], [
-          'stocking_place_id' => $stockingPlace['stocking_place_id'], 
-          'name' => $stockingPlace['name'], 
-          'short_name' => $stockingPlace['short'], 
-          'archive' => lang($stockingPlace['archive'] ? 'common_lang.no' : 'common_lang.yes')
-        ]);
-      }
 
       $data['primary_key_field']  = 'stocking_place_id';
       $data['btn_create_label']   = lang('stock_lang.btn_add_stocking_place');
@@ -269,8 +265,8 @@ class Admin extends BaseController
       $data['url_update'] = "stock/admin/modify_stocking_place/";
       $data['url_delete'] = "stock/admin/delete_stocking_place/";
       $data['url_create'] = "stock/admin/new_stocking_place";
-      $data['url_view']   = "view_stocking_places";
-      $data['url_path']   = "stock/admin";
+      $data['url_getView'] = "stock/admin/view_stocking_places";
+      $data['with_deleted'] = $with_deleted;
 
       return $this->display_view('Common\Views\items_list', $data);
     }
@@ -414,47 +410,44 @@ class Admin extends BaseController
     /**
     * As the name says, view the suppliers.
     */
-    public function view_suppliers($with_deleted = FALSE)
+    public function view_suppliers($with_deleted = false)
     {
-      $data['items'] = [];
+      // Describe columns to display for common module generic items_list view
+      $data['columns'] = ['name'    => lang('stock_lang.field_name'),
+                          'address' => lang('stock_lang.field_address'),
+                          'tel'     => lang('stock_lang.field_tel'),
+                          'email'   => lang('stock_lang.field_email'),
+      ];
 
       if ($with_deleted)
       {
         $suppliers = $this->supplier_model->withDeleted()->findAll();
+        $data['columns']['active'] = lang('stock_lang.field_active');
       }
       else
       {
         $suppliers = $this->supplier_model->findAll();
       }
 
-      $data['list_title'] = lang('stock_lang.title_suppliers');
-        
-      $data['columns'] = ['name'            => lang('stock_lang.field_name'),
-                          'address_line1'   => lang('stock_lang.field_first_address_line'),
-                          'address_line2'   => lang('stock_lang.field_second_address_line'),
-                          'zip'             => lang('stock_lang.field_zip'),
-                          'city'            => lang('stock_lang.field_city'),
-                          'country'         => lang('stock_lang.field_country'),
-                          'tel'             => lang('stock_lang.field_tel'),
-                          'email'           => lang('stock_lang.field_email'),
-                          'archive'         => lang('stock_lang.field_active')
-                         ];
-                          
+      // Order columns and construct contents for common module generic items_list view
+      $data['items'] = [];
       foreach ($suppliers as $supplier)
       {
-        array_push($data['items'], [
-            'supplier_id'     => $supplier['supplier_id'], 
-            'name'            => $supplier['name'], 
-            'address_line1'   => $supplier['address_line1'],
-            'address_line2'   => $supplier['address_line2'],
-            'zip'             => $supplier['zip'],
-            'city'            => $supplier['city'],
-            'country'         => $supplier['country'],
-            'tel'             => $supplier['tel'],
-            'email'           => $supplier['email'],
-            'archive'         => lang($supplier['archive'] ? 'common_lang.no' : 'common_lang.yes')
-        ]);
+        $data['items'][] = [
+          'supplier_id'     => $supplier['supplier_id'],
+          'name'            => $supplier['name'],
+          'address'         => (!empty($supplier['address_line1']) ? $supplier['address_line1']."<br>" : "").
+                               (!empty($supplier['address_line2']) ? $supplier['address_line2']."<br>" : "").
+                               ((!empty($supplier['zip']) || !empty($supplier['city'])) ? $supplier['zip']." ".$supplier['city']."<br>" : "").
+                               (!empty($supplier['country']) ? $supplier['country'] : ""),
+          'tel'             => $supplier['tel'],
+          'email'           => $supplier['email'],
+          'active'          => isset($supplier['archive']) ? lang('common_lang.no') : lang('common_lang.yes')
+        ];
       }
+
+      // Complete datas for common module generic items_list view
+      $data['list_title'] = lang('stock_lang.title_suppliers');
 
       $data['primary_key_field']  = 'supplier_id';
       $data['btn_create_label']   = lang('stock_lang.btn_add_supplier');
@@ -462,8 +455,8 @@ class Admin extends BaseController
       $data['url_update'] = "stock/admin/modify_supplier/";
       $data['url_delete'] = "stock/admin/delete_supplier/";
       $data['url_create'] = "stock/admin/new_supplier";
-      $data['url_view']   = "view_suppliers";
-      $data['url_path']   = "stock/admin";
+      $data['url_getView'] = "stock/admin/view_suppliers";
+      $data['with_deleted'] = $with_deleted;
 
       return $this->display_view('Common\Views\items_list', $data);
     }
@@ -633,42 +626,40 @@ class Admin extends BaseController
     */
     public function view_item_groups($with_deleted = FALSE)
     {
-      $data['items'] = [];
-
       if ($with_deleted)
       {
-        $itemGroups = $this->item_group_model->withDeleted()->findAll();
+        $data['items'] = $this->item_group_model->withDeleted()->findAll();
+
+        // Add the "active" info for each item group
+        foreach ($data['items'] as &$item_group)
+        {
+          $item_group['active'] = isset($item_group['archive']) ? lang('common_lang.no') : lang('common_lang.yes');
+        }
+        $data['columns'] = ['name'   => lang('stock_lang.field_name'),
+                            'short_name'  => lang('stock_lang.field_short_name'),
+                            'active' => lang('stock_lang.field_active'),
+                           ];
       }
       else
       {
-        $itemGroups = $this->item_group_model->findAll();
+        $data['items'] = $this->item_group_model->findAll();
+
+        $data['columns'] = ['name'  => lang('stock_lang.field_name'),
+                            'short_name' => lang('stock_lang.field_short_name'),
+                           ];
       }
 
+      // Complete datas for common module generic items_list view
       $data['list_title'] = lang('stock_lang.title_item_groups');
-        
-      $data['columns'] = ['name'        => lang('stock_lang.field_name'),
-                          'short_name'  => lang('stock_lang.field_short_name'),
-                          'archive'     => lang('stock_lang.field_active')
-                         ];
-                          
-      foreach ($itemGroups as $itemGroup)
-      {
-        array_push($data['items'], [
-          'item_group_id' => $itemGroup['item_group_id'], 
-          'name' => $itemGroup['name'], 
-          'short_name' => $itemGroup['short_name'], 
-          'archive' => lang($itemGroup['archive'] ? 'common_lang.no' : 'common_lang.yes')
-        ]);
-      }
-
+      
       $data['primary_key_field']  = 'item_group_id';
       $data['btn_create_label']   = lang('stock_lang.btn_add_item_group');
       $data['field_display_deleted'] = lang("stock_lang.field_deleted_item_groups");
       $data['url_update'] = "stock/admin/modify_item_group/";
       $data['url_delete'] = "stock/admin/delete_item_group/";
       $data['url_create'] = "stock/admin/new_item_group";
-      $data['url_view']   = "view_item_groups";
-      $data['url_path']   = "stock/admin";
+      $data['url_getView'] = "stock/admin/view_item_groups";
+      $data['with_deleted'] = $with_deleted;
 
       return $this->display_view('Common\Views\items_list', $data);
     }

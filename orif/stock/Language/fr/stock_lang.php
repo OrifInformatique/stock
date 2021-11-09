@@ -34,9 +34,10 @@ return[
 
 
 // Fields labels
-'field_active'                          => 'Activé',
+'field_active'                          => 'Actif',
 'field_name'                            => 'Nom',
 'field_short_name'                      => 'Nom court',
+'field_address'                         => 'Adresse',
 'field_first_address_line'              => 'Première ligne d\'adresse',
 'field_second_address_line'             => 'Deuxième ligne d\'adresse',
 'field_zip'                             => 'NPA',
