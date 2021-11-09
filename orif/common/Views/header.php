@@ -16,9 +16,9 @@
 
     <title><?php
         if (!isset($title) || is_null($title) || $title == '') {
-            echo lang('Common_lang.page_prefix');
+            echo lang('common_lang.page_prefix');
         } else {
-            echo lang('Common_lang.page_prefix').' - '.$title;
+            echo lang('common_lang.page_prefix').' - '.$title;
         }
     ?></title>
 
