@@ -27,6 +27,24 @@ class UpdateImages extends BaseCommand
 
             $same_image_items = $itemModel->asArray()->where('image', $old_image)->find();
 
+            if (!file_exists($imagesPath.$old_image)) {
+                // Extension is the different case (upper, lower), so try to find the actual image
+                // Because the full filename is reverse, extension is first, and name is second
+                [$extension, $filename] = explode('.', strrev($old_image), 2);
+                $filename = strrev($filename);
+                $extension = strrev($extension);
+
+                if (file_exists($imagesPath.$filename.'.'.strtolower($extension))) {
+                    $old_image = $filename.'.'.strtolower($extension);
+                } elseif (file_exists($imagesPath.$filename.'.'.strtoupper($extension))) {
+                    $old_image = $filename.'.'.strtoupper($extension);
+                } else {
+                    // Couldn't find the actual image, so skip this item and log the error
+                    $this->logger->error("Could not find actual image file for ${old_image} for item ${item['item_id']}");
+                    continue;
+                }
+            }
+
             if (count($same_image_items) >= 2) {
                 // Copy the image to not break the other item
                 copy($imagesPath.$old_image, $imagesPath.$new_image);
