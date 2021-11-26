@@ -64,7 +64,7 @@ $config = config('\Stock\Config\StockConfig');
 
     <!-- ITEM DETAILS -->
     <div class="row">
-        <div class="col-xs-12">
+        <div class="col-md-12">
             <p class="bg-primary">&nbsp;<?= lang('MY_application.text_item_detail'); ?></p>
         </div>
     </div>
@@ -138,7 +138,7 @@ $config = config('\Stock\Config\StockConfig');
 
     <!-- ITEM STATUS, LOAN STATUS AND HISTORY -->
     <div class="row">
-        <div class="col-xs-12">
+        <div class="col-md-12">
             <p class="bg-primary">&nbsp;<?= lang('MY_application.text_item_loan_status'); ?></p>
         </div>
     </div>
@@ -171,7 +171,7 @@ $config = config('\Stock\Config\StockConfig');
 
     <!-- ITEM SUPPLIER, BUYING AND WARRANTY INFORMATIONS -->
     <div class="row">
-        <div class="col-xs-12">
+        <div class="col-md-12">
             <p class="bg-primary">&nbsp;<?= lang('MY_application.text_item_buying_warranty'); ?></p>
         </div>
     </div>
@@ -219,7 +219,7 @@ $config = config('\Stock\Config\StockConfig');
 
     <!-- ITEM TAGS -->
     <div class="row">
-        <div class="col-xs-12">
+        <div class="col-md-12">
             <p class="bg-primary">&nbsp;<?= lang('MY_application.text_item_tags'); ?></p>
         </div>
     </div>

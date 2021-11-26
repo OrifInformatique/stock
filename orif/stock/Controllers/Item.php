@@ -219,7 +219,7 @@ class Item extends BaseController {
 
         if (is_null($id)) {
             // No item selected, display items list
-            redirect('/item');
+            return redirect()->to('/item');
         }
 
         // Get item object and related objects
@@ -389,7 +389,7 @@ class Item extends BaseController {
             }
         } else {
             // Access is not allowed
-            redirect("item/");
+            return redirect()->to("item/");
         }
     }
 
@@ -409,7 +409,9 @@ class Item extends BaseController {
 
             // Check if the user cancelled the form
             if(isset($_POST['submitCancel'])){
-                $tmp_image_file = glob($this->config->images_upload_path.$temp_image_name)[0];
+                $files = glob($this->config->images_upload_path.$temp_image_name);
+                if (count($files)) $tmp_image_file = glob($this->config->images_upload_path.$temp_image_name)[0];
+                else $tmp_image_file = false;
 
                 // Check if there is a temporary image file, if yes then delete it
                 if($tmp_image_file != null || $tmp_image_file != false){
@@ -547,7 +549,7 @@ class Item extends BaseController {
             $this->display_view('Stock\Views\item\form', $data);
         } else {
             // Update is not allowed
-            redirect('/item');
+            return redirect()->to('/item');
         }
     }
 
@@ -576,7 +578,7 @@ class Item extends BaseController {
                     // Change this if soft deleting items is enabled
                     // Check if any other item uses this image
                     if (count($items) < 2) {
-                        unlink(ROOTPATH.$this->config->images_upload_path.$item['image']);
+                        unlink(ROOTPATH.'public/'.$this->config->images_upload_path.$item['image']);
                     }
                 }
 
@@ -584,11 +586,11 @@ class Item extends BaseController {
                 $this->loan_model->where('item_id', $id)->delete();
                 $this->item_model->delete($id);
 
-                redirect('/item');
+                return redirect()->to('/item');
             }
         } else {
             // Access is not allowed
-            redirect('/item');
+            return redirect()->to('/item');
         }
     }
 
@@ -603,7 +605,7 @@ class Item extends BaseController {
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
             if (empty($id)) {
                 // No item specified, display items list
-                redirect('/item');
+                return redirect()->to('/item');
             }
 
             $this->user_model = new User_model();
@@ -637,7 +639,7 @@ class Item extends BaseController {
             }
         } else {
             // Access is not allowed
-            redirect('/item');
+            return redirect()->to('/item');
         }
     }
 
@@ -650,7 +652,7 @@ class Item extends BaseController {
     public function inventory_controls($id = NULL) {
         if (empty($id)) {
             // No item specified, display items list
-            redirect('/item');
+            return redirect()->to('/item');
         }
         helper('MY_date');
 
@@ -676,7 +678,7 @@ class Item extends BaseController {
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
             if (empty($id)) {
                 // No item specified, display items list
-                redirect('/item');
+                return redirect()->to('/item');
             }
 
             // Get item object and related loans
@@ -713,7 +715,7 @@ class Item extends BaseController {
             }
         } else {
             // Access is not allowed
-            redirect('/item');
+            return redirect()->to('/item');
         }
     }
 
@@ -758,7 +760,7 @@ class Item extends BaseController {
             $this->display_view('Stock\Views\loan\form', $data);
         } else {
             // Access is not allowed
-            redirect("/item");
+            return redirect()->to("/item");
         }
     }
 
@@ -772,11 +774,12 @@ class Item extends BaseController {
     public function loans($id = NULL) {
         if (empty($id)) {
             // No item specified, display items list
-            redirect('/item');
+            return redirect()->to('/item');
         }
 
         // Get item object and related loans
         $item = $this->item_model->find($id);
+        $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
         $loans = $this->loan_model->where('item_id', $item['item_id'])->findAll();
         array_walk($loans, function(&$loan) {
             $loan['loan_by_user'] = $this->loan_model->get_loaner($loan);
@@ -817,7 +820,7 @@ class Item extends BaseController {
             }
         } else {
             // Access is not allowed
-            redirect('/item');
+            return redirect()->to('/item');
         }
     }
 

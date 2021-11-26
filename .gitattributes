@@ -1,0 +1,7 @@
+# Exclude some files and directories from the project's releases
+/.gitignore export-ignore
+/.gitattributes export-ignore
+/conventions.md export-ignore
+/phpunit.xml.dist export-ignore
+/documentation/ export-ignore
+/spark export-ignore

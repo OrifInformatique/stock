@@ -1,56 +1,56 @@
-# CodeIgniter 4 Framework
+# Stock
 
-## What is CodeIgniter?
+Web application to manage items inventory, loans and more.
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](http://codeigniter.com).
+## Getting Started
 
-This repository holds the distributable version of the framework,
-including the user guide. It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
-More information about the plans for version 4 can be found in [the announcement](http://forum.codeigniter.com/thread-62615.html) on the forums.
+### Prerequisites
 
-The user guide corresponding to this version of the framework can be found
-[here](https://codeigniter4.github.io/userguide/).
+This project is developed on a LAMP server with PHP 7.4 and MariaDB 10.4.
+It is based on the CodeIgniter 4.x framework.
 
+### Installing
 
-## Important Change with index.php
+1. Download [our latest release](https://github.com/OrifInformatique/stock/releases)
+2. Unzip your download in your project's directory (in your local PHP server)
+3. Rename .env_dist file to .env and adapt it for your server's parameters
+4. Generate a local database running CodeIgniter's spark migrate command
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
+```bash
+php spark migrate -all
+```
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
+## Upgrade Version 1.6 to Version 4.0
 
-**Please** read the user guide for a better explanation of how CI4 works!
+This upgrade makes lot of changes as the application is adapted to new CodeIgniter 4.x. Please follow carefully these steps and try it in a test environment before.
 
-## Repository Management
+1. BE SURE TO HAVE A COMPLETE BACKUP OF YOUR APPLICATION (DATABASE AND FILES)
+2. With FTP connexion, remove all files and folder from the hosting server, except for the "uploads" folder
+3. With FTP connexion, upload all the content of Version 4.0 release to the hosting server
+4. Move the "uploads" folder from root to "public" folder
+5. Rename the .env_dist file to .env and adapt its content to your hosting environment
+6. Delete the orif/stock/Database/Migrations/restore_CI3_version folder
+7. Browse to APPLICATION_URL/stock/migrate/toCI4
+8. Enter the password that you can find in orif/stock/Controllers/Migrate.php (line 49) and validate
+9. Delete the file orif/stock/Controllers/Migrate.php
+10. Delete the folder orif/stock/Views/migration
+11. Browse to the application and connect with an administrator account
+12. Browse to APPLICATION_URL/clean_images/index
+13. Click on "Yes" to execute the script which will clean up the items images
+14. Delete the file orif/stock/Controllers/Clean_images.php
+15. Delete the folder orif/stock/Views/admin/clean_images
+16. Delete the folder orif/stock/Commands
+17. VERIFY THAT ALL THE APPLICATION WORKS WELL
 
-We use Github issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
-We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
-FEATURE REQUESTS.
+## Built With
 
-This repository is a "distribution" one, built by our release preparation script.
-Problems with it can be raised on our forum, or as issues in the main repository.
+* [CodeIgniter 4.x](https://www.codeigniter.com/) - PHP framework
+* [Bootstrap](https://getbootstrap.com/) - Design library with personalized css
 
-## Contributing
+## Authors
 
-We welcome contributions from the community.
+* **Orif, domaine informatique** - *Initiating and following the project* - [GitHub account](https://github.com/OrifInformatique)
 
-Please read the [*Contributing to CodeIgniter*](https://github.com/codeigniter4/CodeIgniter4/blob/develop/contributing.md) section in the development repository.
-
-## Server Requirements
-
-PHP version 7.3 or higher is required, with the following extensions installed:
-
-- [intl](http://php.net/manual/en/intl.requirements.php)
-- [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
-
-Additionally, make sure that the following extensions are enabled in your PHP:
-
-- json (enabled by default - don't turn it off)
-- [mbstring](http://php.net/manual/en/mbstring.installation.php)
-- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php)
-- xml (enabled by default - don't turn it off)
+See also the list of [contributors](https://github.com/OrifInformatique/stock/contributors) who participated in this project.

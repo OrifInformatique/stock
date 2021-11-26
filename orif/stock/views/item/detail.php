@@ -147,7 +147,10 @@
                 <div class="col-sm-8">
                     <?php if(!is_null($item['last_inventory_control'])) {
                         echo databaseToShortDate($item['last_inventory_control']['date']);
-                        echo ', '.htmlspecialchars($item['last_inventory_control']['controller']['username']);
+                        echo ', ';
+                        if (!is_null($item['last_inventory_control']['controller'])) {
+                            echo htmlspecialchars($item['last_inventory_control']['controller']['username']);
+                        }
                         if(!is_null($item['last_inventory_control']['remarks'])) {
                             echo '</br >'.htmlspecialchars($item['last_inventory_control']['remarks']);
                         }
