@@ -127,9 +127,9 @@ function display_item(item){
         `<div class="item_picture"><a href="${href}"><img src="${src_image}" width="100" alt="${alt_image}"/></a></div>`,
         `<div><a href="${href}">${serial_number}</a></div>`,
         `<div><a href="${href}">${item_name}</a></div>`,
-        '<div class="small">' + serial_number ? `<?= lang('MY_application.header_serial_nb'); ?>${serial_number}` : '' + '</div>',
+        '<div class="small">' + (serial_number ? `<?= lang('MY_application.header_serial_nb'); ?> : ${serial_number}` : '') + '</div>',
         `<div class="small fst-italic mt-2 mb-2">${item_description}</div>`,
-        `<div class="small">${stocking_place}</div>`,
+        `<div class="small"> <?= lang('MY_application.field_stocking_place_short'); ?> : ${stocking_place}</div>`,
         `<div class="mt-2">${item_condition} ${loan_bootstrap_label} ${item_localisation}</div>`,
     );
     card.append(card_div);
