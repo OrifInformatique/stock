@@ -289,7 +289,7 @@ function display_item(item){
     // Card contents
     let card_div = $('<div>');
     card_div.addClass('item bg-light rounded');
-    if (item['is_late']) {
+    if (item['current_loan']['is_late']) {
         card_div.addClass('border border-danger');
         card_div.css('cssText', 'border-width: 2px !important;');
     }

@@ -105,6 +105,7 @@ class Item_model extends MyModel
         if (is_null($current_loan)) {
           // ITEM IS NOT LOANED
           $current_loan['bootstrap_label'] = '<span class="badge badge-success">'.htmlspecialchars(lang('MY_application.lbl_loan_status_not_loaned')).'</span>';
+          $current_loan['is_late'] = false;
         } else {
           // ITEM IS LOANED
           if (isset($current_loan['planned_return_date']) && !is_null($current_loan['planned_return_date'])) {
@@ -117,9 +118,11 @@ class Item_model extends MyModel
           if ($end < new DateTime()) {
             // LOAN IS LATE
             $current_loan['bootstrap_label'] = '<span class="badge badge-danger">'.htmlspecialchars(lang('MY_application.lbl_loan_status_late')).'</span>';
+            $current_loan['is_late'] = true;
           } else {
             // LOAN IS NOT LATE
             $current_loan['bootstrap_label'] = '<span class="badge badge-warning">'.htmlspecialchars(lang('MY_application.lbl_loan_status_loaned')).'</span>';
+            $current_loan['is_late'] = false;
           }
         }
       return $current_loan;
