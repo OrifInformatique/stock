@@ -9,6 +9,7 @@
 
 namespace  Stock\Models;
 
+use \DateInterval;
 use \DateTime;
 use User\Models\User_model;
 
@@ -106,7 +107,20 @@ class Item_model extends MyModel
           $current_loan['bootstrap_label'] = '<span class="badge badge-success">'.htmlspecialchars(lang('MY_application.lbl_loan_status_not_loaned')).'</span>';
         } else {
           // ITEM IS LOANED
-          $current_loan['bootstrap_label'] = '<span class="badge badge-warning">'.htmlspecialchars(lang('MY_application.lbl_loan_status_loaned')).'</span>';
+          if (isset($current_loan['planned_return_date']) && !is_null($current_loan['planned_return_date'])) {
+            $end = new DateTime($current_loan['planned_return_date']);
+          } else {
+            $end = new DateTime($current_loan['date']);
+            $end = $end->add(new DateInterval('P3M'));
+          }
+
+          if ($end < new DateTime()) {
+            // LOAN IS LATE
+            $current_loan['bootstrap_label'] = '<span class="badge badge-danger">'.htmlspecialchars(lang('MY_application.lbl_loan_status_late')).'</span>';
+          } else {
+            // LOAN IS NOT LATE
+            $current_loan['bootstrap_label'] = '<span class="badge badge-warning">'.htmlspecialchars(lang('MY_application.lbl_loan_status_loaned')).'</span>';
+          }
         }
       return $current_loan;
 
