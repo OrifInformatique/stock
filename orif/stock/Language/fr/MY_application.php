@@ -54,6 +54,7 @@ return[
 'field_image_upload'             => 'Ajoutez une image<br />(hauteur et largeur max. 360px)',
 'field_linked_file_upload'       => 'Ajoutez un fichier joint<br />(un seul fichier possible, pdf ou Word, max. 2Mo)',
 'field_stocking_place'           => 'Lieu de stockage',
+'field_stocking_place_short'     => 'Stockage',
 'field_last_inventory_control'   => 'Dernier contrôle d\'inventaire',
 'field_inventory_control'        => 'Contrôle d\'inventaire',
 'field_current_loan'             => 'Prêt en cours',
