@@ -134,11 +134,11 @@ function display_item(item){
 
     // Card contents
     let card_div = $('<div>');
-    card_div.addClass('item rounded');
+    card_div.addClass('item rounded bg-light');
     if (item['is_late']) {
-        card_div.addClass('alert-warning border border-danger');
+        card_div.addClass('border border-danger');
         card_div.css('cssText', 'border-width: 2px !important;');
-    } else card_div.addClass('bg-light');
+    }
 
     card_div.append(
         `<div class="item_picture"><a href="${href}"><img src="${src_image}" width="100" alt="${alt_image}"/></a></div>`,

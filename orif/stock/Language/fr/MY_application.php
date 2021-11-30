@@ -213,7 +213,7 @@ return[
 // Bootstrap labels
 'lbl_loan_status_loaned'         => 'En prêt',
 'lbl_loan_status_not_loaned'     => 'Pas de prêt en cours',
-'lbl_loan_status_late'           => 'En retard',
+'lbl_loan_status_late'           => 'Prêt en retard',
 // Other texts
 'text_months'                    => 'mois',
 'text_none'                      => 'aucun',
