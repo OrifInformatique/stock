@@ -19,3 +19,13 @@
 li.nav-item {
 	margin: 0 10px;
 }
+
+/* Items list style */
+#list_item .item {
+    padding: .75rem;
+    margin-bottom: 1.5rem;
+}
+#list_item .item .item_picture img  {
+    width: 100%;
+    margin-bottom: 15px;
+}

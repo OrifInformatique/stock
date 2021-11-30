@@ -97,19 +97,10 @@
         <div class="alert alert-warning" id="no_item_message"><?= htmlspecialchars(lang('MY_application.msg_no_item')); ?></div>
         <div class="alert alert-danger" id="error_message"></div>
 
-        <table id="table_item" class="table table-striped table-hover">
-        <thead>
-            <tr>
-                <th><?= htmlspecialchars(lang('MY_application.header_picture')); ?></th>
-                <th><?= htmlspecialchars(lang('MY_application.header_status')); ?></th>
-                <th><?= htmlspecialchars(lang('MY_application.header_item_name')); ?></th>
-                <th nowrap><?= htmlspecialchars(lang('MY_application.header_stocking_place')); ?></th>
-                <th nowrap><?= htmlspecialchars(lang('MY_application.header_inventory_nb')).'<br />'.htmlspecialchars(lang('MY_application.header_serial_nb')); ?></th>
-            </tr>
-        </thead>
-        <tbody id="list_item">
-        </tbody>
-        </table>
+        <div>
+            <div class="row" id="list_item">
+            </div>
+        </div>
     </div>
 
     <div id="pagination_bottom"></div>
@@ -263,30 +254,37 @@ function getFilters() {
 
 function display_item(item){
     // Item's parameters
-    href = '<?= base_url("/item/view/"); ?>/'+item["item_id"];
-    src_image = '<?= base_url(); ?>/'+item["image_path"];
-    alt_image = '<?php htmlspecialchars(lang("MY_application.field_image")); ?>';
-    item_condition = item["condition"]["bootstrap_label"];
-    loan_bootstrap_label = item["current_loan"]["bootstrap_label"];
-    item_localisation = item["current_loan"]["loan_id"]!=null ?'<br><h6>'+item["current_loan"]["item_localisation"]+'</h6>':"";
-    item_name = item["name"];
-    item_description = item["description"];
-    stocking_place = "<span>"+item["stocking_place"]["name"]+"</span>";
-    inventory_number = item["inventory_number"];
-    serial_number = item["serial_number"];
-    delete_item = '<?php if(isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] == true && $_SESSION["user_access"] >= config('\User\Config\UserConfig')->access_lvl_admin) { echo "<td><a href=\"".base_url("/item/delete/"); ?>/'+item["item_id"]+'" class=\"close\" title=\"Supprimer l\'objet\">×</a></td> <?php } ?>';
+    let href = '<?= base_url("/item/view/"); ?>/'+item["item_id"];
+    let src_image = '<?= base_url(); ?>/'+item["image_path"];
+    let alt_image = '<?php htmlspecialchars(lang("MY_application.field_image")); ?>';
+    let item_condition = item["condition"]["bootstrap_label"];
+    let loan_bootstrap_label = item["current_loan"]["bootstrap_label"];
+    let item_localisation = item["current_loan"]["loan_id"]!=null ?'<div class="small">'+item["current_loan"]["item_localisation"]+'</div>':"";
+    let item_name = item["name"];
+    let item_description = item["description"];
+    let stocking_place = "<span>"+item["stocking_place"]["name"]+"</span>";
+    let inventory_number = item["inventory_number"];
+    let serial_number = item["serial_number"];
+    let delete_item = '<?php if(isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] == true && $_SESSION["user_access"] >= config('\User\Config\UserConfig')->access_lvl_admin) { echo "<td><a href=\"".base_url("/item/delete/"); ?>/'+item["item_id"]+'" class=\"close\" title=\"Supprimer l\'objet\">×</a></td> <?php } ?>';
 
-    // Create formatted table row and return it
-    var row = $("<tr>");
+    // Create formatted card
+    let card = $('<div>');
+    card.addClass('col-xl-3 col-md-4 col-sm-6');
 
-    row.append('<td><a href="'+href+'" style="display:block"><img src="'+src_image+'" width="100px" alt="'+alt_image+'" /></a></td>');
-    row.append('<td>'+item_condition+'<br />'+loan_bootstrap_label+'<br />'+item_localisation+'</td>');
-    row.append('<td><a href="'+href+'">'+item_name+'</a><h6>'+item_description+'</h6></td>');
-    row.append('<td>'+stocking_place+'</td>');
-    row.append('<td><a href="'+href+'">'+inventory_number+'</a><br><a href="'+href+'">'+serial_number+'</a></td>');
-    row.append(delete_item);
-    row.append('</tr>');
+    // Card contents
+    let card_div = $('<div>');
+    card_div.addClass('item bg-light rounded');
 
-    return row;
+    card_div.append(
+        `<div class="item_picture"><a href="${href}"><img src="${src_image}" width="100" alt="${alt_image}"/></a></div>`,
+        `<div><a href="${href}">${serial_number}</a></div>`,
+        `<div><a href="${href}">${item_name}</a></div>`,
+        '<div class="small">' + serial_number ? `<?= lang('MY_application.header_serial_nb'); ?>${serial_number}` : '' + '</div>',
+        `<div class="small fst-italic mt-2 mb-2">${item_description}</div>`,
+        `<div class="small">${stocking_place}</div>`,
+        `<div class="mt-2">${item_condition} ${loan_bootstrap_label} ${item_localisation}</div>`,
+    );
+    card.append(card_div);
+    return card;
 }
 </script>
