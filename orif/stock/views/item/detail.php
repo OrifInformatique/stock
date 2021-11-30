@@ -23,6 +23,11 @@
         <div class="col-md-8"><p><?= htmlspecialchars($item['description']); ?></p></div>
         <div class="col-md-4"></div>
     </div>
+    <?php if ($item['is_late']) { ?>
+    <div class="row">
+        <div class="alert alert-danger"><p><?= htmlspecialchars(lang('MY_application.msg_item_loan_late')); ?></p></div>
+    </div>
+    <?php } ?>
 
     <!-- ITEM DETAILS -->
     <div class="row">

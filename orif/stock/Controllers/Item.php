@@ -162,6 +162,29 @@ class Item extends BaseController {
 
         // Keep only the slice of items corresponding to the current page
         $output["items"] = array_slice($output["items"], ($output['number_page']-1)*$this->config->items_per_page, $this->config->items_per_page);
+        $now = new DateTime();
+        array_walk($output['items'], function(&$item) use ($now) {
+            if (!isset($item['current_loan']['loan_id'])) {
+                $item['is_late'] = false;
+            } else {
+                $loan = $item['current_loan'];
+
+                if (isset($loan['planned_return_date']) && !is_null($loan['planned_return_date'])) {
+                    $date = new DateTime($loan['planned_return_date']);
+                } else {
+                    $date = new DateTime($loan['date']);
+                    $date = $date->add(new DateInterval('P3M'));
+                }
+
+                $item['is_late'] = $date < $now;
+            }
+        });
+
+        // Get the amount of late loans
+        $output['late_loans'] = false;
+        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
+            $output['late_loans'] = count($this->get_late_loans_ids());
+        }
 
         return $output;
     }
@@ -238,6 +261,19 @@ class Item extends BaseController {
             $item['last_inventory_control'] = $this->item_model->getLastInventoryControl($item);
             if (!is_null($item['last_inventory_control'])) {
                 $item['last_inventory_control']['controller'] = $this->inventory_control_model->getUser($item['last_inventory_control']['controller_id']);
+            }
+            if (!is_null($item['current_loan']) && isset($item['current_loan']['loan_id'])) {
+                $current_loan = $item['current_loan'];
+                if (isset($current_loan['planned_return_date']) && !is_null($current_loan['planned_return_date'])) {
+                    $date = new DateTime($current_loan['planned_return_date']);
+                } else {
+                    $date = new DateTime($current_loan['date']);
+                    $date = $date->add(new DateInterval('P3M'));
+                }
+
+                $item['is_late'] = $date < new DateTime();
+            } else {
+                $item['is_late'] = false;
             }
             $output['item'] = $item;
             $this->display_view('Stock\Views\item\detail', $output);
@@ -911,11 +947,18 @@ class Item extends BaseController {
             $item['loan'] = $loan;
         });
 
+        // Get the amount of late loans
+        $late_loan_amount = false;
+        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
+            $late_loan_amount = count($late_items);
+        }
+
         return [
             'items' => $items,
             'title' => $title,
             'pagination' => $pagination,
             'number_page' => $number_page,
+            'late_loans' => $late_loan_amount,
         ];
     }
 
@@ -927,6 +970,17 @@ class Item extends BaseController {
      */
     public function load_list_loans_json($page = 1) {
         echo json_encode($this->load_list_loans($page));
+    }
+
+    /**
+     * Gets the ids of late loans
+     *
+     * @return string[] All ids of the late loans, as strings
+     */
+    private function get_late_loans_ids() {
+        $loans = $this->loan_model->where('real_return_date', NULL)->findAll();
+
+        return array_map(function($loan) { return $loan['loan_id']; }, $loans);
     }
 
     /**

@@ -8,7 +8,10 @@
 
 
     <!-- PAGINATION -->
-    <div id="pagination_top"></div>
+    <div class="row">
+        <div id="pagination_top"></div>
+        <div id="late_amount" class="m-4"></div>
+    </div>
 
     <!-- LOANS LIST -->
     <div class="col-lg-12 col-sm-12 table-responsive">
@@ -48,6 +51,7 @@ function load_items(page){
     $("#no_item_message").toggle(false);
     $("#error_message").toggle(false);
     $("#table_item").toggle(false);
+    $('#late_amount').toggle(false);
     $("#list_item").empty();
     $("#pagination_bottom, #pagination_top").empty();
 
@@ -74,6 +78,17 @@ function load_items(page){
             }
 
             $("#pagination_top, #pagination_bottom").html(result.pagination);
+
+            // Show amount of late items if it's given
+            if (result.late_loans !== false) {
+                $('#late_amount').toggle(true);
+
+                if (result.late_loans == 0) {
+                    $('#late_amount').text('<?= lang('MY_application.msg_no_late_loans'); ?>');
+                } else if (result.late_loans > 0) {
+                    $('#late_amount').text(`<?= lang('MY_application.msg_late_loans_amount'); ?>: ${result.late_loans}`);
+                }
+            }
 
             // Change cursor
             $("*").css("cursor", "");
@@ -120,8 +135,10 @@ function display_item(item){
     // Card contents
     let card_div = $('<div>');
     card_div.addClass('item rounded');
-    if (item['is_late']) card_div.addClass('alert-warning');
-    else card_div.addClass('bg-light');
+    if (item['is_late']) {
+        card_div.addClass('alert-warning border border-danger');
+        card_div.css('cssText', 'border-width: 2px !important;');
+    } else card_div.addClass('bg-light');
 
     card_div.append(
         `<div class="item_picture"><a href="${href}"><img src="${src_image}" width="100" alt="${alt_image}"/></a></div>`,
