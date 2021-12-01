@@ -32,7 +32,8 @@ class Loan_model extends MyModel
         $now = new Time('now');
         $threeMonthsAgo = new Time('-3 month');
 
-        $late_condition = "(planned_return_date < '".$now->toDateString()."' or date < '".$threeMonthsAgo->toDateString()."')";
+        // If no return date is specified, loan is considered as late after 3 months
+        $late_condition = "(planned_return_date < '".$now->toDateString()."' or (planned_return_date IS NULL and date < '".$threeMonthsAgo->toDateString()."'))";
 
         $late_loans = $this->where('real_return_date', NULL)
                            ->where($late_condition)
