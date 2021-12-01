@@ -62,7 +62,7 @@ class Loan_model extends MyModel
         if(is_null($this->item_model)){
             $this->item_model = new Item_model();
         }
-        $loan['item'] = $this->item_model->asArray()->where(['item_id'=>$loan['item_id']])->find();
+        $loan['item'] = $this->item_model->asArray()->find($loan['item_id']);
         return $loan['item'];
     }
 

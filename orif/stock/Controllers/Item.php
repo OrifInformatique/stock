@@ -859,18 +859,22 @@ class Item extends BaseController {
             $page = 1;
         }
 
-        // Get item(s) with loans
+        // Get Loans and corresponding items
         $loans = $this->loan_model->where('real_return_date', NULL)->findAll();
-        $items_loans = array_map(function($loan) { return $loan['item_id']; }, $loans);
-        $items = $this->item_model->get_filtered(['c' => [10, 30, 40]]);
-        $items = array_filter($items, function($item) use ($items_loans) { return in_array($item['item_id'], $items_loans); });
-
-        // Get the amount of late loans
-        $late_loan_amount = false;
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
-            $late_loan_amount = count(array_filter($items, function($item) { return $item['current_loan']['is_late']; }));
+        foreach($loans as $loan) {
+            $item = $this->loan_model->get_item($loan);
+            $item['stocking_place'] = $this->item_model->getStockingPlace($item);
+            $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
+            $item['condition'] = $this->item_model->getItemCondition($item);
+            $item['current_loan'] = $this->item_model->getCurrentLoan($item);
+            $item['image'] = $this->item_model->getImage($item);
+            $item['image_path'] = $this->item_model->getImagePath($item);
+            $items[] = $item;
         }
 
+        // Get the amount of late loans
+        $late_loan_amount = count($this->loan_model->get_late_loans());
+        
         // Sort items, separate late loans and others, then sort by name
         usort($items, function($a, $b) {
             $late_a = $a['current_loan']['is_late'];
@@ -895,17 +899,17 @@ class Item extends BaseController {
         // Keep only the slice of items corresponding to the current page
         $items = array_slice($items, ($number_page-1)*$this->config->items_per_page, $this->config->items_per_page);
 
-        // Add to the item whether it is late, the starting date, and the end date
+        // Format dates
         array_walk($items, function(&$item) {
-            $loan = $this->loan_model->where('item_id', $item['item_id'])->orderBy('date', 'desc')->first();
+            $loan = $item['current_loan'];
             if (!isset($loan['planned_return_date']) || is_null($loan['planned_return_date'])) {
-                $loan['planned_return_date'] = '';
+                $loan['planned_return_date'] = lang('MY_application.text_none');
             } else {
                 $loan['planned_return_date'] = databaseToShortDate($loan['planned_return_date']);
             }
             $loan['date'] = databaseToShortDate($loan['date']);
 
-            $item['loan'] = $loan;
+            $item['current_loan'] = $loan;
         });
 
         return [

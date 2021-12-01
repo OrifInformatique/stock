@@ -121,6 +121,7 @@ function display_item(item){
     let item_condition = item["condition"]["bootstrap_label"];
     let loan_bootstrap_label = item["current_loan"]["bootstrap_label"];
     let item_localisation = item["current_loan"]["loan_id"]!=null ?'<div class="small">'+item["current_loan"]["item_localisation"]+'</div>':"";
+    let item_planned_return = '<div class="small">'+'<?= lang("MY_application.field_loan_planned_return"); ?> : '+item["current_loan"]["planned_return_date"]+'</div>';
     let item_name = item["name"];
     let item_description = item["description"];
     let stocking_place = "<span>"+item["stocking_place"]["name"]+"</span>";
@@ -147,7 +148,7 @@ function display_item(item){
         '<div class="small">' + (serial_number ? `<?= lang('MY_application.header_serial_nb'); ?> : ${serial_number}` : '') + '</div>',
         `<div class="small fst-italic mt-2 mb-2">${item_description}</div>`,
         `<div class="small"> <?= lang('MY_application.field_stocking_place_short'); ?> : ${stocking_place}</div>`,
-        `<div class="mt-2">${item_condition} ${loan_bootstrap_label} ${item_localisation}</div>`,
+        `<div class="mt-2">${item_condition} ${loan_bootstrap_label} ${item_localisation} ${item_planned_return}</div>`,
     );
     card.append(card_div);
     return card;
