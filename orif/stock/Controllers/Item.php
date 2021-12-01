@@ -164,9 +164,9 @@ class Item extends BaseController {
         $output["items"] = array_slice($output["items"], ($output['number_page']-1)*$this->config->items_per_page, $this->config->items_per_page);
 
         // Get the amount of late loans
-        $output['late_loans'] = false;
+        $output['late_loans_count'] = false;
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
-            $output['late_loans'] = count($this->get_late_loans_ids());
+            $output['late_loans_count'] = count($this->loan_model->get_late_loans());
         }
 
         return $output;
@@ -925,17 +925,6 @@ class Item extends BaseController {
      */
     public function load_list_loans_json($page = 1) {
         echo json_encode($this->load_list_loans($page));
-    }
-
-    /**
-     * Gets the ids of late loans
-     *
-     * @return string[] All ids of the late loans, as strings
-     */
-    private function get_late_loans_ids() {
-        $loans = $this->loan_model->where('real_return_date', NULL)->findAll();
-
-        return array_map(function($loan) { return $loan['loan_id']; }, $loans);
     }
 
     /**

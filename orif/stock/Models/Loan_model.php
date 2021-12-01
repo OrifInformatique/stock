@@ -12,6 +12,7 @@ namespace Stock\Models;
 use CodeIgniter\Model;
 use User\Models\User_model;
 use Stock\Models\MyModel;
+use CodeIgniter\I18n\Time;
 
 class Loan_model extends MyModel
 {
@@ -25,6 +26,19 @@ class Loan_model extends MyModel
     public function initialize()
     {
         $this->user_model = new User_model();
+    }
+
+    public function get_late_loans() {
+        $now = new Time('now');
+        $threeMonthsAgo = new Time('-3 month');
+
+        $late_condition = "(planned_return_date < '".$now->toDateString()."' or date < '".$threeMonthsAgo->toDateString()."')";
+
+        $late_loans = $this->where('real_return_date', NULL)
+                           ->where($late_condition)
+                           ->findAll();
+        
+        return $late_loans;
     }
 
     public function get_loaner($loan){
