@@ -207,9 +207,8 @@ return[
 'msg_err_not_photo'              => 'Le fichier fournit n\'est pas une image',
 'msg_no_inventory_controls'      => 'Aucun contrôle d\'inventaire',
 'msg_no_item'                    => 'Aucun objet à afficher',
-'msg_no_late_loans'              => 'Aucun prêt en retard',
 'msg_late_loans_amount'          => 'Nombre de prêts en retard',
-'msg_item_loan_late'             => 'Le délai du prêt est dépassé pour cet objet.',
+'msg_item_loan_late'             => 'Le délai du prêt est dépassé pour cet objet',
 // Bootstrap labels
 'lbl_loan_status_loaned'         => 'En prêt',
 'lbl_loan_status_not_loaned'     => 'Pas de prêt en cours',
