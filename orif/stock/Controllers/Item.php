@@ -708,33 +708,35 @@ class Item extends BaseController {
 
             $data['item'] = $item;
             $data['item_id'] = $id;
+            $data['new_loan'] = true;
 
             // Test input
-            $validation = \Config\Services::validation();
+            if (!empty($_POST)) {
+                $validation = \Config\Services::validation();
 
-            $validation->setRule("date", "Date du prêt", 'required', array('required' => "La date du prêt doit être fournie"));
+                $validation->setRule("date", "Date du prêt", 'required', array('required' => "La date du prêt doit être fournie"));
+                $validation->setRule("planned_return_date", lang('MY_application.field_loan_planned_return'), 'required', [
+                    'required' => lang('MY_application.msg_err_no_planned_return_date'),
+                ]);
 
-            if ($validation->run($_POST) === TRUE) {
-                $loanArray = $_POST;
+                if ($validation->run($_POST) === TRUE) {
+                    $loanArray = $_POST;
 
-                if ($loanArray["planned_return_date"] == 0 || $loanArray["planned_return_date"] == "0000-00-00" || $loanArray["planned_return_date"] == "") {
-                    $loanArray["planned_return_date"] = NULL;
+                    if ($loanArray["real_return_date"] == 0 || $loanArray["real_return_date"] == "0000-00-00" || $loanArray["real_return_date"] == "") {
+                        $loanArray["real_return_date"] = NULL;
+                    }
+
+                    $loanArray["item_id"] = $id;
+
+                    $loanArray["loan_by_user_id"] = $this->session->user_id;
+
+                    $this->loan_model->insert($loanArray);
+
+                    return redirect()->to("/item/loans/".$id);
                 }
-
-                if ($loanArray["real_return_date"] == 0 || $loanArray["real_return_date"] == "0000-00-00" || $loanArray["real_return_date"] == "") {
-                    $loanArray["real_return_date"] = NULL;
-                }
-
-                $loanArray["item_id"] = $id;
-
-                $loanArray["loan_by_user_id"] = $this->session->user_id;
-
-                $this->loan_model->insert($loanArray);
-
-                return redirect()->to("/item/loans/".$id);
-            } else {
-                $this->display_view('Stock\Views\loan\form', $data);
+                $data['errors'] = $validation->getErrors();
             }
+            $this->display_view('Stock\Views\loan\form', $data);
         } else {
             // Access is not allowed
             return redirect()->to('/item');
@@ -752,12 +754,16 @@ class Item extends BaseController {
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
             // get the data from the loan with this id (to fill the form or to get the concerned item)
             $data = $this->loan_model->find($id);
+            $data['new_loan'] = false;
 
             if (!empty($_POST)) {
                 // test input
                 $validation = \Config\Services::validation();
 
                 $validation->setRule("date", "Date du prêt", 'required', array('required' => "La date du prêt doit être fournie"));
+                $validation->setRule("planned_return_date", lang('MY_application.field_loan_planned_return'), 'required', [
+                    'required' => lang('MY_application.msg_err_no_planned_return_date'),
+                ]);
 
                 if ($validation->run($_POST) === TRUE) {
                     //Declarations
@@ -778,6 +784,7 @@ class Item extends BaseController {
                     var_dump($data);
                     return redirect()->to("/item/loans/".$data["item_id"]);
                 }
+                $data['errors'] = $validation->getErrors();
             }
             $this->display_view('Stock\Views\loan\form', $data);
         } else {
@@ -887,7 +894,7 @@ class Item extends BaseController {
             $item['image_path'] = $this->item_model->getImagePath($item);
             $items[] = $item;
         }
-        
+
         // Sort items, separate late loans and others, then sort by name
         usort($items, function($a, $b) {
             $late_a = $a['current_loan']['is_late'];

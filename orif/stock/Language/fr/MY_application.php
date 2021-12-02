@@ -203,6 +203,7 @@ return[
 'msg_err_stocking_short_unique'  => 'Un nom court d\'emplacement doit être unique',
 'msg_err_username_used'          => 'Ce nom est déjà utilisé',
 'msg_err_photo_upload'           => 'Aucune photo n\'a été ajoutée',
+'msg_err_no_planned_return_date' => 'La date de retour du prêt doit être fournie',
 'msg_no_loan'                    => 'Aucun prêt à afficher',
 'msg_err_not_photo'              => 'Le fichier fournit n\'est pas une image',
 'msg_no_inventory_controls'      => 'Aucun contrôle d\'inventaire',
