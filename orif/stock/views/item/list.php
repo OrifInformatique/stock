@@ -92,23 +92,23 @@
     <!-- END OF FILTERS AND SORT FORM -->
 
     <!-- PAGINATION -->
-    <div class="row">
+    <div class="row"><div class="col-12">
         <div id="pagination_top"></div>
-    </div>
+    </div></div>
 
-    <div class="top-margin table-responsive">
+    <!-- LIST OF ITEMS -->
+    <div class="alert alert-warning" id="no_item_message"><?= htmlspecialchars(lang('MY_application.msg_no_item')); ?></div>
+    <div class="alert alert-danger" id="error_message"></div>
 
-        <!-- LIST OF ITEMS -->
-        <div class="alert alert-warning" id="no_item_message"><?= htmlspecialchars(lang('MY_application.msg_no_item')); ?></div>
-        <div class="alert alert-danger" id="error_message"></div>
-
-        <div>
-            <div class="row" id="list_item">
-            </div>
+    <div>
+        <div class="row" id="list_item">
         </div>
     </div>
 
-    <div id="pagination_bottom"></div>
+    <!-- PAGINATION -->
+    <div class="row"><div class="col-12">
+        <div id="pagination_bottom"></div>
+    </div></div>
 </div>
 
 
