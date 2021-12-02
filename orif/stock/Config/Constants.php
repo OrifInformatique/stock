@@ -103,7 +103,7 @@ define('IMAGES_UPLOAD_PATH', 'uploads/images/');
 | Number of items show by page
 |-------------------------------------------------------------------------
 */
-define('ITEMS_PER_PAGE',25);
+define('ITEMS_PER_PAGE',48);
 
 /*
  |-------------------------------------------------------------------------
