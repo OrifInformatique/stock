@@ -29,3 +29,15 @@ li.nav-item {
     width: 100%;
     margin-bottom: 15px;
 }
+
+/* Items list for printing */
+@media print {
+    #list_item .col-sm-6 {
+        max-width: 25%;
+        flex: 0 0 25%;
+    }
+
+    #login-bar, #filters, hr, .btn, .alert, #pagination_top, #pagination_bottom {
+        display: none;
+    }
+}

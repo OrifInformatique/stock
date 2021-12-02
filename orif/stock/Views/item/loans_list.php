@@ -83,14 +83,9 @@ function load_items(page){
             $("#pagination_top, #pagination_bottom").html(result.pagination);
 
             // Show amount of late items if it's given
-            if (result.late_loans_count !== false) {
+            if (result.late_loans_count !== false && result.late_loans_count > 0) {
                 $('#late_loans_count').toggle(true);
-
-                if (result.late_loans_count == 0) {
-                    $('#late_loans_count').text('<?= lang('MY_application.msg_no_late_loans'); ?>');
-                } else if (result.late_loans_count > 0) {
-                    $('#late_loans_count').text(`<?= lang('MY_application.msg_late_loans_amount'); ?> : ${result.late_loans_count}`);
-                }
+                $('#late_loans_count').text(`<?= lang('MY_application.msg_late_loans_amount'); ?> : ${result.late_loans_count}`);
             }
 
             // Change cursor
