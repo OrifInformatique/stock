@@ -4,13 +4,15 @@
         class="btn btn-primary" role="button"><?= lang('MY_application.btn_back_to_list'); ?></a>
 
     <!-- HEADER -->
-    <div><h1 class="title-section"><?= lang('MY_application.page_active_loans_list') ?></h1></div>
+    <div>
+        <h1 class="title-section"><?= lang('MY_application.page_active_loans_list') ?></h1>
+        <p id="late_loans_count" class="alert alert-danger"></p>
+    </div>
 
 
     <!-- PAGINATION -->
     <div class="row">
         <div id="pagination_top"></div>
-        <div id="late_amount" class="m-4"></div>
     </div>
 
     <!-- LOANS LIST -->
@@ -51,7 +53,7 @@ function load_items(page){
     $("#no_item_message").toggle(false);
     $("#error_message").toggle(false);
     $("#table_item").toggle(false);
-    $('#late_amount').toggle(false);
+    $('#late_loans_count').toggle(false);
     $("#list_item").empty();
     $("#pagination_bottom, #pagination_top").empty();
 
@@ -81,12 +83,12 @@ function load_items(page){
 
             // Show amount of late items if it's given
             if (result.late_loans_count !== false) {
-                $('#late_amount').toggle(true);
+                $('#late_loans_count').toggle(true);
 
                 if (result.late_loans_count == 0) {
-                    $('#late_amount').text('<?= lang('MY_application.msg_no_late_loans'); ?>');
+                    $('#late_loans_count').text('<?= lang('MY_application.msg_no_late_loans'); ?>');
                 } else if (result.late_loans_count > 0) {
-                    $('#late_amount').text(`<?= lang('MY_application.msg_late_loans_amount'); ?>: ${result.late_loans_count}`);
+                    $('#late_loans_count').text(`<?= lang('MY_application.msg_late_loans_amount'); ?> : ${result.late_loans_count}`);
                 }
             }
 
