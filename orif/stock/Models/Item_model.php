@@ -115,7 +115,11 @@ class Item_model extends MyModel
             $end = $end->add(new DateInterval('P3M'));
           }
 
-          if ($end < new DateTime()) {
+          // Use only current date without time
+          $now = new DateTime();
+          $now->setTime(0,0);
+
+          if ($end < $now) {
             // LOAN IS LATE
             $current_loan['bootstrap_label'] = '<span class="badge badge-danger">'.htmlspecialchars(lang('MY_application.lbl_loan_status_late')).'</span>';
             $current_loan['is_late'] = true;
