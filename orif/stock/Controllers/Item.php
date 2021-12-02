@@ -68,7 +68,6 @@ class Item extends BaseController {
      */
     public function index($page = 1) {
         // Load list of elements to display as filters
-
         $output['item_tags'] = $this->item_tag_model->dropdown('name');
 
         $output['item_conditions'] = $this->item_condition_model->dropdown('name');
@@ -82,6 +81,7 @@ class Item extends BaseController {
                                         lang('MY_application.sort_order_inventory_number'));
         $output['sort_asc_desc'] = array(lang('MY_application.sort_order_asc'),
                                             lang('MY_application.sort_order_des'));
+
         // Prepare search filters values to send to the view
         if (!isset($output["ts"])) $output["ts"] = '';
         if (!isset($output["c"])) $output["c"] = '';
@@ -90,6 +90,10 @@ class Item extends BaseController {
         if (!isset($output["t"])) $output["t"] = '';
         if (!isset($output["o"])) $output["o"] = '';
         if (!isset($output["ad"])) $output["ad"] = '';
+
+        // Get the amount of late loans
+        $output['late_loans_count'] = count($this->loan_model->get_late_loans());
+
         // Send the data to the View
         return $this->display_view('Stock\Views\item\list', $output);
     }
@@ -162,6 +166,24 @@ class Item extends BaseController {
 
         // Keep only the slice of items corresponding to the current page
         $output["items"] = array_slice($output["items"], ($output['number_page']-1)*$this->config->items_per_page, $this->config->items_per_page);
+
+        // Format dates
+        array_walk($output["items"], function(&$item) {
+            $loan = $item['current_loan'];
+            if (!isset($loan['planned_return_date'])) {
+                $loan['planned_return_date'] = lang('MY_application.text_none');
+            } else {
+                $loan['planned_return_date'] = databaseToShortDate($loan['planned_return_date']);
+            }
+            if (isset($loan['date'])) {
+                $loan['date'] = databaseToShortDate($loan['date']);
+            }
+
+            $item['current_loan'] = $loan;
+        });
+
+        // Get the amount of late loans
+        $output['late_loans_count'] = count($this->loan_model->get_late_loans());
 
         return $output;
     }
@@ -853,30 +875,23 @@ class Item extends BaseController {
             $page = 1;
         }
 
-        // Get item(s) with loans
-        $loans = $this->loan_model->where('real_return_date', NULL);
-        $loans = $loans->findAll();
-        $now = new DateTime();
-        $late_items = array_filter($loans, function($loan) use ($now) {
-            // If possible compare with a planned date, otherwise use +3 months
-            if (isset($loan['planned_return_date']) && !is_null($loan['planned_return_date'])) {
-                $date = new DateTime($loan['planned_return_date']);
-            } else {
-                $date = new DateTime($loan['date']);
-                $date = $date->add(new DateInterval('P3M'));
-            }
-
-            return $date < $now;
-        });
-        $late_item_ids = array_map(function($loan) { return $loan['item_id']; }, $late_items);
-        $items_loans = array_map(function($loan) { return $loan['item_id']; }, $loans);
-        $items = $this->item_model->get_filtered(['c' => [10, 30, 40]]);
-        $items = array_filter($items, function($item) use ($items_loans) { return in_array($item['item_id'], $items_loans); });
-
+        // Get Loans and corresponding items
+        $loans = $this->loan_model->where('real_return_date', NULL)->findAll();
+        foreach($loans as $loan) {
+            $item = $this->loan_model->get_item($loan);
+            $item['stocking_place'] = $this->item_model->getStockingPlace($item);
+            $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
+            $item['condition'] = $this->item_model->getItemCondition($item);
+            $item['current_loan'] = $this->item_model->getCurrentLoan($item);
+            $item['image'] = $this->item_model->getImage($item);
+            $item['image_path'] = $this->item_model->getImagePath($item);
+            $items[] = $item;
+        }
+        
         // Sort items, separate late loans and others, then sort by name
-        usort($items, function($a, $b) use ($late_item_ids) {
-            $late_a = in_array($a['item_id'], $late_item_ids);
-            $late_b = in_array($b['item_id'], $late_item_ids);
+        usort($items, function($a, $b) {
+            $late_a = $a['current_loan']['is_late'];
+            $late_b = $b['current_loan']['is_late'];
             if ($late_a != $late_b) {
                 return $late_b <=> $late_a;
             } else {
@@ -897,18 +912,17 @@ class Item extends BaseController {
         // Keep only the slice of items corresponding to the current page
         $items = array_slice($items, ($number_page-1)*$this->config->items_per_page, $this->config->items_per_page);
 
-        // Add to the item whether it is late, the starting date, and the end date
-        array_walk($items, function(&$item) use ($late_item_ids) {
-            $item['is_late'] = in_array($item['item_id'], $late_item_ids);
-            $loan = $this->loan_model->where('item_id', $item['item_id'])->orderBy('date', 'desc')->first();
+        // Format dates
+        array_walk($items, function(&$item) {
+            $loan = $item['current_loan'];
             if (!isset($loan['planned_return_date']) || is_null($loan['planned_return_date'])) {
-                $loan['planned_return_date'] = '';
+                $loan['planned_return_date'] = lang('MY_application.text_none');
             } else {
                 $loan['planned_return_date'] = databaseToShortDate($loan['planned_return_date']);
             }
             $loan['date'] = databaseToShortDate($loan['date']);
 
-            $item['loan'] = $loan;
+            $item['current_loan'] = $loan;
         });
 
         return [
@@ -916,6 +930,7 @@ class Item extends BaseController {
             'title' => $title,
             'pagination' => $pagination,
             'number_page' => $number_page,
+            'late_loans_count' => count($this->loan_model->get_late_loans()),
         ];
     }
 
