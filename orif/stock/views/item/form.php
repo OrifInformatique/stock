@@ -204,7 +204,7 @@ $config = config('\Stock\Config\StockConfig');
             <div class="form-group">
                 <label for="buying_date"><?= lang('MY_application.field_buying_date'); ?></label>
                 <input type="date" id="buying_date" name="buying_date" class="form-control"
-                       value="<?php if(isset($buying_date)) {echo set_value('buying_date',$buying_date);} else {echo set_value('buying_date', date('Y-m-d'));} ?>" onblur="change_warranty()" />
+                       value="<?php if(isset($buying_date)) {echo set_value('buying_date',$buying_date);} else {echo set_value('buying_date', date(config('\Stock\Config\StockConfig')->database_date_format));} ?>" onblur="change_warranty()" />
             </div>
         </div>
         <div class="col-md-4">

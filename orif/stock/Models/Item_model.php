@@ -486,7 +486,7 @@ class Item_model extends MyModel
           $inventory_id = $item['item_id'];
 
           // Add leading zeros to inventory_id
-          for( $i = strlen($inventory_id) ; $i < INVENTORY_NUMBER_CHARS; $i++) {
+          for( $i = strlen($inventory_id) ; $i < config('\Stock\Config\StockConfig')->inventory_number_chars; $i++) {
               $inventory_id = "0".$inventory_id;
           }
           $item['inventory_id'] = $inventory_id;
