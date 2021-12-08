@@ -56,6 +56,7 @@ class Item extends BaseController {
         $this->config = config('\Stock\Config\StockConfig');
         helper('sort');
         helper('form');
+        helper('\Stock\Helpers\MY_date');
     }
 
     /**
@@ -851,6 +852,13 @@ class Item extends BaseController {
         $loans = $this->loan_model->where('item_id', $item['item_id'])->findAll();
         array_walk($loans, function(&$loan) {
             $loan['loan_by_user'] = $this->loan_model->get_loaner($loan);
+            $loan['date'] = databaseToShortDate($loan['date']);
+            if (!is_null($loan['planned_return_date'])) {
+                $loan['planned_return_date'] = databaseToShortDate($loan['planned_return_date']);
+            }
+            if (!is_null($loan['real_return_date'])) {
+                $loan['real_return_date'] = databaseToShortDate($loan['real_return_date']);
+            }
             if (!is_null($loan['loan_to_user_id'])) {
                 $loan['loan_to_user'] = $this->loan_model->get_borrower($loan);
             }

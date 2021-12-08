@@ -21,9 +21,6 @@
     <label for="real_return_date"><?= lang('MY_application.header_loan_real_return'); ?> :&nbsp;</label>
     <input class="form-control" name="real_return_date" type="date" value="<?php if(isset($real_return_date)) {echo $real_return_date;} else {echo set_value('real_return_date');} ?>" /><br />
 
-    <label for="item_localisation"><?= lang('MY_application.header_loan_localisation'); ?> :&nbsp;</label>
-    <input class="form-control" name="item_localisation" value="<?php if(isset($item_localisation)) {echo $item_localisation;} else {echo set_value('item_localisation');} ?>" /><br />
-
     <label for="loan_to_user_id"><?= lang('MY_application.field_loan_to_user'); ?> :&nbsp;</label>
     <select class="form-control" name="loan_to_user_id">
         <option value=""></option>
@@ -34,6 +31,9 @@
 
     <label for="borrower_email"><?= lang('MY_application.field_borrower_email'); ?> :&nbsp;</label>
     <input class="form-control" name="borrower_email" value="<?php if(isset($borrower_email)) {echo $borrower_email;} ?>" /><br />
+
+    <label for="item_localisation"><?= lang('MY_application.header_loan_localisation'); ?> :&nbsp;</label>
+    <input class="form-control" name="item_localisation" value="<?php if(isset($item_localisation)) {echo $item_localisation;} else {echo set_value('item_localisation');} ?>" /><br />
 
     <button type="submit" class="btn btn-success"><?= lang('MY_application.btn_save'); ?></button>
     <a class="btn btn-default" href="<?= base_url("item/loans/" . $item_id); ?>"><?= lang('MY_application.btn_cancel'); ?></a>

@@ -178,7 +178,6 @@ return[
 'btn_all'                        => 'Tout',
 'btn_none'                       => 'Rien',
 'btn_generate_inventory_nb'      => 'Générer un No d\'inventaire',
-'btn_send_email'                 => 'Contacter par mail',
 // Messages
 'msg_err_abbreviation'           => 'Une abréviation doit être fournie',
 'msg_err_invalid_password'       => 'L\'identifiant et le mot de passe ne sont pas valides',

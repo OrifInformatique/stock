@@ -42,7 +42,7 @@
                         <td><?= $loan['loan_by_user']['username']; ?></td>
                         <td><?php if (isset($loan['loan_to_user'])) {echo $loan['loan_to_user']['username'];} ?>
                         <td><?php if (isset($loan['borrower_email'])) { ?>
-                            <a class="btn btn-secondary" href="mailto:<?= $loan['borrower_email']; ?>"><?= lang('MY_application.btn_send_email') ?></a>
+                            <a href="mailto:<?= $loan['borrower_email']; ?>"><?= $loan['borrower_email']; ?></a>
                         <?php } ?>
 
                         <!-- DELETE ACCESS RESTRICTED FOR ADMINISTRATORS ONLY -->
