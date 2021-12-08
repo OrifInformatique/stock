@@ -12,10 +12,25 @@ use CodeIgniter\Config\BaseConfig;
 
 class StockConfig extends BaseConfig
 {
+    /* Authentication system constants */
+    public $access_lvl_guest            =   1;
+    public $access_lvl_observation      =   2;
+    public $access_lvl_formation        =   4;
+    public $access_lvl_msp              =   8;
+    public $access_lvl_admin            =   16;
+
+    public $username_min_length         =   3;
+    public $username_max_length         =   45;
+    public $password_min_length         =   6;
+    public $password_max_length         =   72;
+
     /* Validation rules */
     public $group_short_max_length      =   2;
     public $tag_short_max_length        =   3;
     public $stocking_short_max_length   =   10;
+
+    /* Password hash */
+    public $password_hash_algorithm     =   PASSWORD_BCRYPT;
 
     /* Constants */
     public $inventory_prefix            =   'ORP';

@@ -22,8 +22,6 @@ use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use PSR\Log\LoggerInterface;
 use App\Controllers\BaseController;
-use DateInterval;
-use DateTime;
 use Stock\Models\Inventory_control_model;
 use Stock\Models\Item_model;
 use Stock\Models\Loan_model;
@@ -58,6 +56,7 @@ class Item extends BaseController {
         $this->config = config('\Stock\Config\StockConfig');
         helper('sort');
         helper('form');
+        helper('\Stock\Helpers\MY_date');
     }
 
     /**
@@ -708,33 +707,54 @@ class Item extends BaseController {
 
             $data['item'] = $item;
             $data['item_id'] = $id;
+            $data['new_loan'] = true;
+            $users = (new User_model())->findAll();
+            $data['users'] = array_map(function($user) {
+                return [
+                    'id' => $user['id'],
+                    'username' => $user['username'],
+                    'email' => $user['email'],
+                ];
+            }, $users);
 
             // Test input
-            $validation = \Config\Services::validation();
+            if (!empty($_POST)) {
+                $validation = \Config\Services::validation();
+                $user_ids = implode(',', array_map(function($user) { return $user['id']; }, $users)) . ','; // Allows empty ids
 
-            $validation->setRule("date", "Date du prêt", 'required', array('required' => "La date du prêt doit être fournie"));
+                $validation->setRule("date", "Date du prêt", 'required', array('required' => "La date du prêt doit être fournie"));
+                $validation->setRule("planned_return_date", lang('MY_application.field_loan_planned_return'), 'required', [
+                    'required' => lang('MY_application.msg_err_no_planned_return_date'),
+                ]);
+                $validation->setRule("borrower_email", lang('MY_application.field_borrower_email'), 'required|valid_email', [
+                    'required' => lang('MY_application.msg_err_no_loan_email'),
+                    'valid_email' => lang('MY_application.msg_err_email'),
+                ]);
+                $validation->setRule("loan_to_user_id", lang('MY_application.field_loan_to_user'), "if_exist|in_list[${user_ids}]", [
+                    'in_list' => lang('MY_application.msg_err_invalid_loan_to'),
+                ]);
 
-            if ($validation->run($_POST) === TRUE) {
-                $loanArray = $_POST;
+                if ($validation->run($_POST) === TRUE) {
+                    $loanArray = $_POST;
 
-                if ($loanArray["planned_return_date"] == 0 || $loanArray["planned_return_date"] == "0000-00-00" || $loanArray["planned_return_date"] == "") {
-                    $loanArray["planned_return_date"] = NULL;
+                    if ($loanArray["real_return_date"] == 0 || $loanArray["real_return_date"] == "0000-00-00" || $loanArray["real_return_date"] == "") {
+                        $loanArray["real_return_date"] = NULL;
+                    }
+                    if ($loanArray["loan_to_user_id"] == 0 || $loanArray["loan_to_user_id"] == "") {
+                        $loanArray["loan_to_user_id"] = NULL;
+                    }
+
+                    $loanArray["item_id"] = $id;
+
+                    $loanArray["loan_by_user_id"] = $this->session->user_id;
+
+                    $this->loan_model->insert($loanArray);
+
+                    return redirect()->to("/item/loans/".$id);
                 }
-
-                if ($loanArray["real_return_date"] == 0 || $loanArray["real_return_date"] == "0000-00-00" || $loanArray["real_return_date"] == "") {
-                    $loanArray["real_return_date"] = NULL;
-                }
-
-                $loanArray["item_id"] = $id;
-
-                $loanArray["loan_by_user_id"] = $this->session->user_id;
-
-                $this->loan_model->insert($loanArray);
-
-                return redirect()->to("/item/loans/".$id);
-            } else {
-                $this->display_view('Stock\Views\loan\form', $data);
+                $data['errors'] = $validation->getErrors();
             }
+            $this->display_view('Stock\Views\loan\form', $data);
         } else {
             // Access is not allowed
             return redirect()->to('/item');
@@ -751,33 +771,60 @@ class Item extends BaseController {
         // Check if this is allowed
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $this->has_access_lvl('registered')) {
             // get the data from the loan with this id (to fill the form or to get the concerned item)
-            $data = $this->loan_model->find($id);
+            $loan = $this->loan_model->find($id);
+
+            $data['date'] = $loan['date'];
+            $data['planned_return_date'] = $loan['planned_return_date'];
+            $data['real_return_date'] = $loan['real_return_date'];
+            $data['item_localisation'] = $loan['item_localisation'];
+            $data['item_id'] = $loan['item_id'];
+            $data['loan_to_user_id'] = $loan['loan_to_user_id'];
+            $data['borrower_email'] = $loan['borrower_email'];
+            $data['new_loan'] = false;
+            $users = (new User_model())->findAll();
+            $data['users'] = array_map(function($user) {
+                return [
+                    'id' => $user['id'],
+                    'username' => $user['username'],
+                    'email' => $user['email'],
+                ];
+            }, $users);
 
             if (!empty($_POST)) {
                 // test input
                 $validation = \Config\Services::validation();
+                $user_ids = implode(',', array_map(function($user) { return $user['id']; }, $users)) . ','; // Allows empty ids
 
                 $validation->setRule("date", "Date du prêt", 'required', array('required' => "La date du prêt doit être fournie"));
+                $validation->setRule("planned_return_date", lang('MY_application.field_loan_planned_return'), 'required', [
+                    'required' => lang('MY_application.msg_err_no_planned_return_date'),
+                ]);
+                $validation->setRule("borrower_email", lang('MY_application.field_borrower_email'), 'required|valid_email', [
+                    'required' => lang('MY_application.msg_err_no_loan_email'),
+                    'valid_email' => lang('MY_application.msg_err_email'),
+                ]);
+                $validation->setRule("loan_to_user_id", lang('MY_application.field_loan_to_user'), "if_exist|in_list[${user_ids}]", [
+                    'in_list' => lang('MY_application.msg_err_invalid_loan_to'),
+                ]);
 
                 if ($validation->run($_POST) === TRUE) {
                     //Declarations
 
                     $loanArray = $_POST;
 
-                    if ($loanArray["planned_return_date"] == 0 || $loanArray["planned_return_date"] == "0000-00-00" || $loanArray["planned_return_date"] == "") {
-                        $loanArray["planned_return_date"] = NULL;
-                    }
-
                     if ($loanArray["real_return_date"] == 0 || $loanArray["real_return_date"] == "0000-00-00" || $loanArray["real_return_date"] == "") {
                         $loanArray["real_return_date"] = NULL;
+                    }
+                    if ($loanArray["loan_to_user_id"] == 0 || $loanArray["loan_to_user_id"] == "") {
+                        $loanArray["loan_to_user_id"] = NULL;
                     }
 
                     // Execute the changes in the item table
                     $this->loan_model->update($id, $loanArray);
 
-                    var_dump($data);
                     return redirect()->to("/item/loans/".$data["item_id"]);
                 }
+                $data['errors'] = $validation->getErrors();
             }
             $this->display_view('Stock\Views\loan\form', $data);
         } else {
@@ -805,6 +852,13 @@ class Item extends BaseController {
         $loans = $this->loan_model->where('item_id', $item['item_id'])->findAll();
         array_walk($loans, function(&$loan) {
             $loan['loan_by_user'] = $this->loan_model->get_loaner($loan);
+            $loan['date'] = databaseToShortDate($loan['date']);
+            if (!is_null($loan['planned_return_date'])) {
+                $loan['planned_return_date'] = databaseToShortDate($loan['planned_return_date']);
+            }
+            if (!is_null($loan['real_return_date'])) {
+                $loan['real_return_date'] = databaseToShortDate($loan['real_return_date']);
+            }
             if (!is_null($loan['loan_to_user_id'])) {
                 $loan['loan_to_user'] = $this->loan_model->get_borrower($loan);
             }

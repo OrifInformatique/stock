@@ -112,10 +112,11 @@ class Admin extends BaseController
 
       if ( ! empty($_POST))
       {
+        $short_max_length = config('\Stock\Config\StockConfig')->tag_short_max_length;
         // VALIDATION
         $validationRules = [
           'name'            => 'required|min_length[3]|max_length[45]|is_unique[item_tag.name,item_tag_id,'.$id.']',
-          'short_name'      => 'required|max_length[3]|is_unique[item_tag.short_name,item_tag_id,'.$id.']'
+          'short_name'      => 'required|max_length['.$short_max_length.']|is_unique[item_tag.short_name,item_tag_id,'.$id.']'
           ];
 
         if($this->validate($validationRules))
@@ -151,10 +152,11 @@ class Admin extends BaseController
     {
       if ( ! empty($_POST))
       {
+        $short_max_length = config('\Stock\Config\StockConfig')->tag_short_max_length;
         // VALIDATION
         $validationRules = [
           'name'            => 'required|min_length[3]|max_length[45]|is_unique[item_tag.name]',
-          'short_name'      => 'required|max_length[3]|is_unique[item_tag.short_name]'
+          'short_name'      => 'required|max_length['.$short_max_length.']|is_unique[item_tag.short_name]'
           ];
 
         if($this->validate($validationRules))
@@ -283,10 +285,11 @@ class Admin extends BaseController
 
       if ( ! empty($_POST))
       {
+        $short_max_length = config('\Stock\Config\StockConfig')->stocking_short_max_length;
         // VALIDATION
         $validationRules = [
           'name'            => 'required|min_length[3]|max_length[45]|is_unique[stocking_place.name,stocking_place_id,'.$id.']',
-          'short'           => 'required|max_length[10]|is_unique[stocking_place.short,stocking_place_id,'.$id.']'
+          'short'           => 'required|max_length['.$short_max_length.']|is_unique[stocking_place.short,stocking_place_id,'.$id.']'
           ];
 
         if ($this->validate($validationRules))
@@ -322,10 +325,11 @@ class Admin extends BaseController
     {
       if ( ! empty($_POST))
       {
+        $short_max_length = config('\Stock\Config\StockConfig')->stocking_short_max_length;
         // VALIDATION
         $validationRules = [
           'name'            => 'required|min_length[3]|max_length[45]|is_unique[stocking_place.name]',
-          'short'           => 'required|max_length[10]|is_unique[stocking_place.short]'
+          'short'           => 'required|max_length['.$short_max_length.']|is_unique[stocking_place.short]'
           ];
 
         if($this->validate($validationRules))
@@ -718,7 +722,7 @@ class Admin extends BaseController
         // VALIDATION
         $validationRules = [
           'name'            => 'required|min_length[2]|max_length[45]|is_unique[stocking_place.name]',
-          'short'           => 'required|max_length[10]|is_unique[stocking_place.short_name]'
+          'short'           => 'required|max_length['.config('\Stock\Config\StockConfig')->stocking_short_max_length.']|is_unique[stocking_place.short_name]'
           ];
 
         if($this->validate($validationRules))

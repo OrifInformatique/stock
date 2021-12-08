@@ -32,7 +32,7 @@
                         <th><?= lang('MY_application.header_loan_real_return'); ?></th>
                         <th><?= lang('MY_application.header_loan_localisation'); ?></th>
                         <th><?= lang('MY_application.header_loan_by_user'); ?></th>
-                        <th><?= lang('MY_application.header_loan_to_user'); ?></th>
+                        <th colspan="2"><?= lang('MY_application.header_loan_to_user'); ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -51,7 +51,10 @@
                         <td><?= $loan['real_return_date']; ?></td>
                         <td><?= $loan['item_localisation']; ?></td>
                         <td><?= $loan['loan_by_user']['username']; ?></td>
-                        <td><?php if(isset($loan['loan_to_user'])){ echo $loan['loan_to_user']['username'];} ?>
+                        <td><?php if (isset($loan['loan_to_user'])) {echo $loan['loan_to_user']['username'];} ?>
+                        <td><?php if (isset($loan['borrower_email'])) { ?>
+                            <a href="mailto:<?= $loan['borrower_email']; ?>"><?= $loan['borrower_email']; ?></a>
+                        <?php } ?>
 
                         <!-- DELETE ACCESS RESTRICTED FOR ADMINISTRATORS ONLY -->
 						<?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_admin) { ?>
