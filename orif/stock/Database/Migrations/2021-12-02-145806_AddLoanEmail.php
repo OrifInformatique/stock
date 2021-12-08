@@ -8,7 +8,7 @@ class AddLoanEmail extends Migration
 {
 	public function up()
 	{
-		$this->forge->addColumn('loan', 'borrower_email VARCHAR(60) NULL DEFAULT NULL');
+		$this->forge->addColumn('loan', 'borrower_email VARCHAR(100) NULL DEFAULT NULL');
 	}
 
 	public function down()
