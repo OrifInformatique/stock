@@ -2,7 +2,7 @@
 <div class="container">
 
     <!-- *** ADMIN *** -->
-    <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= ACCESS_LVL_OBSERVATION) { ?>
+    <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_admin) { ?>
         <div class="row bottom-margin">
             <div class="col-12">
                 <!-- Button for new item -->

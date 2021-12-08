@@ -41,7 +41,7 @@
          </div>
      </div>
      <?php } ?>
-     <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?>
+     <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered) { ?>
      <a href="<?= base_url('item/create_inventory_control/'.$item['item_id']); ?>" class="btn btn-primary"><?= lang('MY_application.btn_new') ?></a>
      <?php } ?>
  </div>
