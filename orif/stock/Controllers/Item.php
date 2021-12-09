@@ -422,7 +422,7 @@ class Item extends BaseController {
      */
     public function modify($id) {
         // Check if access is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $this->has_access_lvl('registered')) {
+        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registerd) {
             // Define image path variables
             $_SESSION['picture_prefix'] = str_pad($id, $this->config->inventory_number_chars, "0", STR_PAD_LEFT);
             $temp_image_name = $_SESSION["picture_prefix"].$this->config->image_picture_suffix.$this->config->image_tmp_suffix.$this->config->image_extension;
@@ -623,7 +623,7 @@ class Item extends BaseController {
      */
     public function create_inventory_control($id = NULL) {
         // Check if this is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $this->has_access_lvl('registered')) {
+        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registerd) {
             if (empty($id)) {
                 // No item specified, display items list
                 return redirect()->to('/item');
@@ -696,7 +696,7 @@ class Item extends BaseController {
      */
     public function create_loan($id = NULL) {
         // Check if this is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $this->has_access_lvl('registered')) {
+        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registerd) {
             if (empty($id)) {
                 // No item specified, display items list
                 return redirect()->to('/item');
@@ -769,7 +769,7 @@ class Item extends BaseController {
      */
     public function modify_loan($id = NULL) {
         // Check if this is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $this->has_access_lvl('registered')) {
+        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registerd) {
             // get the data from the loan with this id (to fill the form or to get the concerned item)
             $loan = $this->loan_model->find($id);
 
@@ -996,27 +996,6 @@ class Item extends BaseController {
      */
     public function load_list_loans_json($page = 1) {
         echo json_encode($this->load_list_loans($page));
-    }
-
-    /**
-     * Checks if the current user has a specific access
-     *
-     * **Does not check if the user is logged in**
-     *
-     * @param string $access Either `access_lvl_<level>`, or just the level
-     * @return boolean
-     *  False if `$access` is empty, is not a valid access level, or the user has less than the access level,
-     *  true if the user has at least the access level
-     */
-    private function has_access_lvl(string $access) {
-        if (empty($access)) return false;
-
-        // Forces the selected property to be in the form of access_lvl_x
-        if (!str_starts_with($access, 'access_lvl_')) {
-            $access = "access_lvl_${access}";
-        }
-        $config = config('User\Config\UserConfig');
-        return property_exists($config, $access) && $_SESSION['user_access'] >= $config->{$access};
     }
 
     /**
