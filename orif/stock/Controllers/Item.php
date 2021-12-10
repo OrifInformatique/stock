@@ -275,7 +275,7 @@ class Item extends BaseController {
      */
     public function create() {
         // Check if this is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registerd) {
+        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
             // Get new item id and set picture_prefix
             $item_id = $this->item_model->getFutureId();
             $_SESSION['picture_prefix'] = str_pad($item_id, $this->config->inventory_number_chars, "0", STR_PAD_LEFT);
@@ -422,7 +422,7 @@ class Item extends BaseController {
      */
     public function modify($id) {
         // Check if access is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registerd) {
+        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
             // Define image path variables
             $_SESSION['picture_prefix'] = str_pad($id, $this->config->inventory_number_chars, "0", STR_PAD_LEFT);
             $temp_image_name = $_SESSION["picture_prefix"].$this->config->image_picture_suffix.$this->config->image_tmp_suffix.$this->config->image_extension;
@@ -623,7 +623,7 @@ class Item extends BaseController {
      */
     public function create_inventory_control($id = NULL) {
         // Check if this is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registerd) {
+        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
             if (empty($id)) {
                 // No item specified, display items list
                 return redirect()->to('/item');
@@ -696,7 +696,7 @@ class Item extends BaseController {
      */
     public function create_loan($id = NULL) {
         // Check if this is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registerd) {
+        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
             if (empty($id)) {
                 // No item specified, display items list
                 return redirect()->to('/item');
