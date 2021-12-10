@@ -769,7 +769,7 @@ class Item extends BaseController {
      */
     public function modify_loan($id = NULL) {
         // Check if this is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registerd) {
+        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
             // get the data from the loan with this id (to fill the form or to get the concerned item)
             $loan = $this->loan_model->find($id);
 
