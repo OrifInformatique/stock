@@ -28,7 +28,7 @@ class Admin extends BaseController
     {
         // Set Access level before calling parent constructor
         // Accessibility reserved to admin users
-        $this->access_level=config('\User\Config\UserConfig')->access_lvl_registered;
+        $this->access_level=config('\User\Config\UserConfig')->access_lvl_admin;
 
         // Set Access level before calling parent constructor
         parent::initController($request,$response,$logger);

@@ -28,8 +28,8 @@ $image_height = config('\Stock\Config\StockConfig')->image_upload_height;
 
         <div class="col-sm-6 form-group">
             <!-- Two buttons to differentiate taking a new picture or importing an existing one -->
-            <input id="cameraImport" type="button" value="<?= lang("MY_application.field_take_photo"); ?>" class="btn btn-default" />
-            <input id="imageImport" type="button" value="<?= lang("MY_application.field_import_photo"); ?>" class="btn btn-default" />
+            <input id="cameraImport" type="button" value="<?= lang("MY_application.field_take_photo"); ?>" class="btn btn-primary" />
+            <input id="imageImport" type="button" value="<?= lang("MY_application.field_import_photo"); ?>" class="btn btn-primary" />
         </div>
 
         <!-- Hidden fields used to store the cropped image's data -->

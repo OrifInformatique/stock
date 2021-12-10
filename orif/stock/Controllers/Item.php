@@ -195,39 +195,8 @@ class Item extends BaseController {
     {
         // Create the pagination
         $pager = \Config\Services::pager();
-        /*
-        $config['base_url'] = base_url('/item/index/');
-        $config['total_rows'] = $nbr_items;
-        $config['per_page'] = $this->config->items_per_page;
-        $config['use_page_numbers'] = TRUE;
-        $config['reuse_query_string'] = TRUE;
-
-        $config['full_tag_open'] = '<ul class="pagination">';
-        $config['full_tag_close'] = '</ul>';
-
-        $config['first_link'] = '&laquo;';
-        $config['first_tag_open'] = '<li>';
-        $config['first_tag_close'] = '</li>';
-
-        $config['last_link'] = '&raquo;';
-        $config['last_tag_open'] = '<li>';
-        $config['last_tag_close'] = '</li>';
-
-        $config['next_link'] = FALSE;
-        $config['prev_link'] = FALSE;
-
-        $config['cur_tag_open'] = '<li class="active"><a>';
-        $config['cur_tag_close'] = '</li></a>';
-        $config['num_links'] = 5;
-
-        $config['num_tag_open'] = '<li>';
-        $config['num_tag_close'] = '</li>';
-
-        return $this->pagination->initialize($config);
-        */
 
         return $pager->makeLinks($page, $this->config->items_per_page, $nbr_items);
-
     }
 
     /**
@@ -275,7 +244,7 @@ class Item extends BaseController {
      */
     public function create() {
         // Check if this is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
             // Get new item id and set picture_prefix
             $item_id = $this->item_model->getFutureId();
             $_SESSION['picture_prefix'] = str_pad($item_id, $this->config->inventory_number_chars, "0", STR_PAD_LEFT);
@@ -422,7 +391,7 @@ class Item extends BaseController {
      */
     public function modify($id) {
         // Check if access is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
             // Define image path variables
             $_SESSION['picture_prefix'] = str_pad($id, $this->config->inventory_number_chars, "0", STR_PAD_LEFT);
             $temp_image_name = $_SESSION["picture_prefix"].$this->config->image_picture_suffix.$this->config->image_tmp_suffix.$this->config->image_extension;
@@ -623,11 +592,7 @@ class Item extends BaseController {
      */
     public function create_inventory_control($id = NULL) {
         // Check if this is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
-            if (empty($id)) {
-                // No item specified, display items list
-                return redirect()->to('/item');
-            }
+        if (!empty($id) && isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
 
             $this->user_model = new User_model();
 
@@ -659,7 +624,7 @@ class Item extends BaseController {
                 $this->display_view('Stock\Views\inventory_control\form', $data);
             }
         } else {
-            // Access is not allowed
+            // No item specified or access is not allowed, display items list
             return redirect()->to('/item');
         }
     }
@@ -671,21 +636,24 @@ class Item extends BaseController {
      * @return void
      */
     public function inventory_controls($id = NULL) {
-        if (empty($id)) {
-            // No item specified, display items list
+        if (!empty($id) && isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
+            
+            helper('MY_date');
+
+            // Get item object with related inventory controls
+            $output['item'] = $this->item_model->find($id);
+            $output['inventory_controls'] = $this->inventory_control_model->where('item_id='.$id)->findAll();
+            $output['item']['inventory_number'] = $this->item_model->getInventoryNumber($output['item']);
+            array_walk($output['inventory_controls'], function(&$control) {
+                $control['controller'] = $this->inventory_control_model->getUser($control['controller_id']);
+            });
+
+            $this->display_view('Stock\Views\inventory_control\list', $output);
+        } else {
+
+            // No item specified or access not allowed, display items list
             return redirect()->to('/item');
         }
-        helper('MY_date');
-
-        // Get item object with related inventory controls
-        $output['item'] = $this->item_model->find($id);
-        $output['inventory_controls'] = $this->inventory_control_model->where('item_id='.$id)->findAll();
-        $output['item']['inventory_number'] = $this->item_model->getInventoryNumber($output['item']);
-        array_walk($output['inventory_controls'], function(&$control) {
-            $control['controller'] = $this->inventory_control_model->getUser($control['controller_id']);
-        });
-
-        $this->display_view('Stock\Views\inventory_control\list', $output);
     }
 
     /**
@@ -696,11 +664,7 @@ class Item extends BaseController {
      */
     public function create_loan($id = NULL) {
         // Check if this is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
-            if (empty($id)) {
-                // No item specified, display items list
-                return redirect()->to('/item');
-            }
+        if (!empty($id) && isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
 
             // Get item object and related loans
             $item = $this->item_model->find($id);
@@ -756,7 +720,8 @@ class Item extends BaseController {
             }
             $this->display_view('Stock\Views\loan\form', $data);
         } else {
-            // Access is not allowed
+
+            // No item specified or access is not allowed, redirect to items list
             return redirect()->to('/item');
         }
     }
@@ -769,7 +734,7 @@ class Item extends BaseController {
      */
     public function modify_loan($id = NULL) {
         // Check if this is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
             // get the data from the loan with this id (to fill the form or to get the concerned item)
             $loan = $this->loan_model->find($id);
 
@@ -841,33 +806,35 @@ class Item extends BaseController {
      * @return void
      */
     public function loans($id = NULL) {
-        if (empty($id)) {
-            // No item specified, display items list
+        if (!empty($id) && isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access']>=config('\User\Config\UserConfig')->access_lvl_admin) {
+
+            // Get item object and related loans
+            $item = $this->item_model->find($id);
+            $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
+            $loans = $this->loan_model->where('item_id', $item['item_id'])->findAll();
+            array_walk($loans, function(&$loan) {
+                $loan['loan_by_user'] = $this->loan_model->get_loaner($loan);
+                $loan['date'] = databaseToShortDate($loan['date']);
+                if (!is_null($loan['planned_return_date'])) {
+                    $loan['planned_return_date'] = databaseToShortDate($loan['planned_return_date']);
+                }
+                if (!is_null($loan['real_return_date'])) {
+                    $loan['real_return_date'] = databaseToShortDate($loan['real_return_date']);
+                }
+                if (!is_null($loan['loan_to_user_id'])) {
+                    $loan['loan_to_user'] = $this->loan_model->get_borrower($loan);
+                }
+            });
+
+            $output['item'] = $item;
+            $output['loans'] = $loans;
+
+            $this->display_view('Stock\Views\loan\list', $output);
+        } else {
+
+            // No item specified or access not allowed, display items list
             return redirect()->to('/item');
         }
-
-        // Get item object and related loans
-        $item = $this->item_model->find($id);
-        $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
-        $loans = $this->loan_model->where('item_id', $item['item_id'])->findAll();
-        array_walk($loans, function(&$loan) {
-            $loan['loan_by_user'] = $this->loan_model->get_loaner($loan);
-            $loan['date'] = databaseToShortDate($loan['date']);
-            if (!is_null($loan['planned_return_date'])) {
-                $loan['planned_return_date'] = databaseToShortDate($loan['planned_return_date']);
-            }
-            if (!is_null($loan['real_return_date'])) {
-                $loan['real_return_date'] = databaseToShortDate($loan['real_return_date']);
-            }
-            if (!is_null($loan['loan_to_user_id'])) {
-                $loan['loan_to_user'] = $this->loan_model->get_borrower($loan);
-            }
-        });
-
-        $output['item'] = $item;
-        $output['loans'] = $loans;
-
-        $this->display_view('Stock\Views\loan\list', $output);
     }
 
     /**
