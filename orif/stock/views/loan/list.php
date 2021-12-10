@@ -1,7 +1,11 @@
 <div class="container">
     <?php
     $item_page = base_url('item/view/'.$item['item_id']);
-    $registered_access = $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered;
+    if (isset($_SESSION['user_access'])) {
+        $registered_access = $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered;
+    } else {
+        $registered_access = false;
+    }
     ?>
 
     <!-- BUTTONS -->
