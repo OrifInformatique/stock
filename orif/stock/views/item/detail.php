@@ -122,18 +122,19 @@
                 </div>
             <?php } ?>
             <div class="row"><div class="col-12">
-                <!-- Button to create new loan -->
+
                 <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered) {
+                    //Button to create new loan -->                
                     echo '<a href="'.base_url('/item/create_loan/'.$item['item_id']).'" '.
                          'class="btn btn-primary"  role="button" >'.
                          lang('MY_application.btn_create_loan').'</a>';
-                }?>
 
-                <!-- Button to display loans history -->
-                <?= '<a href="'.base_url('/item/loans/'.$item['item_id']).'" '.
-                    'class="btn btn-default"  role="button" >'.
-                    lang('MY_application.btn_loans_history').
-                    '</a>';?>
+                    // Button to display loans history -->
+                    echo '<a href="'.base_url('/item/loans/'.$item['item_id']).'" '.
+                        'class="btn btn-default"  role="button" >'.
+                        lang('MY_application.btn_loans_history').
+                    '   </a>';
+                }?>
             </div></div>
         </div>
         <div class="col-md-8">
@@ -167,17 +168,17 @@
                 </div>
             </div>
             <div class="row"><div class="col-12">
-                <!-- Button to create new inventory control -->
                 <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered) {
+                    // Button to create new inventory control
                     echo '<a href="'.base_url('/item/create_inventory_control/'.$item['item_id']).
-                         '" class="btn btn-primary"  role="button" >'.
-                         lang('MY_application.btn_create_inventory_control').'</a>';
-                }?>
+                            '" class="btn btn-primary"  role="button" >'.
+                            lang('MY_application.btn_create_inventory_control').'</a>';
 
-                <!-- Button for controls history -->
-                <?= '<a href="'.base_url('/item/inventory_controls/'.$item['item_id']).
-                     '" class="btn btn-default"  role="button" >'.
-                     lang('MY_application.btn_inventory_control_history').'</a>'; ?>
+                    // Button for controls history 
+                    echo '<a href="'.base_url('/item/inventory_controls/'.$item['item_id']).
+                        '" class="btn btn-default"  role="button" >'.
+                        lang('MY_application.btn_inventory_control_history').'</a>';
+                }?>
             </div></div>
         </div>
     </div>

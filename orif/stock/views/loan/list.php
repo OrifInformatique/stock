@@ -66,6 +66,6 @@
         </div>
 	<?php } ?>
 <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $registered_access) { ?>
-	<a href="<?= base_url('item/create_loan/'.$item['item_id']); ?>" class="btn btn-primary">Nouveau…</a>
+	<a href="<?= base_url('item/create_loan/'.$item['item_id']); ?>" class="btn btn-primary"><?= lang('MY_application.btn_new') ?></a>
 <?php } ?>
 </div>
