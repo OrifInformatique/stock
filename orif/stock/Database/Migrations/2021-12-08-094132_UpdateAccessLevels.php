@@ -13,7 +13,7 @@ class UpdateAccessLevels extends Migration
 		$user_model = new User_model();
 		$user_type_model = new User_type_model();
 
-		$types = $user_model->distinct()->findColumn('fk_user_type');
+		$types = $user_type_model->findColumn('id');
 		// Only change user types if they haven't been changed yet
 		if (in_array(4, $types) || in_array(5, $types)) {
 			// Downgrade formation users to observation
