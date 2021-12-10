@@ -71,7 +71,7 @@ $config = config('\Stock\Config\StockConfig');
     <div class="row">
         <div class="col-md-4">
             <div class="form-group">
-                <input name="photoSubmit" type="submit" value="<?= lang('MY_application.field_add_modify_photo')?>" class="btn btn-default" />
+                <input name="photoSubmit" type="submit" value="<?= lang('MY_application.field_add_modify_photo')?>" class="btn btn-primary" />
             </div>
 
             <div class="form-group">
