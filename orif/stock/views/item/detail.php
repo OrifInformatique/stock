@@ -4,7 +4,7 @@
        class="btn btn-primary" role="button"><?= lang('MY_application.btn_back_to_list'); ?></a>
 
     <!-- *** ADMIN *** -->
-	<?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) { ?>
+	<?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered) { ?>
     	<a href="<?= base_url('item/modify/'.$item['item_id']); ?>" class="btn btn-warning" role="button"><?= lang('MY_application.btn_modify'); ?></a>
         <?php if($_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_admin) { ?>
     	   <a href="<?= base_url('item/delete/'.$item['item_id']); ?>" class="btn btn-danger" role="button"><?= lang('MY_application.btn_delete'); ?></a>
@@ -21,12 +21,16 @@
     </div>
     <div class="row">
         <div class="col-md-8"><p><?= htmlspecialchars($item['description']); ?></p></div>
-        <div class="col-md-4"></div>
     </div>
+    <?php if ($item['current_loan']['is_late']) { ?>
+    <div class="row">
+        <div class="col-12"><div class="alert alert-danger"><?= htmlspecialchars(lang('MY_application.msg_item_loan_late')); ?></div></div>
+    </div>
+    <?php } ?>
 
     <!-- ITEM DETAILS -->
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-12">
             <p class="bg-primary">&nbsp;<?= htmlspecialchars(lang('MY_application.text_item_detail')); ?></p>
         </div>
         <div class="col-md-4">
@@ -76,56 +80,60 @@
 
     <!-- ITEM STATUS, LOAN STATUS AND HISTORY -->
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-12 mt-2">
             <p class="bg-primary">&nbsp;<?= htmlspecialchars(lang('MY_application.text_item_loan_status')); ?></p>
         </div>
+    </div>
+    <div class="row">
         <div class="col-md-4">
-            <div class="row"><div class="col-xs-12">
+            <div class="row"><div class="col-12">
                 <!-- Item condition -->
                 <?php if(!is_null($item['item_condition'])){echo $item['item_condition']['bootstrap_label'];}?>
-            </div></div>
-            <div class="row"><div class="col-xs-12">
                 <!-- Loan status -->
                 <?= $item['current_loan']['bootstrap_label']; ?>
             </div></div>
+
             <?php if (array_key_exists('loan_id', $item['current_loan'])) { ?>
                 <!-- Current loan -->
-                <div class="row"><div class="col-xs-12">
+                <div class="row"><div class="col-12">
                     <?= htmlspecialchars($item['current_loan']['item_localisation']); ?><br />
                 </div></div>
                 <div class="row">
-                    <div class="col-xs-6">
+                    <div class="col-6">
                         <label><?= lang('MY_application.field_loan_date'); ?> :&nbsp;</label>
                     </div>
-                    <div class="col-xs-6">
+                    <div class="col-6">
                         <?php if(!empty($item['current_loan']['date'])){
                             echo databaseToShortDate($item['current_loan']['date']);
                         }?>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-xs-6">
+                    <div class="col-6">
                         <label><?= lang('MY_application.field_loan_planned_return'); ?> :&nbsp;</label>
                     </div>
-                    <div class="col-xs-6">
+                    <div class="col-6">
                         <?php if(!empty($item['current_loan']['planned_return_date'])){
                             echo databaseToShortDate($item['current_loan']['planned_return_date']);
+                        } else {
+                            echo lang('MY_application.text_none');
                         }?>
                     </div>
                 </div>
             <?php } ?>
-            <div class="row"><div class="col-xs-12">
-                <!-- Button to display loans history -->
-                <?= '<a href="'.base_url('/item/loans/'.$item['item_id']).'" '.
-                    'class="btn btn-default"  role="button" >'.
-                    lang('MY_application.btn_loans_history').
-                    '</a>';?>
+            <div class="row"><div class="col-12">
 
-                <!-- Button to create new loan -->
-                <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+                <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered) {
+                    //Button to create new loan -->                
                     echo '<a href="'.base_url('/item/create_loan/'.$item['item_id']).'" '.
                          'class="btn btn-primary"  role="button" >'.
                          lang('MY_application.btn_create_loan').'</a>';
+
+                    // Button to display loans history -->
+                    echo '<a href="'.base_url('/item/loans/'.$item['item_id']).'" '.
+                        'class="btn btn-default"  role="button" >'.
+                        lang('MY_application.btn_loans_history').
+                    '   </a>';
                 }?>
             </div></div>
         </div>
@@ -159,17 +167,17 @@
                     } ?>
                 </div>
             </div>
-            <div class="row"><div class="col-xs-12">
-                <!-- Button for controls history -->
-                <?= '<br /><a href="'.base_url('/item/inventory_controls/'.$item['item_id']).
-                     '" class="btn btn-default"  role="button" >'.
-                     lang('MY_application.btn_inventory_control_history').'</a>'; ?>
-
-                <!-- Button to create new inventory control -->
-                <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+            <div class="row"><div class="col-12">
+                <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered) {
+                    // Button to create new inventory control
                     echo '<a href="'.base_url('/item/create_inventory_control/'.$item['item_id']).
-                         '" class="btn btn-primary"  role="button" >'.
-                         lang('MY_application.btn_create_inventory_control').'</a>';
+                            '" class="btn btn-primary"  role="button" >'.
+                            lang('MY_application.btn_create_inventory_control').'</a>';
+
+                    // Button for controls history 
+                    echo '<a href="'.base_url('/item/inventory_controls/'.$item['item_id']).
+                        '" class="btn btn-default"  role="button" >'.
+                        lang('MY_application.btn_inventory_control_history').'</a>';
                 }?>
             </div></div>
         </div>
@@ -177,7 +185,7 @@
 
     <!-- ITEM SUPPLIER, BUYING AND WARRANTY INFORMATIONS -->
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-12 mt-2">
             <p class="bg-primary">&nbsp;<?= lang('MY_application.text_item_buying_warranty'); ?></p>
         </div>
         <div class="col-md-4">
@@ -205,11 +213,11 @@
 
             <?php //CHANGE LABEL COLOR BASED ON WARRANTY STATUS
             if ($item['warranty_status'] == 1) {
-                echo '<span class="label label-success" >';} // UNDER WARRANTY
+                echo '<span class="badge badge-success" >';} // UNDER WARRANTY
             elseif ($item['warranty_status'] == 2) {
-                echo '<span class="label label-warning" >';} // WARRANTY EXPIRES SOON
+                echo '<span class="badge badge-warning" >';} // WARRANTY EXPIRES SOON
             elseif ($item['warranty_status'] == 3) {
-                echo '<span class="label label-danger" >';}  // WARRANTY EXPIRED
+                echo '<span class="badge badge-danger" >';}  // WARRANTY EXPIRED
             else {echo '<span>';}
                 echo lang('MY_application.text_warranty_status.' . $item['warranty_status']); ?>
             </span>
@@ -227,7 +235,7 @@
             {
                 foreach($item['tags'] as $tag)
                 {
-                    echo '<span class="label label-default">'.$tag[0]['name']."</span>\n";
+                    echo '<span class="badge badge-dark">'.$tag[0]['name']."</span>\n";
                 }
             }
             ?>

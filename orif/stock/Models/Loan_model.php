@@ -9,15 +9,15 @@
 
 namespace Stock\Models;
 
-use CodeIgniter\Model;
 use User\Models\User_model;
 use Stock\Models\MyModel;
+use CodeIgniter\I18n\Time;
 
 class Loan_model extends MyModel
 {
     protected $table = 'loan';
     protected $primaryKey = 'loan_id';
-    protected $allowedFields = ['date', 'item_localisation', 'remarks', 'planned_return_date', 'real_return_date', 'item_id', 'loan_by_user_id', 'loan_to_user_id'];
+    protected $allowedFields = ['date', 'item_localisation', 'remarks', 'planned_return_date', 'real_return_date', 'item_id', 'loan_by_user_id', 'loan_to_user_id', 'borrower_email'];
     protected $item_model = null;
     protected $user_model = null;
 
@@ -25,6 +25,20 @@ class Loan_model extends MyModel
     public function initialize()
     {
         $this->user_model = new User_model();
+    }
+
+    public function get_late_loans() {
+        $now = new Time('now');
+        $threeMonthsAgo = new Time('-3 month');
+
+        // If no return date is specified, loan is considered as late after 3 months
+        $late_condition = "(planned_return_date < '".$now->toDateString()."' or (planned_return_date IS NULL and date < '".$threeMonthsAgo->toDateString()."'))";
+
+        $late_loans = $this->where('real_return_date', NULL)
+                           ->where($late_condition)
+                           ->findAll();
+
+        return $late_loans;
     }
 
     public function get_loaner($loan){
@@ -47,7 +61,7 @@ class Loan_model extends MyModel
         if(is_null($this->item_model)){
             $this->item_model = new Item_model();
         }
-        $loan['item'] = $this->item_model->asArray()->where(['item_id'=>$loan['item_id']])->find();
+        $loan['item'] = $this->item_model->asArray()->find($loan['item_id']);
         return $loan['item'];
     }
 

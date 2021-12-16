@@ -28,7 +28,7 @@ class Admin extends BaseController
     {
         // Set Access level before calling parent constructor
         // Accessibility reserved to admin users
-        $this->access_level=config('\User\Config\UserConfig')->access_lvl_registered;
+        $this->access_level=config('\User\Config\UserConfig')->access_lvl_admin;
 
         // Set Access level before calling parent constructor
         parent::initController($request,$response,$logger);
@@ -51,7 +51,7 @@ class Admin extends BaseController
         $this->db = \CodeIgniter\Database\Config::connect();
 
     }
-    
+
 
     /* *********************************************************************************************************
     TAGS
@@ -96,7 +96,7 @@ class Admin extends BaseController
       $data['url_create'] = "stock/admin/new_tag";
       $data['url_getView'] = "stock/admin/view_tags";
       $data['with_deleted'] = $with_deleted;
-      
+
       return $this->display_view('Common\Views\items_list', $data);
     }
 
@@ -105,29 +105,30 @@ class Admin extends BaseController
     */
     public function modify_tag($id = NULL)
     {
-      if(is_null($this->item_tag_model->withDeleted()->find($id))) 
+      if(is_null($this->item_tag_model->withDeleted()->find($id)))
       {
         return redirect()->to("/stock/admin/view_tags");
       }
 
-      if ( ! empty($_POST)) 
+      if ( ! empty($_POST))
       {
+        $short_max_length = config('\Stock\Config\StockConfig')->tag_short_max_length;
         // VALIDATION
         $validationRules = [
           'name'            => 'required|min_length[3]|max_length[45]|is_unique[item_tag.name,item_tag_id,'.$id.']',
-          'short_name'      => 'required|max_length[3]|is_unique[item_tag.short_name,item_tag_id,'.$id.']'
+          'short_name'      => 'required|max_length['.$short_max_length.']|is_unique[item_tag.short_name,item_tag_id,'.$id.']'
           ];
 
-        if($this->validate($validationRules)) 
+        if($this->validate($validationRules))
         {
             $this->item_tag_model->update($id, $_POST);
-            
+
             return redirect()->to('/stock/admin/view_tags');
         }
-	  
+
       // The values of the tag are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
-      } 
-      else 
+      }
+      else
       {
         $output['tag'] = $this->item_tag_model->withDeleted()->find($id);
       }
@@ -135,8 +136,8 @@ class Admin extends BaseController
       if( ! is_null($this->item_tag_model->withDeleted()->find($id)))
       {
         $output['tag'] = $this->item_tag_model->withDeleted()->find($id);
-      } 
-      else 
+      }
+      else
       {
         return redirect()->to('/stock/admin/view_tags');
       }
@@ -149,12 +150,13 @@ class Admin extends BaseController
     */
     public function new_tag()
     {
-      if ( ! empty($_POST)) 
+      if ( ! empty($_POST))
       {
+        $short_max_length = config('\Stock\Config\StockConfig')->tag_short_max_length;
         // VALIDATION
         $validationRules = [
           'name'            => 'required|min_length[3]|max_length[45]|is_unique[item_tag.name]',
-          'short_name'      => 'required|max_length[3]|is_unique[item_tag.short_name]'
+          'short_name'      => 'required|max_length['.$short_max_length.']|is_unique[item_tag.short_name]'
           ];
 
         if($this->validate($validationRules))
@@ -167,14 +169,14 @@ class Admin extends BaseController
 
       $this->display_view('Stock\admin\tags\form');
     }
-    
+
     /**
-    * Delete a tag. 
+    * Delete a tag.
     * If $action is NULL, a confirmation will be shown. If it is anything else, the tag will be deleted.
     */
-    public function delete_tag($id = NULL, $action = 0) 
+    public function delete_tag($id = NULL, $action = 0)
     {
-      if(is_null($this->item_tag_model->withDeleted()->find($id))) 
+      if(is_null($this->item_tag_model->withDeleted()->find($id)))
       {
         return redirect()->to('/stock/admin/view_tags');
       }
@@ -187,7 +189,7 @@ class Admin extends BaseController
           );
           $this->display_view('\Stock\admin\tags\delete', $output);
           break;
-          
+
           case 1: // Soft Delete item_tag
             $this->item_tag_model->delete($id, FALSE);
             return redirect()->to('/stock/admin/view_tags');
@@ -197,7 +199,7 @@ class Admin extends BaseController
             $this->item_tag_link_model->where('item_tag_id', $id)->delete();
             $this->item_tag_model->delete($id, TRUE);
             return redirect()->to('/stock/admin/view_tags');
-          
+
           default: // Do nothing
             return redirect()->to('/stock/admin/view_tags');
       }
@@ -213,11 +215,11 @@ class Admin extends BaseController
     {
         $item_tag = $this->item_tag_model->withDeleted()->find($id);
 
-        if (is_null($item_tag)) 
+        if (is_null($item_tag))
         {
             return redirect()->to('/stock/admin/view_tags');
-        } 
-        else 
+        }
+        else
         {
             $this->item_tag_model->withDeleted()->update($id, ['archive' => NULL]);
             return redirect()->to('/stock/admin/modify_tag/' . $id);
@@ -276,29 +278,30 @@ class Admin extends BaseController
     */
     public function modify_stocking_place($id = NULL)
     {
-      if (is_null($this->stocking_place_model->find($id))) 
+      if (is_null($this->stocking_place_model->find($id)))
       {
         redirect()->to("/admin/view_stocking_places");
       }
 
-      if ( ! empty($_POST)) 
+      if ( ! empty($_POST))
       {
+        $short_max_length = config('\Stock\Config\StockConfig')->stocking_short_max_length;
         // VALIDATION
         $validationRules = [
           'name'            => 'required|min_length[3]|max_length[45]|is_unique[stocking_place.name,stocking_place_id,'.$id.']',
-          'short'           => 'required|max_length[10]|is_unique[stocking_place.short,stocking_place_id,'.$id.']'
+          'short'           => 'required|max_length['.$short_max_length.']|is_unique[stocking_place.short,stocking_place_id,'.$id.']'
           ];
 
-        if ($this->validate($validationRules)) 
+        if ($this->validate($validationRules))
         {
             $this->stocking_place_model->update($id, $_POST);
-            
+
             return redirect()->to('/stock/admin/view_stocking_places');
         }
-	  
+
       // The values of the tag are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
-      } 
-      else 
+      }
+      else
       {
         $output['stocking_place'] = $this->stocking_place_model->withDeleted()->find($id);
       }
@@ -306,8 +309,8 @@ class Admin extends BaseController
       if( ! is_null($this->stocking_place_model->withDeleted()->find($id)))
       {
         $output['stocking_place'] = $this->stocking_place_model->withDeleted()->find($id);
-      } 
-      else 
+      }
+      else
       {
         return redirect()->to('/stock/admin/view_stocking_places');
       }
@@ -320,12 +323,13 @@ class Admin extends BaseController
     */
     public function new_stocking_place()
     {
-      if ( ! empty($_POST)) 
+      if ( ! empty($_POST))
       {
+        $short_max_length = config('\Stock\Config\StockConfig')->stocking_short_max_length;
         // VALIDATION
         $validationRules = [
           'name'            => 'required|min_length[3]|max_length[45]|is_unique[stocking_place.name]',
-          'short'           => 'required|max_length[10]|is_unique[stocking_place.short]'
+          'short'           => 'required|max_length['.$short_max_length.']|is_unique[stocking_place.short]'
           ];
 
         if($this->validate($validationRules))
@@ -338,13 +342,13 @@ class Admin extends BaseController
 
       $this->display_view('Stock\admin\stocking_places\form');
     }
-    
+
     /**
     * Delete the stocking place $id. If $action is null, a confirmation will be shown
     */
     public function delete_stocking_place($id = NULL, $action = 0)
     {
-      if(is_null($this->stocking_place_model->withDeleted()->find($id))) 
+      if(is_null($this->stocking_place_model->withDeleted()->find($id)))
       {
         return redirect()->to('/stock/admin/view_stocking_places');
       }
@@ -357,7 +361,7 @@ class Admin extends BaseController
           );
           $this->display_view('\Stock\admin\stocking_places\delete', $output);
           break;
-          
+
           case 1: // Soft delete stocking_place
             $this->stocking_place_model->delete($id, FALSE);
             return redirect()->to('/stock/admin/view_stocking_places');
@@ -376,7 +380,7 @@ class Admin extends BaseController
 
             $this->stocking_place_model->delete($id, TRUE);
             return redirect()->to('/stock/admin/view_stocking_places');
-          
+
           default: // Do nothing
             return redirect()->to('/stock/admin/view_stocking_places');
       }
@@ -392,11 +396,11 @@ class Admin extends BaseController
     {
         $stocking_place = $this->stocking_place_model->withDeleted()->find($id);
 
-        if (is_null($stocking_place)) 
+        if (is_null($stocking_place))
         {
             return redirect()->to('/stock/admin/view_stocking_places');
-        } 
-        else 
+        }
+        else
         {
             $this->stocking_place_model->withDeleted()->update($id, ['archive' => NULL]);
             return redirect()->to('/stock/admin/modify_stocking_place/' . $id);
@@ -406,7 +410,7 @@ class Admin extends BaseController
     /* *********************************************************************************************************
     SUPPLIERS
     ********************************************************************************************************* */
-          
+
     /**
     * As the name says, view the suppliers.
     */
@@ -466,12 +470,12 @@ class Admin extends BaseController
     */
     public function modify_supplier($id = NULL)
     {
-      if (is_null($this->supplier_model->withDeleted()->find($id))) 
+      if (is_null($this->supplier_model->withDeleted()->find($id)))
       {
         redirect()->to("/admin/view_suppliers");
       }
 
-      if ( ! empty($_POST)) 
+      if ( ! empty($_POST))
       {
         // VALIDATION
         $validationRules = [
@@ -491,16 +495,16 @@ class Admin extends BaseController
             ];
           }
 
-        if ($this->validate($validationRules)) 
+        if ($this->validate($validationRules))
         {
             $this->supplier_model->update($id, $_POST);
-            
+
             return redirect()->to('/stock/admin/view_suppliers');
         }
-	  
+
       // The values of the tag are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
-      } 
-      else 
+      }
+      else
       {
         $output['supplier'] = $this->supplier_model->withDeleted()->find($id);
       }
@@ -508,21 +512,21 @@ class Admin extends BaseController
       if( ! is_null($this->supplier_model->withDeleted()->find($id)))
       {
         $output['supplier'] = $this->supplier_model->withDeleted()->find($id);
-      } 
-      else 
+      }
+      else
       {
         return redirect()->to('/stock/admin/view_suppliers');
       }
 
       $this->display_view('Stock\admin\suppliers\form', $output);
     }
-	
+
     /**
     * Create a new supplier
     */
     public function new_supplier()
     {
-      if ( ! empty($_POST)) 
+      if ( ! empty($_POST))
       {
         // VALIDATION
         $validationRules = [
@@ -558,7 +562,7 @@ class Admin extends BaseController
     */
     public function delete_supplier($id = NULL, $action = 0)
     {
-      if(is_null($this->supplier_model->withDeleted()->find($id))) 
+      if(is_null($this->supplier_model->withDeleted()->find($id)))
       {
         return redirect()->to('/stock/admin/view_suppliers');
       }
@@ -571,7 +575,7 @@ class Admin extends BaseController
           );
           $this->display_view('\Stock\admin\suppliers\delete', $output);
           break;
-          
+
           case 1: // Soft delete supplier
             $this->supplier_model->delete($id, FALSE);
             return redirect()->to('/stock/admin/view_suppliers');
@@ -590,7 +594,7 @@ class Admin extends BaseController
 
             $this->supplier_model->delete($id, TRUE);
             return redirect()->to('/stock/admin/view_suppliers');
-          
+
           default: // Do nothing
             return redirect()->to('/stock/admin/view_suppliers');
       }
@@ -606,17 +610,17 @@ class Admin extends BaseController
     {
         $supplier = $this->supplier_model->withDeleted()->find($id);
 
-        if (is_null($supplier)) 
+        if (is_null($supplier))
         {
             return redirect()->to('/stock/admin/view_suppliers');
-        } 
-        else 
+        }
+        else
         {
             $this->supplier_model->withDeleted()->update($id, ['archive' => NULL]);
             return redirect()->to('/stock/admin/modify_supplier/' . $id);
         }
     }
-    
+
     /* *********************************************************************************************************
     ITEM GROUPS
     ********************************************************************************************************* */
@@ -651,7 +655,7 @@ class Admin extends BaseController
 
       // Complete datas for common module generic items_list view
       $data['list_title'] = lang('stock_lang.title_item_groups');
-      
+
       $data['primary_key_field']  = 'item_group_id';
       $data['btn_create_label']   = lang('stock_lang.btn_add_item_group');
       $data['field_display_deleted'] = lang("stock_lang.field_deleted_item_groups");
@@ -669,12 +673,12 @@ class Admin extends BaseController
     */
     public function modify_item_group($id = NULL)
     {
-      if(is_null($this->item_group_model->withDeleted()->find($id))) 
+      if(is_null($this->item_group_model->withDeleted()->find($id)))
       {
         return redirect()->to("/stock/admin/view_item_groups");
       }
 
-      if ( ! empty($_POST)) 
+      if ( ! empty($_POST))
       {
         // VALIDATION
         $validationRules = [
@@ -682,16 +686,16 @@ class Admin extends BaseController
           'short_name'      => 'required|max_length[2]|is_unique[item_group.short_name,item_group_id,'.$id.']'
           ];
 
-        if($this->validate($validationRules)) 
+        if($this->validate($validationRules))
         {
             $this->item_group_model->update($id, $_POST);
-            
+
             return redirect()->to('/stock/admin/view_item_groups');
         }
-	  
+
       // The values of the tag are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
-      } 
-      else 
+      }
+      else
       {
         $output['item_group'] = $this->item_group_model->withDeleted()->find($id);
       }
@@ -699,8 +703,8 @@ class Admin extends BaseController
       if( ! is_null($this->item_group_model->withDeleted()->find($id)))
       {
         $output['item_group'] = $this->item_group_model->withDeleted()->find($id);
-      } 
-      else 
+      }
+      else
       {
         return redirect()->to('/stock/admin/view_item_groups');
       }
@@ -713,12 +717,12 @@ class Admin extends BaseController
     */
     public function new_item_group()
     {
-      if ( ! empty($_POST)) 
+      if ( ! empty($_POST))
       {
         // VALIDATION
         $validationRules = [
           'name'            => 'required|min_length[2]|max_length[45]|is_unique[stocking_place.name]',
-          'short'           => 'required|max_length[10]|is_unique[stocking_place.short_name]'
+          'short'           => 'required|max_length['.config('\Stock\Config\StockConfig')->stocking_short_max_length.']|is_unique[stocking_place.short_name]'
           ];
 
         if($this->validate($validationRules))
@@ -731,13 +735,13 @@ class Admin extends BaseController
 
       $this->display_view('Stock\admin\item_groups\form');
     }
-	
+
     /**
     * Delete an unused item group
     */
     public function delete_item_group($id = NULL, $action = 0)
     {
-      if(is_null($this->item_group_model->withDeleted()->find($id))) 
+      if(is_null($this->item_group_model->withDeleted()->find($id)))
       {
         return redirect()->to('/stock/admin/view_item_groups');
       }
@@ -750,7 +754,7 @@ class Admin extends BaseController
           );
           $this->display_view('\Stock\admin\item_groups\delete', $output);
           break;
-          
+
           case 1: // Soft delete item_group
             $this->item_group_model->delete($id, FALSE);
             return redirect()->to('/stock/admin/view_item_groups');
@@ -766,10 +770,10 @@ class Admin extends BaseController
                 $this->item_model->update($item_id[$i]['item_id'], ['item_group_id' => NULL]);
               }
             }
-            
+
             $this->item_group_model->delete($id, TRUE);
             return redirect()->to('/stock/admin/view_item_groups');
-          
+
           default: // Do nothing
             return redirect()->to('/stock/admin/view_item_groups');
       }
@@ -785,11 +789,11 @@ class Admin extends BaseController
     {
         $item_group = $this->item_group_model->withDeleted()->find($id);
 
-        if (is_null($item_group)) 
+        if (is_null($item_group))
         {
             return redirect()->to('/stock/admin/view_item_groups');
-        } 
-        else 
+        }
+        else
         {
             $this->item_group_model->withDeleted()->update($id, ['archive' => NULL]);
             return redirect()->to('/stock/admin/modify_item_group/' . $id);

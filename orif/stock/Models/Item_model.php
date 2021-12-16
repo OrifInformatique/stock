@@ -9,6 +9,7 @@
 
 namespace  Stock\Models;
 
+use \DateInterval;
 use \DateTime;
 use User\Models\User_model;
 
@@ -104,9 +105,29 @@ class Item_model extends MyModel
         if (is_null($current_loan)) {
           // ITEM IS NOT LOANED
           $current_loan['bootstrap_label'] = '<span class="badge badge-success">'.htmlspecialchars(lang('MY_application.lbl_loan_status_not_loaned')).'</span>';
+          $current_loan['is_late'] = false;
         } else {
           // ITEM IS LOANED
-          $current_loan['bootstrap_label'] = '<span class="badge badge-warning">'.htmlspecialchars(lang('MY_application.lbl_loan_status_loaned')).'</span>';
+          if (isset($current_loan['planned_return_date']) && !is_null($current_loan['planned_return_date'])) {
+            $end = new DateTime($current_loan['planned_return_date']);
+          } else {
+            $end = new DateTime($current_loan['date']);
+            $end = $end->add(new DateInterval('P3M'));
+          }
+
+          // Use only current date without time
+          $now = new DateTime();
+          $now->setTime(0,0);
+
+          if ($end < $now) {
+            // LOAN IS LATE
+            $current_loan['bootstrap_label'] = '<span class="badge badge-danger">'.htmlspecialchars(lang('MY_application.lbl_loan_status_late')).'</span>';
+            $current_loan['is_late'] = true;
+          } else {
+            // LOAN IS NOT LATE
+            $current_loan['bootstrap_label'] = '<span class="badge badge-warning">'.htmlspecialchars(lang('MY_application.lbl_loan_status_loaned')).'</span>';
+            $current_loan['is_late'] = false;
+          }
         }
       return $current_loan;
 
@@ -465,7 +486,7 @@ class Item_model extends MyModel
           $inventory_id = $item['item_id'];
 
           // Add leading zeros to inventory_id
-          for( $i = strlen($inventory_id) ; $i < INVENTORY_NUMBER_CHARS; $i++) {
+          for( $i = strlen($inventory_id) ; $i < config('\Stock\Config\StockConfig')->inventory_number_chars; $i++) {
               $inventory_id = "0".$inventory_id;
           }
           $item['inventory_id'] = $inventory_id;

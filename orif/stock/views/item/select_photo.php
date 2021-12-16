@@ -4,6 +4,9 @@ $image = $_SESSION['POST']['image'] ?? '';
 if ($image == config('\Stock\Config\StockConfig')->item_no_image) {
     $image = '';
 }
+
+$image_width = config('\Stock\Config\StockConfig')->image_upload_width;
+$image_height = config('\Stock\Config\StockConfig')->image_upload_height;
 ?>
 <form id="form" class="container" method="post" action="<?=base_url('picture/add_picture')?>" enctype="multipart/form-data">
     <?php if (isset($upload_error)) { ?>
@@ -17,7 +20,7 @@ if ($image == config('\Stock\Config\StockConfig')->item_no_image) {
         </div>
     </div>
     <div style="display: none;">
-        <img id="canvas" width="360" height="360" />
+        <img id="canvas" width="<?= $image_width ?>" height="<?= $image_height ?>" />
     </div>
     <div class="row">
         <!-- Hidden file button, on which a click is simulated when user is clicking on one of the visible buttons -->
@@ -25,8 +28,8 @@ if ($image == config('\Stock\Config\StockConfig')->item_no_image) {
 
         <div class="col-sm-6 form-group">
             <!-- Two buttons to differentiate taking a new picture or importing an existing one -->
-            <input id="cameraImport" type="button" value="<?= lang("MY_application.field_take_photo"); ?>" class="btn btn-default" />
-            <input id="imageImport" type="button" value="<?= lang("MY_application.field_import_photo"); ?>" class="btn btn-default" />
+            <input id="cameraImport" type="button" value="<?= lang("MY_application.field_take_photo"); ?>" class="btn btn-primary" />
+            <input id="imageImport" type="button" value="<?= lang("MY_application.field_import_photo"); ?>" class="btn btn-primary" />
         </div>
 
         <!-- Hidden fields used to store the cropped image's data -->

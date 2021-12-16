@@ -22,8 +22,6 @@ use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use PSR\Log\LoggerInterface;
 use App\Controllers\BaseController;
-use DateInterval;
-use DateTime;
 use Stock\Models\Inventory_control_model;
 use Stock\Models\Item_model;
 use Stock\Models\Loan_model;
@@ -58,6 +56,7 @@ class Item extends BaseController {
         $this->config = config('\Stock\Config\StockConfig');
         helper('sort');
         helper('form');
+        helper('\Stock\Helpers\MY_date');
     }
 
     /**
@@ -68,7 +67,6 @@ class Item extends BaseController {
      */
     public function index($page = 1) {
         // Load list of elements to display as filters
-
         $output['item_tags'] = $this->item_tag_model->dropdown('name');
 
         $output['item_conditions'] = $this->item_condition_model->dropdown('name');
@@ -82,6 +80,7 @@ class Item extends BaseController {
                                         lang('MY_application.sort_order_inventory_number'));
         $output['sort_asc_desc'] = array(lang('MY_application.sort_order_asc'),
                                             lang('MY_application.sort_order_des'));
+
         // Prepare search filters values to send to the view
         if (!isset($output["ts"])) $output["ts"] = '';
         if (!isset($output["c"])) $output["c"] = '';
@@ -90,6 +89,10 @@ class Item extends BaseController {
         if (!isset($output["t"])) $output["t"] = '';
         if (!isset($output["o"])) $output["o"] = '';
         if (!isset($output["ad"])) $output["ad"] = '';
+
+        // Get the amount of late loans
+        $output['late_loans_count'] = count($this->loan_model->get_late_loans());
+
         // Send the data to the View
         return $this->display_view('Stock\Views\item\list', $output);
     }
@@ -163,6 +166,24 @@ class Item extends BaseController {
         // Keep only the slice of items corresponding to the current page
         $output["items"] = array_slice($output["items"], ($output['number_page']-1)*$this->config->items_per_page, $this->config->items_per_page);
 
+        // Format dates
+        array_walk($output["items"], function(&$item) {
+            $loan = $item['current_loan'];
+            if (!isset($loan['planned_return_date'])) {
+                $loan['planned_return_date'] = lang('MY_application.text_none');
+            } else {
+                $loan['planned_return_date'] = databaseToShortDate($loan['planned_return_date']);
+            }
+            if (isset($loan['date'])) {
+                $loan['date'] = databaseToShortDate($loan['date']);
+            }
+
+            $item['current_loan'] = $loan;
+        });
+
+        // Get the amount of late loans
+        $output['late_loans_count'] = count($this->loan_model->get_late_loans());
+
         return $output;
     }
 
@@ -174,39 +195,8 @@ class Item extends BaseController {
     {
         // Create the pagination
         $pager = \Config\Services::pager();
-        /*
-        $config['base_url'] = base_url('/item/index/');
-        $config['total_rows'] = $nbr_items;
-        $config['per_page'] = $this->config->items_per_page;
-        $config['use_page_numbers'] = TRUE;
-        $config['reuse_query_string'] = TRUE;
-
-        $config['full_tag_open'] = '<ul class="pagination">';
-        $config['full_tag_close'] = '</ul>';
-
-        $config['first_link'] = '&laquo;';
-        $config['first_tag_open'] = '<li>';
-        $config['first_tag_close'] = '</li>';
-
-        $config['last_link'] = '&raquo;';
-        $config['last_tag_open'] = '<li>';
-        $config['last_tag_close'] = '</li>';
-
-        $config['next_link'] = FALSE;
-        $config['prev_link'] = FALSE;
-
-        $config['cur_tag_open'] = '<li class="active"><a>';
-        $config['cur_tag_close'] = '</li></a>';
-        $config['num_links'] = 5;
-
-        $config['num_tag_open'] = '<li>';
-        $config['num_tag_close'] = '</li>';
-
-        return $this->pagination->initialize($config);
-        */
 
         return $pager->makeLinks($page, $this->config->items_per_page, $nbr_items);
-
     }
 
     /**
@@ -254,7 +244,7 @@ class Item extends BaseController {
      */
     public function create() {
         // Check if this is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
             // Get new item id and set picture_prefix
             $item_id = $this->item_model->getFutureId();
             $_SESSION['picture_prefix'] = str_pad($item_id, $this->config->inventory_number_chars, "0", STR_PAD_LEFT);
@@ -401,7 +391,7 @@ class Item extends BaseController {
      */
     public function modify($id) {
         // Check if access is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
             // Define image path variables
             $_SESSION['picture_prefix'] = str_pad($id, $this->config->inventory_number_chars, "0", STR_PAD_LEFT);
             $temp_image_name = $_SESSION["picture_prefix"].$this->config->image_picture_suffix.$this->config->image_tmp_suffix.$this->config->image_extension;
@@ -602,11 +592,7 @@ class Item extends BaseController {
      */
     public function create_inventory_control($id = NULL) {
         // Check if this is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
-            if (empty($id)) {
-                // No item specified, display items list
-                return redirect()->to('/item');
-            }
+        if (!empty($id) && isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
 
             $this->user_model = new User_model();
 
@@ -638,7 +624,7 @@ class Item extends BaseController {
                 $this->display_view('Stock\Views\inventory_control\form', $data);
             }
         } else {
-            // Access is not allowed
+            // No item specified or access is not allowed, display items list
             return redirect()->to('/item');
         }
     }
@@ -650,21 +636,24 @@ class Item extends BaseController {
      * @return void
      */
     public function inventory_controls($id = NULL) {
-        if (empty($id)) {
-            // No item specified, display items list
+        if (!empty($id) && isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
+            
+            helper('MY_date');
+
+            // Get item object with related inventory controls
+            $output['item'] = $this->item_model->find($id);
+            $output['inventory_controls'] = $this->inventory_control_model->where('item_id='.$id)->findAll();
+            $output['item']['inventory_number'] = $this->item_model->getInventoryNumber($output['item']);
+            array_walk($output['inventory_controls'], function(&$control) {
+                $control['controller'] = $this->inventory_control_model->getUser($control['controller_id']);
+            });
+
+            $this->display_view('Stock\Views\inventory_control\list', $output);
+        } else {
+
+            // No item specified or access not allowed, display items list
             return redirect()->to('/item');
         }
-        helper('MY_date');
-
-        // Get item object with related inventory controls
-        $output['item'] = $this->item_model->find($id);
-        $output['inventory_controls'] = $this->inventory_control_model->where('item_id='.$id)->findAll();
-        $output['item']['inventory_number'] = $this->item_model->getInventoryNumber($output['item']);
-        array_walk($output['inventory_controls'], function(&$control) {
-            $control['controller'] = $this->inventory_control_model->getUser($control['controller_id']);
-        });
-
-        $this->display_view('Stock\Views\inventory_control\list', $output);
     }
 
     /**
@@ -675,46 +664,64 @@ class Item extends BaseController {
      */
     public function create_loan($id = NULL) {
         // Check if this is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
-            if (empty($id)) {
-                // No item specified, display items list
-                return redirect()->to('/item');
-            }
+        if (!empty($id) && isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
 
             // Get item object and related loans
             $item = $this->item_model->find($id);
 
             $data['item'] = $item;
             $data['item_id'] = $id;
+            $data['new_loan'] = true;
+            $users = (new User_model())->findAll();
+            $data['users'] = array_map(function($user) {
+                return [
+                    'id' => $user['id'],
+                    'username' => $user['username'],
+                    'email' => $user['email'],
+                ];
+            }, $users);
 
             // Test input
-            $validation = \Config\Services::validation();
+            if (!empty($_POST)) {
+                $validation = \Config\Services::validation();
+                $user_ids = implode(',', array_map(function($user) { return $user['id']; }, $users)) . ','; // Allows empty ids
 
-            $validation->setRule("date", "Date du prêt", 'required', array('required' => "La date du prêt doit être fournie"));
+                $validation->setRule("date", "Date du prêt", 'required', array('required' => "La date du prêt doit être fournie"));
+                $validation->setRule("planned_return_date", lang('MY_application.field_loan_planned_return'), 'required', [
+                    'required' => lang('MY_application.msg_err_no_planned_return_date'),
+                ]);
+                $validation->setRule("borrower_email", lang('MY_application.field_borrower_email'), 'required|valid_email', [
+                    'required' => lang('MY_application.msg_err_no_loan_email'),
+                    'valid_email' => lang('MY_application.msg_err_email'),
+                ]);
+                $validation->setRule("loan_to_user_id", lang('MY_application.field_loan_to_user'), "if_exist|in_list[${user_ids}]", [
+                    'in_list' => lang('MY_application.msg_err_invalid_loan_to'),
+                ]);
 
-            if ($validation->run($_POST) === TRUE) {
-                $loanArray = $_POST;
+                if ($validation->run($_POST) === TRUE) {
+                    $loanArray = $_POST;
 
-                if ($loanArray["planned_return_date"] == 0 || $loanArray["planned_return_date"] == "0000-00-00" || $loanArray["planned_return_date"] == "") {
-                    $loanArray["planned_return_date"] = NULL;
+                    if ($loanArray["real_return_date"] == 0 || $loanArray["real_return_date"] == "0000-00-00" || $loanArray["real_return_date"] == "") {
+                        $loanArray["real_return_date"] = NULL;
+                    }
+                    if ($loanArray["loan_to_user_id"] == 0 || $loanArray["loan_to_user_id"] == "") {
+                        $loanArray["loan_to_user_id"] = NULL;
+                    }
+
+                    $loanArray["item_id"] = $id;
+
+                    $loanArray["loan_by_user_id"] = $this->session->user_id;
+
+                    $this->loan_model->insert($loanArray);
+
+                    return redirect()->to("/item/loans/".$id);
                 }
-
-                if ($loanArray["real_return_date"] == 0 || $loanArray["real_return_date"] == "0000-00-00" || $loanArray["real_return_date"] == "") {
-                    $loanArray["real_return_date"] = NULL;
-                }
-
-                $loanArray["item_id"] = $id;
-
-                $loanArray["loan_by_user_id"] = $this->session->user_id;
-
-                $this->loan_model->insert($loanArray);
-
-                return redirect()->to("/item/loans/".$id);
-            } else {
-                $this->display_view('Stock\Views\loan\form', $data);
+                $data['errors'] = $validation->getErrors();
             }
+            $this->display_view('Stock\Views\loan\form', $data);
         } else {
-            // Access is not allowed
+
+            // No item specified or access is not allowed, redirect to items list
             return redirect()->to('/item');
         }
     }
@@ -727,35 +734,62 @@ class Item extends BaseController {
      */
     public function modify_loan($id = NULL) {
         // Check if this is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
             // get the data from the loan with this id (to fill the form or to get the concerned item)
-            $data = $this->loan_model->find($id);
+            $loan = $this->loan_model->find($id);
+
+            $data['date'] = $loan['date'];
+            $data['planned_return_date'] = $loan['planned_return_date'];
+            $data['real_return_date'] = $loan['real_return_date'];
+            $data['item_localisation'] = $loan['item_localisation'];
+            $data['item_id'] = $loan['item_id'];
+            $data['loan_to_user_id'] = $loan['loan_to_user_id'];
+            $data['borrower_email'] = $loan['borrower_email'];
+            $data['new_loan'] = false;
+            $users = (new User_model())->findAll();
+            $data['users'] = array_map(function($user) {
+                return [
+                    'id' => $user['id'],
+                    'username' => $user['username'],
+                    'email' => $user['email'],
+                ];
+            }, $users);
 
             if (!empty($_POST)) {
                 // test input
                 $validation = \Config\Services::validation();
+                $user_ids = implode(',', array_map(function($user) { return $user['id']; }, $users)) . ','; // Allows empty ids
 
                 $validation->setRule("date", "Date du prêt", 'required', array('required' => "La date du prêt doit être fournie"));
+                $validation->setRule("planned_return_date", lang('MY_application.field_loan_planned_return'), 'required', [
+                    'required' => lang('MY_application.msg_err_no_planned_return_date'),
+                ]);
+                $validation->setRule("borrower_email", lang('MY_application.field_borrower_email'), 'required|valid_email', [
+                    'required' => lang('MY_application.msg_err_no_loan_email'),
+                    'valid_email' => lang('MY_application.msg_err_email'),
+                ]);
+                $validation->setRule("loan_to_user_id", lang('MY_application.field_loan_to_user'), "if_exist|in_list[${user_ids}]", [
+                    'in_list' => lang('MY_application.msg_err_invalid_loan_to'),
+                ]);
 
                 if ($validation->run($_POST) === TRUE) {
                     //Declarations
 
                     $loanArray = $_POST;
 
-                    if ($loanArray["planned_return_date"] == 0 || $loanArray["planned_return_date"] == "0000-00-00" || $loanArray["planned_return_date"] == "") {
-                        $loanArray["planned_return_date"] = NULL;
-                    }
-
                     if ($loanArray["real_return_date"] == 0 || $loanArray["real_return_date"] == "0000-00-00" || $loanArray["real_return_date"] == "") {
                         $loanArray["real_return_date"] = NULL;
+                    }
+                    if ($loanArray["loan_to_user_id"] == 0 || $loanArray["loan_to_user_id"] == "") {
+                        $loanArray["loan_to_user_id"] = NULL;
                     }
 
                     // Execute the changes in the item table
                     $this->loan_model->update($id, $loanArray);
 
-                    var_dump($data);
                     return redirect()->to("/item/loans/".$data["item_id"]);
                 }
+                $data['errors'] = $validation->getErrors();
             }
             $this->display_view('Stock\Views\loan\form', $data);
         } else {
@@ -772,26 +806,35 @@ class Item extends BaseController {
      * @return void
      */
     public function loans($id = NULL) {
-        if (empty($id)) {
-            // No item specified, display items list
+        if (!empty($id) && isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access']>=config('\User\Config\UserConfig')->access_lvl_admin) {
+
+            // Get item object and related loans
+            $item = $this->item_model->find($id);
+            $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
+            $loans = $this->loan_model->where('item_id', $item['item_id'])->findAll();
+            array_walk($loans, function(&$loan) {
+                $loan['loan_by_user'] = $this->loan_model->get_loaner($loan);
+                $loan['date'] = databaseToShortDate($loan['date']);
+                if (!is_null($loan['planned_return_date'])) {
+                    $loan['planned_return_date'] = databaseToShortDate($loan['planned_return_date']);
+                }
+                if (!is_null($loan['real_return_date'])) {
+                    $loan['real_return_date'] = databaseToShortDate($loan['real_return_date']);
+                }
+                if (!is_null($loan['loan_to_user_id'])) {
+                    $loan['loan_to_user'] = $this->loan_model->get_borrower($loan);
+                }
+            });
+
+            $output['item'] = $item;
+            $output['loans'] = $loans;
+
+            $this->display_view('Stock\Views\loan\list', $output);
+        } else {
+
+            // No item specified or access not allowed, display items list
             return redirect()->to('/item');
         }
-
-        // Get item object and related loans
-        $item = $this->item_model->find($id);
-        $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
-        $loans = $this->loan_model->where('item_id', $item['item_id'])->findAll();
-        array_walk($loans, function(&$loan) {
-            $loan['loan_by_user'] = $this->loan_model->get_loaner($loan);
-            if (!is_null($loan['loan_to_user_id'])) {
-                $loan['loan_to_user'] = $this->loan_model->get_borrower($loan);
-            }
-        });
-
-        $output['item'] = $item;
-        $output['loans'] = $loans;
-
-        $this->display_view('Stock\Views\loan\list', $output);
     }
 
     /**
@@ -853,30 +896,23 @@ class Item extends BaseController {
             $page = 1;
         }
 
-        // Get item(s) with loans
-        $loans = $this->loan_model->where('real_return_date', NULL);
-        $loans = $loans->findAll();
-        $now = new DateTime();
-        $late_items = array_filter($loans, function($loan) use ($now) {
-            // If possible compare with a planned date, otherwise use +3 months
-            if (isset($loan['planned_return_date']) && !is_null($loan['planned_return_date'])) {
-                $date = new DateTime($loan['planned_return_date']);
-            } else {
-                $date = new DateTime($loan['date']);
-                $date = $date->add(new DateInterval('P3M'));
-            }
-
-            return $date < $now;
-        });
-        $late_item_ids = array_map(function($loan) { return $loan['item_id']; }, $late_items);
-        $items_loans = array_map(function($loan) { return $loan['item_id']; }, $loans);
-        $items = $this->item_model->get_filtered(['c' => [10, 30, 40]]);
-        $items = array_filter($items, function($item) use ($items_loans) { return in_array($item['item_id'], $items_loans); });
+        // Get Loans and corresponding items
+        $loans = $this->loan_model->where('real_return_date', NULL)->findAll();
+        foreach($loans as $loan) {
+            $item = $this->loan_model->get_item($loan);
+            $item['stocking_place'] = $this->item_model->getStockingPlace($item);
+            $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
+            $item['condition'] = $this->item_model->getItemCondition($item);
+            $item['current_loan'] = $this->item_model->getCurrentLoan($item);
+            $item['image'] = $this->item_model->getImage($item);
+            $item['image_path'] = $this->item_model->getImagePath($item);
+            $items[] = $item;
+        }
 
         // Sort items, separate late loans and others, then sort by name
-        usort($items, function($a, $b) use ($late_item_ids) {
-            $late_a = in_array($a['item_id'], $late_item_ids);
-            $late_b = in_array($b['item_id'], $late_item_ids);
+        usort($items, function($a, $b) {
+            $late_a = $a['current_loan']['is_late'];
+            $late_b = $b['current_loan']['is_late'];
             if ($late_a != $late_b) {
                 return $late_b <=> $late_a;
             } else {
@@ -897,18 +933,17 @@ class Item extends BaseController {
         // Keep only the slice of items corresponding to the current page
         $items = array_slice($items, ($number_page-1)*$this->config->items_per_page, $this->config->items_per_page);
 
-        // Add to the item whether it is late, the starting date, and the end date
-        array_walk($items, function(&$item) use ($late_item_ids) {
-            $item['is_late'] = in_array($item['item_id'], $late_item_ids);
-            $loan = $this->loan_model->where('item_id', $item['item_id'])->orderBy('date', 'desc')->first();
+        // Format dates
+        array_walk($items, function(&$item) {
+            $loan = $item['current_loan'];
             if (!isset($loan['planned_return_date']) || is_null($loan['planned_return_date'])) {
-                $loan['planned_return_date'] = '';
+                $loan['planned_return_date'] = lang('MY_application.text_none');
             } else {
                 $loan['planned_return_date'] = databaseToShortDate($loan['planned_return_date']);
             }
             $loan['date'] = databaseToShortDate($loan['date']);
 
-            $item['loan'] = $loan;
+            $item['current_loan'] = $loan;
         });
 
         return [
@@ -916,6 +951,7 @@ class Item extends BaseController {
             'title' => $title,
             'pagination' => $pagination,
             'number_page' => $number_page,
+            'late_loans_count' => count($this->loan_model->get_late_loans()),
         ];
     }
 
