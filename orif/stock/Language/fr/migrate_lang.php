@@ -9,16 +9,16 @@
 
 return[
 // Page titles
-'title_migration'           => 'Migration',
+'title_migration'           => 'Migration de la BD',
 
 // Buttons
-'btn_migrate'               => 'Migrer vers CI4',
+'btn_migrate'               => 'Migrer la BD',
 
 // Error messages
 'err_msg_migration_failed'  => 'L\'erreur suivante s\'est produite lors de la migration:<br><br>',
 
 // Other texts
-'warning'                   => 'La migration va modifier la base de données, afin de la rendre compatible avec ci_session, le soft delete et le module user :<br> <br>'
-                                    .'Ceci pouvant être dangereux pour l\'intégrité des données, elle est bloquée derrière un mot de passe.',
+'warning'                   => 'La migration va modifier la base de données, afin de l\'adapter à la nouvelle version de l\'application.<br> <br>'
+                                    .'Ceci pouvant être dangereux pour l\'intégrité des données, il est vivement recommandé de faire une sauvegarde complète de la base de données avant de lancer cette opération.',
 
 ];
