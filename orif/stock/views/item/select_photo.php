@@ -123,6 +123,7 @@ function setCropper(event){
         movable: false,
         rotatable: false,
         scalable: false,
+        zoomable: false,
         viewMode: 1
     });
 }
