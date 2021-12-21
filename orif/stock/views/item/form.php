@@ -234,6 +234,7 @@ $config = config('\Stock\Config\StockConfig');
                             foreach ($tag_links as $tag_link) {
                                 if ($tag_link['item_tag_id'] == $item_tag['item_tag_id']){
                                     echo 'checked';
+                                    break;
                                 }
                             }
                         }
