@@ -637,7 +637,7 @@ class Item extends BaseController {
      */
     public function inventory_controls($id = NULL) {
         if (!empty($id) && isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
-            
+
             helper('MY_date');
 
             // Get item object with related inventory controls
@@ -806,7 +806,7 @@ class Item extends BaseController {
      * @return void
      */
     public function loans($id = NULL) {
-        if (!empty($id) && isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access']>=config('\User\Config\UserConfig')->access_lvl_admin) {
+        if (!empty($id) && isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access']>=config('\User\Config\UserConfig')->access_lvl_registered) {
 
             // Get item object and related loans
             $item = $this->item_model->find($id);
