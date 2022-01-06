@@ -715,8 +715,15 @@ class Item extends BaseController {
                     $this->loan_model->insert($loanArray);
 
                     return redirect()->to("/item/loans/".$id);
+                } else {
+                    $data['errors'] = $validation->getErrors();
+
+                    // List of data inputs from the user
+                    $inputs = ['date', 'planned_return_date', 'real_return_date', 'loan_to_user_id', 'borrower_email', 'item_localisation'];
+                    foreach ($inputs as $input) {
+                        if (isset($_POST[$input])) $data[$input] = $_POST[$input];
+                    }
                 }
-                $data['errors'] = $validation->getErrors();
             }
             $this->display_view('Stock\Views\loan\form', $data);
         } else {
@@ -788,8 +795,15 @@ class Item extends BaseController {
                     $this->loan_model->update($id, $loanArray);
 
                     return redirect()->to("/item/loans/".$data["item_id"]);
+                } else {
+                    $data['errors'] = $validation->getErrors();
+
+                    // List of data inputs from the user
+                    $inputs = ['date', 'planned_return_date', 'real_return_date', 'loan_to_user_id', 'borrower_email', 'item_localisation'];
+                    foreach ($inputs as $input) {
+                        if (isset($_POST[$input])) $data[$input] = $_POST[$input];
+                    }
                 }
-                $data['errors'] = $validation->getErrors();
             }
             $this->display_view('Stock\Views\loan\form', $data);
         } else {
