@@ -60,7 +60,7 @@ class Item_model extends MyModel
      * Returns the id that will receive the next item
      */
     public function getFutureId(){
-      $query = $this->db->query("SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'stock' AND TABLE_NAME = 'item'")->getResultArray();
+      $query = $this->db->query("SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = '{$this->db->database}' AND TABLE_NAME = 'item'")->getResultArray();
 
       // Makes sure we select the auto_increment value
       $value = $query[0]['AUTO_INCREMENT'];
