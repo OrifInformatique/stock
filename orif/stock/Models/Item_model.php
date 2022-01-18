@@ -423,12 +423,12 @@ class Item_model extends MyModel
         // Remove the last " OR "
         $where_itemTagLinks = substr($where_itemTagLinks, 0, -4);
 
-        $item_tag_links = $this->item_tag_link_model->get_many_by($where_itemTagLinks);
+        $item_tag_links = $this->item_tag_link_model->where($where_itemTagLinks)->findAll();
 
         // Prepare WHERE clause for all corresponding items
         $where_itemTagsFilter .= '(';
         foreach ($item_tag_links as $item_tag_link) {
-          $where_itemTagsFilter .= 'item_id='.$item_tag_link->item_id.' OR ';
+          $where_itemTagsFilter .= 'item_id='.$item_tag_link['item_id'].' OR ';
         }
         // Remove the last " OR "
         if($where_itemTagsFilter != "(") {
