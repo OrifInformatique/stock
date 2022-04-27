@@ -19,7 +19,8 @@ It is based on the CodeIgniter 4.x framework.
 4. Generate a local database running CodeIgniter's spark migrate command
 
 ```bash
-php spark migrate -all
+php spark migrate -n Stock
+php spark migrate -n User
 ```
 
 ## Upgrade Version 1.6 to Version 4.0
