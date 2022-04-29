@@ -41,3 +41,17 @@ li.nav-item {
         display: none;
     }
 }
+@media screen and (max-width: 550px) {
+    .row-responsive-2{
+        flex-direction: column!IMPORTANT;
+        align-items: center;
+    }
+    .row-responsive-2 div{
+        max-width: unset!important;
+    }
+    .row-responsive-2 div label{
+        padding-left: .7rem;
+        margin-bottom: .3rem!important;
+    }
+}
+
