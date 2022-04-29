@@ -34,10 +34,12 @@ class Entity extends Migration
             'shortname'=>[
                 'type'=>'VARCHAR',
                 'constraint'=>'3',
+                'null'=>true,
             ],
             'archive'=>[
                 'type'=>'TIMESTAMP',
                 'default'=>null,
+                'null'=>true,
             ]
         ]);
         $this->forge->addPrimaryKey('entity_id');
