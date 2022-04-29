@@ -11,6 +11,7 @@ use App\Controllers\BaseController;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use Stock\Models\Entity;
 use Stock\Models\Item_tag_model;
 use Stock\Models\Item_tag_link_model;
 use Stock\Models\Stocking_place_model;
@@ -24,6 +25,7 @@ class Admin extends BaseController
     /**
      * Constructor
      */
+    private Entity $entity_model;
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
         // Set Access level before calling parent constructor
@@ -46,6 +48,7 @@ class Admin extends BaseController
         $this->supplier_model         = new Supplier_model();
         $this->item_group_model       = new Item_group_model();
         $this->item_model             = new Item_model();
+        $this->entity_model=new Entity();
 
         //get db instance
         $this->db = \CodeIgniter\Database\Config::connect();
@@ -798,5 +801,61 @@ class Admin extends BaseController
             $this->item_group_model->withDeleted()->update($id, ['archive' => NULL]);
             return redirect()->to('/stock/admin/modify_item_group/' . $id);
         }
+    }
+    public function view_entity_list($with_deleted=0){
+        $data['columns'] =['name'=>lang('stock_lang.name'),'address'=>lang('stock_lang.address'),'zip'=>lang('stock_lang.zip_code'),'locality'=>lang('stock_lang.locality'),'shortname'=>lang('stock_lang.add_entity')];
+        $data['items'] = [];
+        foreach ($this->entity_model->withDeleted($with_deleted)->findAll() as $entity){
+            $data['items'][]=['id'=>$entity['entity_id'],'name'=>$entity['name'],'address' => $entity['address'], 'zip' => $entity['zip'], 'locality' => $entity['locality'],'shortname'=>$entity['shortname']];
+        }
+
+   $data['primary_key_field']  = 'id';
+   $data['btn_create_label']   = lang('stock_lang.add_entity');
+   $data['with_deleted']       = $with_deleted;
+   $data['url_detail'] = "stock/admin/view_entity/";
+   $data['url_update'] = "stock/admin/save_entity/1/";
+   $data['url_delete'] = "stock/admin/delete_entity/0/";
+   $data['url_create'] = "stock/admin/save_entity/0/";
+   $data['url_getView'] = "stock/admin/view_entity_list";
+        return $this->display_view('\Stock\admin\entity\list_entity',['data'=>$data]);
+    }
+    public function save_entity($action=0,$entity_id=0)
+    {
+        if(count($this->request->getPost())==0){
+            if ($action==0){
+                return $this->display_view('\Stock\admin\entity\create_entity',['action'=>$action]);
+            }
+            else{
+                if ($entity_id==0){
+                    return $this->display_view('\Stock\admin\entity\create_entity',['action'=>$action,'errors'=>[lang('stock_lang.no_id_found_for_update_error')]]);
+                }
+                else{
+                    return $this->display_view('\Stock\admin\entity\create_entity',['action'=>$action,'data'=>$this->entity_model->withDeleted(true)->find($entity_id)]);
+                }
+            }
+
+        }
+        else{
+            $name=$this->request->getPost('name');
+            $address=$this->request->getPost('address');
+            $zip=$this->request->getPost('zip');
+            $locality=$this->request->getPost('locality');
+            $tag=$this->request->getPost('tag');
+            if ($action==0)
+                $this->entity_model->insert(['name'=>$name,'address'=>$address,'zip'=>$zip,'locality'=>$locality,'tag'=>$tag]);
+            else{
+
+                $this->entity_model->withDeleted()->update($entity_id,['name'=>$name,'address'=>$address,'zip'=>$zip,'locality'=>$locality,'shortname'=>$tag]);
+            }
+            if ($this->entity_model->errors()!=null){
+                return $this->display_view('\Stock\admin\entity\create_entity',array_merge(['action'=>$action,'errors'=>$this->entity_model->errors()],$entity_id!=0?['data'=>$this->entity_model->withDeleted()->find($entity_id)]:['data'=>['name'=>$name,'address'=>$address,'zip'=>$zip,'locality'=>$locality,'tag'=>$tag]]));
+            }
+            else{
+                return redirect()->to(base_url('stock/admin/view_entity_list'));
+            }
+        }
+    }
+    public function delete_entity($action=0,$entity_id=0){
+        return $this->display_view('\Stock\admin\entity\delete_entity',['data'=>$this->entity_model->withDeleted()->find($entity_id)]);
     }
 }
