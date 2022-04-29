@@ -13,6 +13,7 @@ return[
 'title_stocking_places'                 => 'Liste des lieux de stockage',
 'title_suppliers'                       => 'Liste des fournisseurs',
 'title_item_groups'                     => 'Liste des groupes d\'objets',
+'title_entity_list'                     => 'Liste des sites',
 
 
 // Buttons
@@ -99,5 +100,17 @@ return[
                                         . 'Cela permet notamment de garder l\'historique de ses actions. <br> <br>' 
                                         . 'En cas de suppression définitive, toutes les informations concernant ce groupe d\'objet seront supprimées.',
 'item_group_already_disabled'           => 'Ce groupe d\'objet est déjà désactivé. Voulez-vous le supprimer définitivement ?',
+'name'                                  => 'Nom',
+'address'                               => 'Adresse',
+'zip_code'                              => 'Numéro postal',
+'locality'                              => 'Ville',
+'tagname'                               => 'Tag',
+'add_entity'                            => 'Ajouter un site',
+'update_entity'                         => 'Modifier le site',
+'no_id_found_for_update_error'          => 'Pour modifier un site, il vous faut fournir son id dans l\'url',
+'delete_entity_what_to_do'              => 'La désactivation d\'une entité permet de la rendre inutilisable tout en conservant ses informations dans les archives.
+                                            Cela permet notamment de conserver l\'historique de ses actions<br><br>
+                                            En cas de suppression toutes les information associées à ce site seront suprimées',
+
 
 ];
