@@ -246,19 +246,28 @@ class Admin extends BaseController
         foreach ($data['items'] as &$stocking_place)
         {
           $stocking_place['active'] = isset($stocking_place['archive']) ? lang('common_lang.no') : lang('common_lang.yes');
+            if ($stocking_place['fk_entity_id']!=null)
+                $stocking_place['fk_entity_id']=$this->entity_model->withDeleted()->find($stocking_place['fk_entity_id'])['name'];
         }
         $data['columns'] = ['name'   => lang('stock_lang.field_name'),
                             'short'  => lang('stock_lang.field_short_name'),
+                            'fk_entity_id' =>lang('stock_lang.entity_name'),
                             'active' => lang('stock_lang.field_active'),
                            ];
       }
       else
       {
         $data['items'] = $this->stocking_place_model->findAll();
+        foreach ($data['items'] as &$stocking_place) {
+            if ($stocking_place['fk_entity_id']!=null)
+              $stocking_place['fk_entity_id']=$this->entity_model->withDeleted()->find($stocking_place['fk_entity_id'])['name'];
+        }
 
         $data['columns'] = ['name'  => lang('stock_lang.field_name'),
                             'short' => lang('stock_lang.field_short_name'),
-                           ];
+            'fk_entity_id' =>lang('stock_lang.entity_name'),
+
+        ];
       }
 
       // Prepare datas for common module generic items_list view
@@ -317,7 +326,7 @@ class Admin extends BaseController
       {
         return redirect()->to('/stock/admin/view_stocking_places');
       }
-
+      $output['entities']=$this->entity_model->withDeleted()->findAll();
       $this->display_view('Stock\admin\stocking_places\form', $output);
     }
 
@@ -343,7 +352,7 @@ class Admin extends BaseController
         }
 	    }
 
-      $this->display_view('Stock\admin\stocking_places\form');
+      $this->display_view('Stock\admin\stocking_places\form',['entities'=>$this->entity_model->withDeleted()->findAll()]);
     }
 
     /**

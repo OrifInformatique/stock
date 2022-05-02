@@ -26,6 +26,11 @@ else
       <div class="col-sm-9">
         <label for="name"><?= lang('stock_lang.field_name') ?></label>
         <input type="text" class="form-control" name="name" id="name" value="<?php if (isset($stocking_place['name'])) {echo set_value('name',$stocking_place['name']);} else {echo set_value('name');} ?>" />
+        <select id="entity_selector" class="mt-2 form-control" name="fk_entity_id">
+            <?php foreach($entities as $entity):?>
+                <option value="<?=$entity['entity_id']?>" <?=isset($stocking_place['fk_entity_id'])&&$stocking_place['fk_entity_id']==$entity['entity_id']?'selected=true':''?>><?=$entity['name']?></option>
+            <?php endforeach;?>
+        </select>
         <span class="text-danger"><?= $validation->showError('name'); ?></span>
       </div>
     </div>
