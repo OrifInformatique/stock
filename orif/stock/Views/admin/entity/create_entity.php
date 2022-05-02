@@ -37,11 +37,11 @@
 <span class="row row-responsive-2">
     <div class="col-sm-6" style="max-width: calc(50% - .4rem)">
         <label for="entity_name"><?=lang('stock_lang.tagname')?></label>
-        <input type="text" id="entity_tagname" placeholder="<?=lang('stock_lang.tagname')?>" class="form-control form-text" name="tag" value="<?=isset($data)&&isset($data['shortname'])?$data['shortname']:''?>">
+        <input type="text" id="entity_tagname" placeholder="<?=lang('stock_lang.tagname')?>" class="form-control form-text" name="tag" value="<?=isset($data)&&isset($data['shortname'])?$data['shortname']:''?>" maxlength="3">
     </div>
     <div class="col-sm-6 text-right align-items-center" style="display: flex;flex-direction: row;justify-content: end;align-items: end!important;padding-right: 2rem;margin-top: 1.2rem">
         <a href="<?=base_url('stock/admin/view_entity_list')?>" class="nav-link"><?=lang('common_lang.btn_cancel')?></a>
-        <?php if($data['archive']!=''):?>
+        <?php if(isset($data['archive'])&&$data['archive']!=''):?>
             <a href="<?=base_url('stock/admin/reactivate_entity/'.$data['entity_id'])?>" class="btn btn-secondary mr-2"><?=lang('common_lang.btn_reactivate')?></a>
         <?php endif;?>
         <input type="submit" class="btn btn-primary" value="<?=$action!=0?lang('common_lang.btn_edit'):lang('common_lang.btn_add')?>">

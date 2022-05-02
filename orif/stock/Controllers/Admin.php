@@ -640,20 +640,27 @@ class Admin extends BaseController
         // Add the "active" info for each item group
         foreach ($data['items'] as &$item_group)
         {
-          $item_group['active'] = isset($item_group['archive']) ? lang('common_lang.no') : lang('common_lang.yes');
+            $item_group['fk_entity_id']=$this->entity_model->withDeleted(true)->find($item_group['fk_entity_id'])['name'];
+            $item_group['active'] = isset($item_group['archive']) ? lang('common_lang.no') : lang('common_lang.yes');
         }
         $data['columns'] = ['name'   => lang('stock_lang.field_name'),
                             'short_name'  => lang('stock_lang.field_short_name'),
+                            'fk_entity_id'    => lang('stock_lang.entity_name'),
                             'active' => lang('stock_lang.field_active'),
                            ];
       }
       else
       {
         $data['items'] = $this->item_group_model->findAll();
+        foreach ($data['items'] as $itemidx => $item){
+            $item['fk_entity_id']=$this->entity_model->withDeleted(true)->find($item['fk_entity_id'])['name'];
+            $data['items'][$itemidx]=$item;
+        }
 
         $data['columns'] = ['name'  => lang('stock_lang.field_name'),
                             'short_name' => lang('stock_lang.field_short_name'),
-                           ];
+                            'fk_entity_id'    => lang('stock_lang.entity_name'),
+        ];
       }
 
       // Complete datas for common module generic items_list view
@@ -711,7 +718,7 @@ class Admin extends BaseController
       {
         return redirect()->to('/stock/admin/view_item_groups');
       }
-
+      $output['entities']=$this->entity_model->withDeleted(false)->findAll();
       $this->display_view('Stock\admin\item_groups\form', $output);
     }
 
@@ -736,7 +743,7 @@ class Admin extends BaseController
         }
 	    }
 
-      $this->display_view('Stock\admin\item_groups\form');
+      $this->display_view('Stock\admin\item_groups\form',['entities'=>$this->entity_model->withDeleted(false)->findAll()]);
     }
 
     /**

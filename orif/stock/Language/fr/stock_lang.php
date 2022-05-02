@@ -101,6 +101,7 @@ return[
                                         . 'En cas de suppression définitive, toutes les informations concernant ce groupe d\'objet seront supprimées.',
 'item_group_already_disabled'           => 'Ce groupe d\'objet est déjà désactivé. Voulez-vous le supprimer définitivement ?',
 'name'                                  => 'Nom',
+'entity_name'                           => 'Nom du site',
 'address'                               => 'Adresse',
 'zip_code'                              => 'Numéro postal',
 'locality'                              => 'Ville',
