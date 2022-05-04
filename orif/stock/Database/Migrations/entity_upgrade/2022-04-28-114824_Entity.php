@@ -36,12 +36,8 @@ class Entity extends Migration
                 'constraint'=>'3',
                 'null'=>true,
             ],
-            'archive'=>[
-                'type'=>'TIMESTAMP',
-                'default'=>null,
-                'null'=>true,
-            ]
         ]);
+        $this->forge->addField( 'archive timestamp NULL default NULL');
         $this->forge->addPrimaryKey('entity_id');
         $this->forge->createTable('entity',false);
         $this->db->enableForeignKeyChecks();
