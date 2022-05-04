@@ -828,7 +828,10 @@ class Admin extends BaseController
         $data['columns'] =['name'=>lang('stock_lang.name'),'address'=>lang('stock_lang.address'),'zip'=>lang('stock_lang.zip_code'),'locality'=>lang('stock_lang.locality'),'shortname'=>lang('stock_lang.tagname')];
         $data['items'] = [];
         foreach ($this->entity_model->withDeleted($with_deleted)->findAll() as $entity){
-            $data['items'][]=['id'=>$entity['entity_id'],'name'=>$entity['name'],'address' => $entity['address'], 'zip' => $entity['zip'], 'locality' => $entity['locality'],'shortname'=>$entity['shortname']];
+            $data['items'][]=['id'=>$entity['entity_id'],'name'=>$entity['name'],'address' => $entity['address'], 'zip' => $entity['zip'], 'locality' => $entity['locality'],'shortname'=>$entity['shortname'],'enabled'=>$entity['archive']==null?lang('common_lang.yes'):lang('common_lang.no')];
+        }
+        if ($with_deleted==true){
+            $data['columns']['enabled']=lang('stock_lang.field_active');
         }
 
    $data['primary_key_field']  = 'id';
