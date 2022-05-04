@@ -157,16 +157,25 @@ $config = config('\Stock\Config\StockConfig');
         </div>
         <div class="form-group col-md-4">
             <label for="stocking_place_id"><?= lang('MY_application.field_stocking_place'); ?></label>
-			<select id="stocking_place_id" name="stocking_place_id" class="form-control"><?php
+			<select id="stocking_place_id" name="stocking_place_id" class="form-control" onchange="setEntityOption()"><?php
 				foreach ($stocking_places as $stocking_place) {
 				?><option value="<?= $stocking_place['stocking_place_id']; ?>" <?php
                     if (isset($stocking_place_id) && $stocking_place_id == $stocking_place['stocking_place_id']) {
                         echo "selected";
                     }
-                ?> ><?= $stocking_place['name']; ?></option><?php
+                ?> data-fk_entity="<?=$stocking_place['fk_entity_id']?>"><?= $stocking_place['name']; ?></option><?php
 				} ?>
 			</select>
         </div>
+        <div class="form-group col-md-4">
+            <label for="entity_selector"><?=lang('stock_lang.entity_name')?></label>
+            <select class="form-control" disabled name="fk_entity_id" id="entity_selector">
+                <?php foreach ((new \Stock\Models\Entity())->findAll() as $entity):?>
+                    <option value="<?=$entity['entity_id']?>"><?=$entity['name']?></option>
+                <?php endforeach;?>
+            </select>
+        </div>
+
     </div>
 
     <!-- ITEM SUPPLIER, BUYING AND WARRANTY INFORMATIONS -->
@@ -355,6 +364,9 @@ function getFirstTagShortName(){
     }
     return firstTagShortName;
 }
-
+function setEntityOption(){
+    $('#entity_selector').val(document.getElementById('stocking_place_id').selectedOptions[0].getAttribute('data-fk_entity'))
+}
 change_warranty();
+setEntityOption();
 </script>
