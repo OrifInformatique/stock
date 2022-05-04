@@ -665,6 +665,7 @@ class Admin extends BaseController
       {
         $data['items'] = $this->item_group_model->findAll();
         foreach ($data['items'] as $itemidx => $item){
+            if (isset($item['fk_entity_id']))
             $item['fk_entity_id']=$this->entity_model->withDeleted(true)->find($item['fk_entity_id'])['name'];
             $data['items'][$itemidx]=$item;
         }
