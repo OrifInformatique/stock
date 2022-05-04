@@ -18,6 +18,9 @@ use Stock\Models\Stocking_place_model;
 use Stock\Models\Supplier_model;
 use Stock\Models\Item_group_model;
 use Stock\Models\Item_model;
+use Stock\Models\UserEntity;
+use User\Models\User_model;
+use User\Models\User_type_model;
 
 
 class Admin extends BaseController
@@ -736,23 +739,26 @@ class Admin extends BaseController
     */
     public function new_item_group()
     {
-      if ( ! empty($_POST))
+        $validation=\Config\Services::validation();
+
+        if ( ! empty($_POST))
       {
         // VALIDATION
         $validationRules = [
           'name'            => 'required|min_length[2]|max_length[45]|is_unique[stocking_place.name]',
-          'short'           => 'required|max_length['.config('\Stock\Config\StockConfig')->stocking_short_max_length.']|is_unique[stocking_place.short_name]'
+          'short_name'           => 'required|max_length['.config('\Stock\Config\StockConfig')->stocking_short_max_length.']|is_unique[item_group.short_name]'
           ];
-
-        if($this->validate($validationRules))
+          $validation->setRules($validationRules);
+        if($validation->withRequest($this->request)->run())
         {
-          $this->item_groups_model->insert($_POST);
+            $itemGroupModel=new Item_group_model();
+            $itemGroupModel->insert($_POST);
 
           return redirect()->to("/stock/admin/view_item_groups");
         }
 	    }
 
-      $this->display_view('Stock\admin\item_groups\form',['entities'=>$this->entity_model->withDeleted(false)->findAll()]);
+      $this->display_view('Stock\admin\item_groups\form',['entities'=>$this->entity_model->withDeleted(false)->findAll(),'error'=>$validation->getErrors()]);
     }
 
     /**
@@ -887,4 +893,98 @@ class Admin extends BaseController
             return redirect()->to(base_url('stock/admin/view_entity_list'));
         }
     }
+
+    public function save_user($user_id=0){
+        $tmpUserTypes=(new User_type_model())->findAll();
+        $userTypes=[];
+        foreach ($tmpUserTypes as $userType){
+            $userTypes[$userType['id']]=$userType['name'];
+        }
+        if(count($this->request->getPost())>0){
+            $validation=\Config\Services::validation();
+            $validationRules=['id'        =>['label'=>'Id','rules'=>'cb_not_null_user'],
+                'user_name' =>['label'=>lang('user_lang.field_username'),'rules'=>'required|trim|'.
+                    'min_length['.config('\User\Config\UserConfig')->username_min_length.']|'.
+                    'max_length['.config('\User\Config\UserConfig')->username_max_length.']|'.
+                    'cb_unique_user['.$user_id.']'],
+                'user_usertype'=>['label'=>lang('user_lang.field_usertype'),'rules'=>'required|cb_not_null_user_type'],
+                'fk_entity_id'=>['label'=>lang('stock_lang.entity_name'),'rules'=>'required']];
+                $validationErrors=[
+                    'id'=>['cb_not_null_user' => lang('user_lang.msg_err_user_not_exist')],
+                    'user_name'=>['cb_unique_user' => lang('user_lang.msg_err_user_not_unique')],
+                    'user_usertype'=>['cb_not_null_user_type' => lang('user_lang.msg_err_user_type_not_exist')]];
+            if ($this->request->getPost('user_email')) {
+                $validationRules['user_email']=['label'=>lang('user_lang.field_email'),'rules'=>'required|valid_email|max_length['.config("\User\Config\UserConfig")->email_max_length.']'];
+            }
+            if ($user_id==0){
+                $validationRules['user_password']=['label'=>lang('user_lang.field_password'),'rules'=>'required|trim|'.
+                    'min_length['.config("\User\Config\UserConfig")->password_min_length.']|'.
+                    'max_length['.config("\User\Config\UserConfig")->password_max_length.']'];
+                $validationRules['user_password_again']=['label'=>lang('user_lang.field_password_confirm'),'rules'=>'required|trim|matches[user_password]|'.
+                    'min_length['.config("\User\Config\UserConfig")->password_min_length.']|'.
+                    'max_length['.config("\User\Config\UserConfig")->password_max_length.']'];
+            }
+            $validation->setRules($validationRules,$validationErrors);
+            $validation->withRequest($this->request)->run();
+            if(count($validation->getErrors())>0){
+                return $this->display_view('\Stock\admin\users\form_user',['user'=>$user_id>0?(new User_model())->find($user_id):null,'user_types'=>$userTypes,'entities'=>$this->entity_model->withDeleted()->findAll(),'errors'=>$validation->getErrors()]);
+            }
+            $userModel=new User_model();
+            $userEntityModel=new UserEntity();
+            $username=$this->request->getPost('user_name');
+            $email=$this->request->getPost('user_email');
+            $userType=$this->request->getPost('user_usertype');
+            $fk_entity_ids=$this->request->getPost('fk_entity_id');
+            $password=$this->request->getPost('user_password');
+            $fk_entity_ids=array_filter(explode(';',$fk_entity_ids));
+            //update user
+            if ($user_id>0){
+
+                $userModel->withDeleted()->update($user_id,['fk_user_type'=>$userType,'username'=>$username,'email'=>$email,'password'=>password_hash($password,PASSWORD_BCRYPT)]);
+                //see if entity is the same or is contained in user_entity
+                $fk_entities_associated=$userEntityModel->where('fk_user_id',$user_id)->findColumn('fk_entity_id');
+                if ($fk_entities_associated!=null) {
+                    $fk_entities_to_delete = array_diff($fk_entities_associated, $fk_entity_ids);
+                    //delete reference who aren't in update request
+                    foreach ($fk_entities_to_delete as $fk_entity_to_delete) {
+                        $userEntityModel->where('fk_entity_id', $fk_entity_to_delete)->where('fk_user_id', $user_id)->delete();
+                    }
+                }
+
+                //add reference who are in create request
+                foreach ($fk_entity_ids as $fk_entity_id){
+                    if (!in_array($fk_entity_id,$fk_entities_associated==null?[]:$fk_entities_associated)){
+                        /*d($fk_entity_ids);
+                        d($fk_entities_associated);
+                        dd($fk_entity_id);
+                        */
+                        $userEntityModel->insert(['fk_user_id'=>$user_id,'fk_entity_id'=>$fk_entity_id]);
+                    }
+                }
+                return redirect()->to(base_url('user/admin/list_user'));
+            }
+            //add user
+            else{
+                $user_id=$userModel->withDeleted()->insert(['fk_user_type'=>$userType,'username'=>$username,'email'=>$email,'password'=>password_hash($password,PASSWORD_BCRYPT)]);
+                foreach($fk_entity_ids as $fk_entity_id){
+                    $userEntityModel->insert(['fk_entity_id'=>$fk_entity_id,'fk_user_id'=>$user_id]);
+                }
+                return redirect()->to(base_url('user/admin/list_user'));
+            }
+            return redirect()->to(base_url('user/admin/list_user'));
+
+
+        }
+        else{
+            $user=null;
+            if ($user_id>0){
+                $user=(new User_model())->withDeleted()->find($user_id);
+                $user['entities_ids']=(new UserEntity())->where('fk_user_id',$user_id)->findColumn('fk_entity_id');
+            }
+            return $this->display_view('\Stock\admin\users\form_user',['user'=>$user,'user_types'=>$userTypes,'entities'=>$this->entity_model->withDeleted()->findAll()]);
+        }
+
+    }
+
+
 }
