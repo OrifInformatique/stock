@@ -449,7 +449,6 @@ class Item_model extends MyModel
         $where_itemsFilters .= $where_itemTagsFilter;
       }
 
-
       /*********************
       ** GET FILTERED ITEMS
       **********************/
@@ -462,7 +461,6 @@ class Item_model extends MyModel
         $items = $this->asArray()->where($where_itemsFilters)->find();
       }
 
-
       foreach ($items as &$item){
         $item['stocking_place'] = $this->getStockingPlace($item);
         $item['inventory_number'] = $this->getInventoryNumber($item);
@@ -471,8 +469,24 @@ class Item_model extends MyModel
         $item['image'] = $this->getImage($item);
         $item['image_path'] = $this->getImagePath($item);
       }
+      if (isset($filters['e'])&&count($filters['e'])>0){
+          foreach ($items as $itemidx=>$item){
+              foreach($filters['e'] as $entityidx=>$entity_id){
+              if ((isset($item['stocking_place'])&&$item['stocking_place']['fk_entity_id']==$entity_id)||
+                  (isset($item['item_group_id'])&&(new Item_group_model())->find($item['item_group_id'])['fk_entity_id']==$entity_id)){
+                  $item['fk_entity_id']=$entity_id;
+                  break;
+              }
+              else if($entityidx + 1 == count($filters['e'])){
+                  unset($items[$itemidx]);
+              }
+              else{
+                  continue;
+              }
 
-
+            }
+          }
+      }
       return $items;
     }
 

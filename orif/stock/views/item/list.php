@@ -1,8 +1,9 @@
-
 <div class="container">
 
     <!-- *** ADMIN *** -->
-    <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered) { ?>
+    <?php use Stock\Models\UserEntity;
+
+    if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered) { ?>
         <div class="row bottom-margin">
             <div class="col-12">
                 <!-- Button for new item -->
@@ -20,6 +21,49 @@
             <div class="col-sm-8 top-margin">
                 <!-- HEADING -->
                 <p class="bg-primary">&nbsp;<?php echo htmlspecialchars(lang('MY_application.text_search_filters')); ?></p>
+                <div class="row">
+                    <div id="e" class="col-sm-12">
+                        <!--ONLY FOR LOGGEDIN USER-->
+                        <?php if(isset($_SESSION['logged_in'])&&$_SESSION['logged_in']==true):?>
+                        <label><?=lang('stock_lang.entity_name')?></label>
+                        <button class="multiselect dropdown-toggle btn btn-outline-primary" type="button" style="width: 100%" data-toggle="dropdown" id="entity_selector"><?=lang('stock_lang.entity_name')?></button>
+                        <ul class="multiselect-container dropdown-menu">
+                            <?php
+                            //get entity number filter
+                            $fentity=[];
+                            foreach ((explode('&e[]=', $_SERVER['QUERY_STRING'])) as $particle) {
+                                if (is_numeric($particle)) {
+                                    $fentity[]=$particle;
+                                }
+                            }
+                            foreach ($entities as $entity){
+                                if (isset($_SESSION['user_id'])&&$_SESSION['user_access']<config('\User\Config\UserConfig')->access_lvl_admin&&
+                                    !in_array($entity['entity_id'],(new UserEntity())->where('fk_user_id',$_SESSION['user_id'])->findColumn('fk_entity_id'))){
+                                    continue;
+
+                                }
+                                $checked='';
+                                if (count($fentity)>0){
+                                    foreach ($fentity as $fentity_id){
+                                        if ($entity['entity_id']==$fentity_id){
+                                            $checked='checked';
+                                        }
+
+                                    }
+                                }
+                                if (isset($_SESSION['user_id']))
+                                count((new UserEntity())->where('fk_user_id',$_SESSION['user_id'])->findColumn('fk_entity_id'))==1?$checked='checked':null;
+                                echo "<li onclick='event.stopImmediatePropagation()'>
+                                        <a tabindex='0' class='select-option'><label class='checkbox' for='${entity['name']}'><input type='checkbox' id='${entity['name']}' value='${entity['entity_id']}' aria-label='${entity['name']}' onchange='add_entity_filter(this)' ${checked}><span class='checkbox'>${entity['name']}</span></label></a>
+                                       </li>";
+                            }
+                            ?>
+                        </ul>
+
+
+                <?php endif?>
+                </div>
+                </div>
 
                 <div class="row">
                     <!-- TEXT FILTER -->
@@ -34,6 +78,7 @@
                 </div>
 
                 <div class="row">
+
                     <!-- TAGS FILTER -->
                     <div id="t" class="col-sm-8 top-margin">
                         <?= form_label(lang('MY_application.field_tags'),'item_conditions-multiselect').form_dropdown('t[]', $item_tags, isset($_GET["t"])?$_GET["t"]:"",'id="item_tags-multiselect" multiple="multiple"');?>
@@ -248,13 +293,26 @@ function getFilters() {
         c+="&c[]="+val.value;
     });
 
+    //entity_filter
+    let e="";
+    let enttemparray=[];
+    (window.location.href.split('&e[]=')).forEach(value=>{
+        if (parseInt(value)>=0){
+            enttemparray.push(value);
+        }
+    });
+    enttemparray.forEach((val)=>{
+        e+='&e[]='+val;
+    });
+
     // Sort order
     o = $("#o .multiselect-container .active input")[0].value;
 
     // Sort ascending/descending
     ad = $("#ad .multiselect-container .active input")[0].value;
 
-    return "?ts="+ts+t+g+s+c+"&o="+o+"&ad="+ad;
+
+    return "?ts="+ts+t+g+s+c+"&o="+o+"&ad="+ad+e;
 }
 
 function display_item(item){
@@ -293,4 +351,24 @@ function display_item(item){
     card.append(card_div);
     return card;
 }
+function add_entity_filter(el){
+    if(window.location.href.includes('&e[]='+el.value)&&el.checked===false){
+        window.location.href=window.location.href.split('&e[]='+el.value).join('');
+    }
+    else{
+        (window.location.href+='&e[]='+el.value);
+    }
+}
+setTimeout(()=>{
+if (document.getElementById('entity_selector')!=null){
+    //when in the url no entity is set
+    if(window.location.search.split('e').length===1){
+        document.querySelector('#entity_selector').nextElementSibling.querySelectorAll('input').forEach((element)=>{
+            if (element.checked){
+                window.location.href.includes('?')?window.location.href+="&e[]="+element.value:window.location.href+="?e[]="+element.value;
+            }
+        })
+    }
+}
+})
 </script>

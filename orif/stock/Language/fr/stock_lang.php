@@ -113,5 +113,8 @@ return[
                                             Cela permet notamment de conserver l\'historique de ses actions<br><br>
                                             En cas de suppression toutes les information associées à ce site seront suprimées',
 
+/** ERRORS */
+'unauthorized_entity_list'              => 'Vous n\'êtes pas autorisé à consulter le(s) sites demandés',
+
 
 ];

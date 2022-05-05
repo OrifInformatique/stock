@@ -22,6 +22,7 @@ use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use PSR\Log\LoggerInterface;
 use App\Controllers\BaseController;
+use Stock\Models\Entity;
 use Stock\Models\Inventory_control_model;
 use Stock\Models\Item_model;
 use Stock\Models\Loan_model;
@@ -31,6 +32,7 @@ use Stock\Models\Item_group_model;
 use Stock\Models\Item_tag_link_model;
 use Stock\Models\Stocking_place_model;
 use Stock\Models\Supplier_model;
+use Stock\Models\UserEntity;
 use User\Models\User_model;
 
 class Item extends BaseController {
@@ -89,10 +91,11 @@ class Item extends BaseController {
         if (!isset($output["t"])) $output["t"] = '';
         if (!isset($output["o"])) $output["o"] = '';
         if (!isset($output["ad"])) $output["ad"] = '';
+        if (!isset($output["e"])) $output["e"] = '';
 
         // Get the amount of late loans
         $output['late_loans_count'] = count($this->loan_model->get_late_loans());
-
+        $output['entities']=(new Entity())->findAll();
         // Send the data to the View
         return $this->display_view('Stock\Views\item\list', $output);
     }
@@ -118,6 +121,27 @@ class Item extends BaseController {
         }
 
         // Get item(s) through filtered search on the database
+        // verify entity filter and restrict it to admin or user who is associated to entity
+        if (array_key_exists('e',$filters)){
+            //in the case user access is above admin
+            if (isset($_SESSION['user_id'])&&$_SESSION['user_access']<config('\User\Config\UserConfig')->access_lvl_admin){
+                foreach ($filters['e'] as $entity_filter)
+                if(in_array($entity_filter,(new UserEntity())->where('fk_user_id',$_SESSION['user_id'])->findColumn('fk_entity_id'))){
+                    continue;
+                }
+                else{
+                    $this->response->setStatusCode(400)->setContentType('application/json')->setBody(lang('stock_lang.unauthorized_entity_list'))->send();
+                    exit();
+                }
+
+            }
+            //in the case user is not loggedin
+            elseif (!isset($_SESSION['user_id'])){
+
+            }
+
+        }
+
         $output['items'] = $this->item_model->get_filtered($filters);
 
         // Verify the existence of the sort order key in filters
