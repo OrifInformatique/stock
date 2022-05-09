@@ -114,25 +114,19 @@ class Item extends BaseController {
             // No condition selected for filtering, default filtering for "functional" items
             $filters['c'] = array($this->config->functional_item_condition);
         }
-
-        // Sanitize $page parameter
-        if (empty($page) || !is_numeric($page) || $page<1) {
-            $page = 1;
-        }
-
         // Get item(s) through filtered search on the database
         // verify entity filter and restrict it to admin or user who is associated to entity
         if (array_key_exists('e',$filters)){
             //in the case user access is above admin
             if (isset($_SESSION['user_id'])&&$_SESSION['user_access']<config('\User\Config\UserConfig')->access_lvl_admin){
                 foreach ($filters['e'] as $entity_filter)
-                if(in_array($entity_filter,(new UserEntity())->where('fk_user_id',$_SESSION['user_id'])->findColumn('fk_entity_id'))){
-                    continue;
-                }
-                else{
-                    $this->response->setStatusCode(400)->setContentType('application/json')->setBody(lang('stock_lang.unauthorized_entity_list'))->send();
-                    exit();
-                }
+                    if(in_array($entity_filter,(new UserEntity())->where('fk_user_id',$_SESSION['user_id'])->findColumn('fk_entity_id'))){
+                        continue;
+                    }
+                    else{
+                        $this->response->setStatusCode(400)->setContentType('application/json')->setBody(lang('stock_lang.unauthorized_entity_list'))->send();
+                        exit();
+                    }
 
             }
             //in the case user is not loggedin
@@ -140,6 +134,11 @@ class Item extends BaseController {
 
             }
 
+        }
+
+        // Sanitize $page parameter
+        if (empty($page) || !is_numeric($page) || $page<1) {
+            $page = 1;
         }
 
         $output['items'] = $this->item_model->get_filtered($filters);
@@ -279,7 +278,7 @@ class Item extends BaseController {
 
             // Check if the user cancelled the form
             if(isset($_POST['submitCancel'])){
-                $tmp_image_file = glob($this->config->images_upload_path.$temp_image_name)[0];
+                $tmp_image_file = isset(glob($this->config->images_upload_path.$temp_image_name)[0])?glob($this->config->images_upload_path.$temp_image_name)[0]:null;
 
                 // Check if there is a temporary file, if yes then delete it
                 if($tmp_image_file != null || $tmp_image_file != false){
@@ -343,7 +342,6 @@ class Item extends BaseController {
                         $itemArray[$key] = $value;
                     }
                 }
-
                 // Turn Temporaty Image into a final one if there is one
                 if(file_exists($this->config->images_upload_path.$temp_image_name)){
                     rename($this->config->images_upload_path.$temp_image_name, $this->config->images_upload_path.$new_image_name);
@@ -384,7 +382,18 @@ class Item extends BaseController {
                 $this->supplier_model = new Supplier_model();
 
                 // Load the comboboxes options
-                $data['stocking_places'] = $this->stocking_place_model->findAll();
+                if (isset($_SESSION['user_access'])&&isset($_SESSION['user_id'])&&$_SESSION['user_access']<config('\User\Config\UserConfig')->access_lvl_admin){
+                    $userid=$_SESSION['user_id'];
+                    $userentitymodel=new UserEntity();
+                    $stockingplacemodel=new Stocking_place_model();
+                    $entitiesAssociated=$userentitymodel->where('fk_user_id',$userid)->findColumn('fk_entity_id');
+                    $data['stocking_places']=$stockingplacemodel->whereIn('fk_entity_id',$entitiesAssociated)->findAll();
+                }
+                else{
+                    $data['stocking_places'] = $this->stocking_place_model->findAll();
+
+                }
+                $data['entities']=(new \Stock\Models\Entity())->whereIn('entity_id',(new UserEntity())->where('fk_user_id',$_SESSION['user_id'])->findColumn('fk_entity_id'))->findAll();
                 $data['suppliers'] = $this->supplier_model->findAll();
                 $data['item_groups_name'] = $this->item_group_model->dropdown('name');
 
@@ -559,7 +568,13 @@ class Item extends BaseController {
                 }
             }
             unset($_SESSION['POST']);
-
+            if(isset($data['item_group_id'])){
+                $data['entity_id']=(new Item_group_model())->find($data['item_group_id'])['fk_entity_id'];
+            }
+            elseif(isset($data['stocking_place_id'])){
+                $data['entity_id']=(new Stocking_place_model())->find($data['stocking_place_id'])['fk_entity_id'];
+            }
+            $data['entities']=(new \Stock\Models\Entity())->whereIn('entity_id',(new UserEntity())->where('fk_user_id',$_SESSION['user_id'])->findColumn('fk_entity_id'))->findAll();
             $this->display_view('Stock\Views\item\form', $data);
         } else {
             // Update is not allowed

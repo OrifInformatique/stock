@@ -941,10 +941,15 @@ class Admin extends BaseController
             $fk_entity_ids=$this->request->getPost('fk_entity_id');
             $password=$this->request->getPost('user_password');
             $fk_entity_ids=array_filter(explode(';',$fk_entity_ids));
+            $userdata=[];
+            $username!=null?$userdata['username']=$username:null;
+            $email!=null?$userdata['email']=$email:null;
+            $userType!=null?$userdata['fk_user_type']=$userType:null;
+            $password!=null?$userdata['password']=password_hash($password,PASSWORD_BCRYPT):null;
             //update user
             if ($user_id>0){
 
-                $userModel->withDeleted()->update($user_id,['fk_user_type'=>$userType,'username'=>$username,'email'=>$email,'password'=>password_hash($password,PASSWORD_BCRYPT)]);
+                $userModel->withDeleted()->update($user_id,$userdata);
                 //see if entity is the same or is contained in user_entity
                 $fk_entities_associated=$userEntityModel->where('fk_user_id',$user_id)->findColumn('fk_entity_id');
                 if ($fk_entities_associated!=null) {
@@ -969,7 +974,7 @@ class Admin extends BaseController
             }
             //add user
             else{
-                $user_id=$userModel->withDeleted()->insert(['fk_user_type'=>$userType,'username'=>$username,'email'=>$email,'password'=>password_hash($password,PASSWORD_BCRYPT)]);
+                $user_id=$userModel->withDeleted()->insert($userdata);
                 foreach($fk_entity_ids as $fk_entity_id){
                     $userEntityModel->insert(['fk_entity_id'=>$fk_entity_id,'fk_user_id'=>$user_id]);
                 }
