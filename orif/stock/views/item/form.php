@@ -387,10 +387,12 @@ function initItemGroup(el){
         else if (element.dataset.fk_entity===fk_entity_id){
             element.style.display='unset';
             element.parentElement.value=element.value;
-            element.selected=true;
         }
         else {
             element.style.display='none';
+        }
+        if (element.value==='<?=$item_group_id?>'){
+            element.selected=true;
         }
     });
 }
