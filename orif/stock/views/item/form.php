@@ -391,7 +391,7 @@ function initItemGroup(el){
         else {
             element.style.display='none';
         }
-        if (element.value==='<?=$item_group_id?>'){
+        if (element.value==='<?=isset($item_group_id)?$item_group_id:'NONE'?>'){
             element.selected=true;
         }
     });
