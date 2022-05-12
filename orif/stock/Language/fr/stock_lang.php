@@ -14,6 +14,7 @@ return[
 'title_suppliers'                       => 'Liste des fournisseurs',
 'title_item_groups'                     => 'Liste des groupes d\'objets',
 'title_entity_list'                     => 'Liste des sites',
+'title_excel_export'                    => 'Exportation Excel',
 
 
 // Buttons
@@ -32,6 +33,7 @@ return[
 'btn_delete_supplier'                   => 'Supprimer ce fournisseur',
 'btn_soft_delete_supplier'              => 'Désactiver ce fournisseur',
 'btn_soft_delete_item_group'            => 'Désactiver ce group d\'objet',
+'btn_export'                            => 'Exporter',
 
 
 // Fields labels
@@ -116,5 +118,9 @@ return[
 /** ERRORS */
 'unauthorized_entity_list'              => 'Vous n\'êtes pas autorisé à consulter le(s) sites demandés',
 
+/** BTN */
+'excel_export_btn'                      => 'Exporter',
+/** LABELS **/
+'lbl_filter_to_use'                     => 'Filtre à utiliser pour l\'exportation'
 
 ];

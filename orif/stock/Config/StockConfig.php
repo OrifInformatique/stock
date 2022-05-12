@@ -42,4 +42,6 @@ class StockConfig extends BaseConfig
     public $database_datetime_format    =   'Y-m-d H:i:s';
     public $image_upload_width          =   360;
     public $image_upload_height         =   360;
+
+    public $access_lvl_manager          =   2;
 }
