@@ -134,7 +134,7 @@
                 <?php if (isset($_SESSION['user_access'])&&$_SESSION['user_access']>=config('\Stock\Config\StockConfig')->access_lvl_manager):?>
                 <div class="row pl-2 pr-2">
                     <div class="bg-primary w-100 mt-1 pl-1 mb-1"><?=lang('stock_lang.title_excel_export')?></div>
-                    <a href="<?=base_url('stock/export_excel')?>" class="btn btn-primary w-100"><?=lang('stock_lang.excel_export_btn')?><i class="bi bi-file-earmark-excel-fill ml-2" style="color: #983030"></i></a>
+                    <a href="<?=base_url('stock/export_excel')?>" class="btn btn-primary w-100"><?=lang('stock_lang.excel_export_btn')?><i class="bi bi-file-earmark-excel-fill ml-2" style="color: #217346"></i></a>
                 </div>
                 <?php endif;?>
 
