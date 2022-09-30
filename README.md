@@ -15,7 +15,7 @@ It is based on the CodeIgniter 4.x framework.
 
 1. Download [our latest release](https://github.com/OrifInformatique/stock/releases)
 2. Unzip your download in your project's directory (in your local PHP server)
-3. Rename .env_dist file to .env and adapt it for your server's parameters
+3. Copy .env_dist file and rename to .env, then adapt it for your server's parameters
 ```
 FOR EXAMPLE
 
