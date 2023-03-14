@@ -121,6 +121,9 @@ return[
 /** BTN */
 'excel_export_btn'                      => 'Exporter',
 /** LABELS **/
-'lbl_filter_to_use'                     => 'Filtre à utiliser pour l\'exportation'
+'lbl_filter_to_use'                     => 'Filtre à utiliser pour l\'exportation',
+
+// Warning
+'no_entity_excel_export'                => 'Vous n\'avez pas accès à la fonctionnalité d\'exportation en Excel, car vous n\'êtes pas encore lié à un site.'
 
 ];
