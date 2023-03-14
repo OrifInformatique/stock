@@ -38,6 +38,9 @@
         <div class="alert alert-warning" role="alert">
             <?= lang('stock_lang.no_entity_excel_export'); ?>
         </div>
+        <div class="row justify-content-end align-items-center form-group">
+            <a href="<?=base_url()?>" class="btn btn-primary mr-3" style="max-width: 100px" ><?=lang('common_lang.btn_back')?></a>
+        </div>
     <?php endif; ?>
 </div>
 <script>
