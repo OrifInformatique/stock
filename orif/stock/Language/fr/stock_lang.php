@@ -124,6 +124,7 @@ return[
 'lbl_filter_to_use'                     => 'Filtre à utiliser pour l\'exportation',
 
 // Warning
+'no_entity'                             => 'Aucun site n\'a été créé jusqu\'à présent, vous ne pouvez donc pas utiliser la fonction d\'exportation avec les sites.',
 'no_entity_excel_export'                => 'Vous n\'avez pas accès à la fonctionnalité d\'exportation en Excel, car vous n\'êtes pas encore lié à un site.'
 
 ];

@@ -1,4 +1,9 @@
 <div class="container">
+    <?php if (!is_null($entities) && count($entities) == 0): ?>
+        <div class="alert alert-warning" role="alert">
+            <?= lang('stock_lang.no_entity'); ?>
+        </div>
+    <?php endif; ?>
     <?php if (!(is_null($entities) && is_null($item_groups))): ?>
         <h2><?=lang('stock_lang.title_excel_export')?></h2>
         <form action="javascript:void(0)" onsubmit="submitRequest()">
@@ -10,20 +15,20 @@
                 <?php endforeach;?>
             </select>
             <div class="form_group entity_container">
-            <label><?=lang('stock_lang.entity_name')?></label>
-            <select class="form-control pl-2 entity-selector" id="entity_id" name="entity_id">
-                <?php foreach ($entities as $entity): ?>
-                    <option value="<?=$entity['entity_id']?>"><?=$entity['name']?></option>
-                <?php endforeach;?>
-            </select>
+                <label><?=lang('stock_lang.entity_name')?></label>
+                <select class="form-control pl-2 entity-selector" id="entity_id" name="entity_id">
+                    <?php foreach ($entities as $entity): ?>
+                        <option value="<?=$entity['entity_id']?>"><?=$entity['name']?></option>
+                    <?php endforeach;?>
+                </select>
             </div>
             <div class="form-group item_group_container d-none">
-            <label><?=lang('stock_lang.btn_item_groups')?></label>
-            <select class="form-control pl-2 item_groups_selector" id="item_group_id" name="item_group_id">
-                <?php foreach ($item_groups as $item_group): ?>
-                    <option value="<?=$item_group['item_group_id']?>"><?=$item_group['name']?></option>
-                <?php endforeach;?>
-            </select>
+                <label><?=lang('stock_lang.btn_item_groups')?></label>
+                <select class="form-control pl-2 item_groups_selector" id="item_group_id" name="item_group_id">
+                    <?php foreach ($item_groups as $item_group): ?>
+                        <option value="<?=$item_group['item_group_id']?>"><?=$item_group['name']?></option>
+                    <?php endforeach;?>
+                </select>
             </div>
         </div>
             <div class="row justify-content-end align-items-center form-group mt-2 pl-2 pr-4">

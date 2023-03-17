@@ -14,6 +14,55 @@
     <?php } ?>
     <!-- *** END OF ADMIN *** -->
 
+    <div class="row pb-3">
+        <div id="e" class="col-sm-12">
+            <!--ONLY FOR LOGGEDIN USER-->
+            <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true):?>
+                <label><?=lang('stock_lang.entity_name')?></label>
+                <button class="multiselect dropdown-toggle btn btn-outline-primary" type="button" style="width: 100%" data-toggle="dropdown" id="entity_selector"><?=lang('stock_lang.entity_name')?></button>
+                <ul class="multiselect-container dropdown-menu">
+                    <?php
+                    //get entity number filter
+                    $fentity=[];
+                    foreach ((explode('&e[]=', $_SERVER['QUERY_STRING'])) as $particle) {
+                        if (is_numeric($particle)) {
+                            $fentity[] = $particle;
+                        }
+                    }
+                    foreach ($entities as $entity) {
+                        if (isset($_SESSION['user_id']) && $_SESSION['user_access'] < config('\User\Config\UserConfig')->access_lvl_admin
+                            && !in_array($entity['entity_id'], (new UserEntity())->where('fk_user_id', $_SESSION['user_id'])->findColumn('fk_entity_id'))) {
+                            continue;
+                        }
+                        $checked = '';
+                        if (count($fentity) > 0){
+                            foreach ($fentity as $fentity_id){
+                                if ($entity['entity_id'] == $fentity_id) {
+                                    $checked = 'checked';
+                                }
+                            }
+                        }
+                        if (isset($_SESSION['user_id'])) {
+                            $entities = (new UserEntity())->where('fk_user_id', $_SESSION['user_id'])->findColumn('fk_entity_id');
+                            if (!is_null($entities)) {
+                                count($entities) == 1 ? $checked = 'checked' : null;
+                                echo "<li onclick=\"event.stopImmediatePropagation()\">
+                                        <a tabindex=\"0\" class=\"select-option\">
+                                            <label class=\"checkbox\" for=\"{$entity['name']}\">
+                                            <input type=\"checkbox\" id=\"{$entity['name']}\" value=\"{$entity['entity_id']}\" aria-label=\"{$entity['name']}\" onchange=\"add_entity_filter(this)\" {$checked}>
+                                            <span class=\"checkbox\">{$entity['name']}</span>
+                                            </label>
+                                        </a>
+                                    </li>";
+                            }
+                        }
+                    }
+                    ?>
+                </ul>
+            <?php endif?>
+        </div>
+    </div>
+
     <!-- FILTERS AND SORT FORM -->
     <form id="filters" class="" style="overflow: visible;" method="get" action="<?=base_url("item/index/1") . "/"?>">
         <div class="row">
@@ -21,49 +70,7 @@
             <div class="col-sm-8 top-margin">
                 <!-- HEADING -->
                 <p class="bg-primary">&nbsp;<?php echo htmlspecialchars(lang('MY_application.text_search_filters')); ?></p>
-                <div class="row">
-                    <div id="e" class="col-sm-12">
-                        <!--ONLY FOR LOGGEDIN USER-->
-                        <?php if(isset($_SESSION['logged_in'])&&$_SESSION['logged_in']==true):?>
-                        <label><?=lang('stock_lang.entity_name')?></label>
-                        <button class="multiselect dropdown-toggle btn btn-outline-primary" type="button" style="width: 100%" data-toggle="dropdown" id="entity_selector"><?=lang('stock_lang.entity_name')?></button>
-                        <ul class="multiselect-container dropdown-menu">
-                            <?php
-                            //get entity number filter
-                            $fentity=[];
-                            foreach ((explode('&e[]=', $_SERVER['QUERY_STRING'])) as $particle) {
-                                if (is_numeric($particle)) {
-                                    $fentity[]=$particle;
-                                }
-                            }
-                            foreach ($entities as $entity){
-                                if (isset($_SESSION['user_id'])&&$_SESSION['user_access']<config('\User\Config\UserConfig')->access_lvl_admin&&
-                                    !in_array($entity['entity_id'],(new UserEntity())->where('fk_user_id',$_SESSION['user_id'])->findColumn('fk_entity_id'))){
-                                    continue;
-
-                                }
-                                $checked='';
-                                if (count($fentity)>0){
-                                    foreach ($fentity as $fentity_id){
-                                        if ($entity['entity_id']==$fentity_id){
-                                            $checked='checked';
-                                        }
-
-                                    }
-                                }
-                                if (isset($_SESSION['user_id']))
-                                count((new UserEntity())->where('fk_user_id',$_SESSION['user_id'])->findColumn('fk_entity_id'))==1?$checked='checked':null;
-                                echo "<li onclick='event.stopImmediatePropagation()'>
-                                        <a tabindex='0' class='select-option'><label class='checkbox' for='${entity['name']}'><input type='checkbox' id='${entity['name']}' value='${entity['entity_id']}' aria-label='${entity['name']}' onchange='add_entity_filter(this)' ${checked}><span class='checkbox'>${entity['name']}</span></label></a>
-                                       </li>";
-                            }
-                            ?>
-                        </ul>
-
-
-                <?php endif?>
-                </div>
-                </div>
+                
 
                 <div class="row">
                     <!-- TEXT FILTER -->
@@ -103,7 +110,7 @@
             <!-- SORT ORDER -->
             <div class="col-sm-4 top-margin">
                 <!-- HEADING -->
-                <p class="bg-primary">&nbsp;<?php echo htmlspecialchars(lang('MY_application.text_sort_order')); ?></p>
+                <p class="bg-primary mt-3 mt-sm-0">&nbsp;<?php echo htmlspecialchars(lang('MY_application.text_sort_order')); ?></p>
 
                 <div class="row">
                     <!-- SORT ORDER -->
@@ -132,10 +139,8 @@
                     </a>
                 </div>
                 <?php if (isset($_SESSION['user_access'])&&$_SESSION['user_access']>=config('\Stock\Config\StockConfig')->access_lvl_manager):?>
-                <div class="row pl-2 pr-2">
-                    <div class="bg-primary w-100 mt-1 pl-1 mb-1"><?=lang('stock_lang.title_excel_export')?></div>
-                    <a href="<?=base_url('stock/export_excel')?>" class="btn btn-primary w-100"><?=lang('stock_lang.excel_export_btn')?><i class="bi bi-file-earmark-excel-fill ml-2" style="color: #217346"></i></a>
-                </div>
+                    <p class="bg-primary mt-1 pl-1 mb-1"><?=lang('stock_lang.title_excel_export')?></p>
+                    <a href="<?=base_url('stock/export_excel')?>" class="btn btn-primary col-sm-12"><?=lang('stock_lang.excel_export_btn')?><i class="bi bi-file-earmark-excel-fill ml-2" style="color: #217346"></i></a>
                 <?php endif;?>
 
             </div>
@@ -144,7 +149,7 @@
     <!-- END OF FILTERS AND SORT FORM -->
 
     <!-- PAGINATION -->
-    <div class="row"><div class="col-12">
+    <div class="row"><div class="col-12 text-center">
         <div id="pagination_top"></div>
     </div></div>
 
@@ -158,7 +163,7 @@
     </div>
 
     <!-- PAGINATION -->
-    <div class="row"><div class="col-12">
+    <div class="row"><div class="col-12 text-center">
         <div id="pagination_bottom"></div>
     </div></div>
 </div>
