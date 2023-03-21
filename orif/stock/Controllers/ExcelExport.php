@@ -182,6 +182,8 @@ class ExcelExport extends \App\Controllers\BaseController
         // Sum of results
         $result = $nb_items_by_item_group + $nb_items_by_stocking_place;
 
+        // Makes sure the debug toolbar is not sent with the JSON
+        $this->response->setContentType('Content-Type: application/json');
         return json_encode([
             'nb_items' => $result
         ]);
