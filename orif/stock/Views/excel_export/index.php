@@ -1,4 +1,7 @@
 <div class="container">
+    <div class="d-none alert alert-warning" id="no_items" role="alert">
+        <?= lang('stock_lang.entity_has_no_items'); ?>
+    </div>
     <?php if (!is_null($entities) && count($entities) == 0): ?>
         <div class="alert alert-warning" role="alert">
             <?= lang('stock_lang.no_entity'); ?>
@@ -16,7 +19,7 @@
             </select>
             <div class="form_group entity_container">
                 <label><?=lang('stock_lang.entity_name')?></label>
-                <select class="form-control pl-2 entity-selector" id="entity_id" name="entity_id">
+                <select class="form-control pl-2 entity-selector" id="entity_id" name="entity_id" onchange="checkEntityItems()">
                     <?php foreach ($entities as $entity): ?>
                         <option value="<?=$entity['entity_id']?>"><?=$entity['name']?></option>
                     <?php endforeach;?>
@@ -33,7 +36,7 @@
         </div>
             <div class="row justify-content-end align-items-center form-group mt-2 pl-2 pr-4">
                 <a href="<?=base_url()?>" class="mr-3" style="max-width: 100px" ><?=lang('common_lang.btn_cancel')?></a>
-                <input type="submit" class="form-control btn btn-primary" value="<?=lang('stock_lang.btn_export')?>" style="max-width: 100px" />
+                <input type="submit" id="btn_submit" class="form-control btn btn-primary" value="<?=lang('stock_lang.btn_export')?>" style="max-width: 100px" />
             </div>
         </form>
         <div class="loaderContainer d-none">
@@ -49,6 +52,10 @@
     <?php endif; ?>
 </div>
 <script>
+    window.onload = () => {
+        checkEntityItems();
+    }
+
     function selectFilter(element) {
         if(element.value==="1") {
             document.querySelector('.entity_container').classList.remove('d-none');
@@ -103,5 +110,22 @@
         link.click();
         loaderContainer.classList.add('d-none');
         loaderContainer.querySelector('#loader').style.animation='';
+    }
+
+    async function checkEntityItems() {
+        let entityId = document.getElementById("entity_id").value;
+        let url = `<?= base_url('stock/export_excel/has_items'); ?>/${entityId}`;
+        let response = await fetch(url, {method: 'POST'});
+        let alert = document.getElementById('no_items');
+        let submitButton = document.getElementById('btn_submit');
+        const json = await response.json();
+
+        if (json.nb_items == 0) {
+            alert.classList.remove('d-none');
+            submitButton.disabled = true;
+        } else {
+            alert.classList.add('d-none');
+            submitButton.disabled = false;
+        }
     }
 </script>

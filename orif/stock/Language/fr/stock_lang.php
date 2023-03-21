@@ -125,6 +125,7 @@ return[
 
 // Warning
 'no_entity'                             => 'Aucun site n\'a été créé jusqu\'à présent, vous ne pouvez donc pas utiliser la fonction d\'exportation avec les sites.',
-'no_entity_excel_export'                => 'Vous n\'avez pas accès à la fonctionnalité d\'exportation en Excel, car vous n\'êtes pas encore lié à un site.'
+'no_entity_excel_export'                => 'Vous n\'avez pas accès à la fonctionnalité d\'exportation en Excel, car vous n\'êtes pas encore lié à un site.',
+'entity_has_no_items'                   => 'Le site que vous avez sélectionné n\'est lié à aucun objet.',
 
 ];
