@@ -37,6 +37,7 @@ class StockConfig extends BaseConfig
     public $image_picture_suffix        =   '_picture';
     public $image_tmp_suffix            =   '_tmp';
     public $images_upload_path          =   'uploads/images/';
+    public $files_upload_path           =   'uploads/files/';
     public $items_per_page              =   48;
     public $database_date_format        =   'Y-m-d';
     public $database_datetime_format    =   'Y-m-d H:i:s';

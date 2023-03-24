@@ -37,16 +37,35 @@ use User\Models\User_model;
 
 class Item extends BaseController {
 
-    /* MY_Controller variables definition */
+    // Properties
     protected $access_level = "*";
+    private Item_model $item_model;
+    private Loan_model $loan_model;
+    private Item_tag_link_model $item_tag_link_model;
+    private Inventory_control_model $inventory_control_model;
+    private Item_tag_model $item_tag_model;
+    private Item_condition_model $item_condition_model;
+    private Item_group_model $item_group_model;
+    private Stocking_place_model $stocking_place_model;
+    private Supplier_model $supplier_model;
+    private User_model $user_model;
+    private $config;
 
     /**
      * Constructor
      */
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger) {
+        // Set Access level before calling parent constructor
+        // Accessibility reserved to admin users
         $this->access_level = "*";
         parent::initController($request, $response, $logger);
 
+        // Load required helpers
+        helper('sort');
+        helper('form');
+        helper('\Stock\Helpers\MY_date');
+
+        // Load required models 
         $this->item_model = new Item_model();
         $this->loan_model = new Loan_model();
         $this->item_tag_link_model = new Item_tag_link_model();
@@ -56,9 +75,6 @@ class Item extends BaseController {
         $this->item_group_model = new Item_group_model();
         $this->stocking_place_model = new Stocking_place_model();
         $this->config = config('\Stock\Config\StockConfig');
-        helper('sort');
-        helper('form');
-        helper('\Stock\Helpers\MY_date');
     }
 
     /**
@@ -602,15 +618,34 @@ class Item extends BaseController {
                 $this->item_model->update($id, array("description" => "FAC"));
 
                 $item = $this->item_model->find($id);
+
+                // Delete image file
                 if (!is_null($item['image']) && $item['image'] != $this->config->item_no_image) {
                     $items = $this->item_model->asArray()->where('image', $item['image'])->findAll();
+                    $path_to_image = ROOTPATH.'public/' . $this->config->images_upload_path . $item['image'];
+                    $image_file_exists = file_exists($path_to_image);
+
                     // Change this if soft deleting items is enabled
                     // Check if any other item uses this image
-                    if (count($items) < 2) {
-                        unlink(ROOTPATH.'public/'.$this->config->images_upload_path.$item['image']);
+                    if ($image_file_exists && count($items) < 2) {
+                        unlink($path_to_image);
                     }
                 }
 
+                // Delete linked file
+                if (!is_null($item['linked_file']) && $item['linked_file']) {
+                    $items = $this->item_model->asArray()->where('linked_file', $item['linked_file'])->findAll();
+                    $path_to_file = ROOTPATH.'public/' . $this->config->files_upload_path . $item['linked_file'];
+                    $linked_file_exists = file_exists($path_to_file);
+
+                    // Change this if soft deleting items is enabled
+                    // Check if any other item uses this linked_file
+                    if ($linked_file_exists && count($items) < 2) {
+                        unlink($path_to_file);
+                    }
+                }
+
+                $this->inventory_control_model->where('item_id', $id)->delete();
                 $this->item_tag_link_model->where('item_id', $id)->delete();
                 $this->loan_model->where('item_id', $id)->delete();
                 $this->item_model->delete($id);
