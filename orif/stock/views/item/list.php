@@ -29,19 +29,22 @@
                             $fentity[] = $particle;
                         }
                     }
-                    foreach ($entities as $entity) {
+
+                    foreach ($entities as $key => $entity) {
                         if (isset($_SESSION['user_id']) && $_SESSION['user_access'] < config('\User\Config\UserConfig')->access_lvl_admin
                             && !in_array($entity['entity_id'], (new UserEntity())->where('fk_user_id', $_SESSION['user_id'])->findColumn('fk_entity_id'))) {
                             continue;
                         }
+
                         $checked = '';
-                        if (count($fentity) > 0){
-                            foreach ($fentity as $fentity_id){
+                        /* if (count($fentity) > 0) {
+                            foreach ($fentity as $fentity_id) {
                                 if ($entity['entity_id'] == $fentity_id) {
                                     $checked = 'checked';
                                 }
                             }
-                        }
+                        } */
+
                         if (isset($_SESSION['user_id'])) {
                             $entities = (new UserEntity())->where('fk_user_id', $_SESSION['user_id'])->findColumn('fk_entity_id');
                             if (!is_null($entities)) {
@@ -49,7 +52,7 @@
                                 echo "<li onclick=\"event.stopImmediatePropagation()\">
                                         <a tabindex=\"0\" class=\"select-option\">
                                             <label class=\"checkbox\" for=\"{$entity['name']}\">
-                                            <input type=\"checkbox\" id=\"{$entity['name']}\" value=\"{$entity['entity_id']}\" aria-label=\"{$entity['name']}\" onchange=\"add_entity_filter(this)\" {$checked}>
+                                            <input type=\"checkbox\" id=\"{$entity['name']}\" value=\"{$entity['entity_id']}\" aria-label=\"{$entity['name']}\" onload=\"is_entity_filter(this)\" onchange=\"add_entity_filter(this)\">
                                             <span class=\"checkbox\">{$entity['name']}</span>
                                             </label>
                                         </a>
@@ -363,14 +366,24 @@ function display_item(item){
     card.append(card_div);
     return card;
 }
-function add_entity_filter(el){
-    if(window.location.href.includes('&e[]='+el.value)&&el.checked===false){
-        window.location.href=window.location.href.split('&e[]='+el.value).join('');
-    }
-    else{
-        (window.location.href+='&e[]='+el.value);
+
+function add_entity_filter(el) {
+    if (window.location.href.includes('&e[]=' + el.value)) {
+        window.location.href=window.location.href.split('&e[]=' + el.value).join('');
+    } else {
+        (window.location.href += '&e[]=' + el.value);
     }
 }
+
+function is_entity_filter(el) {
+    console.log('test');
+    if (window.location.href.includes('&e[]=' + el.value)) {
+        el.checked = true;
+    } else {
+        el.checked = false;
+    }
+}
+
 setTimeout(()=>{
 if (document.getElementById('entity_selector')!=null){
     //when in the url no entity is set

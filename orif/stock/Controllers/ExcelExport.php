@@ -167,25 +167,29 @@ class ExcelExport extends \App\Controllers\BaseController
      * @return void
      */
     public function has_items($entityId) {
-        // Count result by item_group
+        // Get result by item_group
         $builder = $this->db->table('entity');
         $entity = $builder->where('entity_id', $entityId);
         $join_item_group = $entity->join('item_group', 'item_group.fk_entity_id = entity.entity_id', 'inner');
-        $join_item_by_item_group = $join_item_group->join('item', 'item.item_group_id = item_group.item_group_id', 'inner');
-        $nb_items_by_item_group = $join_item_by_item_group->countAllResults();
+        $join_item_by_item_group = $join_item_group->join('item', 'item.item_group_id = item_group.item_group_id', 'inner')
+            ->distinct()->select('item.name');
+        $items_by_item_group = $join_item_by_item_group->get()->getResult('array');
 
-        // Count items by stocking_place
+        // Get items by stocking_place
+        $builder = $this->db->table('entity');
+        $entity = $builder->where('entity_id', $entityId);
         $join_stocking_place = $entity->join('stocking_place', 'stocking_place.fk_entity_id = entity.entity_id', 'inner');
-        $join_item_by_stocking_place = $join_stocking_place->join('item', 'item.stocking_place_id = stocking_place.stocking_place_id', 'inner');
-        $nb_items_by_stocking_place = $join_item_by_stocking_place->countAllResults();
+        $join_item_by_stocking_place = $join_stocking_place->join('item', 'item.stocking_place_id = stocking_place.stocking_place_id', 'inner')
+            ->distinct()->select('item.name');
+        $items_by_stocking_place = $join_item_by_stocking_place->get()->getResult('array');
 
         // Sum of results
-        $result = $nb_items_by_item_group + $nb_items_by_stocking_place;
+        $nb_items = count(array_unique(array_merge($items_by_item_group, $items_by_stocking_place), SORT_REGULAR));
 
         // Makes sure the debug toolbar is not sent with the JSON
         $this->response->setContentType('Content-Type: application/json');
         return json_encode([
-            'nb_items' => $result
+            'nb_items' => $nb_items
         ]);
     }
 }
