@@ -127,6 +127,7 @@ return[
 'no_entity'                             => 'Aucun site n\'a été créé jusqu\'à présent, vous ne pouvez donc pas utiliser la fonction d\'exportation avec les sites.',
 'no_entity_excel_export'                => 'Vous n\'avez pas accès à la fonctionnalité d\'exportation en Excel, car vous n\'êtes pas encore lié à un site.',
 'entity_has_no_items'                   => 'Le site que vous avez sélectionné n\'est lié à aucun objet.',
-'msg_no_entities_exist'                 => 'Aucun site n\'a été créé, vous visionnez donc tous les objets',
+'msg_no_entities_exist'                 => 'Aucun site n\'a été créé, par défaut tous les objets sont affichés',
+'msg_user_has_no_entities'              => 'Vous n\'êtes lié à aucun site, veuillez contacter votre administrateur',
 
 ];

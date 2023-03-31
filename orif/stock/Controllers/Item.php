@@ -50,6 +50,7 @@ class Item extends BaseController {
     protected Supplier_model $supplier_model;
     protected User_model $user_model;
     protected Entity $entity_model;
+    protected UserEntity $user_entity_model;
     protected $config;
 
     /**
@@ -76,6 +77,7 @@ class Item extends BaseController {
         $this->item_group_model = new Item_group_model();
         $this->stocking_place_model = new Stocking_place_model();
         $this->entity_model = new Entity();
+        $this->user_entity_model = new UserEntity();
         $this->config = config('\Stock\Config\StockConfig');
     }
 
@@ -114,6 +116,10 @@ class Item extends BaseController {
         // Get the amount of late loans
         $output['late_loans_count'] = count($this->loan_model->get_late_loans());
         $output['entities'] = $this->entity_model->dropdown('name');
+
+        if (isset($_SESSION['user_id'])) {
+            $output['has_entities'] = count($this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->findAll()) > 0;
+        }
 
         // Send the data to the View
         return $this->display_view('Stock\Views\item\list', $output);
