@@ -995,4 +995,9 @@ class Item extends BaseController {
         return $validation;
     }
 
+    public function return_loan() {
+        echo 'Retour du prêt';
+        
+    }
+
 }
