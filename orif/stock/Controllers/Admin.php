@@ -722,12 +722,12 @@ class Admin extends BaseController
         // VALIDATION
         $validationRules = [
           'name'            => 'required|min_length[2]|max_length[45]|is_unique[stocking_place.name]',
-          'short'           => 'required|max_length['.config('\Stock\Config\StockConfig')->stocking_short_max_length.']|is_unique[stocking_place.short_name]'
+          'short_name'      => 'required|max_length['.config('\Stock\Config\StockConfig')->stocking_short_max_length.']|is_unique[stocking_place.name]'
           ];
 
         if($this->validate($validationRules))
         {
-          $this->item_groups_model->insert($_POST);
+          $this->item_group_model->insert($_POST);
 
           return redirect()->to("/stock/admin/view_item_groups");
         }
