@@ -91,9 +91,14 @@ $validation=\Config\Services::validation();
 
                                     }
                                 }
-                                echo "<li onclick='event.stopImmediatePropagation()'>
-                                        <a tabindex='0' class='select-option'><label class='checkbox' for='${entity['name']}'><input type='checkbox' id='${entity['name']}' value='${entity['entity_id']}' aria-label='${entity['name']}' onchange='setfkentity(this)' ${checked}><span class='checkbox'>${entity['name']}</span></label></a>
-                                       </li>";
+                                echo "<li onclick=\"event.stopImmediatePropagation()\">
+                                        <a tabindex=\"0\" class=\"select-option\">
+                                            <label class=\"checkbox\" for=\"{$entity['name']}\">
+                                                <input type=\"checkbox\" id=\"{$entity['name']}\" value=\"{$entity['entity_id']}\" aria-label=\"{$entity['name']}\" onchange=\"setfkentity(this)\" {$checked}>
+                                                <span class=\"checkbox\">{$entity['name']}</span>
+                                            </label>
+                                        </a>
+                                    </li>";
                             }
                             ?>
                         </ul>

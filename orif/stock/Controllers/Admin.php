@@ -25,10 +25,20 @@ use User\Models\User_type_model;
 
 class Admin extends BaseController
 {
+    // Properties
+    protected Item_tag_model $item_tag_model;
+    protected Item_tag_link_model $item_tag_link_model;
+    protected Stocking_place_model $stocking_place_model;
+    protected Supplier_model $supplier_model;
+    protected Item_group_model $item_group_model;
+    protected Item_model $item_model;
+    protected Entity $entity_model;
+    protected $db;
+    protected $validation;
+
     /**
      * Constructor
      */
-    private Entity $entity_model;
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
         // Set Access level before calling parent constructor
@@ -51,7 +61,7 @@ class Admin extends BaseController
         $this->supplier_model         = new Supplier_model();
         $this->item_group_model       = new Item_group_model();
         $this->item_model             = new Item_model();
-        $this->entity_model=new Entity();
+        $this->entity_model           = new Entity();
 
         //get db instance
         $this->db = \CodeIgniter\Database\Config::connect();
@@ -68,42 +78,43 @@ class Admin extends BaseController
     */
     public function view_tags($with_deleted = false)
     {
-      if ($with_deleted)
-      {
-        $data['items'] = $this->item_tag_model->withDeleted()->findAll();
-
-        // Add the "active" info for each tag
-        foreach ($data['items'] as &$tag)
+        if ($with_deleted)
         {
-          $tag['active'] = isset($tag['archive']) ? lang('common_lang.no') : lang('common_lang.yes');
+            $data['items'] = $this->item_tag_model->withDeleted()->findAll();
+
+            // Add the "active" info for each tag
+            foreach ($data['items'] as &$tag)
+            {
+            $tag['active'] = isset($tag['archive']) ? lang('common_lang.no') : lang('common_lang.yes');
+            }
+            $data['columns'] = ['name'      => lang('stock_lang.field_name'),
+                                'short_name'  => lang('stock_lang.field_short_name'),
+                                'active'      => lang('stock_lang.field_active'),
+                            ];
         }
-        $data['columns'] = ['name'      => lang('stock_lang.field_name'),
-                            'short_name'  => lang('stock_lang.field_short_name'),
-                            'active'      => lang('stock_lang.field_active'),
-                           ];
-      }
-      else
-      {
-        $data['items'] = $this->item_tag_model->findAll();
+        else
+        {
+            $data['items'] = $this->item_tag_model->findAll();
 
-        $data['columns'] = ['name'        => lang('stock_lang.field_name'),
-                            'short_name'  => lang('stock_lang.field_short_name'),
-                           ];
-      }
+            $data['columns'] = [
+                'name' => lang('stock_lang.field_name'),
+                'short_name'  => lang('stock_lang.field_short_name')
+                ];
+        }
 
-      // Prepare datas for common module generic items_list view
-      $data['list_title'] = lang('stock_lang.title_tags');
+        // Prepare datas for common module generic items_list view
+        $data['list_title'] = lang('stock_lang.title_tags');
 
-      $data['primary_key_field']  = 'item_tag_id';
-      $data['btn_create_label']   = lang('stock_lang.btn_add_tag');
-      $data['field_display_deleted'] = lang("stock_lang.field_deleted_tags");
-      $data['url_update'] = "stock/admin/modify_tag/";
-      $data['url_delete'] = "stock/admin/delete_tag/";
-      $data['url_create'] = "stock/admin/new_tag";
-      $data['url_getView'] = "stock/admin/view_tags";
-      $data['with_deleted'] = $with_deleted;
+        $data['primary_key_field'] = 'item_tag_id';
+        $data['btn_create_label'] = lang('stock_lang.btn_add_tag');
+        $data['field_display_deleted'] = lang("stock_lang.field_deleted_tags");
+        $data['url_update'] = "stock/admin/modify_tag/";
+        $data['url_delete'] = "stock/admin/delete_tag/";
+        $data['url_create'] = "stock/admin/new_tag";
+        $data['url_getView'] = "stock/admin/view_tags";
+        $data['with_deleted'] = $with_deleted;
 
-      return $this->display_view('Common\Views\items_list', $data);
+        return $this->display_view('Common\Views\items_list', $data);
     }
 
     /**
@@ -111,44 +122,44 @@ class Admin extends BaseController
     */
     public function modify_tag($id = NULL)
     {
-      if(is_null($this->item_tag_model->withDeleted()->find($id)))
-      {
-        return redirect()->to("/stock/admin/view_tags");
-      }
-
-      if ( ! empty($_POST))
-      {
-        $short_max_length = config('\Stock\Config\StockConfig')->tag_short_max_length;
-        // VALIDATION
-        $validationRules = [
-          'name'            => 'required|min_length[3]|max_length[45]|is_unique[item_tag.name,item_tag_id,'.$id.']',
-          'short_name'      => 'required|max_length['.$short_max_length.']|is_unique[item_tag.short_name,item_tag_id,'.$id.']'
-          ];
-
-        if($this->validate($validationRules))
+        if (is_null($this->item_tag_model->withDeleted()->find($id)))
         {
-            $this->item_tag_model->update($id, $_POST);
+            return redirect()->to("/stock/admin/view_tags");
+        }
 
+        if ( ! empty($_POST))
+        {
+            $short_max_length = config('\Stock\Config\StockConfig')->tag_short_max_length;
+            // VALIDATION
+            $validationRules = [
+            'name'            => 'required|min_length[3]|max_length[45]|is_unique[item_tag.name,item_tag_id,'.$id.']',
+            'short_name'      => 'required|max_length['.$short_max_length.']|is_unique[item_tag.short_name,item_tag_id,'.$id.']'
+            ];
+
+            if($this->validate($validationRules))
+            {
+                $this->item_tag_model->update($id, $_POST);
+
+                return redirect()->to('/stock/admin/view_tags');
+            }
+
+        // The values of the tag are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
+        }
+        else
+        {
+            $output['tag'] = $this->item_tag_model->withDeleted()->find($id);
+        }
+
+        if( ! is_null($this->item_tag_model->withDeleted()->find($id)))
+        {
+            $output['tag'] = $this->item_tag_model->withDeleted()->find($id);
+        }
+        else
+        {
             return redirect()->to('/stock/admin/view_tags');
         }
 
-      // The values of the tag are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
-      }
-      else
-      {
-        $output['tag'] = $this->item_tag_model->withDeleted()->find($id);
-      }
-
-      if( ! is_null($this->item_tag_model->withDeleted()->find($id)))
-      {
-        $output['tag'] = $this->item_tag_model->withDeleted()->find($id);
-      }
-      else
-      {
-        return redirect()->to('/stock/admin/view_tags');
-      }
-
-      $this->display_view('Stock\admin\tags\form', $output);
+        $this->display_view('Stock\admin\tags\form', $output);
     }
 
     /**
@@ -156,24 +167,22 @@ class Admin extends BaseController
     */
     public function new_tag()
     {
-      if ( ! empty($_POST))
-      {
-        $short_max_length = config('\Stock\Config\StockConfig')->tag_short_max_length;
-        // VALIDATION
-        $validationRules = [
-          'name'            => 'required|min_length[3]|max_length[45]|is_unique[item_tag.name]',
-          'short_name'      => 'required|max_length['.$short_max_length.']|is_unique[item_tag.short_name]'
-          ];
+        if ( ! empty($_POST)) {
+            $short_max_length = config('\Stock\Config\StockConfig')->tag_short_max_length;
+            // VALIDATION
+            $validationRules = [
+            'name'            => 'required|min_length[3]|max_length[45]|is_unique[item_tag.name]',
+            'short_name'      => 'required|max_length['.$short_max_length.']|is_unique[item_tag.short_name]'
+            ];
 
-        if($this->validate($validationRules))
-        {
-          $this->item_tag_model->insert($_POST);
+            if($this->validate($validationRules)) {
+                $this->item_tag_model->insert($_POST);
 
-          return redirect()->to("/stock/admin/view_tags/");
+                return redirect()->to("/stock/admin/view_tags/");
+            }
         }
-	    }
 
-      $this->display_view('Stock\admin\tags\form');
+        $this->display_view('Stock\admin\tags\form');
     }
 
     /**

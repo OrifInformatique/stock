@@ -2,11 +2,11 @@
 
 namespace Stock\Models;
 
+use Stock\Models\MyModel;
 use CodeIgniter\Database\ConnectionInterface;
-use CodeIgniter\Model;
 use CodeIgniter\Validation\ValidationInterface;
 
-class Entity extends Model
+class Entity extends MyModel
 {
 	protected $DBGroup              = 'default';
 	protected $table                = 'entity';

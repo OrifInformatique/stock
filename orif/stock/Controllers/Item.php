@@ -39,17 +39,18 @@ class Item extends BaseController {
 
     // Properties
     protected $access_level = "*";
-    private Item_model $item_model;
-    private Loan_model $loan_model;
-    private Item_tag_link_model $item_tag_link_model;
-    private Inventory_control_model $inventory_control_model;
-    private Item_tag_model $item_tag_model;
-    private Item_condition_model $item_condition_model;
-    private Item_group_model $item_group_model;
-    private Stocking_place_model $stocking_place_model;
-    private Supplier_model $supplier_model;
-    private User_model $user_model;
-    private $config;
+    protected Item_model $item_model;
+    protected Loan_model $loan_model;
+    protected Item_tag_link_model $item_tag_link_model;
+    protected Inventory_control_model $inventory_control_model;
+    protected Item_tag_model $item_tag_model;
+    protected Item_condition_model $item_condition_model;
+    protected Item_group_model $item_group_model;
+    protected Stocking_place_model $stocking_place_model;
+    protected Supplier_model $supplier_model;
+    protected User_model $user_model;
+    protected Entity $entity_model;
+    protected $config;
 
     /**
      * Constructor
@@ -74,6 +75,7 @@ class Item extends BaseController {
         $this->item_condition_model = new Item_condition_model();
         $this->item_group_model = new Item_group_model();
         $this->stocking_place_model = new Stocking_place_model();
+        $this->entity_model = new Entity();
         $this->config = config('\Stock\Config\StockConfig');
     }
 
@@ -111,7 +113,8 @@ class Item extends BaseController {
 
         // Get the amount of late loans
         $output['late_loans_count'] = count($this->loan_model->get_late_loans());
-        $output['entities']=(new Entity())->findAll();
+        $output['entities'] = $this->entity_model->dropdown('name');
+
         // Send the data to the View
         return $this->display_view('Stock\Views\item\list', $output);
     }
@@ -130,26 +133,18 @@ class Item extends BaseController {
             // No condition selected for filtering, default filtering for "functional" items
             $filters['c'] = array($this->config->functional_item_condition);
         }
-        // Get item(s) through filtered search on the database
-        // verify entity filter and restrict it to admin or user who is associated to entity
-        if (array_key_exists('e',$filters)){
-            //in the case user access is above admin
-            if (isset($_SESSION['user_id'])&&$_SESSION['user_access']<config('\User\Config\UserConfig')->access_lvl_admin){
-                foreach ($filters['e'] as $entity_filter)
-                    if(in_array($entity_filter,(new UserEntity())->where('fk_user_id',$_SESSION['user_id'])->findColumn('fk_entity_id'))){
-                        continue;
-                    }
-                    else{
-                        $this->response->setStatusCode(400)->setContentType('application/json')->setBody(lang('stock_lang.unauthorized_entity_list'))->send();
-                        exit();
-                    }
+        
+        if (!isset($filters['e'])) {
+            $entityId = 0;
+            $entity = $this->entity_model->first();
 
-            }
-            //in the case user is not loggedin
-            elseif (!isset($_SESSION['user_id'])){
-
+            if (!is_null($entity)) {
+                $entityId = $entity['entity_id'];
             }
 
+            if ($entityId !== 0) {
+                $filters['e'] = array($entityId);
+            }
         }
 
         // Sanitize $page parameter

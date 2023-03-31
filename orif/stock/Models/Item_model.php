@@ -450,34 +450,38 @@ class Item_model extends MyModel
       }
 
       /*********************
+      ** ENTITY TAG FILTERS
+      **********************/
+
+      if (isset($filters['e'])) {
+        $builder = $this->db->table('entity');
+        $entity = $builder->where('entity_id', $filters['e']);
+        $join_item_group = $entity->join('item_group', 'item_group.fk_entity_id = entity.entity_id', 'inner');
+        $join_stocking_place = $join_item_group->join('stocking_place', 'stocking_place.fk_entity_id = entity.entity_id', 'inner');
+        $join_items = $join_stocking_place->join('item', 'item.item_group_id = item_group.item_group_id AND item.stocking_place_id = stocking_place.stocking_place_id', 'inner');
+      }
+
+      /*********************
       ** GET FILTERED ITEMS
       **********************/
       if ($where_itemsFilters == '')
       {
-        // No filter, get all items
-        $items = $this->asArray()->find();
-      } else {
-        // Get filtered items
-        $items = $this->asArray()->where($where_itemsFilters)->find();
-      }
-        if (isset($filters['e'])&&count($filters['e'])>0){
-            foreach ($items as $itemidx=>$item){
-                foreach($filters['e'] as $entityidx=>$entity_id){
-                    if ((isset($item['stocking_place'])&&$item['stocking_place']['fk_entity_id']==$entity_id)||
-                        (isset($item['item_group_id'])&&(new Item_group_model())->find($item['item_group_id'])['fk_entity_id']==$entity_id)){
-                        $item['fk_entity_id']=$entity_id;
-                        break;
-                    }
-                    else if($entityidx + 1 == count($filters['e'])){
-                        unset($items[$itemidx]);
-                    }
-                    else{
-                        continue;
-                    }
-
-                }
-            }
+        if (!isset($filters['e'])) {
+            // No filter, get all items
+            $items = $this->asArray()->find();
+        } else {
+            // Get all items by entity
+            $items = $join_items->get()->getResultArray();
         }
+      } else {
+        if (!isset($filters['e'])) {
+            // Get filtered items
+            $items = $this->asArray()->where($where_itemsFilters)->find();
+        } else {
+            // Get all items by filters and entity
+            $items = $join_items->where($where_itemsFilters)->get()->getResultArray();
+        }
+      }
 
       foreach ($items as &$item){
         $item['stocking_place'] = $this->getStockingPlace($item);
