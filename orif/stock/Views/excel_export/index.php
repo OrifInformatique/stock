@@ -114,18 +114,18 @@
 
     async function checkEntityItems() {
         let entityId = document.getElementById("entity_id").value;
-        let url = `<?= base_url('stock/export_excel/has_items'); ?>/${entityId}`;
+        let url = `<?= base_url('stock/item/has_items/true'); ?>/${entityId}`;
         let response = await fetch(url, {method: 'POST'});
         let alert = document.getElementById('no_items');
         let submitButton = document.getElementById('btn_submit');
         const json = await response.json();
 
-        if (json.nb_items == 0) {
-            alert.classList.remove('d-none');
-            submitButton.disabled = true;
-        } else {
+        if (json.has_items) {
             alert.classList.add('d-none');
             submitButton.disabled = false;
+        } else {
+            alert.classList.remove('d-none');
+            submitButton.disabled = true;
         }
     }
 </script>

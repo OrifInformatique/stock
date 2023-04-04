@@ -159,28 +159,4 @@ class ExcelExport extends \App\Controllers\BaseController
 
         return $this->display_view('\Stock\excel_export\index', $datas);
     }
-    
-    /**
-     * 
-     *
-     * @param  mixed $entityId
-     * @return void
-     */
-    public function has_items($entityId) {
-        // Get result by item_group
-        $builder = $this->db->table('entity');
-        $entity = $builder->where('entity_id', $entityId);
-        $join_item_group = $entity->join('item_group', 'item_group.fk_entity_id = entity.entity_id', 'inner');
-        $join_stocking_place = $join_item_group->join('stocking_place', 'stocking_place.fk_entity_id = entity.entity_id', 'inner');
-        $join_item = $join_stocking_place->join('item', 'item.item_group_id = item_group.item_group_id AND item.stocking_place_id = stocking_place.stocking_place_id', 'inner');
-        
-        // Sum of results
-        $nb_items = $join_item->countAllResults();
-
-        // Makes sure the debug toolbar is not sent with the JSON
-        $this->response->setContentType('Content-Type: application/json');
-        return json_encode([
-            'nb_items' => $nb_items
-        ]);
-    }
 }

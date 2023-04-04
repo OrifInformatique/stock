@@ -45,4 +45,5 @@ class StockConfig extends BaseConfig
     public $image_upload_height         =   360;
 
     public $access_lvl_manager          =   2;
+    public $access_lvl_admin            =   4;
 }

@@ -34,6 +34,7 @@ use Stock\Models\Stocking_place_model;
 use Stock\Models\Supplier_model;
 use Stock\Models\UserEntity;
 use User\Models\User_model;
+use CodeIgniter\Database\BaseConnection;
 
 class Item extends BaseController {
 
@@ -52,6 +53,7 @@ class Item extends BaseController {
     protected Entity $entity_model;
     protected UserEntity $user_entity_model;
     protected $config;
+    protected BaseConnection $db;
 
     /**
      * Constructor
@@ -79,6 +81,9 @@ class Item extends BaseController {
         $this->entity_model = new Entity();
         $this->user_entity_model = new UserEntity();
         $this->config = config('\Stock\Config\StockConfig');
+
+        // Initialize db for query builder
+        $this->db = \Config\Database::connect();
     }
 
     /**
@@ -118,8 +123,13 @@ class Item extends BaseController {
         $output['entities'] = $this->entity_model->dropdown('name');
 
         if (isset($_SESSION['user_id'])) {
-            $output['has_entities'] = count($this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->findAll()) > 0;
+            $output['has_entities'] = $this->config->access_lvl_admin > $_SESSION['user_access'] ? count($this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->findAll()) > 0 : true;
+        } else {
+            // Default value to prevent displaying the message for non logged in users
+            $output['has_entities'] = true;
         }
+
+        $output['entities_has_items'] = $this->has_items(false);
 
         // Send the data to the View
         return $this->display_view('Stock\Views\item\list', $output);
@@ -1068,6 +1078,35 @@ class Item extends BaseController {
         $validation->setRule("inventory_prefix", lang('MY_application.field_inventory_number'), 'required');
 
         return $validation;
+    }
+
+    /**
+     * 
+     *
+     * @param  mixed $entityId
+     * @return void
+     */
+    public function has_items($isJSON = true, $entityId = null) {
+        // Get result by item_group
+        $builder = $this->db->table('entity');
+        $entity = !is_null($entityId) ? $builder->where('entity_id', $entityId) : $builder;
+        $join_item_group = $entity->join('item_group', 'item_group.fk_entity_id = entity.entity_id', 'inner');
+        $join_stocking_place = $join_item_group->join('stocking_place', 'stocking_place.fk_entity_id = entity.entity_id', 'inner');
+        $join_item = $join_stocking_place->join('item', 'item.item_group_id = item_group.item_group_id AND item.stocking_place_id = stocking_place.stocking_place_id', 'inner');
+        
+        // Count all results
+        $nb_items = $join_item->countAllResults();
+        $result = $nb_items > 0;
+
+        if ($isJSON) {
+            // Makes sure the debug toolbar is not sent with the JSON
+            $this->response->setContentType('Content-Type: application/json');
+            return json_encode([
+                'has_items' => $result
+            ]);
+        } else {
+            return $result;
+        }
     }
 
 }

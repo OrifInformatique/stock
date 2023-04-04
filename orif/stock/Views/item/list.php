@@ -24,10 +24,13 @@
        <?= lang('stock_lang.msg_no_entities_exist') ?>
     </div>
 
-    <div id="alert_user_has_no_entities" class="<?= isset($has_entities) ? '' : 'd-none' ?> alert alert-warning text-center" role="alert">
-       <?= lang('stock_lang.msg_user_has_no_entities') ?>
+    <div id="alert_entities_has_no_items" class="<?= $entities_has_items ? 'd-none' : '' ?> alert alert-warning text-center" role="alert">
+       <?= lang('stock_lang.msg_entities_has_no_items') ?>
     </div>
 
+    <div id="alert_user_has_no_entities" class="<?= $has_entities ? 'd-none' : '' ?> alert alert-warning text-center" role="alert">
+       <?= lang('stock_lang.msg_user_has_no_entities') ?>
+    </div>
     <!-- FILTERS AND SORT FORM -->
     <form id="filters" class="" style="overflow: visible;" method="get" action="<?=base_url("item/index/1") . "/"?>">
         <div class="row">
