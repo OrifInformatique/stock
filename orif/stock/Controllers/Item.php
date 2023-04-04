@@ -22,7 +22,7 @@ use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use PSR\Log\LoggerInterface;
 use App\Controllers\BaseController;
-use Stock\Models\Entity;
+use Stock\Models\Entity_model;
 use Stock\Models\Inventory_control_model;
 use Stock\Models\Item_model;
 use Stock\Models\Loan_model;
@@ -32,7 +32,7 @@ use Stock\Models\Item_group_model;
 use Stock\Models\Item_tag_link_model;
 use Stock\Models\Stocking_place_model;
 use Stock\Models\Supplier_model;
-use Stock\Models\UserEntity;
+use Stock\Models\User_entity_model;
 use User\Models\User_model;
 use CodeIgniter\Database\BaseConnection;
 
@@ -50,8 +50,8 @@ class Item extends BaseController {
     protected Stocking_place_model $stocking_place_model;
     protected Supplier_model $supplier_model;
     protected User_model $user_model;
-    protected Entity $entity_model;
-    protected UserEntity $user_entity_model;
+    protected Entity_model $entity_model;
+    protected User_entity_model $user_entity_model;
     protected $config;
     protected BaseConnection $db;
 
@@ -78,8 +78,8 @@ class Item extends BaseController {
         $this->item_condition_model = new Item_condition_model();
         $this->item_group_model = new Item_group_model();
         $this->stocking_place_model = new Stocking_place_model();
-        $this->entity_model = new Entity();
-        $this->user_entity_model = new UserEntity();
+        $this->entity_model = new Entity_model();
+        $this->user_entity_model = new User_entity_model();
         $this->config = config('\Stock\Config\StockConfig');
 
         // Initialize db for query builder
@@ -411,7 +411,7 @@ class Item extends BaseController {
                 // Load the comboboxes options
                 if (isset($_SESSION['user_access'])&&isset($_SESSION['user_id'])&&$_SESSION['user_access']<config('\User\Config\UserConfig')->access_lvl_admin){
                     $userid=$_SESSION['user_id'];
-                    $userentitymodel=new UserEntity();
+                    $userentitymodel=new User_entity_model();
                     $stockingplacemodel=new Stocking_place_model();
                     $entitiesAssociated=$userentitymodel->where('fk_user_id',$userid)->findColumn('fk_entity_id');
                     $data['stocking_places']=$stockingplacemodel->whereIn('fk_entity_id',$entitiesAssociated)->findAll();
@@ -420,7 +420,7 @@ class Item extends BaseController {
                     $data['stocking_places'] = $this->stocking_place_model->findAll();
 
                 }
-                $data['entities']=(new \Stock\Models\Entity())->whereIn('entity_id',(new UserEntity())->where('fk_user_id',$_SESSION['user_id'])->findColumn('fk_entity_id'))->findAll();
+                $data['entities']=(new \Stock\Models\Entity_model())->whereIn('entity_id',(new User_entity_model())->where('fk_user_id',$_SESSION['user_id'])->findColumn('fk_entity_id'))->findAll();
                 $data['suppliers'] = $this->supplier_model->findAll();
                 $data['item_groups_name'] = $this->item_group_model->dropdown('name');
 
@@ -601,7 +601,7 @@ class Item extends BaseController {
             elseif(isset($data['stocking_place_id'])){
                 $data['entity_id']=(new Stocking_place_model())->find($data['stocking_place_id'])['fk_entity_id'];
             }
-            $data['entities']=(new \Stock\Models\Entity())->whereIn('entity_id',(new UserEntity())->where('fk_user_id',$_SESSION['user_id'])->findColumn('fk_entity_id'))->findAll();
+            $data['entities']=(new \Stock\Models\Entity_model())->whereIn('entity_id',(new User_entity_model())->where('fk_user_id',$_SESSION['user_id'])->findColumn('fk_entity_id'))->findAll();
             $this->display_view('Stock\Views\item\form', $data);
         } else {
             // Update is not allowed

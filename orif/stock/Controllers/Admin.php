@@ -11,14 +11,14 @@ use App\Controllers\BaseController;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
-use Stock\Models\Entity;
+use Stock\Models\Entity_model;
 use Stock\Models\Item_tag_model;
 use Stock\Models\Item_tag_link_model;
 use Stock\Models\Stocking_place_model;
 use Stock\Models\Supplier_model;
 use Stock\Models\Item_group_model;
 use Stock\Models\Item_model;
-use Stock\Models\UserEntity;
+use Stock\Models\User_entity_model;
 use User\Models\User_model;
 use User\Models\User_type_model;
 
@@ -32,7 +32,7 @@ class Admin extends BaseController
     protected Supplier_model $supplier_model;
     protected Item_group_model $item_group_model;
     protected Item_model $item_model;
-    protected Entity $entity_model;
+    protected Entity_model $entity_model;
     protected $db;
     protected $validation;
 
@@ -61,7 +61,7 @@ class Admin extends BaseController
         $this->supplier_model         = new Supplier_model();
         $this->item_group_model       = new Item_group_model();
         $this->item_model             = new Item_model();
-        $this->entity_model           = new Entity();
+        $this->entity_model           = new Entity_model();
 
         //get db instance
         $this->db = \CodeIgniter\Database\Config::connect();
@@ -943,7 +943,7 @@ class Admin extends BaseController
                 return $this->display_view('\Stock\admin\users\form_user',['user'=>$user_id>0?(new User_model())->find($user_id):null,'user_types'=>$userTypes,'entities'=>$this->entity_model->withDeleted()->findAll(),'errors'=>$validation->getErrors()]);
             }
             $userModel=new User_model();
-            $userEntityModel=new UserEntity();
+            $userEntityModel=new User_entity_model();
             $username=$this->request->getPost('user_name');
             $email=$this->request->getPost('user_email');
             $userType=$this->request->getPost('user_usertype');
@@ -997,7 +997,7 @@ class Admin extends BaseController
             $user=null;
             if ($user_id>0){
                 $user=(new User_model())->withDeleted()->find($user_id);
-                $user['entities_ids']=(new UserEntity())->where('fk_user_id',$user_id)->findColumn('fk_entity_id');
+                $user['entities_ids']=(new User_entity_model())->where('fk_user_id',$user_id)->findColumn('fk_entity_id');
             }
             return $this->display_view('\Stock\admin\users\form_user',['user'=>$user,'user_types'=>$userTypes,'entities'=>$this->entity_model->withDeleted()->findAll()]);
         }

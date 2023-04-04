@@ -1,7 +1,7 @@
 <div class="container">
 
     <!-- *** ADMIN *** -->
-    <?php use Stock\Models\UserEntity;
+    <?php use Stock\Models\User_entity_model;
 
     if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered) { ?>
         <div class="row bottom-margin">

@@ -6,7 +6,7 @@ use Stock\Models\MyModel;
 use CodeIgniter\Database\ConnectionInterface;
 use CodeIgniter\Validation\ValidationInterface;
 
-class Entity extends MyModel
+class Entity_model extends MyModel
 {
 	protected $DBGroup              = 'default';
 	protected $table                = 'entity';

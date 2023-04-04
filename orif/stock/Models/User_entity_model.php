@@ -2,9 +2,9 @@
 
 namespace Stock\Models;
 
-use CodeIgniter\Model;
+use Stock\Models\MyModel;
 
-class UserEntity extends Model
+class User_entity_model extends MyModel
 {
 	protected $DBGroup              = 'default';
 	protected $table                = 'user_entity';

@@ -5,26 +5,26 @@ namespace Stock\Controllers;
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
-use Stock\Models\Entity;
+use Stock\Models\Entity_model;
 use Stock\Models\Item_group_model;
 use Stock\Models\Item_model;
 use Stock\Models\Item_tag_link_model;
 use Stock\Models\Item_tag_model;
 use Stock\Models\Stocking_place_model;
 use Stock\Models\Supplier_model;
-use Stock\Models\UserEntity;
+use Stock\Models\User_entity_model;
 use CodeIgniter\Database\BaseConnection;
 
 class ExcelExport extends \App\Controllers\BaseController
 {
-    private Entity $entity_model;
+    private Entity_model $entity_model;
     private Item_group_model $item_group_model; // TODO: add properties for models
     private Item_model $item_model;
     private BaseConnection $db;
 
     public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger)
     {
-        $this->entity_model = new Entity(); // TODO: Inject model here
+        $this->entity_model = new Entity_model(); // TODO: Inject model here
 
         $this->db = \Config\Database::connect();
 
@@ -55,7 +55,7 @@ class ExcelExport extends \App\Controllers\BaseController
             }
             //prepare items to add in excel sheet
             foreach ($items as $idx => $item) {
-                (((new Stocking_place_model())->find($item['stocking_place_id']))['fk_entity_id']) == null ? $item['entity_name'] = '' : ($item['entity_name'] = (new Entity())->find((new Stocking_place_model())->find($item['stocking_place_id'])['fk_entity_id']) != null ? (new Entity())->find((new Stocking_place_model())->find($item['stocking_place_id'])['fk_entity_id'])['name'] : '');
+                (((new Stocking_place_model())->find($item['stocking_place_id']))['fk_entity_id']) == null ? $item['entity_name'] = '' : ($item['entity_name'] = (new Entity_model())->find((new Stocking_place_model())->find($item['stocking_place_id'])['fk_entity_id']) != null ? (new Entity_model())->find((new Stocking_place_model())->find($item['stocking_place_id'])['fk_entity_id'])['name'] : '');
                 $item['stock_place'] = (new Stocking_place_model())->find($item['stocking_place_id'])['name'];
                 $tag_ids = (new Item_tag_link_model())->where('item_id', $item['item_id'])->findColumn('item_tag_id');
                 is_array($tag_ids) ? $item['tags'] = (new Item_tag_model())->whereIn('item_tag_id', $tag_ids)->findColumn('name') : $item['tags'] = [];
@@ -139,7 +139,7 @@ class ExcelExport extends \App\Controllers\BaseController
         $datas['item_groups'] = null;
 
         if (isset($_SESSION['user_access']) && $_SESSION['user_access'] > config('\Stock\Config\StockConfig')->access_lvl_manager) {
-            $datas['entities'] = (new Entity())->findAll();
+            $datas['entities'] = (new Entity_model())->findAll();
             $datas['item_groups'] = (new Item_group_model())->findAll();
             if (count($datas['entities']) > 0) {
                 $datas['filters'][] = ['name' => lang('stock_lang.entity_name'),'value' => 1];
@@ -148,10 +148,11 @@ class ExcelExport extends \App\Controllers\BaseController
                 $datas['filters'][] = ['name' => lang('stock_lang.btn_item_groups'),'value' => 2];
             }
         } elseif(isset($_SESSION['user_id'])) {
-            if ((new UserEntity())->where('fk_user_id', $_SESSION['user_id'])->countAllResults() > 0) {
+            if ((new User_entity_model())->where('fk_user_id', $_SESSION['user_id'])->countAllResults() > 0) {
                 $datas['filters'][] = ['name' => lang('stock_lang.entity_name'),'value' => 1];
-                $datas['entities'] = (new Entity())->whereIn('entity_id', (new UserEntity())->where('fk_user_id', $_SESSION['user_id'])->findColumn('fk_entity_id'))->findAll();
-                $datas['item_groups'] = (new Item_group_model())->whereIn('fk_entity_id',(new UserEntity())->where('fk_user_id', $_SESSION['user_id'])->findColumn('fk_entity_id'))->findAll();
+                $datas['filters'][] = ['name' => lang('stock_lang.btn_item_groups'),'value' => 2];
+                $datas['entities'] = (new Entity_model())->whereIn('entity_id', (new User_entity_model())->where('fk_user_id', $_SESSION['user_id'])->findColumn('fk_entity_id'))->findAll();
+                $datas['item_groups'] = (new Item_group_model())->whereIn('fk_entity_id',(new User_entity_model())->where('fk_user_id', $_SESSION['user_id'])->findColumn('fk_entity_id'))->findAll();
             }
         } else {
             return;
