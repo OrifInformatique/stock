@@ -123,10 +123,24 @@ class Item extends BaseController {
         $output['entities'] = $this->entity_model->dropdown('name');
 
         if (isset($_SESSION['user_id'])) {
+            $userDefaultEntity = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->first();
+            $defaultEntity = $this->entity_model->find(isset($userDefaultEntity) ? $userDefaultEntity['fk_entity_id'] : 0);
             $output['has_entities'] = $this->config->access_lvl_admin > $_SESSION['user_access'] ? count($this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->findAll()) > 0 : true;
         } else {
             // Default value to prevent displaying the message for non logged in users
             $output['has_entities'] = true;
+        }
+
+        if (isset($defaultEntity['entity_id'])) {
+            $output['default_entity'] = $defaultEntity['entity_id'];
+        } else {
+            $firstEntity = $this->entity_model->first();
+
+            if (!is_null($firstEntity)) {
+                $output['default_entity'] = $firstEntity['entity_id'];
+            } else {
+                $output['default_entity'] = null;
+            }
         }
 
         $output['entities_has_items'] = $this->has_items(false);
@@ -151,15 +165,27 @@ class Item extends BaseController {
         }
         
         if (!isset($filters['e'])) {
-            $entityId = 0;
-            $entity = $this->entity_model->first();
+            if (isset($_SESSION['user_id'])) {
+                // Find first user entity and returns null if it does not exist
+                $userDefaultEntity = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->first();
+                $defaultEntity = $this->entity_model->find(isset($userDefaultEntity['fk_entity_id']) ? $userDefaultEntity['fk_entity_id'] : 0);
 
-            if (!is_null($entity)) {
-                $entityId = $entity['entity_id'];
+                // In case user has no entities
+                if (is_null($defaultEntity)) {
+                    $defaultEntity = $this->entity_model->first();
+                }
+            } else {
+                $defaultEntity = $this->entity_model->first();
+            }
+
+            if (isset($defaultEntity['entity_id'])) {
+                $entityId = $defaultEntity['entity_id'];
+            } else {
+                $entityId = 0;
             }
 
             if ($entityId !== 0) {
-                $filters['e'] = array($entityId);
+                $filters['e'] = $entityId;
             }
         }
 

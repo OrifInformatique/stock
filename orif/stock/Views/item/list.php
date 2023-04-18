@@ -16,7 +16,7 @@
 
     <div class="row pb-3">
         <div id="e" class="col-sm-12">
-            <?= form_label(lang('stock_lang.entity_name'),'entities_list_label').form_dropdown('e[]', $entities, isset($_GET["e"])?$_GET["e"]:"",'id="entities_list"');?>
+            <?= form_label(lang('stock_lang.entity_name'),'entities_list_label').form_dropdown('e[]', $entities, isset($_GET["e"]) ? $_GET["e"] : $default_entity,'id="entities_list"');?>
         </div>
     </div>
 
