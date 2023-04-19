@@ -300,7 +300,7 @@ class Item_model extends MyModel
         // Prepare WHERE clause
         $where_textSearchFilter .= '(';
         $where_textSearchFilter .=
-          "name LIKE '%".$text_search_content."%' "
+          "item.name LIKE '%".$text_search_content."%' "
           ."OR description LIKE '%".$text_search_content."%' "
           ."OR serial_number LIKE '%".$text_search_content."%' ";
 
