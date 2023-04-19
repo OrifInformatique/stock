@@ -222,6 +222,10 @@ function load_items(page, filters){
             }
 
             if (result.user_entities) {
+                eItems = $("#e .multiselect-container .active input");
+                if (eItems.length > 0) {
+                    $("#btn_add").attr("href", '<?= base_url('item/create') ?>' + '/' + eItems[0].value);
+                }
                 $("#btn_add").toggle(result.user_entities.includes($("#e .multiselect-container .active input")[0].value));
             } else {
                 $("#btn_add").toggle(false);

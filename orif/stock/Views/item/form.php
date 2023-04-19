@@ -6,7 +6,7 @@ $config = config('\Stock\Config\StockConfig');
     <div class="row">
         <div class="form-group col-xs-12">
             <button type="submit" class="btn btn-success"><?= lang('MY_application.btn_save'); ?></button>
-            <button type="submit" class="btn btn-danger" name="submitCancel"><?= lang('MY_application.btn_cancel');?></button>
+            <a href="<?= base_url('item/') ?>" class="btn btn-danger"><?= lang('MY_application.btn_cancel');?></a>
         </div>
     </div>
 
@@ -64,7 +64,7 @@ $config = config('\Stock\Config\StockConfig');
             <label for="entity_selector"><?=lang('stock_lang.entity_name')?></label>
             <select class="form-control mb-3" name="fk_entity_id" id="entity_selector" onchange="initStockingPlace(this);initItemGroup(this)">
                 <?php foreach ($entities as $entity):?>
-                    <option value="<?=$entity['entity_id']?>"  data-tag-name="<?=$entity['shortname']?>" <?=isset($entity_id)&&$entity_id==$entity['entity_id']?'selected':''?>><?=$entity['name']?></option>
+                    <option value="<?=$entity['entity_id']?>"  data-tag-name="<?=$entity['shortname']?>" <?=isset($entity_id)&&$entity_id==$entity['entity_id'] ? 'selected': (isset($selected_entity_id) && $selected_entity_id == $entity['entity_id'] ? 'selected' : '')?>><?=$entity['name']?></option>
                 <?php endforeach;?>
             </select>
         </div>
@@ -362,6 +362,7 @@ function getFirstTagShortName(){
     }
     return firstTagShortName;
 }
+
 function initStockingPlace(el){
     const fk_entity_id=el.value;
     document.querySelector('#stocking_place_id').querySelectorAll('option').forEach((element)=>{
@@ -378,6 +379,7 @@ function initStockingPlace(el){
         }
     })
 }
+
 function initItemGroup(el){
     const fk_entity_id=el.value;
     document.querySelector('#item_group_id').querySelectorAll('option').forEach((element)=>{
@@ -396,6 +398,7 @@ function initItemGroup(el){
         }
     });
 }
+
 initStockingPlace(document.querySelector('#entity_selector'));
 initItemGroup(document.querySelector('#entity_selector'));
 

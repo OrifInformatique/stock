@@ -164,7 +164,7 @@ class Item extends BaseController {
             $filters['c'] = array($this->config->functional_item_condition);
         }
         
-        if (!isset($filters['c'])) {
+        if (!isset($filters['e'])) {
             if (isset($_SESSION['user_id'])) {
                 $entityId = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->first()['fk_entity_id'] ?? 0;
             } else {
@@ -312,7 +312,7 @@ class Item extends BaseController {
      *
      * @return void
      */
-    public function create() {
+    public function create($entity_id) {
         // Check if this is allowed
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
             // Get new item id and set picture_prefix
@@ -438,8 +438,8 @@ class Item extends BaseController {
                 }
                 else{
                     $data['stocking_places'] = $this->stocking_place_model->findAll();
-
                 }
+
                 $data['entities']=(new \Stock\Models\Entity_model())->whereIn('entity_id',(new User_entity_model())->where('fk_user_id',$_SESSION['user_id'])->findColumn('fk_entity_id'))->findAll();
                 $data['suppliers'] = $this->supplier_model->findAll();
                 $data['item_groups_name'] = $this->item_group_model->dropdown('name');
@@ -451,6 +451,9 @@ class Item extends BaseController {
 
                 // Load the tags
                 $data['item_tags'] = $this->item_tag_model->findAll();
+
+                // Load entity id
+                $data['selected_entity_id'] = $entity_id;
 
                 $data['item_id'] = $this->item_model->getFutureId();
                 $data['errors'] = $validation->getErrors();
