@@ -1,13 +1,13 @@
 <div class="container">
 
     <!-- *** ADMIN *** -->
-    <?php use Stock\Models\User_entity_model;
+    <?php
 
     if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered) { ?>
         <div class="row bottom-margin">
             <div class="col-12">
                 <!-- Button for new item -->
-                <a href="<?php echo base_url("item/create/"); ?>"
+                <a id="btn_add" href="<?php echo base_url("item/create/"); ?>"
                         class="btn btn-success mb-3"><?php echo htmlspecialchars(lang('MY_application.btn_new')); ?></a>
             </div>
         </div>
@@ -194,6 +194,7 @@ function load_items(page, filters){
     $("#no_item_message").toggle(false);
     $("#error_message").toggle(false);
     $("#table_item").toggle(false);
+    $("#btn_add").toggle(false);
     $("#list_item").empty();
     $("#pagination_bottom, #pagination_top").empty();
 
@@ -218,6 +219,12 @@ function load_items(page, filters){
                 });
             } else {
                 $("#no_item_message").toggle(true);
+            }
+
+            if (result.user_entities) {
+                $("#btn_add").toggle(result.user_entities.includes($("#e .multiselect-container .active input")[0].value));
+            } else {
+                $("#btn_add").toggle(false);
             }
 
             $("#pagination_top, #pagination_bottom").html(result.pagination);

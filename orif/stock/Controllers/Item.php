@@ -164,28 +164,17 @@ class Item extends BaseController {
             $filters['c'] = array($this->config->functional_item_condition);
         }
         
-        if (!isset($filters['e'])) {
+        if (!isset($filters['c'])) {
             if (isset($_SESSION['user_id'])) {
-                // Find first user entity and returns null if it does not exist
-                $userDefaultEntity = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->first();
-                $defaultEntity = $this->entity_model->find(isset($userDefaultEntity['fk_entity_id']) ? $userDefaultEntity['fk_entity_id'] : 0);
-
-                // In case user has no entities
-                if (is_null($defaultEntity)) {
-                    $defaultEntity = $this->entity_model->first();
-                }
-            } else {
-                $defaultEntity = $this->entity_model->first();
-            }
-
-            if (isset($defaultEntity['entity_id'])) {
-                $entityId = $defaultEntity['entity_id'];
+                $entityId = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->first()['fk_entity_id'] ?? 0;
             } else {
                 $entityId = 0;
             }
-
+            
             if ($entityId !== 0) {
                 $filters['e'] = $entityId;
+            } else {
+                $filters['e'] = $this->entity_model->first()['entity_id'] ?? 0;
             }
         }
 
@@ -259,6 +248,11 @@ class Item extends BaseController {
 
         // Get the amount of late loans
         $output['late_loans_count'] = count($this->loan_model->get_late_loans());
+
+        if (isset($_SESSION['user_id'])) {
+            $entities = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->findColumn('fk_entity_id');
+            $output['user_entities'] = $entities;
+        }
 
         return $output;
     }
