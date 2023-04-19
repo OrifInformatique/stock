@@ -6,7 +6,7 @@ $config = config('\Stock\Config\StockConfig');
     <div class="row">
         <div class="form-group col-xs-12">
             <button type="submit" class="btn btn-success"><?= lang('MY_application.btn_save'); ?></button>
-            <a href="<?= base_url('item/') ?>" class="btn btn-danger"><?= lang('MY_application.btn_cancel');?></a>
+            <a href="<?= isset($_SESSION['items_list_url']) ? $_SESSION['items_list_url'] : base_url() ?>" class="btn btn-danger"><?= lang('MY_application.btn_cancel');?></a>
         </div>
     </div>
 
