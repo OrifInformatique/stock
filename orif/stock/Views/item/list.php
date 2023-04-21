@@ -16,7 +16,7 @@
 
     <div class="row pb-3">
         <div id="e" class="col-sm-12">
-            <?= form_label(lang('stock_lang.entity_name'),'entities_list_label').form_dropdown('e[]', $entities, isset($_GET["e"]) ? $_GET["e"] : $default_entity,'id="entities_list"');?>
+            <?= form_label(lang('stock_lang.entity_name'),'entities_list_label').form_dropdown('e', $entities, isset($_GET["e"]) ? $_GET["e"] : $default_entity,'id="entities_list"');?>
         </div>
     </div>
 
@@ -99,11 +99,9 @@
                 </div>
                 <div class="text-right">
                     <a href="<?= base_url("item/index/") . "/"?>" class="btn btn-default"><?php echo htmlspecialchars(lang('MY_application.btn_remove_filters')); ?></a>
-                    <a href="<?= base_url("item/list_loans/") . "/"?>" class="btn btn-primary">
+                    <a href="<?= base_url("item/list_loans/") . "/"?>" id="btn_late_loans" class="btn btn-primary">
                         <?php echo htmlspecialchars(lang('MY_application.btn_to_loans')); ?>
-                        <?php if(isset($late_loans_count) && $late_loans_count > 0): ?>
-                            <span class="badge badge-danger"><?= $late_loans_count ?></span>
-                        <?php endif ?>
+                            <span id="late_loans" class="badge badge-danger"></span>
                     </a>
                 </div>
                 <?php if (isset($_SESSION['user_access'])&&$_SESSION['user_access']>=config('\Stock\Config\StockConfig')->access_lvl_manager):?>
@@ -194,6 +192,7 @@ function load_items(page, filters){
     $("#no_item_message").toggle(false);
     $("#error_message").toggle(false);
     $("#table_item").toggle(false);
+    $("#late_loans").toggle(false);
     $("#btn_add").toggle(false);
     $("#list_item").empty();
     $("#pagination_bottom, #pagination_top").empty();
@@ -210,7 +209,8 @@ function load_items(page, filters){
             page = result.number_page;
             filters=getFilters();
             history.pushState(null, "", "<?= base_url("item/index/")?>"+ "/"+page+filters);
-
+            eItems = $("#e .multiselect-container .active input");
+            
             // Empty list before filling it
             if (result.items.length > 0){
                 $("#table_item").toggle(true);
@@ -221,15 +221,25 @@ function load_items(page, filters){
                 $("#no_item_message").toggle(true);
             }
 
-            if (result.user_entities) {
-                eItems = $("#e .multiselect-container .active input");
-                if (eItems.length > 0) {
-                    $("#btn_add").attr("href", '<?= base_url('item/create') ?>' + '/' + eItems[0].value);
-                }
-                $("#btn_add").toggle(result.user_entities.includes($("#e .multiselect-container .active input")[0].value));
+            if (result.late_loans_count > 0) {
+                $("#late_loans").toggle(true);
+                $("#late_loans").text(result.late_loans_count);
             } else {
-                $("#btn_add").toggle(false);
+                $("#late_loans").toggle(false);
             }
+
+            if (eItems.length > 0) {
+                $("#btn_late_loans").attr("href", '<?= base_url('item/list_loans') ?>' + '/1?e=' + eItems[0].value);
+                
+                if (result.user_entities) {
+                    $("#btn_add").attr("href", '<?= base_url('item/create') ?>' + '/' + eItems[0].value);
+                    $("#btn_add").toggle(result.user_entities.includes($("#e .multiselect-container .active input")[0].value));
+                } else {
+                    $("#btn_add").toggle(false);
+                }
+            }
+
+            
 
             $("#pagination_top, #pagination_bottom").html(result.pagination);
 
