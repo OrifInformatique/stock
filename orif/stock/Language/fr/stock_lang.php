@@ -25,14 +25,15 @@ return[
 'btn_add_tag'                           => 'Ajouter un tag',
 'btn_add_stocking_place'                => 'Ajouter un lieu de stockage',
 'btn_add_supplier'                      => 'Ajouter un fournisseur',
-'btn_add_item_group'                    => 'Ajouter un groupe d\'objet',
+'btn_add_item_group'                    => 'Ajouter un groupe d\'objets',
 'btn_soft_delete_tag'                   => 'Désactiver ce tag',
 'btn_delete_tag'                        => 'Supprimer ce tag',
 'btn_soft_delete_stocking_place'        => 'Désactiver ce lieu de stockage',
 'btn_delete_stocking_place'             => 'Supprimer ce lieu de stockage',
 'btn_delete_supplier'                   => 'Supprimer ce fournisseur',
 'btn_soft_delete_supplier'              => 'Désactiver ce fournisseur',
-'btn_soft_delete_item_group'            => 'Désactiver ce group d\'objet',
+'btn_soft_delete_item_group'            => 'Désactiver ce groupe d\'objets',
+'btn_delete_item_group'                 => 'Supprimer ce groupe d\'objets',
 'btn_export'                            => 'Exporter',
 
 
@@ -65,7 +66,7 @@ return[
 'tag'                                   => 'Tag',
 'stocking_place'                        => 'Lieu de stockage',
 'supplier'                              => 'Fournisseur',
-'item_group'                            => 'Group d\'objet',
+'item_group'                            => 'Groupe d\'objets',
 
 'tag_deletion_explanation'              => 'La désactivation d\'un tag permet de le rendre inutilisable tout en conservant ses informations dans les archives. ' 
                                                 . 'Cela permet notamment de garder l\'historique de ses actions. <br> <br>' 
@@ -93,15 +94,15 @@ return[
                                                 . 'En cas de suppression définitive, toutes les informations concernant ce fournisseur seront supprimées.',
 'supplier_already_disabled'             => 'Ce fournisseur est déjà désactivé. Voulez-vous le supprimer définitivement ?',
 
-'item_group_already_disabled'           => 'Ce groupe d\'objet est déjà désactivé. Voulez-vous le supprimer définitivement ?',
-'delete_item_group'                     => 'Désactiver ou supprimer ce groupe d\'objet',
-'hard_delete_item_group'                => 'Supprimer définitivement ce groupe d\'objet',
-'reactivate_item_group'                 => 'Réactiver ce groupe d\'objet',
-'item_group_already_disabled'           => 'Ce groupe d\'objet est déjà désactivé. Voulez-vous le supprimer définitivement ?',
-'item_group_deletion_explanation'       => 'La désactivation d\'un groupe d\'objet permet de le rendre inutilisable tout en conservant ses informations dans les archives. ' 
+'item_group_already_disabled'           => 'Ce groupe d\'objets est déjà désactivé. Voulez-vous le supprimer définitivement ?',
+'delete_item_group'                     => 'Désactiver ou supprimer ce groupe d\'objets',
+'hard_delete_item_group'                => 'Supprimer définitivement ce groupe d\'objets',
+'reactivate_item_group'                 => 'Réactiver ce groupe d\'objets',
+'item_group_already_disabled'           => 'Ce groupe d\'objets est déjà désactivé. Voulez-vous le supprimer définitivement ?',
+'item_group_deletion_explanation'       => 'La désactivation d\'un groupe d\'objets permet de le rendre inutilisable tout en conservant ses informations dans les archives. ' 
                                         . 'Cela permet notamment de garder l\'historique de ses actions. <br> <br>' 
-                                        . 'En cas de suppression définitive, toutes les informations concernant ce groupe d\'objet seront supprimées.',
-'item_group_already_disabled'           => 'Ce groupe d\'objet est déjà désactivé. Voulez-vous le supprimer définitivement ?',
+                                        . 'En cas de suppression définitive, toutes les informations concernant ce groupe d\'objets seront supprimées.',
+'item_group_already_disabled'           => 'Ce groupe d\'objets est déjà désactivé. Voulez-vous le supprimer définitivement ?',
 'name'                                  => 'Nom',
 'entity_name'                           => 'Nom du site',
 'address'                               => 'Adresse',
