@@ -171,8 +171,8 @@ class Admin extends BaseController
             $short_max_length = config('\Stock\Config\StockConfig')->tag_short_max_length;
             // VALIDATION
             $validationRules = [
-            'name'            => 'required|min_length[3]|max_length[45]|is_unique[item_tag.name]',
-            'short_name'      => 'required|max_length['.$short_max_length.']|is_unique[item_tag.short_name]'
+                'name'            => 'required|min_length[3]|max_length[45]|is_unique[item_tag.name]',
+                'short_name'      => 'required|max_length['.$short_max_length.']|is_unique[item_tag.short_name]'
             ];
 
             if($this->validate($validationRules)) {
@@ -705,43 +705,48 @@ class Admin extends BaseController
     */
     public function modify_item_group($id = NULL)
     {
-      if(is_null($this->item_group_model->withDeleted()->find($id)))
-      {
-        return redirect()->to("/stock/admin/view_item_groups");
-      }
+        $output = [];
 
-      if ( ! empty($_POST))
-      {
-        // VALIDATION
-        $validationRules = [
-          'name'            => 'required|min_length[3]|max_length[45]|is_unique[item_group.name,item_group_id,'.$id.']',
-          'short_name'      => 'required|max_length[2]|is_unique[item_group.short_name,item_group_id,'.$id.']'
-          ];
+        if(is_null($this->item_group_model->withDeleted()->find($id))) {
+            return redirect()->to("/stock/admin/view_item_groups");
+        }
 
-        if($this->validate($validationRules))
-        {
-            $this->item_group_model->update($id, $_POST);
+        if ( ! empty($_POST)) {
+            // VALIDATION
+            $validationRules = [
+                'name' => 'required|min_length[2]|max_length[45]|is_unique_group_name_by_entity[' . $id . ',' . $_POST['fk_entity_id'] . ']',
+                'short_name' => 'required|max_length['.config('\Stock\Config\StockConfig')->stocking_short_max_length.']|is_unique_group_short_name_by_entity[' . $id . ',' . $_POST['fk_entity_id'] . ']'
+            ];
 
+            $validationErrors = [
+                'name' => [
+                    'is_unique_group_name_by_entity' => lang('stock_lang.unique_item_group_name')
+                ],
+                'short_name' => [
+                    'is_unique_group_short_name_by_entity' => lang('stock_lang.unique_item_group_short_name')
+                ]
+            ];
+
+            if($this->validate($validationRules, $validationErrors)) {
+                $this->item_group_model->update($id, $_POST);
+
+                return redirect()->to('/stock/admin/view_item_groups');
+            }
+
+        // The values of the tag are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
+        } else {
+            $output['item_group'] = $this->item_group_model->withDeleted()->find($id);
+        }
+
+        if ( ! is_null($this->item_group_model->withDeleted()->find($id))) {
+            $output['item_group'] = $this->item_group_model->withDeleted()->find($id);
+        } else {
             return redirect()->to('/stock/admin/view_item_groups');
         }
 
-      // The values of the tag are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
-      }
-      else
-      {
-        $output['item_group'] = $this->item_group_model->withDeleted()->find($id);
-      }
+        $output['entities'] = $this->entity_model->withDeleted(false)->findAll();
 
-      if( ! is_null($this->item_group_model->withDeleted()->find($id)))
-      {
-        $output['item_group'] = $this->item_group_model->withDeleted()->find($id);
-      }
-      else
-      {
-        return redirect()->to('/stock/admin/view_item_groups');
-      }
-      $output['entities']=$this->entity_model->withDeleted(false)->findAll();
-      $this->display_view('Stock\admin\item_groups\form', $output);
+        $this->display_view('Stock\admin\item_groups\form', $output);
     }
 
     /**
@@ -749,26 +754,40 @@ class Admin extends BaseController
     */
     public function new_item_group()
     {
-        $validation=\Config\Services::validation();
+        $output = [];
+        $validation = \Config\Services::validation();
 
         if ( ! empty($_POST))
-      {
-        // VALIDATION
-        $validationRules = [
-          'name'            => 'required|min_length[2]|max_length[45]|is_unique[stocking_place.name]',
-          'short_name'           => 'required|max_length['.config('\Stock\Config\StockConfig')->stocking_short_max_length.']|is_unique[item_group.short_name]'
-          ];
-          $validation->setRules($validationRules);
-        if($validation->withRequest($this->request)->run())
         {
-            $itemGroupModel=new Item_group_model();
-            $itemGroupModel->insert($_POST);
+            // VALIDATION
+            $validationRules = [
+                'name' => 'required|min_length[2]|max_length[45]|is_unique_group_name_by_entity[item_group.item_group_id,' . $_POST['fk_entity_id'] . ']',
+                'short_name' => 'required|max_length['.config('\Stock\Config\StockConfig')->stocking_short_max_length.']|is_unique_group_short_name_by_entity[item_group.item_group_id,' . $_POST['fk_entity_id'] . ']'
+            ];
 
-          return redirect()->to("/stock/admin/view_item_groups");
-        }
+            $validationErrors = [
+                'name' => [
+                    'is_unique_group_name_by_entity' => lang('stock_lang.unique_item_group_name')
+                ],
+                'short_name' => [
+                    'is_unique_group_short_name_by_entity' => lang('stock_lang.unique_item_group_short_name')
+                ]
+            ];
+            
+            $validation->setRules($validationRules, $validationErrors);
+
+            if ($validation->withRequest($this->request)->run()) {
+                $itemGroupModel=new Item_group_model();
+                $itemGroupModel->insert($_POST);
+
+                return redirect()->to("/stock/admin/view_item_groups");
+            }
 	    }
 
-      $this->display_view('Stock\admin\item_groups\form',['entities'=>$this->entity_model->withDeleted(false)->findAll(),'error'=>$validation->getErrors()]);
+        $output['entities'] = $this->entity_model->withDeleted(false)->findAll();
+        $output['errors'] = $validation->getErrors();
+
+        $this->display_view('Stock\admin\item_groups\form', $output);
     }
 
     /**
