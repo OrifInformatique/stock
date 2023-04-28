@@ -33,7 +33,7 @@
                     <?php endif; ?>
 
                     <a href="<?= base_url(uri_string().'/2'); ?>" class="btn btn-danger">
-                        <?= lang('stock_lang.btn_delete_tag'); ?>
+                        <?= lang('stock_lang.btn_delete_item_group'); ?>
                     </a>
                 </div>
             </div>
