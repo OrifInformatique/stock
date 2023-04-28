@@ -118,8 +118,8 @@ return[
 
 /** ERRORS */
 'unauthorized_entity_list'              => 'Vous n\'êtes pas autorisé à consulter le(s) sites demandés',
-'unique_item_group_name'                => 'Ce nom est déjà utilisé dans cette entité',
-'unique_item_group_short_name'          => 'Ce nom court est déjà utilisé dans cette entité',
+'msg_err_unique_name'                => 'Ce nom est déjà utilisé dans cette entité',
+'msg_err_unique_short_name'          => 'Ce nom court est déjà utilisé dans cette entité',
 
 /** BTN */
 'excel_export_btn'                      => 'Exporter',

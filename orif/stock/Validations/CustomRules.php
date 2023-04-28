@@ -11,6 +11,7 @@ namespace Stock\Validations;
 
 
 use Stock\Models\Item_group_model;
+use Stock\Models\Stocking_place_model;
 
 class CustomRules
 {
@@ -37,9 +38,9 @@ class CustomRules
     }
 
     /**
-     * Checks that a name doesn't already exist in an entity
+     * Checks that a short_name doesn't already exist in an entity
      *
-     * @param string $name = name to check
+     * @param string $short name = short name to check
      * @param string $params = contains every parameters needed separated with a comma
      * @return boolean = TRUE if the username is unique, FALSE otherwise
      */
@@ -56,5 +57,49 @@ class CustomRules
                         ->first();
 
         return is_null($item_group);
+    }
+
+    /**
+     * Checks that a name doesn't already exist in an entity
+     *
+     * @param string $name = name to check
+     * @param string $params = contains every parameters needed separated with a comma
+     * @return boolean = TRUE if the username is unique, FALSE otherwise
+     */
+    public function is_unique_place_name_by_entity(string $name, string $params) : bool
+    {
+        // Separate the 2 parameters
+        $params = explode(',', $params);
+
+        $stocking_place_model = new Stocking_place_model();
+
+        $stocking_place = $stocking_place_model->where('name', [$name])
+                            ->where('fk_entity_id', $params[1])
+                            ->where('stocking_place_id !=', $params[0])
+                            ->first();
+
+        return is_null($stocking_place);
+    }
+
+    /**
+     * Checks that a short_name doesn't already exist in an entity
+     *
+     * @param string $short_name = short name to check
+     * @param string $params = contains every parameters needed separated with a comma
+     * @return boolean = TRUE if the username is unique, FALSE otherwise
+     */
+    public function is_unique_place_short_name_by_entity(string $short_name, string $params) : bool
+    {
+        // Separate the 2 parameters
+        $params = explode(',', $params);
+
+        $stocking_place_model = new Stocking_place_model();
+
+        $stocking_place = $stocking_place_model->where('short', $short_name)
+                            ->where('fk_entity_id', $params[1])
+                            ->where('stocking_place_id !=', $params[0])
+                            ->first();
+
+        return is_null($stocking_place);
     }
 }

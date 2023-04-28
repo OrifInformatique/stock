@@ -302,44 +302,51 @@ class Admin extends BaseController
     */
     public function modify_stocking_place($id = NULL)
     {
-      if (is_null($this->stocking_place_model->find($id)))
-      {
-        redirect()->to("/admin/view_stocking_places");
-      }
+        $output = [];
 
-      if ( ! empty($_POST))
-      {
-        $short_max_length = config('\Stock\Config\StockConfig')->stocking_short_max_length;
-        // VALIDATION
-        $validationRules = [
-          'name'            => 'required|min_length[3]|max_length[45]|is_unique[stocking_place.name,stocking_place_id,'.$id.']',
-          'short'           => 'required|max_length['.$short_max_length.']|is_unique[stocking_place.short,stocking_place_id,'.$id.']'
-          ];
-
-        if ($this->validate($validationRules))
+        if (is_null($this->stocking_place_model->find($id)))
         {
-            $this->stocking_place_model->update($id, $_POST);
+            redirect()->to("/admin/view_stocking_places");
+        }
 
+        if ( ! empty($_POST))
+        {
+            $short_max_length = config('\Stock\Config\StockConfig')->stocking_short_max_length;
+            // VALIDATION
+            $validationRules = [
+                'name' => 'required|min_length[3]|max_length[45]|is_unique_place_name_by_entity[' . $id . ',' . $_POST['fk_entity_id'] . ']',
+                'short' => 'required|max_length['.$short_max_length.']|is_unique_place_short_name_by_entity[' . $id . ',' . $_POST['fk_entity_id'] . ']'
+            ];
+
+            $validationErrors = [
+                'name' => [
+                    'is_unique_place_name_by_entity' => lang('stock_lang.msg_err_unique_name')
+                ],
+                'short' => [
+                    'is_unique_place_short_name_by_entity' => lang('stock_lang.msg_err_unique_short_name')
+                ]
+            ];
+
+            if ($this->validate($validationRules, $validationErrors)) {
+                $this->stocking_place_model->update($id, $_POST);
+
+                return redirect()->to('/stock/admin/view_stocking_places');
+            }
+
+        // The values of the tag are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
+        } else {
+            $output['stocking_place'] = $this->stocking_place_model->withDeleted()->find($id);
+        }
+
+        if ( ! is_null($this->stocking_place_model->withDeleted()->find($id))) {
+            $output['stocking_place'] = $this->stocking_place_model->withDeleted()->find($id);
+        } else {
             return redirect()->to('/stock/admin/view_stocking_places');
         }
 
-      // The values of the tag are loaded only if no form is submitted, otherwise we don't need them and it would disturb the form re-population
-      }
-      else
-      {
-        $output['stocking_place'] = $this->stocking_place_model->withDeleted()->find($id);
-      }
+        $output['entities']=$this->entity_model->withDeleted()->findAll();
 
-      if( ! is_null($this->stocking_place_model->withDeleted()->find($id)))
-      {
-        $output['stocking_place'] = $this->stocking_place_model->withDeleted()->find($id);
-      }
-      else
-      {
-        return redirect()->to('/stock/admin/view_stocking_places');
-      }
-      $output['entities']=$this->entity_model->withDeleted()->findAll();
-      $this->display_view('Stock\admin\stocking_places\form', $output);
+        $this->display_view('Stock\admin\stocking_places\form', $output);
     }
 
     /**
@@ -347,24 +354,36 @@ class Admin extends BaseController
     */
     public function new_stocking_place()
     {
-      if ( ! empty($_POST))
-      {
-        $short_max_length = config('\Stock\Config\StockConfig')->stocking_short_max_length;
-        // VALIDATION
-        $validationRules = [
-          'name'            => 'required|min_length[3]|max_length[45]|is_unique[stocking_place.name]',
-          'short'           => 'required|max_length['.$short_max_length.']|is_unique[stocking_place.short]'
-          ];
+        $output = [];
 
-        if($this->validate($validationRules))
-        {
-          $this->stocking_place_model->insert($_POST);
+        if ( ! empty($_POST)) {
+            $short_max_length = config('\Stock\Config\StockConfig')->stocking_short_max_length;
 
-          return redirect()->to("/stock/admin/view_stocking_places");
+            // VALIDATION
+            $validationRules = [
+                'name' => 'required|min_length[3]|max_length[45]|is_unique_place_name_by_entity[stocking_place.stocking_place_id,' . $_POST['fk_entity_id'] . ']',
+                'short' => 'required|max_length['.$short_max_length.']|is_unique_place_short_name_by_entity[stocking_place.stocking_place_id,' . $_POST['fk_entity_id'] . ']'
+            ];
+
+            $validationErrors = [
+                'name' => [
+                    'is_unique_place_name_by_entity' => lang('stock_lang.msg_err_unique_name')
+                ],
+                'short' => [
+                    'is_unique_place_short_name_by_entity' => lang('stock_lang.msg_err_unique_short_name')
+                ]
+            ];
+
+            if ($this->validate($validationRules, $validationErrors)) {
+                $this->stocking_place_model->insert($_POST);
+
+                return redirect()->to("/stock/admin/view_stocking_places");
+            }
         }
-	    }
 
-      $this->display_view('Stock\admin\stocking_places\form',['entities'=>$this->entity_model->withDeleted()->findAll()]);
+        $output['entities'] = $this->entity_model->withDeleted()->findAll();
+
+        $this->display_view('Stock\admin\stocking_places\form', $output);
     }
 
     /**
@@ -720,10 +739,10 @@ class Admin extends BaseController
 
             $validationErrors = [
                 'name' => [
-                    'is_unique_group_name_by_entity' => lang('stock_lang.unique_item_group_name')
+                    'is_unique_group_name_by_entity' => lang('stock_lang.msg_err_unique_name')
                 ],
                 'short_name' => [
-                    'is_unique_group_short_name_by_entity' => lang('stock_lang.unique_item_group_short_name')
+                    'is_unique_group_short_name_by_entity' => lang('stock_lang.msg_err_unique_short_name')
                 ]
             ];
 
@@ -767,10 +786,10 @@ class Admin extends BaseController
 
             $validationErrors = [
                 'name' => [
-                    'is_unique_group_name_by_entity' => lang('stock_lang.unique_item_group_name')
+                    'is_unique_group_name_by_entity' => lang('stock_lang.msg_err_unique_name')
                 ],
                 'short_name' => [
-                    'is_unique_group_short_name_by_entity' => lang('stock_lang.unique_item_group_short_name')
+                    'is_unique_group_short_name_by_entity' => lang('stock_lang.msg_err_unique_short_name')
                 ]
             ];
             
