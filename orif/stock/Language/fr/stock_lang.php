@@ -13,6 +13,8 @@ return[
 'title_stocking_places'                 => 'Liste des lieux de stockage',
 'title_suppliers'                       => 'Liste des fournisseurs',
 'title_item_groups'                     => 'Liste des groupes d\'objets',
+'title_entity_list'                     => 'Liste des sites',
+'title_excel_export'                    => 'Exportation Excel',
 
 
 // Buttons
@@ -23,14 +25,16 @@ return[
 'btn_add_tag'                           => 'Ajouter un tag',
 'btn_add_stocking_place'                => 'Ajouter un lieu de stockage',
 'btn_add_supplier'                      => 'Ajouter un fournisseur',
-'btn_add_item_group'                    => 'Ajouter un groupe d\'objet',
+'btn_add_item_group'                    => 'Ajouter un groupe d\'objets',
 'btn_soft_delete_tag'                   => 'Désactiver ce tag',
 'btn_delete_tag'                        => 'Supprimer ce tag',
 'btn_soft_delete_stocking_place'        => 'Désactiver ce lieu de stockage',
 'btn_delete_stocking_place'             => 'Supprimer ce lieu de stockage',
 'btn_delete_supplier'                   => 'Supprimer ce fournisseur',
 'btn_soft_delete_supplier'              => 'Désactiver ce fournisseur',
-'btn_soft_delete_item_group'            => 'Désactiver ce group d\'objet',
+'btn_soft_delete_item_group'            => 'Désactiver ce groupe d\'objets',
+'btn_delete_item_group'                 => 'Supprimer ce groupe d\'objets',
+'btn_export'                            => 'Exporter',
 
 
 // Fields labels
@@ -62,7 +66,7 @@ return[
 'tag'                                   => 'Tag',
 'stocking_place'                        => 'Lieu de stockage',
 'supplier'                              => 'Fournisseur',
-'item_group'                            => 'Group d\'objet',
+'item_group'                            => 'Groupe d\'objets',
 
 'tag_deletion_explanation'              => 'La désactivation d\'un tag permet de le rendre inutilisable tout en conservant ses informations dans les archives. ' 
                                                 . 'Cela permet notamment de garder l\'historique de ses actions. <br> <br>' 
@@ -90,14 +94,44 @@ return[
                                                 . 'En cas de suppression définitive, toutes les informations concernant ce fournisseur seront supprimées.',
 'supplier_already_disabled'             => 'Ce fournisseur est déjà désactivé. Voulez-vous le supprimer définitivement ?',
 
-'item_group_already_disabled'           => 'Ce groupe d\'objet est déjà désactivé. Voulez-vous le supprimer définitivement ?',
-'delete_item_group'                     => 'Désactiver ou supprimer ce groupe d\'objet',
-'hard_delete_item_group'                => 'Supprimer définitivement ce groupe d\'objet',
-'reactivate_item_group'                 => 'Réactiver ce groupe d\'objet',
-'item_group_already_disabled'           => 'Ce groupe d\'objet est déjà désactivé. Voulez-vous le supprimer définitivement ?',
-'item_group_deletion_explanation'       => 'La désactivation d\'un groupe d\'objet permet de le rendre inutilisable tout en conservant ses informations dans les archives. ' 
+'item_group_already_disabled'           => 'Ce groupe d\'objets est déjà désactivé. Voulez-vous le supprimer définitivement ?',
+'delete_item_group'                     => 'Désactiver ou supprimer ce groupe d\'objets',
+'hard_delete_item_group'                => 'Supprimer définitivement ce groupe d\'objets',
+'reactivate_item_group'                 => 'Réactiver ce groupe d\'objets',
+'item_group_already_disabled'           => 'Ce groupe d\'objets est déjà désactivé. Voulez-vous le supprimer définitivement ?',
+'item_group_deletion_explanation'       => 'La désactivation d\'un groupe d\'objets permet de le rendre inutilisable tout en conservant ses informations dans les archives. ' 
                                         . 'Cela permet notamment de garder l\'historique de ses actions. <br> <br>' 
-                                        . 'En cas de suppression définitive, toutes les informations concernant ce groupe d\'objet seront supprimées.',
-'item_group_already_disabled'           => 'Ce groupe d\'objet est déjà désactivé. Voulez-vous le supprimer définitivement ?',
+                                        . 'En cas de suppression définitive, toutes les informations concernant ce groupe d\'objets seront supprimées.',
+'item_group_already_disabled'           => 'Ce groupe d\'objets est déjà désactivé. Voulez-vous le supprimer définitivement ?',
+'name'                                  => 'Nom',
+'entity_name'                           => 'Nom du site',
+'address'                               => 'Adresse',
+'zip_code'                              => 'Numéro postal',
+'locality'                              => 'Ville',
+'tagname'                               => 'Tag',
+'add_entity'                            => 'Ajouter un site',
+'update_entity'                         => 'Modifier le site',
+'no_id_found_for_update_error'          => 'Pour modifier un site, il vous faut fournir son id dans l\'url',
+'delete_entity_what_to_do'              => 'La désactivation d\'un site permet de le rendre inutilisable tout en conservant ses informations dans les archives.
+                                            Cela permet notamment de conserver l\'historique de ses actions.<br><br>
+                                            En cas de suppression, toutes les information associées à ce site seront suprimées.',
+
+/** ERRORS */
+'unauthorized_entity_list'              => 'Vous n\'êtes pas autorisé à consulter le(s) sites demandés',
+'msg_err_unique_name'                   => 'Ce nom est déjà utilisé dans ce site',
+'msg_err_unique_short_name'             => 'Ce nom court est déjà utilisé dans ce site',
+
+/** BTN */
+'excel_export_btn'                      => 'Exporter',
+/** LABELS **/
+'lbl_filter_to_use'                     => 'Filtre à utiliser pour l\'exportation',
+
+// Warning
+'no_entity'                             => 'Aucun site n\'a été créé jusqu\'à présent, vous ne pouvez donc pas utiliser la fonction d\'exportation avec les sites.',
+'no_entity_excel_export'                => 'Vous n\'avez pas accès à la fonctionnalité d\'exportation en Excel, car vous n\'êtes pas encore lié à un site.',
+'entity_has_no_items'                   => 'Le site que vous avez sélectionné n\'est lié à aucun objet.',
+'msg_no_entities_exist'                 => 'Aucun site n\'a été créé, par défaut tous les objets sont affichés',
+'msg_user_has_no_entities'              => 'Vous n\'êtes lié à aucun site, veuillez contacter votre administrateur',
+'msg_entities_has_no_items'             => 'Aucun site n\'est lié à un objet',
 
 ];

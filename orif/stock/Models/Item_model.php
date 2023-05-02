@@ -300,7 +300,7 @@ class Item_model extends MyModel
         // Prepare WHERE clause
         $where_textSearchFilter .= '(';
         $where_textSearchFilter .=
-          "name LIKE '%".$text_search_content."%' "
+          "item.name LIKE '%".$text_search_content."%' "
           ."OR description LIKE '%".$text_search_content."%' "
           ."OR serial_number LIKE '%".$text_search_content."%' ";
 
@@ -362,7 +362,7 @@ class Item_model extends MyModel
         // Prepare WHERE clause
         $where_itemGroupFilter .= '(';
         foreach ($item_groups_selection as $item_group_id) {
-          $where_itemGroupFilter .= 'item_group_id='.$item_group_id.' OR ';
+          $where_itemGroupFilter .= 'item.item_group_id='.$item_group_id.' OR ';
         }
         // Remove the last " OR "
         $where_itemGroupFilter = substr($where_itemGroupFilter, 0, -4);
@@ -387,7 +387,7 @@ class Item_model extends MyModel
         // Prepare WHERE clause
         $where_stockingPlaceFilter .= '(';
         foreach ($stocking_places_selection as $stocking_place_id) {
-          $where_stockingPlaceFilter .= 'stocking_place_id='.$stocking_place_id.' OR ';
+          $where_stockingPlaceFilter .= 'item.stocking_place_id='.$stocking_place_id.' OR ';
         }
         // Remove the last " OR "
         if($where_stockingPlaceFilter != "(") {
@@ -449,19 +449,26 @@ class Item_model extends MyModel
         $where_itemsFilters .= $where_itemTagsFilter;
       }
 
+      /*********************
+      ** ENTITY TAG FILTERS
+      **********************/
+
+      if (isset($filters['e']) && $filters['e'] !== 0) {
+        $builder = $this->db->table('entity');
+        $entity = $builder->where('entity_id', $filters['e']);
+        $join_item_group = $entity->join('item_group', 'item_group.fk_entity_id = entity.entity_id', 'inner');
+        $join_stocking_place = $join_item_group->join('stocking_place', 'stocking_place.fk_entity_id = entity.entity_id', 'inner');
+        $join_items = $join_stocking_place->join('item', 'item.item_group_id = item_group.item_group_id AND item.stocking_place_id = stocking_place.stocking_place_id', 'inner');
+      }
 
       /*********************
       ** GET FILTERED ITEMS
       **********************/
-      if ($where_itemsFilters == '')
-      {
-        // No filter, get all items
-        $items = $this->asArray()->find();
+      if (isset($filters['e']) && $filters['e'] !== 0) {
+        $items = $join_items->where($where_itemsFilters)->get()->getResultArray();
       } else {
-        // Get filtered items
         $items = $this->asArray()->where($where_itemsFilters)->find();
       }
-
 
       foreach ($items as &$item){
         $item['stocking_place'] = $this->getStockingPlace($item);
@@ -471,8 +478,6 @@ class Item_model extends MyModel
         $item['image'] = $this->getImage($item);
         $item['image_path'] = $this->getImagePath($item);
       }
-
-
       return $items;
     }
 

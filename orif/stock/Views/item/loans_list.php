@@ -3,15 +3,20 @@
 	<a href="<?= $_SESSION['items_list_url'] ?: base_url('/item'); ?>"
         class="btn btn-primary" role="button"><?= lang('MY_application.btn_back_to_list'); ?></a>
 
+    <div class="row pb-3 pt-3">
+        <div id="e" class="col-sm-12">
+            <?= form_label(lang('stock_lang.entity_name'),'entities_list_label').form_dropdown('e', $entities, isset($_GET["e"]) ? $_GET["e"] : '', 'id="entities_list"');?>
+        </div>
+    </div>
+    
     <!-- HEADER -->
     <div>
         <h1 class="title-section"><?= lang('MY_application.page_active_loans_list') ?></h1>
         <p id="late_loans_count" class="alert alert-danger"></p>
     </div>
 
-
     <!-- PAGINATION -->
-    <div class="row"><div class="col-12">
+    <div class="row text-center"><div class="col-12">
         <div id="pagination_top"></div>
     </div></div>
 
@@ -24,7 +29,7 @@
     </div>
 
     <!-- PAGINATION -->
-    <div class="row"><div class="col-12">
+    <div class="row text-center"><div class="col-12">
         <div id="pagination_bottom"></div>
     </div></div>
 </div>
@@ -33,9 +38,24 @@ $(document).ready(function() {
     // ******************************************
     // Load items list
     // ******************************************
-    // Load parameters in the URL
-    let page = location.pathname.split("/").pop();
-    load_items(page);
+
+    var no_filter = "<?= htmlspecialchars(lang('MY_application.field_no_filter')); ?>";
+    $('#entities_list').multiselect({
+        nonSelectedText: no_filter,
+        buttonWidth: '100%',
+        buttonClass: 'btn btn-outline-primary',
+        numberDisplayed: 5
+    });
+
+    page = location.pathname.split("/").pop();
+    filters = location.search;
+    load_items(page, filters);
+
+    // Reload items list on filter update
+    $("input[type=checkbox], input[type=radio]").change(function() {
+        // Load page 1 with new filters
+        load_items(1, getFilters());
+    });
 });
 
 // ******************************************
@@ -43,7 +63,20 @@ $(document).ready(function() {
 // ******************************************
 let populating = false;
 
-function load_items(page){
+function getFilters() {
+    //entity_filter
+    e = "";
+    eItems = $("#e .multiselect-container .active input");
+    if (eItems.length > 0) {
+        e = "e=" + eItems[0].value;
+    } else {
+        $('#alert_no_entities').removeClass('d-none');
+    }
+
+    return "?"+e;
+}
+
+function load_items(page, filters){
     if (populating) return;
     populating = true;
 
@@ -56,11 +89,12 @@ function load_items(page){
     $("#table_item").toggle(false);
     $('#late_loans_count').toggle(false);
     $("#list_item").empty();
+    $("#error_message").empty();
     $("#pagination_bottom, #pagination_top").empty();
 
 
     // URL for ajax call to PHP controller                      Stock\Controllers\
-    url = "<?= base_url("/Item/load_list_loans_json")?>"+ "/" + page;
+    url = "<?= base_url("/Item/load_list_loans_json")?>"+ "/" + page+filters;
 
     $.ajax({
         url: url,
@@ -68,10 +102,11 @@ function load_items(page){
         success: function (response) {
             var result = JSON.parse(response);
             page = result.number_page;
-            history.pushState(null, "", "<?= base_url("item/list_loans/")?>"+ "/"+page);
+            filters=getFilters();
+            history.pushState(null, "", "<?= base_url("item/list_loans/")?>"+ "/"+page+filters);
 
             // Empty list before filling it
-            if (result.items.length > 0){
+            if (result.items !== null && result.items.length > 0){
                 $("#table_item").toggle(true);
                 $.each(result.items, function (i, item) {
                     $("#list_item").append(display_item(item));
@@ -94,10 +129,10 @@ function load_items(page){
             $(".pagination a").click(function(e){
                 e.preventDefault();
                 let pageLinkNumber = parseInt(e.target.href.split("=").pop(), 10);
-                load_items(pageLinkNumber);
+                load_items(pageLinkNumber, getFilters());
             });
 
-            history.pushState(null, "", "<?= base_url("item/list_loans/")?>"+ "/" +page);
+            history.pushState(null, "", "<?= base_url("item/list_loans/")?>"+ "/" +page+filters);
             populating = false;
         },
         error : function(resultat, statut, erreur){

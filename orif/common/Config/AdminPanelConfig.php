@@ -23,5 +23,6 @@ class AdminPanelConfig extends \CodeIgniter\Config\BaseConfig
         ['label'=>'stock_lang.title_stocking_places', 'pageLink'=>'stock/admin/view_stocking_places'],
         ['label'=>'stock_lang.title_suppliers', 'pageLink'=>'stock/admin/view_suppliers'],
         ['label'=>'stock_lang.title_item_groups', 'pageLink'=>'stock/admin/view_item_groups'],
+        ['label'=>'stock_lang.title_entity_list','pageLink'=>'stock/admin/view_entity_list']
     ];
 }

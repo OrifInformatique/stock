@@ -22,6 +22,7 @@ use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use PSR\Log\LoggerInterface;
 use App\Controllers\BaseController;
+use Stock\Models\Entity_model;
 use Stock\Models\Inventory_control_model;
 use Stock\Models\Item_model;
 use Stock\Models\Loan_model;
@@ -31,20 +32,44 @@ use Stock\Models\Item_group_model;
 use Stock\Models\Item_tag_link_model;
 use Stock\Models\Stocking_place_model;
 use Stock\Models\Supplier_model;
+use Stock\Models\User_entity_model;
 use User\Models\User_model;
+use CodeIgniter\Database\BaseConnection;
 
 class Item extends BaseController {
 
-    /* MY_Controller variables definition */
+    // Properties
     protected $access_level = "*";
+    protected Item_model $item_model;
+    protected Loan_model $loan_model;
+    protected Item_tag_link_model $item_tag_link_model;
+    protected Inventory_control_model $inventory_control_model;
+    protected Item_tag_model $item_tag_model;
+    protected Item_condition_model $item_condition_model;
+    protected Item_group_model $item_group_model;
+    protected Stocking_place_model $stocking_place_model;
+    protected Supplier_model $supplier_model;
+    protected User_model $user_model;
+    protected Entity_model $entity_model;
+    protected User_entity_model $user_entity_model;
+    protected $config;
+    protected BaseConnection $db;
 
     /**
      * Constructor
      */
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger) {
+        // Set Access level before calling parent constructor
+        // Accessibility reserved to admin users
         $this->access_level = "*";
         parent::initController($request, $response, $logger);
 
+        // Load required helpers
+        helper('sort');
+        helper('form');
+        helper('\Stock\Helpers\MY_date');
+
+        // Load required models 
         $this->item_model = new Item_model();
         $this->loan_model = new Loan_model();
         $this->item_tag_link_model = new Item_tag_link_model();
@@ -53,10 +78,12 @@ class Item extends BaseController {
         $this->item_condition_model = new Item_condition_model();
         $this->item_group_model = new Item_group_model();
         $this->stocking_place_model = new Stocking_place_model();
+        $this->entity_model = new Entity_model();
+        $this->user_entity_model = new User_entity_model();
         $this->config = config('\Stock\Config\StockConfig');
-        helper('sort');
-        helper('form');
-        helper('\Stock\Helpers\MY_date');
+
+        // Initialize db for query builder
+        $this->db = \Config\Database::connect();
     }
 
     /**
@@ -89,9 +116,32 @@ class Item extends BaseController {
         if (!isset($output["t"])) $output["t"] = '';
         if (!isset($output["o"])) $output["o"] = '';
         if (!isset($output["ad"])) $output["ad"] = '';
+        if (!isset($output["e"])) $output["e"] = '';
 
-        // Get the amount of late loans
-        $output['late_loans_count'] = count($this->loan_model->get_late_loans());
+        $output['entities'] = $this->entity_model->dropdown('name');
+
+        if (isset($_SESSION['user_id'])) {
+            $userDefaultEntity = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->first();
+            $defaultEntity = $this->entity_model->find(isset($userDefaultEntity) ? $userDefaultEntity['fk_entity_id'] : 0);
+            $output['has_entities'] = $this->config->access_lvl_admin > $_SESSION['user_access'] ? count($this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->findAll()) > 0 : true;
+        } else {
+            // Default value to prevent displaying the message for non logged in users
+            $output['has_entities'] = true;
+        }
+
+        if (isset($defaultEntity['entity_id'])) {
+            $output['default_entity'] = $defaultEntity['entity_id'];
+        } else {
+            $firstEntity = $this->entity_model->first();
+
+            if (!is_null($firstEntity)) {
+                $output['default_entity'] = $firstEntity['entity_id'];
+            } else {
+                $output['default_entity'] = null;
+            }
+        }
+
+        $output['entities_has_items'] = $this->has_items(false);
 
         // Send the data to the View
         return $this->display_view('Stock\Views\item\list', $output);
@@ -111,13 +161,26 @@ class Item extends BaseController {
             // No condition selected for filtering, default filtering for "functional" items
             $filters['c'] = array($this->config->functional_item_condition);
         }
+        
+        if (!isset($filters['e'])) {
+            if (isset($_SESSION['user_id'])) {
+                $entityId = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->first()['fk_entity_id'] ?? 0;
+            } else {
+                $entityId = 0;
+            }
+            
+            if ($entityId !== 0) {
+                $filters['e'] = $entityId;
+            } else {
+                $filters['e'] = $this->entity_model->first()['entity_id'] ?? 0;
+            }
+        }
 
         // Sanitize $page parameter
         if (empty($page) || !is_numeric($page) || $page<1) {
             $page = 1;
         }
 
-        // Get item(s) through filtered search on the database
         $output['items'] = $this->item_model->get_filtered($filters);
 
         // Verify the existence of the sort order key in filters
@@ -182,7 +245,16 @@ class Item extends BaseController {
         });
 
         // Get the amount of late loans
-        $output['late_loans_count'] = count($this->loan_model->get_late_loans());
+        if (isset($filters['e']) && $filters['e'] !== 0) {
+            $output['late_loans_count'] = $this->loan_model->get_late_loans_by_entity($filters['e']);
+        } else {
+            $output['late_loans_count'] = count($this->loan_model->get_late_loans());
+        }
+
+        if (isset($_SESSION['user_id'])) {
+            $entities = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->findColumn('fk_entity_id');
+            $output['user_entities'] = $entities;
+        }
 
         return $output;
     }
@@ -242,7 +314,7 @@ class Item extends BaseController {
      *
      * @return void
      */
-    public function create() {
+    public function create($entity_id) {
         // Check if this is allowed
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
             // Get new item id and set picture_prefix
@@ -255,7 +327,7 @@ class Item extends BaseController {
 
             // Check if the user cancelled the form
             if(isset($_POST['submitCancel'])){
-                $tmp_image_file = glob($this->config->images_upload_path.$temp_image_name)[0];
+                $tmp_image_file = isset(glob($this->config->images_upload_path.$temp_image_name)[0])?glob($this->config->images_upload_path.$temp_image_name)[0]:null;
 
                 // Check if there is a temporary file, if yes then delete it
                 if($tmp_image_file != null || $tmp_image_file != false){
@@ -319,7 +391,6 @@ class Item extends BaseController {
                         $itemArray[$key] = $value;
                     }
                 }
-
                 // Turn Temporaty Image into a final one if there is one
                 if(file_exists($this->config->images_upload_path.$temp_image_name)){
                     rename($this->config->images_upload_path.$temp_image_name, $this->config->images_upload_path.$new_image_name);
@@ -360,7 +431,18 @@ class Item extends BaseController {
                 $this->supplier_model = new Supplier_model();
 
                 // Load the comboboxes options
-                $data['stocking_places'] = $this->stocking_place_model->findAll();
+                if (isset($_SESSION['user_access'])&&isset($_SESSION['user_id'])&&$_SESSION['user_access']<config('\User\Config\UserConfig')->access_lvl_admin){
+                    $userid=$_SESSION['user_id'];
+                    $userentitymodel=new User_entity_model();
+                    $stockingplacemodel=new Stocking_place_model();
+                    $entitiesAssociated=$userentitymodel->where('fk_user_id',$userid)->findColumn('fk_entity_id');
+                    $data['stocking_places']=$stockingplacemodel->whereIn('fk_entity_id',$entitiesAssociated)->findAll();
+                }
+                else{
+                    $data['stocking_places'] = $this->stocking_place_model->findAll();
+                }
+
+                $data['entities']=(new \Stock\Models\Entity_model())->whereIn('entity_id',(new User_entity_model())->where('fk_user_id',$_SESSION['user_id'])->findColumn('fk_entity_id'))->findAll();
                 $data['suppliers'] = $this->supplier_model->findAll();
                 $data['item_groups_name'] = $this->item_group_model->dropdown('name');
 
@@ -371,6 +453,9 @@ class Item extends BaseController {
 
                 // Load the tags
                 $data['item_tags'] = $this->item_tag_model->findAll();
+
+                // Load entity id
+                $data['selected_entity_id'] = $entity_id;
 
                 $data['item_id'] = $this->item_model->getFutureId();
                 $data['errors'] = $validation->getErrors();
@@ -535,7 +620,13 @@ class Item extends BaseController {
                 }
             }
             unset($_SESSION['POST']);
-
+            if(isset($data['item_group_id'])){
+                $data['entity_id']=(new Item_group_model())->find($data['item_group_id'])['fk_entity_id'];
+            }
+            elseif(isset($data['stocking_place_id'])){
+                $data['entity_id']=(new Stocking_place_model())->find($data['stocking_place_id'])['fk_entity_id'];
+            }
+            $data['entities']=(new \Stock\Models\Entity_model())->whereIn('entity_id',(new User_entity_model())->where('fk_user_id',$_SESSION['user_id'])->findColumn('fk_entity_id'))->findAll();
             $this->display_view('Stock\Views\item\form', $data);
         } else {
             // Update is not allowed
@@ -563,15 +654,34 @@ class Item extends BaseController {
                 $this->item_model->update($id, array("description" => "FAC"));
 
                 $item = $this->item_model->find($id);
+
+                // Delete image file
                 if (!is_null($item['image']) && $item['image'] != $this->config->item_no_image) {
                     $items = $this->item_model->asArray()->where('image', $item['image'])->findAll();
+                    $path_to_image = ROOTPATH.'public/' . $this->config->images_upload_path . $item['image'];
+                    $image_file_exists = file_exists($path_to_image);
+
                     // Change this if soft deleting items is enabled
                     // Check if any other item uses this image
-                    if (count($items) < 2) {
-                        unlink(ROOTPATH.'public/'.$this->config->images_upload_path.$item['image']);
+                    if ($image_file_exists && count($items) < 2) {
+                        unlink($path_to_image);
                     }
                 }
 
+                // Delete linked file
+                if (!is_null($item['linked_file']) && $item['linked_file']) {
+                    $items = $this->item_model->asArray()->where('linked_file', $item['linked_file'])->findAll();
+                    $path_to_file = ROOTPATH.'public/' . $this->config->files_upload_path . $item['linked_file'];
+                    $linked_file_exists = file_exists($path_to_file);
+
+                    // Change this if soft deleting items is enabled
+                    // Check if any other item uses this linked_file
+                    if ($linked_file_exists && count($items) < 2) {
+                        unlink($path_to_file);
+                    }
+                }
+
+                $this->inventory_control_model->where('item_id', $id)->delete();
                 $this->item_tag_link_model->where('item_id', $id)->delete();
                 $this->loan_model->where('item_id', $id)->delete();
                 $this->item_model->delete($id);
@@ -887,7 +997,8 @@ class Item extends BaseController {
      * @return void
      */
     public function list_loans() {
-        $this->display_view('Stock\Views\item\loans_list');
+        $output['entities'] = $this->entity_model->dropdown('name');
+        $this->display_view('Stock\Views\item\loans_list', $output);
     }
 
     /**
@@ -905,68 +1016,98 @@ class Item extends BaseController {
             $_SESSION['items_list_url'] .= '?'.$_SERVER['QUERY_STRING'];
         }
 
+        // Add page title
+        $title = lang('My_application.page_item_list');
+        $late_loans_count = 0;
+
+        // Get user's search filters and add default values
+        $filters = $_GET;
+
         // Sanitize $page parameter
         if (empty($page) || !is_numeric($page) || $page<1) {
             $page = 1;
         }
 
         // Get Loans and corresponding items
-        $loans = $this->loan_model->where('real_return_date', NULL)->findAll();
-        foreach($loans as $loan) {
-            $item = $this->loan_model->get_item($loan);
-            $item['stocking_place'] = $this->item_model->getStockingPlace($item);
-            $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
-            $item['condition'] = $this->item_model->getItemCondition($item);
-            $item['current_loan'] = $this->item_model->getCurrentLoan($item);
-            $item['image'] = $this->item_model->getImage($item);
-            $item['image_path'] = $this->item_model->getImagePath($item);
-            $items[] = $item;
+        if (isset($filters['e'])) {
+            $builder = $this->db->table('entity');
+            $entity = $builder->where('entity_id', $filters['e']);
+            $return_date = $entity->where('real_return_date', null);
+            $join_item_group = $return_date->join('item_group', 'item_group.fk_entity_id = entity.entity_id', 'inner');
+            $join_stocking_place = $join_item_group->join('stocking_place', 'stocking_place.fk_entity_id = entity.entity_id', 'inner');
+            $join_items = $join_stocking_place->join('item', 'item.item_group_id = item_group.item_group_id AND item.stocking_place_id = stocking_place.stocking_place_id', 'inner');
+            $join_loans = $join_items->join('loan', 'loan.item_id = item.item_id', 'inner');
+            $join_loans->select(['loan.loan_id', 'loan.date', 'loan.item_localisation', 'loan.remarks', 'loan.planned_return_date', 'loan.real_return_date', 'loan.item_id', 'loan.loan_by_user_id', 'loan.loan_to_user_id', 'loan.borrower_email']);
+            $loans = $join_loans->get()->getResultArray();
+
+            $late_loans_count = $this->loan_model->get_late_loans_by_entity($filters['e']);
+        } else {
+            $loans = $this->loan_model->where('real_return_date', NULL)->findAll();
+            $late_loans_count = count($this->loan_model->get_late_loans());
         }
 
-        // Sort items, separate late loans and others, then sort by name
-        usort($items, function($a, $b) {
-            $late_a = $a['current_loan']['is_late'];
-            $late_b = $b['current_loan']['is_late'];
-            if ($late_a != $late_b) {
-                return $late_b <=> $late_a;
-            } else {
-                return strtolower($a['name']) <=> strtolower($b['name']);
+        if (count($loans) > 0) {
+            foreach($loans as $loan) {
+                $item = $this->loan_model->get_item($loan);
+                $item['stocking_place'] = $this->item_model->getStockingPlace($item);
+                $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
+                $item['condition'] = $this->item_model->getItemCondition($item);
+                $item['current_loan'] = $this->item_model->getCurrentLoan($item);
+                $item['image'] = $this->item_model->getImage($item);
+                $item['image_path'] = $this->item_model->getImagePath($item);
+                $items[] = $item;
             }
-        });
-
-        // Add page title
-        $title = lang('My_application.page_item_list');
-
-        // Pagination
-        $items_count = count($items);
-        $pagination = $this->load_pagination($items_count, $page);
-
-        $number_page = $page;
-        if($number_page > ceil($items_count/$this->config->items_per_page)) $number_page = ceil($items_count/$this->config->items_per_page);
-
-        // Keep only the slice of items corresponding to the current page
-        $items = array_slice($items, ($number_page-1)*$this->config->items_per_page, $this->config->items_per_page);
-
-        // Format dates
-        array_walk($items, function(&$item) {
-            $loan = $item['current_loan'];
-            if (!isset($loan['planned_return_date']) || is_null($loan['planned_return_date'])) {
-                $loan['planned_return_date'] = lang('MY_application.text_none');
-            } else {
-                $loan['planned_return_date'] = databaseToShortDate($loan['planned_return_date']);
-            }
-            $loan['date'] = databaseToShortDate($loan['date']);
-
-            $item['current_loan'] = $loan;
-        });
-
-        return [
-            'items' => $items,
-            'title' => $title,
-            'pagination' => $pagination,
-            'number_page' => $number_page,
-            'late_loans_count' => count($this->loan_model->get_late_loans()),
-        ];
+    
+            // Sort items, separate late loans and others, then sort by name
+            usort($items, function($a, $b) {
+                $late_a = $a['current_loan']['is_late'];
+                $late_b = $b['current_loan']['is_late'];
+                if ($late_a != $late_b) {
+                    return $late_b <=> $late_a;
+                } else {
+                    return strtolower($a['name']) <=> strtolower($b['name']);
+                }
+            });
+    
+            // Pagination
+            $items_count = count($items);
+            $pagination = $this->load_pagination($items_count, $page);
+    
+            $number_page = $page;
+            if($number_page > ceil($items_count/$this->config->items_per_page)) $number_page = ceil($items_count/$this->config->items_per_page);
+    
+            // Keep only the slice of items corresponding to the current page
+            $items = array_slice($items, ($number_page-1)*$this->config->items_per_page, $this->config->items_per_page);
+    
+            // Format dates
+            array_walk($items, function(&$item) {
+                $loan = $item['current_loan'];
+                if (!isset($loan['planned_return_date']) || is_null($loan['planned_return_date'])) {
+                    $loan['planned_return_date'] = lang('MY_application.text_none');
+                } else {
+                    $loan['planned_return_date'] = databaseToShortDate($loan['planned_return_date']);
+                }
+                $loan['date'] = databaseToShortDate($loan['date']);
+    
+                $item['current_loan'] = $loan;
+            });
+    
+            return [
+                'items' => $items,
+                'title' => $title,
+                'pagination' => $pagination,
+                'number_page' => $number_page,
+                'late_loans_count' => $late_loans_count,
+            ];
+        } else {
+            return [
+                'items' => null,
+                'title' => $title,
+                'pagination' => null,
+                'number_page' => 0,
+                'late_loans_count' => 0,
+            ];
+        }
     }
 
     /**
@@ -993,6 +1134,40 @@ class Item extends BaseController {
         $validation->setRule("inventory_prefix", lang('MY_application.field_inventory_number'), 'required');
 
         return $validation;
+    }
+
+    /**
+     * 
+     *
+     * @param  mixed $entityId
+     * @return void
+     */
+    public function has_items($isJSON = true, $entityId = null) {
+        // Get result by item_group
+        $builder = $this->db->table('entity');
+        $entity = !is_null($entityId) ? $builder->where('entity_id', $entityId) : $builder;
+        $join_item_group = $entity->join('item_group', 'item_group.fk_entity_id = entity.entity_id', 'inner');
+        $join_stocking_place = $join_item_group->join('stocking_place', 'stocking_place.fk_entity_id = entity.entity_id', 'inner');
+        $join_item = $join_stocking_place->join('item', 'item.item_group_id = item_group.item_group_id AND item.stocking_place_id = stocking_place.stocking_place_id', 'inner');
+        
+        // Count all results
+        $nb_items = $join_item->countAllResults();
+        $result = $nb_items > 0;
+
+        if ($isJSON) {
+            // Makes sure the debug toolbar is not sent with the JSON
+            $this->response->setContentType('Content-Type: application/json');
+            return json_encode([
+                'has_items' => $result
+            ]);
+        } else {
+            return $result;
+        }
+    }
+
+    public function return_loan() {
+        echo 'Retour du prêt';
+        
     }
 
 }

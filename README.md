@@ -41,8 +41,8 @@ database.default.DBDriver = MySQLi
 4. Generate a local database running CodeIgniter's spark migrate commands
 
 ```bash
-php spark migrate --n Stock
-php spark migrate --n User
+php spark migrate -n Stock
+php spark migrate -n User
 ```
 
 ## Upgrade Version 1.6 to Version 4.0

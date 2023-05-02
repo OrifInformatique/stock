@@ -19,7 +19,7 @@ class Item_group_model extends MyModel
     /* MY_Model variables definition */
     protected $table = 'item_group';
     protected $primaryKey = 'item_group_id';
-    protected $allowedFields = ['name', 'short_name', 'archive'];
+    protected $allowedFields = ['fk_entity_id','name', 'short_name', 'archive'];
     protected $useSoftDeletes = true;
     protected $deletedField = 'archive';
 

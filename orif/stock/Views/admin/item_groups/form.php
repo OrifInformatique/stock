@@ -27,6 +27,11 @@ else
         <label for="name"><?= lang('stock_lang.field_name') ?></label>
         <input type="text" class="form-control" name="name" id="name" value="<?php if (isset($item_group['name'])) {echo set_value('name',$item_group['name']);} else {echo set_value('name');} ?>" />
         <span class="text-danger"><?= $validation->showError('name'); ?></span>
+        <select class="form-control mt-2" id="entity_selector" name="fk_entity_id">
+            <?php foreach ($entities as $entity):?>
+                <option value="<?=$entity['entity_id']?>" <?=isset($item_group['fk_entity_id'])&&$item_group['fk_entity_id']==$entity['entity_id']?'selected=true':''?>><?=$entity['name']?></option>
+            <?php endforeach;?>
+        </select>
       </div>
     </div>
   </div>

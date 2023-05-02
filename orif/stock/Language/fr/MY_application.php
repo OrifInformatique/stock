@@ -173,6 +173,7 @@ return[
 'btn_to_loans'                   => 'Liste des prêts',
 'btn_loans_history'              => 'Historique des prêts',
 'btn_create_loan'                => 'Nouveau prêt',
+'btn_return_loan'                => 'Retour du prêt',
 'btn_submit_filters'             => 'Appliquer filtres et tri',
 'btn_remove_filters'             => 'Supprimer les filtres',
 'btn_all'                        => 'Tout',
