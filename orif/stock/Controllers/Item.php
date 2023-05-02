@@ -1132,6 +1132,8 @@ class Item extends BaseController {
 
         $validation->setRule("name", lang('MY_application.field_item_name'), 'required');
         $validation->setRule("inventory_prefix", lang('MY_application.field_inventory_number'), 'required');
+        $validation->setRule("item_group_id", lang('MY_application.field_group'), 'required');
+        $validation->setRule("stocking_place_id", lang('MY_application.field_stocking_place'), 'required');
 
         return $validation;
     }
