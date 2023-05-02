@@ -112,14 +112,14 @@ return[
 'add_entity'                            => 'Ajouter un site',
 'update_entity'                         => 'Modifier le site',
 'no_id_found_for_update_error'          => 'Pour modifier un site, il vous faut fournir son id dans l\'url',
-'delete_entity_what_to_do'              => 'La désactivation d\'une entité permet de la rendre inutilisable tout en conservant ses informations dans les archives.
-                                            Cela permet notamment de conserver l\'historique de ses actions<br><br>
-                                            En cas de suppression toutes les information associées à ce site seront suprimées',
+'delete_entity_what_to_do'              => 'La désactivation d\'un site permet de le rendre inutilisable tout en conservant ses informations dans les archives.
+                                            Cela permet notamment de conserver l\'historique de ses actions.<br><br>
+                                            En cas de suppression, toutes les information associées à ce site seront suprimées.',
 
 /** ERRORS */
 'unauthorized_entity_list'              => 'Vous n\'êtes pas autorisé à consulter le(s) sites demandés',
-'msg_err_unique_name'                => 'Ce nom est déjà utilisé dans cette entité',
-'msg_err_unique_short_name'          => 'Ce nom court est déjà utilisé dans cette entité',
+'msg_err_unique_name'                   => 'Ce nom est déjà utilisé dans ce site',
+'msg_err_unique_short_name'             => 'Ce nom court est déjà utilisé dans ce site',
 
 /** BTN */
 'excel_export_btn'                      => 'Exporter',
