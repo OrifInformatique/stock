@@ -98,9 +98,6 @@ class Item extends BaseController {
 
         $output['item_conditions'] = $this->item_condition_model->dropdown('name');
 
-        $output['item_groups'] = $this->item_group_model->dropdown('name');
-
-        $output['stocking_places'] = $this->stocking_place_model->dropdown('name');
         $output['sort_order'] = array(lang('MY_application.sort_order_name'),
                                         lang('MY_application.sort_order_stocking_place_id'),
                                         lang('MY_application.sort_order_date'),
@@ -141,6 +138,16 @@ class Item extends BaseController {
             }
         }
 
+        $filters = $_GET;
+
+        $filters['e'] = $this->getEFilter($filters);
+
+        $where = isset($filters['e']) && $filters['e'] !== 0 ? "fk_entity_id = {$filters['e']}" : "fk_entity_id IS NULL";
+
+        $output['item_groups'] = $this->dropdown($this->item_group_model->select(["item_group_id", "name"])->where($where)->findAll(), 'item_group_id');
+
+        $output['stocking_places'] = $this->dropdown($this->stocking_place_model->select(["stocking_place_id", "name"])->where($where)->findAll(), 'stocking_place_id');
+
         $output['entities_has_items'] = $this->has_items(false);
 
         // Send the data to the View
@@ -162,19 +169,7 @@ class Item extends BaseController {
             $filters['c'] = array($this->config->functional_item_condition);
         }
         
-        if (!isset($filters['e'])) {
-            if (isset($_SESSION['user_id'])) {
-                $entityId = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->first()['fk_entity_id'] ?? 0;
-            } else {
-                $entityId = 0;
-            }
-            
-            if ($entityId !== 0) {
-                $filters['e'] = $entityId;
-            } else {
-                $filters['e'] = $this->entity_model->first()['entity_id'] ?? 0;
-            }
-        }
+        $filters['e'] = $this->getEFilter($filters);
 
         // Sanitize $page parameter
         if (empty($page) || !is_numeric($page) || $page<1) {
@@ -1172,4 +1167,45 @@ class Item extends BaseController {
         
     }
 
+    /**
+     * Transform the array for dropdown display 
+     *
+     * @param  array $array 
+     * @param  string $id = column name of the id
+     * @return array
+     */
+    private function dropdown($array, $id) {
+        $result = array();
+
+        foreach ($array as $row) {
+            $result[$row[$id]] = $row['name'];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get e filter or set the default one 
+     *
+     * @param  array $filters = $_GET variable
+     * @return int
+     */
+    private function getEFilter($filters): int {        
+        if (isset($filters['e'])) {
+            return $filters['e'];
+        }
+        
+        if (isset($_SESSION['user_id'])) {
+            $entityId = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->first()['fk_entity_id'] ?? 0;
+        } else {
+            $entityId = 0;
+        }
+        
+        if ($entityId !== 0) {
+            return $entityId;
+        }
+        
+        return $this->entity_model->first()['entity_id'] ?? 0;        
+    }
+    
 }

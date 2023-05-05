@@ -164,12 +164,20 @@ $(document).ready(function() {
     filters = location.search;
     load_items(page, filters);
 
+    // Reload the page entirely if entity has been changed
+    $('#e ul.multiselect-container input[type=radio]').change(() => {
+        // Load page 1 with new filters
+        load_items(1, getFilters()).finally(() => {
+            location.reload();
+        });
+    });
+
     // Reload items list on filter update
-    $("input[type=checkbox], input[type=radio]").change(function(){
+    $("input[type=checkbox], input[type=radio]").change(function() {
         // Load page 1 with new filters
         load_items(1, getFilters());
     });
-    $("#text_search").on("change blur", function(){
+    $("#text_search").on("change blur", function() {
         // Load page 1 with new filters
         load_items(1, getFilters());
     });
@@ -181,7 +189,7 @@ $(document).ready(function() {
 // ******************************************
 let populating = false;
 
-function load_items(page, filters){
+async function load_items(page, filters) {
     if (populating) return;
     populating = true;
 
@@ -201,7 +209,7 @@ function load_items(page, filters){
     // URL for ajax call to PHP controller                      Stock\Controllers\
     url = "<?= base_url("/Item/load_list_json")?>"+ "/" + page+filters;
 
-    $.ajax({
+    await $.ajax({
         url: url,
         type: "get",
         success: function (response) {
