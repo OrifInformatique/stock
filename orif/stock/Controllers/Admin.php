@@ -33,6 +33,9 @@ class Admin extends BaseController
     protected Item_group_model $item_group_model;
     protected Item_model $item_model;
     protected Entity_model $entity_model;
+    protected User_entity_model $user_entity_model;
+    protected User_model $user_model;
+    protected User_type_model $user_type_model;
     protected $db;
     protected $validation;
 
@@ -62,6 +65,9 @@ class Admin extends BaseController
         $this->item_group_model       = new Item_group_model();
         $this->item_model             = new Item_model();
         $this->entity_model           = new Entity_model();
+        $this->user_entity_model      = new User_entity_model();
+        $this->user_model             = new User_model();
+        $this->user_type_model        = new User_type_model();
 
         //get db instance
         $this->db = \CodeIgniter\Database\Config::connect();
@@ -946,12 +952,14 @@ class Admin extends BaseController
     }
 
     public function save_user($user_id=0){
-        $tmpUserTypes=(new User_type_model())->findAll();
-        $userTypes=[];
-        foreach ($tmpUserTypes as $userType){
-            $userTypes[$userType['id']]=$userType['name'];
+        $tmpUserTypes = $this->user_type_model->findAll();
+        $userTypes = [];
+
+        foreach ($tmpUserTypes as $userType) {
+            $userTypes[$userType['id']] = $userType['name'];
         }
-        if(count($this->request->getPost())>0){
+
+        if (count($this->request->getPost()) > 0) {
             $validation=\Config\Services::validation();
             $validationRules=['id'        =>['label'=>'Id','rules'=>'cb_not_null_user'],
                 'user_name' =>['label'=>lang('user_lang.field_username'),'rules'=>'required|trim|'.
@@ -959,15 +967,17 @@ class Admin extends BaseController
                     'max_length['.config('\User\Config\UserConfig')->username_max_length.']|'.
                     'cb_unique_user['.$user_id.']'],
                 'user_usertype'=>['label'=>lang('user_lang.field_usertype'),'rules'=>'required|cb_not_null_user_type'],
-                'fk_entity_id'=>['label'=>lang('stock_lang.entity_name'),'rules'=>'required']];
+                'entities'=>['label'=>lang('stock_lang.entity_name'),'rules'=>'required']];
                 $validationErrors=[
                     'id'=>['cb_not_null_user' => lang('user_lang.msg_err_user_not_exist')],
                     'user_name'=>['cb_unique_user' => lang('user_lang.msg_err_user_not_unique')],
                     'user_usertype'=>['cb_not_null_user_type' => lang('user_lang.msg_err_user_type_not_exist')]];
+
             if ($this->request->getPost('user_email')) {
                 $validationRules['user_email']=['label'=>lang('user_lang.field_email'),'rules'=>'required|valid_email|max_length['.config("\User\Config\UserConfig")->email_max_length.']'];
             }
-            if ($user_id==0){
+
+            if ($user_id == 0) {
                 $validationRules['user_password']=['label'=>lang('user_lang.field_password'),'rules'=>'required|trim|'.
                     'min_length['.config("\User\Config\UserConfig")->password_min_length.']|'.
                     'max_length['.config("\User\Config\UserConfig")->password_max_length.']'];
@@ -975,72 +985,81 @@ class Admin extends BaseController
                     'min_length['.config("\User\Config\UserConfig")->password_min_length.']|'.
                     'max_length['.config("\User\Config\UserConfig")->password_max_length.']'];
             }
+
             $validation->setRules($validationRules,$validationErrors);
             $validation->withRequest($this->request)->run();
-            if(count($validation->getErrors())>0){
-                return $this->display_view('\Stock\admin\users\form_user',['user'=>$user_id>0?(new User_model())->find($user_id):null,'user_types'=>$userTypes,'entities'=>$this->entity_model->withDeleted()->findAll(),'errors'=>$validation->getErrors()]);
-            }
-            $userModel=new User_model();
-            $userEntityModel=new User_entity_model();
-            $username=$this->request->getPost('user_name');
-            $email=$this->request->getPost('user_email');
-            $userType=$this->request->getPost('user_usertype');
-            $fk_entity_ids=$this->request->getPost('fk_entity_id');
-            $password=$this->request->getPost('user_password');
-            $fk_entity_ids=array_filter(explode(';',$fk_entity_ids));
-            $userdata=[];
-            $username!=null?$userdata['username']=$username:null;
-            $email!=null?$userdata['email']=$email:null;
-            $userType!=null?$userdata['fk_user_type']=$userType:null;
-            $password!=null?$userdata['password']=password_hash($password,PASSWORD_BCRYPT):null;
-            //update user
-            if ($user_id>0){
 
-                $userModel->withDeleted()->update($user_id,$userdata);
+            if (count($validation->getErrors()) > 0) {
+                return $this->display_view('\Stock\admin\users\form_user', [
+                    'user' => $user_id > 0 ? $this->user_model->find($user_id) : null,
+                    'user_types' => $userTypes,
+                    'entities' => $this->entity_model->dropdown('name'),
+                    'errors' => $validation->getErrors()
+                ]);
+            }
+
+            $username = $this->request->getPost('user_name');
+            $email = $this->request->getPost('user_email');
+            $userType = $this->request->getPost('user_usertype');
+            $fk_entity_ids = $this->request->getPost('entities[]');
+            $password = $this->request->getPost('user_password');
+            $userdata = [];
+            $username != null ? $userdata['username'] = $username : null;
+            $email != null ? $userdata['email'] = $email : null;
+            $userType != null ? $userdata['fk_user_type'] = $userType : null;
+            $password != null?$userdata['password'] = password_hash($password, PASSWORD_BCRYPT) : null;
+
+            if ($user_id > 0) {
+                // Update a user
+                $this->user_model->withDeleted()->update($user_id, $userdata);
+
                 //see if entity is the same or is contained in user_entity
-                $fk_entities_associated=$userEntityModel->where('fk_user_id',$user_id)->findColumn('fk_entity_id');
-                if ($fk_entities_associated!=null) {
+                $fk_entities_associated = $this->user_entity_model->where('fk_user_id',$user_id)->findColumn('fk_entity_id');
+                if ($fk_entities_associated != null) {
                     $fk_entities_to_delete = array_diff($fk_entities_associated, $fk_entity_ids);
+
                     //delete reference who aren't in update request
                     foreach ($fk_entities_to_delete as $fk_entity_to_delete) {
-                        $userEntityModel->where('fk_entity_id', $fk_entity_to_delete)->where('fk_user_id', $user_id)->delete();
+                        $this->user_entity_model->where('fk_entity_id', $fk_entity_to_delete)->where('fk_user_id', $user_id)->delete();
                     }
                 }
 
                 //add reference who are in create request
-                foreach ($fk_entity_ids as $fk_entity_id){
-                    if (!in_array($fk_entity_id,$fk_entities_associated==null?[]:$fk_entities_associated)){
-                        /*d($fk_entity_ids);
-                        d($fk_entities_associated);
-                        dd($fk_entity_id);
-                        */
-                        $userEntityModel->insert(['fk_user_id'=>$user_id,'fk_entity_id'=>$fk_entity_id]);
+                foreach ($fk_entity_ids as $fk_entity_id) {
+                    if (!in_array($fk_entity_id, $fk_entities_associated == null ? [] : $fk_entities_associated)) {
+                        $this->user_entity_model->insert([
+                            'fk_user_id' => $user_id,
+                            'fk_entity_id' => $fk_entity_id
+                        ]);
                     }
                 }
+
                 return redirect()->to(base_url('user/admin/list_user'));
-            }
-            //add user
-            else{
-                $user_id=$userModel->withDeleted()->insert($userdata);
-                foreach($fk_entity_ids as $fk_entity_id){
-                    $userEntityModel->insert(['fk_entity_id'=>$fk_entity_id,'fk_user_id'=>$user_id]);
+            } else {
+                // Add user
+                $user_id = $this->user_model->withDeleted()->insert($userdata);
+                foreach ($fk_entity_ids as $fk_entity_id) {
+                    $this->user_entity_model->insert(['fk_entity_id'=>$fk_entity_id,'fk_user_id'=>$user_id]);
                 }
+
                 return redirect()->to(base_url('user/admin/list_user'));
             }
+
             return redirect()->to(base_url('user/admin/list_user'));
+        } else {
+            $user = null;
 
-
-        }
-        else{
-            $user=null;
-            if ($user_id>0){
-                $user=(new User_model())->withDeleted()->find($user_id);
-                $user['entities_ids']=(new User_entity_model())->where('fk_user_id',$user_id)->findColumn('fk_entity_id');
+            if ($user_id > 0) {
+                $user = $this->user_model->withDeleted()->find($user_id);
+                $user['user_entities'] = $this->user_entity_model->where('fk_user_id', $user_id)->findColumn('fk_entity_id');
             }
-            return $this->display_view('\Stock\admin\users\form_user',['user'=>$user,'user_types'=>$userTypes,'entities'=>$this->entity_model->withDeleted()->findAll()]);
+
+            return $this->display_view('\Stock\admin\users\form_user', [
+                'user' => $user,
+                'user_types' => $userTypes,
+                'entities' => $this->entity_model->dropdown('name')
+            ]);
         }
 
     }
-
-
 }

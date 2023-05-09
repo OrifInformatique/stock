@@ -75,51 +75,12 @@ $validation=\Config\Services::validation();
                 <?= form_dropdown('user_usertype', $user_types, $user_usertype ?? $user['fk_user_type'] ?? NULL, $dropdown_options); ?>
                 </div>
                 <div class="form-group">
-                    <!--oninput="autocompleteinput(event)"-->
-                    <label style="opacity: 0">empty</label>
-                    <span class="row-responsive-2">
-                        <button class="multiselect dropdown-toggle btn btn-outline-primary" type="button" style="width: 100%" data-toggle="dropdown"><?=lang('stock_lang.entity_name')?></button>
-                        <ul class="multiselect-container dropdown-menu">
-                            <?php
-                            foreach ($entities as $entity){
-                                $checked='';
-                                if (isset($user['entities_ids'])){
-                                    foreach ($user['entities_ids'] as $user_entity_id){
-                                        if ($entity['entity_id']==$user_entity_id){
-                                            $checked='checked';
-                                        }
-
-                                    }
-                                }
-                                echo "<li onclick=\"event.stopImmediatePropagation()\">
-                                        <a tabindex=\"0\" class=\"select-option\">
-                                            <label class=\"checkbox\" for=\"{$entity['name']}\">
-                                                <input type=\"checkbox\" id=\"{$entity['name']}\" value=\"{$entity['entity_id']}\" aria-label=\"{$entity['name']}\" onchange=\"setfkentity(this)\" {$checked}>
-                                                <span class=\"checkbox\">{$entity['name']}</span>
-                                            </label>
-                                        </a>
-                                    </li>";
-                            }
-                            ?>
-                        </ul>
-
-                    </span>
-                    <?php
-                    echo "<input type='hidden'  id='fk_entity_id' name='fk_entity_id' value='";
-                    if(isset($user['entities_ids'])) {
-                        echo implode(';', $user['entities_ids']) . ";'>";
-                    }
-                    else{
-                        echo "'>";
-                    }
-                    ?>
-
-
+                    <?= form_label(lang('stock_lang.entity_name'), 'entities-multiselect').form_dropdown('entities[]', $entities, isset($user['user_entities']) ? $user['user_entities'] : [], 'id="entities-multiselect" multiple="multiple"'); ?>
                 </div>
             </div>
         </div>
         
-        <?php if (!$update) { ?>
+        <?php if (!$update): ?>
             <!-- PASSWORD FIELDS ONLY FOR NEW USERS -->
             <div class="row">
                 <div class="col-sm-6 form-group">
@@ -136,9 +97,9 @@ $validation=\Config\Services::validation();
                     ]); ?>
                 </div>
             </div>
-        <?php } ?>
+        <?php endif; ?>
         
-        <?php if ($update) { ?>
+        <?php if ($update): ?>
             <div class="row">
                 <!-- RESET PASSWORD FOR EXISTING USER -->
                 <div class="col-12">
@@ -148,7 +109,7 @@ $validation=\Config\Services::validation();
                 </div>
                 
                 <!-- ACTIVATE / DISABLE EXISTING USER -->
-                <?php if ($user['archive']) { ?>
+                <?php if ($user['archive']): ?>
                     <div class="col-12">
                         <a href="<?= base_url('user/admin/reactivate_user/'.$user['id']); ?>" >
                             <?= lang("user_lang.user_reactivate"); ?>
@@ -159,15 +120,15 @@ $validation=\Config\Services::validation();
                             <?= lang("user_lang.btn_hard_delete_user"); ?>
                         </a>
                     </div>
-                <?php } else { ?>
+                <?php else: ?>
                     <div class="col-12">
                         <a href="<?= base_url('user/admin/delete_user/'.$user['id']); ?>" class="text-danger" >
                             <?= lang("user_lang.user_delete"); ?>
                         </a>
                     </div>
-                <?php } ?>
+                <?php endif; ?>
             </div>
-        <?php } ?>
+        <?php endif; ?>
                     
         <!-- FORM BUTTONS -->
         <div class="row">
@@ -177,78 +138,14 @@ $validation=\Config\Services::validation();
             </div>
         </div>
     <?= form_close(); ?>
-    <!--<div class="autoCompleteChoice" style="display: flex;position: absolute;height: auto;flex-wrap: wrap;flex-direction: column;background-color: white;width: 50%;max-width: 250px" class="dropdown-menu"></div>-->
 </div>
-<!--
+
 <script type="text/javascript">
-    function autocompleteinput(){
-        const input=document.querySelector('#entity_selector');
-        let coordinates=input.getBoundingClientRect();
-        const autoCompleteChoice=document.querySelector('.autoCompleteChoice');
-        autoCompleteChoice.style.borderWidth='0';
-        autoCompleteChoice.innerHTML='';
-        autoCompleteChoice.style.left=coordinates.left+'px';
-        autoCompleteChoice.style.top=coordinates.top+window.scrollY+36+'px';
-
-        let particle=input.value.includes(';')?input.value.split(';')[input.value.split(';').length-1]:input.value;
-        const autoCompleteSelect=document.querySelector('#entity_selector_auto_complete');
-        autoCompleteSelect.querySelectorAll('option').forEach((option)=>{
-            if (option.innerText.toLocaleLowerCase().includes(particle.toLocaleLowerCase())&&particle!==''&&option.innerText.toLocaleLowerCase()!==particle.toLocaleLowerCase()){
-                let btn=document.createElement('button');
-                btn.classList.add('btn','btn-outline-secondary','text-dark')
-                btn.innerText=option.innerText;
-                btn.addEventListener('click',(event)=>{
-                    let value=input.getAttribute('data-value');
-                    value+=option.value+';';
-                    input.setAttribute('data-value',value);
-                    input.value=input.value.split(particle).join('')
-                    input.value+=event.target.innerText+';';
-                    autoCompleteChoice.innerHTML='';
-                    input.focus();
-                    document.getElementById('fk_entity_id').value=input.getAttribute('data-value');
-
-                })
-                autoCompleteChoice.append(btn);
-                if (input.value.toLocaleLowerCase().split(';')[input.value.toLocaleLowerCase().split(';').length-1]===option.innerText.toLocaleLowerCase()&&!input.getAttribute('data-value').includes(option.value)){
-                    input.setAttribute('data-value',input.getAttribute('data-value')+option.value+';');
-                }
-            }
-        })
-        let correctValue=()=>{
-            let values=input.value.split(';');
-            let parsedValue='';
-            values.forEach((val)=>{
-                document.querySelectorAll('#entity_selector_auto_complete option').forEach((option)=>{
-                    if (val.toLocaleLowerCase()===option.innerText.toLocaleLowerCase()){
-                        parsedValue+=option.value+';';
-                    }
-                })
-            })
-            parsedValue.split(';').forEach((val)=>{
-                input.getAttribute('data-value').split(';').forEach((data)=>{
-                    if (val===data){
-                        parsedValue.replace(val+';','');
-                    }
-                })
-            });
-            input.setAttribute('data-value',parsedValue);
-
-        }
-        correctValue();
-        document.getElementById('fk_entity_id').value=input.getAttribute('data-value');
-
-    }
-    autocompleteinput();
-</script>
--->
-<script type="text/javascript">
-    function setfkentity(element){
-        if(element.checked){
-            document.getElementById('fk_entity_id').value+=(element.value)+';'
-        }
-        else{
-            document.getElementById('fk_entity_id').value=document.getElementById('fk_entity_id').value.split(element.value+';').join('');
-        }
-
-    }
+    var no_filter = "<?= htmlspecialchars(lang('MY_application.field_no_filter')); ?>";
+    $('#entities-multiselect').multiselect({
+        nonSelectedText: no_filter,
+        buttonWidth: '100%',
+        buttonClass: 'btn btn-outline-primary',
+        numberDisplayed: 5
+    });
 </script>
