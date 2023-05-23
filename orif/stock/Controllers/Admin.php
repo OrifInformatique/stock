@@ -994,6 +994,7 @@ class Admin extends BaseController
                     'user' => $user_id > 0 ? $this->user_model->find($user_id) : null,
                     'user_types' => $userTypes,
                     'entities' => $this->entity_model->dropdown('name'),
+                    'default_entities' => $this->entity_model->findAll(),
                     'errors' => $validation->getErrors()
                 ]);
             }
@@ -1057,7 +1058,8 @@ class Admin extends BaseController
             return $this->display_view('\Stock\admin\users\form_user', [
                 'user' => $user,
                 'user_types' => $userTypes,
-                'entities' => $this->entity_model->dropdown('name')
+                'entities' => $this->entity_model->dropdown('name'),
+                'default_entities' => $this->entity_model->findAll()
             ]);
         }
 

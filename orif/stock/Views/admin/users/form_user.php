@@ -59,23 +59,31 @@ $validation=\Config\Services::validation();
                     ]); ?>
 
                 </div>
+                <div id="entities" class="form-group">
+                    <?= form_label(lang('stock_lang.entity_name'), 'entities-multiselect').form_dropdown('entities[]', $entities, isset($user['user_entities']) ? $user['user_entities'] : [], 'id="entities-multiselect" multiple="multiple"'); ?>
+                </div>
             </div>
             <div class="col-sm-6">
                 <div class="form-group">
-                <?= form_label(lang('user_lang.field_usertype'), 'user_usertype', ['class' => 'form-label']); ?>
-                <?php
-                    $dropdown_options = ['class' => 'form-control', 'id' => 'user_usertype'];
-                    if(isset($user) && isset($_SESSION['user_id']) && $_SESSION['user_id'] == $user['id']){
-                        $dropdown_options['disabled'] = 'disabled';
-                        echo form_hidden('user_usertype', $user_usertype ?? $user['fk_user_type'] ?? "");
-                        echo "<div class=\"alert alert-info\">".lang('user_lang.user_update_usertype_himself')."</div>";
-                    }
+                    <?= form_label(lang('user_lang.field_usertype'), 'user_usertype', ['class' => 'form-label']); ?>
+                    <?php
+                        $dropdown_options = ['class' => 'form-control', 'id' => 'user_usertype'];
+                        if(isset($user) && isset($_SESSION['user_id']) && $_SESSION['user_id'] == $user['id']){
+                            $dropdown_options['disabled'] = 'disabled';
+                            echo form_hidden('user_usertype', $user_usertype ?? $user['fk_user_type'] ?? "");
+                            echo "<div class=\"alert alert-info\">".lang('user_lang.user_update_usertype_himself')."</div>";
+                        }
 
-                ?>
-                <?= form_dropdown('user_usertype', $user_types, $user_usertype ?? $user['fk_user_type'] ?? NULL, $dropdown_options); ?>
+                    ?>
+                    <?= form_dropdown('user_usertype', $user_types, $user_usertype ?? $user['fk_user_type'] ?? NULL, $dropdown_options); ?>
                 </div>
-                <div class="form-group">
-                    <?= form_label(lang('stock_lang.entity_name'), 'entities-multiselect').form_dropdown('entities[]', $entities, isset($user['user_entities']) ? $user['user_entities'] : [], 'id="entities-multiselect" multiple="multiple"'); ?>
+                <div id="default_entity" class="form-group">
+                    <label for="entity_selector"><?=lang('stock_lang.entity_name')?></label>
+                    <select class="form-control mb-3" name="fk_entity_id" id="entity_selector">
+                        <?php foreach ($default_entities as $entity):?>
+                            <option value="<?=$entity['entity_id']?>"  data-tag-name="<?=$entity['shortname']?>" <?= isset($entity_id) && $entity_id == $entity['entity_id'] ? 'selected': (isset($selected_entity_id) && $selected_entity_id == $entity['entity_id'] ? 'selected' : '')?>><?=$entity['name'] ?></option>
+                        <?php endforeach;?>
+                    </select>
                 </div>
             </div>
         </div>
@@ -86,7 +94,8 @@ $validation=\Config\Services::validation();
                 <div class="col-sm-6 form-group">
                     <?= form_label(lang('user_lang.field_password'), 'user_password', ['class' => 'form-label']); ?>
                     <?= form_password('user_password', '', [
-                        'class' => 'form-control', 'id' => 'user_password'
+                        'class' => 'form-control', 
+                        'id' => 'user_password'
                     ]); ?>
                 </div>
                 <div class="col-sm-6 form-group">
@@ -142,10 +151,14 @@ $validation=\Config\Services::validation();
 
 <script type="text/javascript">
     var no_filter = "<?= htmlspecialchars(lang('MY_application.field_no_filter')); ?>";
-    $('#entities-multiselect').multiselect({
+    $('#entities-multiselect, #default-entity-multiselect').multiselect({
         nonSelectedText: no_filter,
         buttonWidth: '100%',
         buttonClass: 'btn btn-outline-primary',
         numberDisplayed: 5
+    });
+
+    $('#entities ul.multiselect-container input[type=checkbox]').change(() => {
+        console.log('test');
     });
 </script>
