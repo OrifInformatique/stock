@@ -126,14 +126,14 @@
                 <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered) {
                     //Button to create new loan -->
                     if(empty($item['current_loan']['planned_return_date'])){                
-                    echo '<a href="'.base_url('/item/create_loan/'.$item['item_id']).'" '.
+                        echo '<a href="'.base_url('/item/create_loan/'.$item['item_id']).'" '.
                          'class="btn btn-primary"  role="button" >'.
                          lang('MY_application.btn_create_loan').'</a>'; }
-                         else {
-                            echo '<a href="'.base_url('/item/return_loan/'.$item['item_id']).'" '.
-                            'class="btn btn-primary"  role="button" >'.
-                            lang('MY_application.btn_return_loan').'</a>';
-                         }
+                    else {
+                        echo '<a href="'.base_url('/item/return_loan/'.$item['current_loan']['loan_id']).'" '.
+                        'class="btn btn-primary"  role="button" >'.
+                        lang('MY_application.btn_return_loan').'</a>';
+                    }
 
                     // Button to display loans history -->
                     echo '<a href="'.base_url('/item/loans/'.$item['item_id']).'" '.
