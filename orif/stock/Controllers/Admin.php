@@ -951,7 +951,7 @@ class Admin extends BaseController
         }
     }
 
-    public function save_user($user_id=0){
+    public function save_user($user_id = 0) {
         $tmpUserTypes = $this->user_type_model->findAll();
         $userTypes = [];
 
@@ -961,29 +961,61 @@ class Admin extends BaseController
 
         if (count($this->request->getPost()) > 0) {
             $validation=\Config\Services::validation();
-            $validationRules=['id'        =>['label'=>'Id','rules'=>'cb_not_null_user'],
-                'user_name' =>['label'=>lang('user_lang.field_username'),'rules'=>'required|trim|'.
-                    'min_length['.config('\User\Config\UserConfig')->username_min_length.']|'.
-                    'max_length['.config('\User\Config\UserConfig')->username_max_length.']|'.
-                    'cb_unique_user['.$user_id.']'],
-                'user_usertype'=>['label'=>lang('user_lang.field_usertype'),'rules'=>'required|cb_not_null_user_type'],
-                'entities'=>['label'=>lang('stock_lang.entity_name'),'rules'=>'required']];
-                $validationErrors=[
-                    'id'=>['cb_not_null_user' => lang('user_lang.msg_err_user_not_exist')],
-                    'user_name'=>['cb_unique_user' => lang('user_lang.msg_err_user_not_unique')],
-                    'user_usertype'=>['cb_not_null_user_type' => lang('user_lang.msg_err_user_type_not_exist')]];
+            $validationRules = [
+                'id' => [
+                    'label' => 'Id',
+                    'rules' => 'cb_not_null_user'
+                ],
+                'user_name' => [
+                    'label' => lang('user_lang.field_username'),
+                    'rules' => 'required|trim|'.
+                        'min_length['.config('\User\Config\UserConfig')->username_min_length.']|'.
+                        'max_length['.config('\User\Config\UserConfig')->username_max_length.']|'.
+                        'cb_unique_user['.$user_id.']'
+                ],
+                'user_usertype' => [
+                    'label' => lang('user_lang.field_usertype'),
+                    'rules' => 'required|cb_not_null_user_type'
+                ],
+                'entities' => [
+                    'label' => lang('stock_lang.entity_name'),
+                    'rules'=>'required'
+                ]
+            ];
+
+            $validationErrors = [
+                'id' => [
+                    'cb_not_null_user' => lang('user_lang.msg_err_user_not_exist')
+                ],
+                'user_name' => [
+                    'cb_unique_user' => lang('user_lang.msg_err_user_not_unique')
+                ],
+                'user_usertype' => [
+                    'cb_not_null_user_type' => lang('user_lang.msg_err_user_type_not_exist')
+                ]
+            ];
 
             if ($this->request->getPost('user_email')) {
-                $validationRules['user_email']=['label'=>lang('user_lang.field_email'),'rules'=>'required|valid_email|max_length['.config("\User\Config\UserConfig")->email_max_length.']'];
+                $validationRules['user_email'] = [
+                    'label' => lang('user_lang.field_email'),
+                    'rules' => 'required|valid_email|max_length['.config("\User\Config\UserConfig")->email_max_length.']'
+                ];
             }
 
             if ($user_id == 0) {
-                $validationRules['user_password']=['label'=>lang('user_lang.field_password'),'rules'=>'required|trim|'.
-                    'min_length['.config("\User\Config\UserConfig")->password_min_length.']|'.
-                    'max_length['.config("\User\Config\UserConfig")->password_max_length.']'];
-                $validationRules['user_password_again']=['label'=>lang('user_lang.field_password_confirm'),'rules'=>'required|trim|matches[user_password]|'.
-                    'min_length['.config("\User\Config\UserConfig")->password_min_length.']|'.
-                    'max_length['.config("\User\Config\UserConfig")->password_max_length.']'];
+                $validationRules['user_password'] = [
+                    'label' => lang('user_lang.field_password'),
+                    'rules' => 'required|trim|'.
+                        'min_length['.config("\User\Config\UserConfig")->password_min_length.']|'.
+                        'max_length['.config("\User\Config\UserConfig")->password_max_length.']'
+                ];
+
+                $validationRules['user_password_again'] = [
+                    'label' => lang('user_lang.field_password_confirm'),
+                    'rules' => 'required|trim|matches[user_password]|'.
+                        'min_length['.config("\User\Config\UserConfig")->password_min_length.']|'.
+                        'max_length['.config("\User\Config\UserConfig")->password_max_length.']'
+                    ];
             }
 
             $validation->setRules($validationRules,$validationErrors);
@@ -1052,7 +1084,7 @@ class Admin extends BaseController
 
             if ($user_id > 0) {
                 $user = $this->user_model->withDeleted()->find($user_id);
-                $user['user_entities'] = $this->user_entity_model->where('fk_user_id', $user_id)->findColumn('fk_entity_id');
+                $user['user_entities'] = $this->user_entity_model->where('fk_user_id', $user_id)->findAll();
             }
 
             return $this->display_view('\Stock\admin\users\form_user', [

@@ -18,11 +18,11 @@ $validation=\Config\Services::validation();
     </div>
     
     <!-- INFORMATION MESSAGE IF USER IS DISABLED -->
-    <?php if ($update && $user['archive']) { ?>
+    <?php if ($update && $user['archive']): ?>
         <div class="col-12 alert alert-info">
             <?= lang("user_lang.user_disabled_info"); ?>
         </div>
-    <?php } ?>
+    <?php endif; ?>
     
     <!-- FORM OPEN -->
     <?php
@@ -30,16 +30,16 @@ $validation=\Config\Services::validation();
         'id' => 'user_form',
         'name' => 'user_form'
     );
-    echo form_open(base_url('stock/admin/save_user/'.(isset($user['id'])?$user['id']:'')), $attributes, [
+    echo form_open(base_url('stock/admin/save_user/'.(isset($user['id']) ? $user['id'] : '')), $attributes, [
         'id' => $user['id'] ?? 0
     ]);
     ?>
         <!-- ERROR MESSAGES -->
-        <?php if (! empty($validation->getErrors())) : ?>
+        <?php if (! empty($validation->getErrors())): ?>
             <div class="alert alert-danger" role="alert">
                 <?= $validation->listErrors(); ?>
             </div>
-        <?php endif ?>
+        <?php endif; ?>
 
         <!-- USER FIELDS -->
         <div class="row">
@@ -60,7 +60,7 @@ $validation=\Config\Services::validation();
 
                 </div>
                 <div id="entities" class="form-group">
-                    <?= form_label(lang('stock_lang.entity_name'), 'entities-multiselect').form_dropdown('entities[]', $entities, isset($user['user_entities']) ? $user['user_entities'] : [], 'id="entities-multiselect" multiple="multiple"'); ?>
+                    <?= form_label(lang('stock_lang.entity_name'), 'entities-multiselect').form_dropdown('entities[]', $entities, isset($user['user_entities']) ? array_column($user['user_entities'], 'fk_entity_id') : [], 'id="entities-multiselect" multiple="multiple"'); ?>
                 </div>
             </div>
             <div class="col-sm-6">
@@ -80,9 +80,23 @@ $validation=\Config\Services::validation();
                 <div id="default_entity" class="form-group">
                     <label for="entity_selector"><?=lang('stock_lang.entity_name')?></label>
                     <select class="form-control mb-3" name="fk_entity_id" id="entity_selector">
-                        <?php foreach ($default_entities as $entity):?>
-                            <option value="<?=$entity['entity_id']?>"  data-tag-name="<?=$entity['shortname']?>" <?= isset($entity_id) && $entity_id == $entity['entity_id'] ? 'selected': (isset($selected_entity_id) && $selected_entity_id == $entity['entity_id'] ? 'selected' : '')?>><?=$entity['name'] ?></option>
-                        <?php endforeach;?>
+                        <?php foreach ($default_entities as $entity): ?>
+                            <?php
+                                $selectedId = null;
+
+                                if (isset($user['user_entities'])) {
+                                    $filtered = array_filter($user['user_entities'], function($userEntity) {
+                                        return isset($userEntity['default']) && $userEntity['default'] == true;
+                                    });
+
+                                    $ids = array_column($filtered, 'fk_entity_id');
+                                    $selectedId = reset($ids);
+                                }    
+                            ?>
+                            <option value="<?=$entity['entity_id']?>" data-tag-name="<?=$entity['shortname']?>" <?= ($selectedId == $entity['entity_id']) ? 'selected' : '' ?>>
+                                <?=$entity['name']?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
             </div>
