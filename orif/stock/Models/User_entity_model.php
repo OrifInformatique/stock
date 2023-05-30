@@ -13,7 +13,7 @@ class User_entity_model extends MyModel
 	protected $insertID             = 0;
 	protected $returnType           = 'array';
 	protected $protectFields        = true;
-	protected $allowedFields        = ['fk_entity_id','fk_user_id'];
+	protected $allowedFields        = ['fk_entity_id','fk_user_id', 'default'];
 
 	// Dates
 	protected $useTimestamps        = false;

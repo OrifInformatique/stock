@@ -1035,19 +1035,21 @@ class Admin extends BaseController
             $email = $this->request->getPost('user_email');
             $userType = $this->request->getPost('user_usertype');
             $fk_entity_ids = $this->request->getPost('entities[]');
+            $default_entity = $this->request->getPost('default_entity');
             $password = $this->request->getPost('user_password');
             $userdata = [];
             $username != null ? $userdata['username'] = $username : null;
             $email != null ? $userdata['email'] = $email : null;
             $userType != null ? $userdata['fk_user_type'] = $userType : null;
             $password != null?$userdata['password'] = password_hash($password, PASSWORD_BCRYPT) : null;
+            $user_entities = $this->user_entity_model->where('fk_user_id', $user_id)->findAll();
 
             if ($user_id > 0) {
                 // Update a user
                 $this->user_model->withDeleted()->update($user_id, $userdata);
 
                 //see if entity is the same or is contained in user_entity
-                $fk_entities_associated = $this->user_entity_model->where('fk_user_id',$user_id)->findColumn('fk_entity_id');
+                $fk_entities_associated = $this->user_entity_model->where('fk_user_id', $user_id)->findColumn('fk_entity_id');
                 if ($fk_entities_associated != null) {
                     $fk_entities_to_delete = array_diff($fk_entities_associated, $fk_entity_ids);
 
@@ -1057,12 +1059,22 @@ class Admin extends BaseController
                     }
                 }
 
+                // Update default entity
+                foreach($user_entities as $user_entity) {
+                    if (!$user_entity['default'] && $user_entity['fk_entity_id'] == $default_entity) {
+                        $this->user_entity_model->update($user_entity['id'], ['default' => true]);
+                    } else if ($user_entity['default'] && $user_entity['fk_entity_id'] !== $default_entity) {
+                        $this->user_entity_model->update($user_entity['id'], ['default' => false]);
+                    }
+                }
+
                 //add reference who are in create request
                 foreach ($fk_entity_ids as $fk_entity_id) {
                     if (!in_array($fk_entity_id, $fk_entities_associated == null ? [] : $fk_entities_associated)) {
                         $this->user_entity_model->insert([
                             'fk_user_id' => $user_id,
-                            'fk_entity_id' => $fk_entity_id
+                            'fk_entity_id' => $fk_entity_id,
+                            'default' => $fk_entity_id == $default_entity
                         ]);
                     }
                 }
@@ -1072,7 +1084,10 @@ class Admin extends BaseController
                 // Add user
                 $user_id = $this->user_model->withDeleted()->insert($userdata);
                 foreach ($fk_entity_ids as $fk_entity_id) {
-                    $this->user_entity_model->insert(['fk_entity_id'=>$fk_entity_id,'fk_user_id'=>$user_id]);
+                    $this->user_entity_model->insert([
+                        'fk_entity_id' => $fk_entity_id,
+                        'fk_user_id' => $user_id    
+                    ]);
                 }
 
                 return redirect()->to(base_url('user/admin/list_user'));
