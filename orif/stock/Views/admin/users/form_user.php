@@ -79,7 +79,8 @@ $validation = \Config\Services::validation();
                 <?= form_dropdown('user_usertype', $user_types, $user_usertype ?? $user['fk_user_type'] ?? NULL, $dropdown_options); ?>
             </div>
             <div class="form-group">
-                <label for="default_entity"><?= lang('stock_lang.entity_name') ?></label>
+                <label for="default_entity"><?= lang('stock_lang.default_entity_name') ?></label>
+                <p id="no-options-message" class="alert alert-warning" style="display: none;"><?= lang('stock_lang.no_selected_entity'); ?></p>
                 <select class="form-control mb-3" name="default_entity" id="default_entity">
                     <?php foreach ($default_entities as $entity) : ?>
                         <?php
@@ -186,8 +187,6 @@ $validation = \Config\Services::validation();
             const optionValue = checkbox.value;
             const isChecked = checkbox.checked;
 
-            console.log(optionValue, isChecked);
-
             toggleOptionByValue(select, optionValue, isChecked);
 
             // Add event listener for checkbox change event
@@ -222,20 +221,30 @@ $validation = \Config\Services::validation();
         for (let i = 0; i < options.length; i++) {
             if (options[i].value === optionValue) {
                 options[i].style.display = show ? 'block' : 'none';
+                if (show) {
+                    selectedOptionIndex = i; // Update the selected option index when showing the option
+                }
                 break;
             }
         }
 
-        // If the current selected option is hidden, find and select the first visible option
-        if (isCurrentSelectedHidden) {
-            for (let i = 0; i < options.length; i++) {
-                if (options[i].style.display !== 'none') {
-                    selectElement.selectedIndex = i;
-                    break;
-                }
+        // Check if there are any visible options
+        let hasVisibleOptions = false;
+        for (let i = 0; i < options.length; i++) {
+            if (options[i].style.display !== 'none') {
+                hasVisibleOptions = true;
+                break;
             }
+        }
+
+        // Display message if no visible options and select the first available option
+        const messageElement = document.getElementById('no-options-message'); // Add an element with id="no-options-message" in your HTML to display the message
+        if (!hasVisibleOptions) {
+            messageElement.style.display = 'block';
+            selectElement.selectedIndex = -1; // Deselect all options
         } else {
-            selectElement.selectedIndex = selectedOptionIndex;
+            messageElement.style.display = 'none';
+            selectElement.selectedIndex = selectedOptionIndex; // Update the selected index
         }
     }
 </script>

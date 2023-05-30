@@ -105,6 +105,7 @@ return[
 'item_group_already_disabled'           => 'Ce groupe d\'objets est déjà désactivé. Voulez-vous le supprimer définitivement ?',
 'name'                                  => 'Nom',
 'entity_name'                           => 'Nom du site',
+'default_entity_name'                   => 'Site par défaut',
 'address'                               => 'Adresse',
 'zip_code'                              => 'Numéro postal',
 'locality'                              => 'Ville',
@@ -128,6 +129,7 @@ return[
 
 // Warning
 'no_entity'                             => 'Aucun site n\'a été créé jusqu\'à présent, vous ne pouvez donc pas utiliser la fonction d\'exportation avec les sites.',
+'no_selected_entity'                    => 'Aucun site n\'a été sélectionné.',
 'no_entity_excel_export'                => 'Vous n\'avez pas accès à la fonctionnalité d\'exportation en Excel, car vous n\'êtes pas encore lié à un site.',
 'entity_has_no_items'                   => 'Le site que vous avez sélectionné n\'est lié à aucun objet.',
 'msg_no_entities_exist'                 => 'Aucun site n\'a été créé, par défaut tous les objets sont affichés',
