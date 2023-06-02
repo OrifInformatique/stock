@@ -253,7 +253,7 @@ class Item extends BaseController {
 
         return $pager->makeLinks($page, $this->config->items_per_page, $nbr_items);
     }
-
+    
     /**
      * Display details of one single item
      *
@@ -269,6 +269,10 @@ class Item extends BaseController {
 
         // Get item object and related objects
         $item = $this->item_model->asArray()->where(["item_id"=>$id])->first();
+
+        if (isset($_SESSION['user_id']) && !is_null($item)) {
+            $output['can_modify'] = $this->user_entity_model->check_user_item_entity($_SESSION['user_id'], $id);
+        }
 
         if (!is_null($item)) {
             $item['supplier'] = $this->item_model->getSupplier($item);
@@ -299,7 +303,12 @@ class Item extends BaseController {
      */
     public function create($entity_id) {
         // Check if this is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
+        if (isset($_SESSION['logged_in']) &&
+            $_SESSION['logged_in'] == true &&
+            isset($_SESSION['user_id']) &&
+            $this->user_entity_model->check_user_entity($_SESSION['user_id'], $entity_id) &&
+            $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
+
             // Get new item id and set picture_prefix
             $item_id = $this->item_model->getFutureId();
             $_SESSION['picture_prefix'] = str_pad($item_id, $this->config->inventory_number_chars, "0", STR_PAD_LEFT);
@@ -447,7 +456,7 @@ class Item extends BaseController {
             }
         } else {
             // Access is not allowed
-            return redirect()->to("item/");
+            return redirect()->to("/item");
         }
     }
 
@@ -459,7 +468,12 @@ class Item extends BaseController {
      */
     public function modify($id) {
         // Check if access is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
+        if (isset($_SESSION['logged_in']) &&
+            $_SESSION['logged_in'] == true &&
+            isset($_SESSION['user_id']) &&
+            $this->user_entity_model->check_user_item_entity($_SESSION['user_id'], $id) &&
+            $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
+
             // Define image path variables
             $_SESSION['picture_prefix'] = str_pad($id, $this->config->inventory_number_chars, "0", STR_PAD_LEFT);
             $temp_image_name = $_SESSION["picture_prefix"].$this->config->image_picture_suffix.$this->config->image_tmp_suffix.$this->config->image_extension;
@@ -627,7 +641,12 @@ class Item extends BaseController {
      */
     public function delete($id, $command = NULL) {
         // Check if this is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_admin) {
+        if (isset($_SESSION['logged_in']) &&
+            $_SESSION['logged_in'] == true &&
+            isset($_SESSION['user_id']) &&
+            $this->user_entity_model->check_user_item_entity($_SESSION['user_id'], $id) &&
+            $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_admin) {
+
             if (empty($command)) {
                 $data['db'] = 'item';
                 $data['id'] = $id;
@@ -685,7 +704,12 @@ class Item extends BaseController {
      */
     public function create_inventory_control($id = NULL) {
         // Check if this is allowed
-        if (!empty($id) && isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
+        if (!empty($id) &&
+            isset($_SESSION['logged_in']) &&
+            $_SESSION['logged_in'] == true &&
+            isset($_SESSION['user_id']) &&
+            $this->user_entity_model->check_user_item_entity($_SESSION['user_id'], $id) &&
+            $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
 
             $this->user_model = new User_model();
 
@@ -729,7 +753,12 @@ class Item extends BaseController {
      * @return void
      */
     public function inventory_controls($id = NULL) {
-        if (!empty($id) && isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
+        if (!empty($id) &&
+            isset($_SESSION['logged_in']) &&
+            $_SESSION['logged_in'] == true &&
+            isset($_SESSION['user_id']) &&
+            $this->user_entity_model->check_user_item_entity($_SESSION['user_id'], $id) &&
+            $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
 
             helper('MY_date');
 
@@ -757,7 +786,12 @@ class Item extends BaseController {
      */
     public function create_loan($id = NULL) {
         // Check if this is allowed
-        if (!empty($id) && isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
+        if (!empty($id) &&
+            isset($_SESSION['logged_in']) &&
+            $_SESSION['logged_in'] == true &&
+            isset($_SESSION['user_id']) && 
+            $this->user_entity_model->check_user_item_entity($_SESSION['user_id'], $id) &&
+            $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
 
             // Get item object and related loans
             $item = $this->item_model->find($id);
@@ -834,7 +868,12 @@ class Item extends BaseController {
      */
     public function modify_loan($id = NULL) {
         // Check if this is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
+        if (isset($_SESSION['logged_in']) &&
+            $_SESSION['logged_in'] == true &&
+            isset($_SESSION['user_id']) &&
+            $this->user_entity_model->check_user_loan_entity($_SESSION['user_id'], $id) &&
+            $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
+
             // get the data from the loan with this id (to fill the form or to get the concerned item)
             $loan = $this->loan_model->find($id);
 
@@ -913,7 +952,12 @@ class Item extends BaseController {
      * @return void
      */
     public function loans($id = NULL) {
-        if (!empty($id) && isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access']>=config('\User\Config\UserConfig')->access_lvl_registered) {
+        if (!empty($id) &&
+            isset($_SESSION['logged_in']) &&
+            $_SESSION['logged_in'] == true &&
+            isset($_SESSION['user_id']) &&
+            $this->user_entity_model->check_user_item_entity($_SESSION['user_id'], $id) &&
+            $_SESSION['user_access']>=config('\User\Config\UserConfig')->access_lvl_registered) {
 
             // Get item object and related loans
             $item = $this->item_model->find($id);
@@ -954,7 +998,12 @@ class Item extends BaseController {
      */
     public function delete_loan($id, $command = NULL) {
         // Check if this is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_admin) {
+        if (isset($_SESSION['logged_in']) &&
+            $_SESSION['logged_in'] == true &&
+            isset($_SESSION['user_id']) &&
+            $this->user_entity_model->check_user_loan_entity($_SESSION['user_id'], $id) &&
+            $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_admin) {
+
             if (empty($command)) {
                 $data['db'] = 'loan';
                 $data['id'] = $id;
