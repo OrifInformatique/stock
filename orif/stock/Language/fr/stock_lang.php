@@ -53,6 +53,8 @@ return[
 'field_deleted_stocking_places'         => 'Afficher les lieux de stockage désactivés',
 'field_deleted_suppliers'               => 'Afficher les fournisseurs désactivés',
 'field_deleted_item_groups'             => 'Afficher les groupes d\'objets désactivés',
+'field_user_entities'                   => 'Sites attribués',
+'field_user_default_entity'             => 'Site principal',
 
 // Admin other labels   
 'admin_modify'                          => 'Modification',
@@ -128,6 +130,7 @@ return[
 
 // Warning
 'no_entity'                             => 'Aucun site n\'a été créé jusqu\'à présent, vous ne pouvez donc pas utiliser la fonction d\'exportation avec les sites.',
+'no_selected_entity'                    => 'Aucun site n\'a été sélectionné.',
 'no_entity_excel_export'                => 'Vous n\'avez pas accès à la fonctionnalité d\'exportation en Excel, car vous n\'êtes pas encore lié à un site.',
 'entity_has_no_items'                   => 'Le site que vous avez sélectionné n\'est lié à aucun objet.',
 'msg_no_entities_exist'                 => 'Aucun site n\'a été créé, par défaut tous les objets sont affichés',

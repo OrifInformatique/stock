@@ -116,27 +116,15 @@ class Item extends BaseController {
         if (!isset($output["e"])) $output["e"] = '';
 
         $output['entities'] = $this->entity_model->dropdown('name');
+        $output['has_entities'] = true;
 
         if (isset($_SESSION['user_id'])) {
-            $userDefaultEntity = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->first();
-            $defaultEntity = $this->entity_model->find(isset($userDefaultEntity) ? $userDefaultEntity['fk_entity_id'] : 0);
+            $userDefaultEntity = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->where('default', true)->first();
+            $defaultEntity = isset($userDefaultEntity) ? $this->entity_model->find($userDefaultEntity['fk_entity_id']) : null;
             $output['has_entities'] = $this->config->access_lvl_admin > $_SESSION['user_access'] ? count($this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->findAll()) > 0 : true;
-        } else {
-            // Default value to prevent displaying the message for non logged in users
-            $output['has_entities'] = true;
         }
 
-        if (isset($defaultEntity['entity_id'])) {
-            $output['default_entity'] = $defaultEntity['entity_id'];
-        } else {
-            $firstEntity = $this->entity_model->first();
-
-            if (!is_null($firstEntity)) {
-                $output['default_entity'] = $firstEntity['entity_id'];
-            } else {
-                $output['default_entity'] = null;
-            }
-        }
+        $output['default_entity'] = isset($defaultEntity['entity_id']) ? $defaultEntity['entity_id'] : ($this->entity_model->first()['entity_id'] ?? null);
 
         $filters = $_GET;
 
@@ -621,7 +609,7 @@ class Item extends BaseController {
             elseif(isset($data['stocking_place_id'])){
                 $data['entity_id']=(new Stocking_place_model())->find($data['stocking_place_id'])['fk_entity_id'];
             }
-            $data['entities']=(new \Stock\Models\Entity_model())->whereIn('entity_id',(new User_entity_model())->where('fk_user_id',$_SESSION['user_id'])->findColumn('fk_entity_id'))->findAll();
+            $data['entities'] = $this->entity_model->whereIn('entity_id', $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->findColumn('fk_entity_id'))->findAll();
             $this->display_view('Stock\Views\item\form', $data);
         } else {
             // Update is not allowed
@@ -1196,7 +1184,7 @@ class Item extends BaseController {
         }
         
         if (isset($_SESSION['user_id'])) {
-            $entityId = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->first()['fk_entity_id'] ?? 0;
+            $entityId = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->where('default', true)->first()['fk_entity_id'] ?? 0;
         } else {
             $entityId = 0;
         }

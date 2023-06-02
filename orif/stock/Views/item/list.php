@@ -106,7 +106,11 @@
                 </div>
                 <?php if (isset($_SESSION['user_access'])&&$_SESSION['user_access']>=config('\Stock\Config\StockConfig')->access_lvl_manager):?>
                     <p class="bg-primary mt-1 pl-1 mb-1"><?=lang('stock_lang.title_excel_export')?></p>
-                    <a href="<?=base_url('stock/export_excel')?>" class="btn btn-primary col-sm-12"><?=lang('stock_lang.excel_export_btn')?><i class="bi bi-file-earmark-excel-fill ml-2" style="color: #217346"></i></a>
+                    <a href="<?=base_url('stock/export_excel')?>" class="btn btn-primary col-sm-12"><?=lang('stock_lang.excel_export_btn')?>
+                        <svg xmlns="http://www.w3.org/2000/svg" style="color: #217346" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-excel-fill" viewBox="0 0 16 16">
+                            <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0zM9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1zM5.884 6.68 8 9.219l2.116-2.54a.5.5 0 1 1 .768.641L8.651 10l2.233 2.68a.5.5 0 0 1-.768.64L8 10.781l-2.116 2.54a.5.5 0 0 1-.768-.641L7.349 10 5.116 7.32a.5.5 0 1 1 .768-.64z"/>
+                        </svg>
+                    </a>
                 <?php endif;?>
 
             </div>
