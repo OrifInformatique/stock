@@ -1184,7 +1184,7 @@ class Item extends BaseController {
         }
         
         if (isset($_SESSION['user_id'])) {
-            $entityId = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->first()['fk_entity_id'] ?? 0;
+            $entityId = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->where('default', true)->first()['fk_entity_id'] ?? 0;
         } else {
             $entityId = 0;
         }
