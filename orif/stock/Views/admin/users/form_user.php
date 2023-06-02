@@ -60,9 +60,6 @@ $validation = \Config\Services::validation();
                 ]); ?>
 
             </div>
-            <div id="entities" class="form-group">
-                <?= form_label(lang('stock_lang.entity_name'), 'entities-multiselect') . form_dropdown('entities[]', $entities, isset($user['user_entities']) ? array_column($user['user_entities'], 'fk_entity_id') : [], 'id="entities-multiselect" multiple="multiple"'); ?>
-            </div>
         </div>
         <div class="col-sm-6">
             <div class="form-group">
@@ -74,12 +71,20 @@ $validation = \Config\Services::validation();
                     echo form_hidden('user_usertype', $user_usertype ?? $user['fk_user_type'] ?? "");
                     echo "<div class=\"alert alert-info\">" . lang('user_lang.user_update_usertype_himself') . "</div>";
                 }
-
                 ?>
                 <?= form_dropdown('user_usertype', $user_types, $user_usertype ?? $user['fk_user_type'] ?? NULL, $dropdown_options); ?>
             </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <div id="entities" class="form-group">
+                <?= form_label(lang('stock_lang.field_user_entities'), 'entities-multiselect') . form_dropdown('entities[]', $entities, isset($user['user_entities']) ? array_column($user['user_entities'], 'fk_entity_id') : [], 'id="entities-multiselect" multiple="multiple"'); ?>
+            </div>
+        </div>
+        <div class="col-sm-6">
             <div class="form-group">
-                <label for="default_entity"><?= lang('stock_lang.default_entity_name') ?></label>
+                <label for="default_entity"><?= lang('stock_lang.field_user_default_entity') ?></label>
                 <p id="no-options-message" class="alert alert-warning" style="display: none;"><?= lang('stock_lang.no_selected_entity'); ?></p>
                 <select class="form-control mb-3" name="default_entity" id="default_entity">
                     <?php foreach ($default_entities as $entity) : ?>

@@ -53,6 +53,8 @@ return[
 'field_deleted_stocking_places'         => 'Afficher les lieux de stockage désactivés',
 'field_deleted_suppliers'               => 'Afficher les fournisseurs désactivés',
 'field_deleted_item_groups'             => 'Afficher les groupes d\'objets désactivés',
+'field_user_entities'                   => 'Sites attribués',
+'field_user_default_entity'             => 'Site principal',
 
 // Admin other labels   
 'admin_modify'                          => 'Modification',
@@ -105,7 +107,6 @@ return[
 'item_group_already_disabled'           => 'Ce groupe d\'objets est déjà désactivé. Voulez-vous le supprimer définitivement ?',
 'name'                                  => 'Nom',
 'entity_name'                           => 'Nom du site',
-'default_entity_name'                   => 'Site par défaut',
 'address'                               => 'Adresse',
 'zip_code'                              => 'Numéro postal',
 'locality'                              => 'Ville',
