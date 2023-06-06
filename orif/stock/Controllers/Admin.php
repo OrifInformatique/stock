@@ -321,7 +321,8 @@ class Admin extends BaseController
             // VALIDATION
             $validationRules = [
                 'name' => 'required|min_length[3]|max_length[45]|is_unique_place_name_by_entity[' . $id . ',' . $_POST['fk_entity_id'] . ']',
-                'short' => 'required|max_length['.$short_max_length.']|is_unique_place_short_name_by_entity[' . $id . ',' . $_POST['fk_entity_id'] . ']'
+                'short' => 'required|max_length['.$short_max_length.']|is_unique_place_short_name_by_entity[' . $id . ',' . $_POST['fk_entity_id'] . ']',
+                'fk_entity_id' => 'required|stocking_place_has_same_entity[' . $id . ']'
             ];
 
             $validationErrors = [
@@ -330,6 +331,9 @@ class Admin extends BaseController
                 ],
                 'short' => [
                     'is_unique_place_short_name_by_entity' => lang('stock_lang.msg_err_unique_short_name')
+                ],
+                'fk_entity_id' => [
+                    'stocking_place_has_same_entity' => lang('stock_lang.msg_err_stocking_place_has_same_entity')
                 ]
             ];
 

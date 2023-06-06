@@ -20,7 +20,7 @@ class CustomRules
      *
      * @param string $name = name to check
      * @param string $params = contains every parameters needed separated with a comma
-     * @return boolean = TRUE if the username is unique, FALSE otherwise
+     * @return boolean = TRUE if the name is unique, FALSE otherwise
      */
     public function is_unique_group_name_by_entity(string $name, string $params) : bool
     {
@@ -42,7 +42,7 @@ class CustomRules
      *
      * @param string $short name = short name to check
      * @param string $params = contains every parameters needed separated with a comma
-     * @return boolean = TRUE if the username is unique, FALSE otherwise
+     * @return boolean = TRUE if the short_name is unique, FALSE otherwise
      */
     public function is_unique_group_short_name_by_entity(string $short_name, string $params) : bool
     {
@@ -64,7 +64,7 @@ class CustomRules
      *
      * @param string $name = name to check
      * @param string $params = contains every parameters needed separated with a comma
-     * @return boolean = TRUE if the username is unique, FALSE otherwise
+     * @return boolean = TRUE if the name is unique, FALSE otherwise
      */
     public function is_unique_place_name_by_entity(string $name, string $params) : bool
     {
@@ -86,7 +86,7 @@ class CustomRules
      *
      * @param string $short_name = short name to check
      * @param string $params = contains every parameters needed separated with a comma
-     * @return boolean = TRUE if the username is unique, FALSE otherwise
+     * @return boolean = TRUE if the short_name is unique, FALSE otherwise
      */
     public function is_unique_place_short_name_by_entity(string $short_name, string $params) : bool
     {
@@ -106,9 +106,9 @@ class CustomRules
     /**
      * Checks that an entity change on an item_group does not affect any item
      *
-     * @param string $short_name = short name to check
+     * @param string $entity_id = entity id to check
      * @param string $params = contains every parameters needed separated with a comma
-     * @return boolean = TRUE if the $entity_id equals fk_entity_id from the query is unique, FALSE otherwise
+     * @return boolean = TRUE if the $entity_id equals fk_entity_id from the query or no result was found, FALSE otherwise
      */
     public function item_group_has_same_entity(string $entity_id, string $params) : bool
     {
@@ -127,6 +127,34 @@ class CustomRules
                                    ->distinct()
                                    ->get()
                                    ->getRow();
+
+        return $result ? $result->fk_entity_id === $entity_id : true;
+    }
+
+    /**
+     * Checks that an entity change on a stocking_place does not affect any item
+     *
+     * @param string $entity_id = entity id to check
+     * @param string $params = contains every parameters needed separated with a comma
+     * @return boolean = TRUE if the $entity_id equals fk_entity_id from the query or no result was found, FALSE otherwise
+     */
+    public function stocking_place_has_same_entity(string $entity_id, string $params) : bool
+    {
+        // Separate the 2 parameters
+        $params = explode(',', $params);
+
+        $stocking_place_model = new Stocking_place_model();
+
+        $stocking_place_entity_id = $stocking_place_model->where('stocking_place_id', $params[0])->findColumn('fk_entity_id');
+
+        $result = $stocking_place_model->select('item_group.fk_entity_id')
+                                       ->join('item', 'item.stocking_place_id = stocking_place.stocking_place_id', 'inner')
+                                       ->join('item_group', 'item_group.item_group_id = item.item_group_id', 'inner')
+                                       ->where('stocking_place.stocking_place_id', $params[0])
+                                       ->where('stocking_place.fk_entity_id', $stocking_place_entity_id)
+                                       ->distinct()
+                                       ->get()
+                                       ->getRow();
 
         return $result ? $result->fk_entity_id === $entity_id : true;
     }
