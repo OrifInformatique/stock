@@ -122,6 +122,7 @@ return[
 'unauthorized_entity_list'              => 'Vous n\'êtes pas autorisé à consulter le(s) sites demandés',
 'msg_err_unique_name'                   => 'Ce nom est déjà utilisé dans ce site',
 'msg_err_unique_short_name'             => 'Ce nom court est déjà utilisé dans ce site',
+'msg_err_item_group_has_same_entity'    => 'Le changement de site pour ce groupe d\'objets n\'est pas autorisé, car il est actuellement utilisé par d\'autres objets.',
 
 /** BTN */
 'excel_export_btn'                      => 'Exporter',

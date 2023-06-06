@@ -102,4 +102,32 @@ class CustomRules
 
         return is_null($stocking_place);
     }
+
+    /**
+     * Checks that an entity change on an item_group does not affect any item
+     *
+     * @param string $short_name = short name to check
+     * @param string $params = contains every parameters needed separated with a comma
+     * @return boolean = TRUE if the $entity_id equals fk_entity_id from the query is unique, FALSE otherwise
+     */
+    public function item_group_has_same_entity(string $entity_id, string $params) : bool
+    {
+        // Separate the 2 parameters
+        $params = explode(',', $params);
+
+        $item_group_model = new Item_group_model();
+
+        $item_group_entity_id = $item_group_model->where('item_group_id', $params[0])->findColumn('fk_entity_id');
+
+        $result = $item_group_model->select('stocking_place.fk_entity_id')
+                                   ->join('item', 'item.item_group_id = item_group.item_group_id', 'inner')
+                                   ->join('stocking_place', 'stocking_place.stocking_place_id = item.stocking_place_id', 'inner')
+                                   ->where('item_group.item_group_id', $params[0])
+                                   ->where('item_group.fk_entity_id', $item_group_entity_id)
+                                   ->distinct()
+                                   ->get()
+                                   ->getRow();
+
+        return $result ? $result->fk_entity_id === $entity_id : true;
+    }
 }

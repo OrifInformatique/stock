@@ -732,7 +732,7 @@ class Admin extends BaseController
     {
         $output = [];
 
-        if(is_null($this->item_group_model->withDeleted()->find($id))) {
+        if (is_null($this->item_group_model->withDeleted()->find($id))) {
             return redirect()->to("/stock/admin/view_item_groups");
         }
 
@@ -740,7 +740,8 @@ class Admin extends BaseController
             // VALIDATION
             $validationRules = [
                 'name' => 'required|min_length[2]|max_length[45]|is_unique_group_name_by_entity[' . $id . ',' . $_POST['fk_entity_id'] . ']',
-                'short_name' => 'required|max_length['.config('\Stock\Config\StockConfig')->stocking_short_max_length.']|is_unique_group_short_name_by_entity[' . $id . ',' . $_POST['fk_entity_id'] . ']'
+                'short_name' => 'required|max_length['.config('\Stock\Config\StockConfig')->stocking_short_max_length.']|is_unique_group_short_name_by_entity[' . $id . ',' . $_POST['fk_entity_id'] . ']',
+                'fk_entity_id' => 'required|item_group_has_same_entity[' . $id . ']'
             ];
 
             $validationErrors = [
@@ -749,6 +750,9 @@ class Admin extends BaseController
                 ],
                 'short_name' => [
                     'is_unique_group_short_name_by_entity' => lang('stock_lang.msg_err_unique_short_name')
+                ],
+                'fk_entity_id' => [
+                    'item_group_has_same_entity' => lang('stock_lang.msg_err_item_group_has_same_entity')
                 ]
             ];
 
