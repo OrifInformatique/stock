@@ -77,23 +77,23 @@ $(document).ready(() => {
     $('#e ul.multiselect-container input[type=radio]').change(() => {
         eFilter = getEFilter();
         isChecked = $('#toggle_deleted').prop('checked');
-        history.pushState(null, "", "<?= base_url("stock/admin/list_user")?>"+ "/"+eFilter+"/"+(+isChecked));
-        $.post('<?=base_url();?>/stock/admin/list_user/'+eFilter+"/"+(+isChecked), {}, data => {
-            $('#userslist').empty();
-            $('#userslist')[0].innerHTML = $(data).find('#userslist')[0].innerHTML;
-        });
+        updateUserList(eFilter, isChecked);
     });
 
     $('#toggle_deleted').change(e => {
         eFilter = getEFilter();
         isChecked = e.currentTarget.checked;
-        history.pushState(null, "", "<?= base_url("stock/admin/list_user")?>"+ "/"+eFilter+"/"+(+isChecked));
-        $.post('<?=base_url();?>/stock/admin/list_user/'+eFilter+"/"+(+isChecked), {}, data => {
-            $('#userslist').empty();
-            $('#userslist')[0].innerHTML = $(data).find('#userslist')[0].innerHTML;
-        });
+        updateUserList(eFilter, isChecked);
     });
 });
+
+function updateUserList(eFilter, isChecked) {
+    history.pushState(null, "", "<?= base_url("stock/admin/list_user")?>"+ "/"+eFilter+"/"+(+isChecked));
+    $.post('<?=base_url();?>/stock/admin/list_user/'+eFilter+"/"+(+isChecked), {}, data => {
+        $('#userslist').empty();
+        $('#userslist')[0].innerHTML = $(data).find('#userslist')[0].innerHTML;
+    });
+}
 
 function getEFilter() {
     e = "";
