@@ -951,6 +951,45 @@ class Admin extends BaseController
         }
     }
 
+    /**
+     * Displays the list of users
+     *
+     * @param boolean $with_deleted : Display archived users or not
+     * @return void
+     */
+    public function list_user($entity_id = null, $with_deleted = FALSE) {
+        if (is_null($entity_id)) {
+            $entity_id = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->where('default', true)->findColumn('fk_entity_id');
+            $entity_id = reset($entity_id);
+        }
+
+        $fk_user_ids = $this->user_entity_model->where('fk_entity_id', $entity_id)->findColumn('fk_user_id');
+
+        if ($with_deleted) {
+            $users = $this->user_model->withDeleted()->find($fk_user_ids);
+        } else {
+            $users = $this->user_model->find($fk_user_ids);
+        }
+
+        //usertiarray is an array contained all usertype name and id
+        $usertiarray=$this->db->table('user_type')->select(['id','name'],)->get()->getResultArray();
+        $usertypes = [];
+        foreach ($usertiarray as $row){
+            $usertypes[$row['id']] = $row['name'];
+        }
+
+        $output = array(
+            'title' => lang('user_lang.title_administration'),
+            'users' => $users,
+            'user_types' => $usertypes,
+            'with_deleted' => $with_deleted,
+            'entities' => $this->entity_model->dropdown('name'),
+            'default_entity' => $entity_id
+        );
+
+        $this->display_view('\Stock\admin\users\list_user', $output);
+    }
+
     public function save_user($user_id = 0) {
         $tmpUserTypes = $this->user_type_model->findAll();
         $userTypes = [];
