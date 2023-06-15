@@ -1,0 +1,196 @@
+/* ADD CUSTOM STYLES HERE */
+
+/* Login bar styles */
+@media screen and (max-width: 768px) {
+    #login-bar h1 {
+        font-size: 25px;
+    }
+}
+@media screen and (min-width: 768px) {
+    #login-bar h1 {
+        font-size: 30px;
+    }
+}
+
+/* Nav menu style */
+#my-navbar .active {
+    border-bottom: 3px #1a661a solid;
+}
+li.nav-item {
+	margin: 0 10px;
+}
+/* Migration Part */
+.migrationBody{
+    width: 100%;
+    padding-block: 5px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+.migrationTable{
+}
+.migrationTable tr:active{
+    background-color: rgba(0,0,0,.1)!important;
+}
+.migrationTable thead tr:active{
+    background-color: unset!important;
+}
+.migrationTable tr td{
+}
+.migrationTable tbody tr td:first-of-type{
+    padding-left: .75rem;
+}
+.migrationTable tbody tr td:last-of-type span{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+.migrationTable tbody tr td:last-of-type span a{
+    margin-inline: .3rem;
+    margin-block: 5px;
+}
+.migrationViewContainer{
+    padding-inline: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.migrationViewBody{
+
+}
+.migrationModuleIndex{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 50px;
+    background-color: unset!important;
+    padding-right: .75rem;
+    border-bottom: 2px solid #AE9B70;
+    transform: translateX(-1rem);
+
+}
+.multipleControlMigration{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    background-color: #DBCEB1;
+    align-self: center;
+    margin-top: 1.2rem;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+    border-radius: 5px;
+    padding-inline: .75rem;
+    padding-right: .2rem;
+    align-items: center;
+}
+.multipleControlMigration span{
+    height: 2rem;
+    text-align: center;
+    display: flex;
+
+}
+.multipleControlMigration .text-white span{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.multipleControlMigration span p{
+    border-radius: 100%;
+    background-color: #AE9B70;
+    width: 2rem;
+    height: 2rem;
+    margin-right: .75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.multipleControlMigration .migrationControlContainer{
+    display: flex;
+    justify-content: flex-end;
+    width: 45%;
+    height: 42px;
+}
+.multipleControlMigration .migrationControlContainer span{
+    height: 100%;
+}
+.multipleControlMigration .migrationControlContainer button{
+    margin-inline: .3rem;
+    margin-block: 2px;
+}
+/* Migration Part End */
+#spinnerContainer{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: flex;
+    background-color: #ae9b70;
+    width: 100px;
+    height: 100px;
+    border-radius: 10px;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 5.1px 10.2px 10.2px hsl(0deg 0% 0% / 0.34);
+    box-sizing: border-box;
+    border: #897754 4px solid;
+}
+.background{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 80%;
+    height: 80%;
+    border-radius: 100%;
+    box-sizing: border-box;
+    padding-block-start: 10px;
+    padding: 15% 10%;
+    border: 8px #bfa78a solid;
+    animation: rotate 0.9s linear infinite;
+
+}
+.item{
+    position: relative;
+    align-self: start;
+    display: block;
+    border-radius: 100%;
+    width: 10px;
+    height: 10px;
+    bottom: 63%;
+
+}
+.item:nth-child(1){
+    background-color: #958259;
+
+}
+
+.item:nth-child(2){
+    background-color: white;
+    position: relative;
+    bottom: 73%;
+}
+.item:nth-child(3){
+    background-color: #958259;
+
+}
+
+@keyframes rotate {
+    0%{
+        transform:rotate(0deg);
+    }
+    100%{
+        transform:rotate(360deg);
+
+    }
+
+}
+.overlay-modal{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background-color:rgba(0,0,0,0.5);
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
