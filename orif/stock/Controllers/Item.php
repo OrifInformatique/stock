@@ -1149,7 +1149,7 @@ class Item extends BaseController {
      * @return void
      */
     public function load_list_loans_json($page = 1) {
-        echo json_encode($this->load_list_loans($page));
+        return json_encode($this->load_list_loans($page));
     }
 
     /**

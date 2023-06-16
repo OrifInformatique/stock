@@ -358,7 +358,6 @@ function display_item(item){
         `<div class="mt-2">${item_condition} ${loan_bootstrap_label} ${item_localisation} ${item_planned_return}</div>`,
     );
     card.append(card_div);
-    console.log(JSON.stringify(card));
     return card;
 }
 </script>

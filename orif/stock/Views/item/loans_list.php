@@ -94,7 +94,7 @@ function load_items(page, filters){
 
 
     // URL for ajax call to PHP controller                      Stock\Controllers\
-    url = "<?= base_url("/Item/load_list_loans_json")?>"+ "/" + page+filters;
+    url = "<?= base_url("/item/load_list_loans_json")?>"+ "/" + page+filters;
 
     $.ajax({
         url: url,

@@ -108,7 +108,7 @@
         <div class="col-sm-6 text-left">
             <!-- Display the "create" button if url_create is defined -->
             <?php if(isset($url_create)) { ?>
-                <a class="btn btn-primary" href="<?= site_url(esc($url_create)) ?>"><?= esc($btn_create_label) ?></a>
+                <a class="btn btn-primary" href="<?= base_url(esc($url_create)) ?>"><?= esc($btn_create_label) ?></a>
             <?php } ?>
         </div>
         <div class="col-sm-6 text-right">
@@ -152,21 +152,21 @@
                     <td class="text-right">                        
                         <!-- Bootstrap details icon ("Card text"), redirect to url_detail, adding /primary_key as parameter -->
                         <?php if(isset($url_detail)) { ?>
-                            <a href="<?= site_url(esc($url_detail.$itemEntity[$primary_key_field])) ?>">
+                            <a href="<?= base_url(esc($url_detail.$itemEntity[$primary_key_field])) ?>">
                                 <i class="bi-card-text" style="font-size: 20px;"></i>
                             </a>
                         <?php } ?>
 
                         <!-- Bootstrap edit icon ("Pencil"), redirect to url_update, adding /primary_key as parameter -->
                         <?php if(isset($url_update)) { ?>
-                            <a href="<?= site_url(esc($url_update.$itemEntity[$primary_key_field])) ?>">
+                            <a href="<?= base_url(esc($url_update.$itemEntity[$primary_key_field])) ?>">
                                 <i class="bi-pencil" style="font-size: 20px;"></i>
                             </a>
                         <?php } ?>
                         
                         <!-- Bootstrap delete icon ("Trash"), redirect to url_delete, adding /primary_key as parameter -->
                         <?php if(isset($url_delete)) { ?>
-                            <a href="<?= site_url(esc($url_delete.$itemEntity[$primary_key_field])) ?>">
+                            <a href="<?= base_url(esc($url_delete.$itemEntity[$primary_key_field])) ?>">
                                 <i class="bi-trash" style="font-size: 20px;"></i>
                             </a>
                         <?php } ?>

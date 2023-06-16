@@ -31,7 +31,7 @@ $validation = \Config\Services::validation();
         'id' => 'user_form',
         'name' => 'user_form'
     );
-    echo form_open(base_url('stock/admin/save_user/' . (isset($user['id']) ? $user['id'] : '')), $attributes, [
+    echo form_open(base_url('stock/admin/save_user' . (isset($user['id']) ? "/{$user['id']}" : '')), $attributes, [
         'id' => $user['id'] ?? 0
     ]);
     ?>
@@ -47,14 +47,14 @@ $validation = \Config\Services::validation();
         <div class="col-sm-6">
             <div class="form-group">
                 <?= form_label(lang('user_lang.field_username'), 'user_name', ['class' => 'form-label']); ?>
-                <?= form_input('user_name', $user_name ?? $user['username'] ?? '', [
+                <?= form_input('user_name', $user_name ?? $user['username'] ?? set_value('user_name'), [
                     'maxlength' => config("\User\Config\UserConfig")->username_max_length,
                     'class' => 'form-control', 'id' => 'user_name'
                 ]); ?>
             </div>
             <div class="form-group">
                 <?= form_label(lang('user_lang.field_email'), 'user_email', ['class' => 'form-label']); ?>
-                <?= form_input('user_email', $user['email'] ?? '', [
+                <?= form_input('user_email', $user['email'] ?? set_value('user_email'), [
                     'maxlength' => config('\User\Config\UserConfig')->email_max_length,
                     'class' => 'form-control', 'id' => 'user_email'
                 ]); ?>
@@ -68,18 +68,18 @@ $validation = \Config\Services::validation();
                 $dropdown_options = ['class' => 'form-control', 'id' => 'user_usertype'];
                 if (isset($user) && isset($_SESSION['user_id']) && $_SESSION['user_id'] == $user['id']) {
                     $dropdown_options['disabled'] = 'disabled';
-                    echo form_hidden('user_usertype', $user_usertype ?? $user['fk_user_type'] ?? "");
+                    echo form_hidden('user_usertype', $user_usertype ?? $user['fk_user_type'] ?? set_value('user_usertype'));
                     echo "<div class=\"alert alert-info\">" . lang('user_lang.user_update_usertype_himself') . "</div>";
                 }
                 ?>
-                <?= form_dropdown('user_usertype', $user_types, $user_usertype ?? $user['fk_user_type'] ?? NULL, $dropdown_options); ?>
+                <?= form_dropdown('user_usertype', $user_types, $user_usertype ?? $user['fk_user_type'] ?? set_value('user_usertype'), $dropdown_options); ?>
             </div>
         </div>
     </div>
     <div class="row">
         <div class="col-sm-6">
             <div id="entities" class="form-group">
-                <?= form_label(lang('stock_lang.field_user_entities'), 'entities-multiselect') . form_dropdown('entities[]', $entities, isset($user['user_entities']) ? array_column($user['user_entities'], 'fk_entity_id') : [], 'id="entities-multiselect" multiple="multiple"'); ?>
+                <?= form_label(lang('stock_lang.field_user_entities'), 'entities-multiselect') . form_dropdown('entities[]', $entities, isset($user['user_entities']) ? array_column($user['user_entities'], 'fk_entity_id') : set_value('entities'), 'id="entities-multiselect" multiple="multiple"'); ?>
             </div>
         </div>
         <div class="col-sm-6">

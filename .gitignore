@@ -125,3 +125,6 @@ nb-configuration.xml
 /phpunit*.xml
 /.phpunit.*.cache
 
+# User uploaded files (the folders have to stay in GIT)
+public/uploads/images/*
+public/uploads/files/*
