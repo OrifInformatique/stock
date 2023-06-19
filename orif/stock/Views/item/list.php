@@ -251,14 +251,12 @@ async function load_items(page, filters) {
                 }
             }
 
-            
-
             $("#pagination_top, #pagination_bottom").html(result.pagination);
 
             // Change cursor
             $("*").css("cursor", "");
             $(".pagination a").css("cursor", "pointer");
-            $(".pagination a").click(function(e){
+            $(".pagination a").click(function(e) {
                 e.preventDefault();
                 let pageLinkNumber = parseInt(e.target.href.split("=").pop(), 10);
                 load_items(pageLinkNumber, getFilters());
@@ -327,7 +325,7 @@ function getFilters() {
 function display_item(item){
     // Item's parameters
     let href = '<?= base_url("/item/view/"); ?>'+item["item_id"];
-    let src_image = '<?= base_url(); ?>/'+item["image_path"];
+    let src_image = '<?= base_url(); ?>'+item["image_path"];
     let alt_image = '<?php htmlspecialchars(lang("MY_application.field_image")); ?>';
     let item_condition = item["condition"]["bootstrap_label"];
     let loan_bootstrap_label = item["current_loan"]["bootstrap_label"];
