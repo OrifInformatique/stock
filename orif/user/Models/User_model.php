@@ -28,6 +28,9 @@ class User_model extends \CodeIgniter\Model{
     {
         $this->user_type_model=new User_type_model();
         $this->validationRules=[
+            'id' => [
+                'rules' => 'permit_empty|numeric'
+            ],
             'username' =>
                 ['label' => lang('user_lang.field_username'),
                  'rules' => 'cb_unique_username[{id}]|required|trim|'.

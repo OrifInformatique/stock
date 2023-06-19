@@ -982,11 +982,14 @@ class Admin extends BaseController
             $fk_entity_ids = $this->request->getPost('entities[]');
             $default_entity = $this->request->getPost('default_entity');
             $password = $this->request->getPost('user_password');
+            $password_confirm = $this->request->getPost('user_password_again');
             $userdata = [];
+            $user_id > 0 ? $userdata['id'] = $user_id : null;
             $username != null ? $userdata['username'] = $username : null;
             $email != null ? $userdata['email'] = $email : null;
             $userType != null ? $userdata['fk_user_type'] = $userType : null;
-            $password != null ? $userdata['password'] = password_hash($password, PASSWORD_BCRYPT) : null;
+            $password != null ? $userdata['password'] = $password : null;
+            $password_confirm != null ? $userdata['password_confirm'] = $password_confirm : null;
             $user_entities = $this->user_entity_model->where('fk_user_id', $user_id)->findAll();
 
             if ($user_id > 0) {
@@ -1053,6 +1056,47 @@ class Admin extends BaseController
                 'entities' => $this->entity_model->dropdown('name'),
                 'default_entities' => $this->entity_model->findAll()
             ]);
+        }
+    }
+
+    /**
+     * Delete or deactivate a user depending on $action
+     *
+     * @param integer $user_id = ID of the user to affect
+     * @param integer $action = Action to apply on the user:
+     *  - 0 for displaying the confirmation
+     *  - 1 for deactivating (soft delete)
+     *  - 2 for deleting (hard delete)
+     * @return void
+     */
+    public function delete_user($user_id, $action = 0)
+    {
+        $user = $this->user_model->withDeleted()->find($user_id);
+        if (is_null($user)) {
+            return redirect()->to('/user/admin/list_user');
+        }
+
+        switch($action) {
+            case 0: // Display confirmation
+                $output = array(
+                    'user' => $user,
+                    'title' => lang('user_lang.title_user_delete')
+                );
+                $this->display_view('\User\admin\delete_user', $output);
+                break;
+            case 1: // Deactivate (soft delete) user
+                if ($_SESSION['user_id'] != $user['id']) {
+                    $this->user_model->delete($user_id, FALSE);
+                }
+                return redirect()->to('/user/admin/list_user');
+            case 2: // Delete user
+                if ($_SESSION['user_id'] != $user['id']) {
+                    $this->user_entity_model->where('fk_user_id', $user_id)->delete();
+                    $this->user_model->delete($user_id, TRUE);
+                }
+                return redirect()->to('/user/admin/list_user');
+            default: // Do nothing
+                return redirect()->to('/user/admin/list_user');
         }
     }
 }
