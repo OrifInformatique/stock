@@ -119,7 +119,7 @@
     <!-- END OF FILTERS AND SORT FORM -->
 
     <!-- PAGINATION -->
-    <div class="row"><div class="col-12 text-center">
+    <div class="row"><div class="col-12 pt-3">
         <div id="pagination_top"></div>
     </div></div>
 
@@ -133,7 +133,7 @@
     </div>
 
     <!-- PAGINATION -->
-    <div class="row"><div class="col-12 text-center">
+    <div class="row"><div class="col-12 pt-3">
         <div id="pagination_bottom"></div>
     </div></div>
 </div>
