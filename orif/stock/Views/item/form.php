@@ -24,16 +24,80 @@ $config = config('\Stock\Config\StockConfig');
     ?>
     </div>
 
-    <!-- ITEM NAME AND DESCRIPTION -->
+    <!-- ITEM_COMMON, ITEM NAME AND DESCRIPTION -->
     <div class="row">
+        <div class="form-group col-11">
+            <?= form_label(lang('stock_lang.item_common'), 'item_common_name'); ?>
+            <?= form_input('item_common_name', '', [
+                'placeholder' => lang('stock_lang.item_common'),
+                'class' => 'form-control', 
+                'id' => 'item_common_name',
+                'readonly' => 'true',
+                'onClick' => "$('#itemCommonBrowse').modal('show');"
+                ]); 
+            ?>
+
+            <!-- Modal -->
+            <div class="modal fade" id="itemCommonBrowse" tabindex="-1" aria-labelledby="itemCommonBrowseLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-scrollable">
+                    <div class="modal-content col-10">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="itemCommonBrowseLabel"><?= lang('stock_lang.item_common'); ?></h5>
+                        </div>
+                        <div class="form-group search-sticky">
+                            <?= form_label(lang('stock_lang.field_search_item_common'), 'search_item_common', ['class' => '']) ?>
+                            <?= form_input('search_item_common', '', [
+                                'placeholder' => lang('stock_lang.field_search_item_common'),
+                                'class' => 'form-control bg-white', 'id' => 'search_item_common'
+                                ]); 
+                            ?>
+                        </div>
+                        <div class="modal-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover" style="overflow-x: auto;">
+                                    <thead>
+                                        <tr role="button">
+                                            <th scope="col"></th>
+                                            <th scope="col"><?= lang('stock_lang.field_item_common_name'); ?></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="itemCommonList">
+                                        <tr>
+                                            <td>
+                                                <img src="<?= base_url('uploads/images') . '/' . $config->item_no_image ?>" width="100px" height="100px" alt="">
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <?php foreach($item_common_list as $item_common): ?>
+                                            <?php if (! is_null($item_common)): ?>
+                                                <tr>
+                                                    <td>
+                                                        <img src="<?= base_url('uploads/images') . '/' . $item_common['image'] ?>" width="100px" height="100px" alt="">
+                                                    </td>
+                                                    <td><?= $item_common['name']; ?></td>
+                                                </tr>
+                                            <?php endif; ?>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                                <div id="noItemFoundMessage" class="alert alert-info"><?= lang('stock_lang.no_item_common_found'); ?></div>
+                            </div>
+                        </div>
+                        <div class="modal-footer justify-content-center">
+                            <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal" onclick="$('#itemCommonBrowse').modal('hide');"><?= lang('stock_lang.save_and_quit'); ?></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="col-md-8">
             <div class="form-group">
-                <input type="text" class="form-control input-bold" name="name"
+                <input type="text" id="name" class="form-control input-bold" name="name"
                         placeholder="<?= lang('MY_application.field_item_name') ?>"
                         value="<?php if(isset($name)) {echo set_value('name',$name);} else {echo set_value('name');} ?>" />
             </div>
             <div class="form-group">
-                <input type="text" class="form-control" name="description"
+                <input type="text" id="description" class="form-control" name="description"
                         placeholder="<?= lang('MY_application.field_item_description') ?>"
                         value="<?php if(isset($description)) {echo set_value('description',$description);} else {echo set_value('description');} ?>" />
             </div>
@@ -254,12 +318,55 @@ $config = config('\Stock\Config\StockConfig');
         </div>
     </div>
 </form>
+
+<!-- SCRIPT -->
 <script>
 $(document).ready(function() {
+    $("#noItemFoundMessage").toggle(false);
     // Refresh the image to prevent display of an old cach image.
     // Changing the src attribute forces browser to update.
     d = new Date();
     $("#picture").attr("src", "<?= base_url($config->images_upload_path.$imagePath); ?>?"+d.getTime());
+    
+    $("#itemCommonBrowse tr").click(function() {
+        $(this).addClass('highlight').siblings().removeClass('highlight');
+        var text = $(this).find('td:eq(1)').text();
+        $('#item_common_name').val(text).trigger('change');
+    });
+
+    $("#search_item_common").on("keyup", function() {
+        let value = $(this).val().toLowerCase();
+        let found = false; // Flag to check if any item is found
+        
+        $("#itemCommonList tr").filter(function() {
+            let rowText = $(this).text().toLowerCase();
+            let isVisible = rowText.indexOf(value) > -1;
+            $(this).toggle(isVisible);
+            
+            if (isVisible) {
+                found = true;
+            }
+        });
+        
+        // Toggle the message based on whether any item is found
+        $("#noItemFoundMessage").toggle(!found);
+    });
+
+    $('#item_common_name').on('change', (e) => {
+        let name = $('#name');
+        let description = $('#description');
+        let itemGroup = $('#item_group_id');
+        if (e.target.value === "") {
+            name.prop('disabled', false);
+            description.prop('disabled', false);
+            itemGroup.prop('disabled', false);
+        } else {
+            name.prop('disabled', true);
+            description.prop('disabled', true);
+            itemGroup.prop('disabled', true);
+        }
+        console.log(e.target.value);
+    });
 });
 
 function get(objectName){
@@ -315,7 +422,7 @@ function change_warranty() {
 	}
 }
 
-function createInventoryNo(){
+function createInventoryNo() {
 
     var objectGroupField = document.getElementById('item_group_id');
 

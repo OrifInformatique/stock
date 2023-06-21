@@ -85,3 +85,15 @@ li.nav-item {
     }
 }
 
+.search-sticky {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    padding: 1rem;
+    z-index: 1055;
+}
+
+.highlight {
+    background-color: #ECECEC;
+}
+

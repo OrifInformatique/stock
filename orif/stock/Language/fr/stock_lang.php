@@ -55,6 +55,8 @@ return[
 'field_deleted_item_groups'             => 'Afficher les groupes d\'objets désactivés',
 'field_user_entities'                   => 'Sites attribués',
 'field_user_default_entity'             => 'Site principal',
+'field_search_item_common'              => 'Rechercher un objet commun',
+'field_item_common_name'                => 'Nom de l\'objet commun',
 
 // Admin other labels   
 'admin_modify'                          => 'Modification',
@@ -69,6 +71,8 @@ return[
 'stocking_place'                        => 'Lieu de stockage',
 'supplier'                              => 'Fournisseur',
 'item_group'                            => 'Groupe d\'objets',
+'item_common'                           => 'Objet commun',
+'no_item_common_found'                  => 'Aucun objet commun n\'a été trouvé',
 
 'tag_deletion_explanation'              => 'La désactivation d\'un tag permet de le rendre inutilisable tout en conservant ses informations dans les archives. ' 
                                                 . 'Cela permet notamment de garder l\'historique de ses actions. <br> <br>' 
@@ -113,6 +117,7 @@ return[
 'tagname'                               => 'Tag',
 'add_entity'                            => 'Ajouter un site',
 'update_entity'                         => 'Modifier le site',
+'save_and_quit'                         => 'Sauvegarder et revenir au formulaire',
 'no_id_found_for_update_error'          => 'Pour modifier un site, il vous faut fournir son id dans l\'url',
 'delete_entity_what_to_do'              => 'La désactivation d\'un site permet de le rendre inutilisable tout en conservant ses informations dans les archives.
                                             Cela permet notamment de conserver l\'historique de ses actions.<br><br>
