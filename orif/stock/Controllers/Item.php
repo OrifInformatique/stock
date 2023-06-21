@@ -33,6 +33,7 @@ use Stock\Models\Item_tag_link_model;
 use Stock\Models\Stocking_place_model;
 use Stock\Models\Supplier_model;
 use Stock\Models\User_entity_model;
+use Stock\Models\Item_common_model;
 use User\Models\User_model;
 use CodeIgniter\Database\BaseConnection;
 
@@ -52,6 +53,7 @@ class Item extends BaseController {
     protected User_model $user_model;
     protected Entity_model $entity_model;
     protected User_entity_model $user_entity_model;
+    protected Item_common_model $item_common_model;
     protected $config;
     protected BaseConnection $db;
 
@@ -80,6 +82,7 @@ class Item extends BaseController {
         $this->stocking_place_model = new Stocking_place_model();
         $this->entity_model = new Entity_model();
         $this->user_entity_model = new User_entity_model();
+        $this->item_common_model = new Item_common_model();
         $this->config = config('\Stock\Config\StockConfig');
 
         // Initialize db for query builder
@@ -275,21 +278,30 @@ class Item extends BaseController {
         }
 
         if (!is_null($item)) {
-            $item['supplier'] = $this->item_model->getSupplier($item);
-            $item['stocking_place'] = $this->item_model->getStockingPlace($item);
-            $item['item_condition'] = $this->item_model->getItemCondition($item);
-            $item['item_group'] = $this->item_model->getItemGroup($item);
-            $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
-            $item['current_loan'] = $this->item_model->getCurrentLoan($item);
-            $item['warranty_status'] = $this->item_model->getWarrantyStatus($item);
-            $item['tags'] = $this->item_model->getTags($item);
-            $item['image'] = $this->item_model->getImagePath($item);
-            $item['last_inventory_control'] = $this->item_model->getLastInventoryControl($item);
-            if (!is_null($item['last_inventory_control'])) {
-                $item['last_inventory_control']['controller'] = $this->inventory_control_model->getUser($item['last_inventory_control']['controller_id']);
+            $item_common = $this->item_common_model->find($item['item_common_id']);
+
+            if (!is_null($item_common)) {
+                $item['supplier'] = $this->item_model->getSupplier($item);
+                $item['stocking_place'] = $this->item_model->getStockingPlace($item);
+                $item['item_condition'] = $this->item_model->getItemCondition($item);
+                $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
+                $item['current_loan'] = $this->item_model->getCurrentLoan($item);
+                $item['warranty_status'] = $this->item_model->getWarrantyStatus($item);
+                $item['last_inventory_control'] = $this->item_model->getLastInventoryControl($item);
+
+                $item_common['tags'] = $this->item_common_model->getTags($item_common);
+                $item_common['image'] = $this->item_common_model->getImagePath($item_common);
+                $item_common['item_group'] = $this->item_common_model->getItemGroup($item_common);
+                if (!is_null($item['last_inventory_control'])) {
+                    $item['last_inventory_control']['controller'] = $this->inventory_control_model->getUser($item['last_inventory_control']['controller_id']);
+                }
+                $output['item_common'] = $item_common;
+                $output['item'] = $item;
+                $this->display_view('Stock\Views\item\detail', $output);
+            } else {
+                // $id is not valid, display an error message
+                $this->display_view('Stock\Views\errors\application\inexistent_item');
             }
-            $output['item'] = $item;
-            $this->display_view('Stock\Views\item\detail', $output);
         } else {
             // $id is not valid, display an error message
             $this->display_view('Stock\Views\errors\application\inexistent_item');
@@ -456,7 +468,7 @@ class Item extends BaseController {
             }
         } else {
             // Access is not allowed
-            return redirect()->to("/item");
+            return redirect()->to(base_url());
         }
     }
 
@@ -1182,7 +1194,8 @@ class Item extends BaseController {
         $entity = !is_null($entityId) ? $builder->where('entity_id', $entityId) : $builder;
         $join_item_group = $entity->join('item_group', 'item_group.fk_entity_id = entity.entity_id', 'inner');
         $join_stocking_place = $join_item_group->join('stocking_place', 'stocking_place.fk_entity_id = entity.entity_id', 'inner');
-        $join_item = $join_stocking_place->join('item', 'item.item_group_id = item_group.item_group_id AND item.stocking_place_id = stocking_place.stocking_place_id', 'inner');
+        $join_item = $join_stocking_place->join('item', 'item.stocking_place_id = stocking_place.stocking_place_id', 'inner')
+                                         ->join('item_common', 'item_common.item_group_id = item_group.item_group_id');
         
         // Count all results
         $nb_items = $join_item->countAllResults();

@@ -20,13 +20,13 @@ class Item_tag_model extends MyModel
     protected $useSoftDeletes = true;
     protected $deletedField = 'archive';
 
-    public function initialize(){
-        if(!$this->item_tag_link_model) {
-            $this->item_tag_link_model = new Item_tag_link_model();
-        }
+    protected Item_tag_link_model $item_tag_link_model;
+
+    public function initialize() {
+        $this->item_tag_link_model = new Item_tag_link_model();
     }
 
-    public function get_items($tag){
+    public function get_items($tag) {
         if(is_null($this->item_tag_link_model)){
             $this->item_tag_link_model = new Item_tag_link_model();
         }

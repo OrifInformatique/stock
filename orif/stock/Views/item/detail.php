@@ -14,13 +14,13 @@
 
     <!-- ITEM NAME AND DESCRIPTION -->
 	<div class="row">
-        <div class="col-md-8"><h3><?= htmlspecialchars($item['name']); ?></h3></div>
+        <div class="col-md-8"><h3><?= htmlspecialchars($item_common['name']); ?></h3></div>
         <div class="col-md-4">
             <h4 class="text-right"><?= lang('MY_application.field_inventory_number_abr').' : '.htmlspecialchars($item['inventory_number']); ?></h4>
         </div>
     </div>
     <div class="row">
-        <div class="col-md-8"><p><?= htmlspecialchars($item['description']); ?></p></div>
+        <div class="col-md-8"><p><?= htmlspecialchars($item_common['description']); ?></p></div>
     </div>
     <?php if ($item['current_loan']['is_late']) { ?>
     <div class="row">
@@ -35,7 +35,7 @@
         </div>
         <div class="col-md-4">
             <img id="picture"
-                 src="<?= base_url($item['image']); ?>"
+                 src="<?= base_url($item_common['image']); ?>"
                  width="100%"
                  alt="<?= lang('MY_application.field_image'); ?>" />
         </div>
@@ -45,7 +45,7 @@
                     <label><?= htmlspecialchars(lang('MY_application.field_group')); ?></label>
                 </div>
                 <div class="col-sm-9">
-                    <?php if(!is_null($item['item_group'])){echo htmlspecialchars($item['item_group']['name']);} ?>
+                    <?php if(!is_null($item_common['item_group'])){echo htmlspecialchars($item_common['item_group']['name']);} ?>
                 </div>
             </div>
             <div class="row">
@@ -232,9 +232,9 @@
         </div>
         <div class="col-md-12">
             <?php
-            if (!empty($item['tags']))
+            if (!empty($item_common['tags']))
             {
-                foreach($item['tags'] as $tag)
+                foreach($item_common['tags'] as $tag)
                 {
                     echo '<span class="badge badge-dark">'.$tag[0]['name']."</span>\n";
                 }
@@ -248,6 +248,6 @@ $(document).ready(function() {
     // Refresh the image to prevent display of an old cach image.
     // Changing the src attribute forces browser to update.
     d = new Date();
-    $("#picture").attr("src", "<?= base_url($item['image']); ?>?"+d.getTime());
+    $("#picture").attr("src", "<?= base_url($item_common['image']); ?>?"+d.getTime());
 });
 </script>

@@ -12,10 +12,7 @@
 
 namespace  Stock\Models;
 
-use CodeIgniter\Model;
 use Stock\Models\MyModel;
-
-
 
 class Item_tag_link_model extends MyModel
 {
@@ -24,11 +21,11 @@ class Item_tag_link_model extends MyModel
     protected $primaryKey = 'item_tag_link_id';
     protected $allowedFields = ['item_tag_id', 'item_id'];
 
-    public function getTags($item){
+    public function getTags($item_common){
         $item_tag_model = new Item_tag_model();
 
         $tags = array();
-        $tagIDs = $this->asArray()->where(['item_id'=>$item['item_id']])->findColumn('item_tag_id');
+        $tagIDs = $this->asArray()->where(['item_common_id'=>$item_common['item_common_id']])->findColumn('item_tag_id');
 
         if (!is_null($tagIDs)) {
             foreach ($tagIDs as $tagID){
@@ -43,11 +40,11 @@ class Item_tag_link_model extends MyModel
         $item_model = new Item_model();
 
         $items = array();
-        $itemsIDs = $this->asArray()->where(['item_tag_id'=>$tag['item_tag_id']])->findColumn('item_id');
+        $itemsCommonIDs = $this->asArray()->where(['item_tag_id'=>$tag['item_tag_id']])->findColumn('item_common_id');
 
-        if (!is_null($itemsIDs)) {
-            foreach ($itemsIDs as $itemID){
-                array_push($items, $item_model->asArray()->where(['item_id'=>$itemID])->find());
+        if (!is_null($itemsCommonIDs)) {
+            foreach ($itemsCommonIDs as $itemCommonID){
+                array_push($items, $item_model->asArray()->where(['item_common_id'=>$itemCommonID])->find());
             }
         }
 
