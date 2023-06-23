@@ -18,15 +18,9 @@
             <div class="col-4"><?= lang('stock_lang.field_linked_file') . ':'; ?></div>
             <div class="col-8">
                 <!-- Button to display linked file -->
-                <?php if (!empty($item['linked_file'])): ?>
-                    <a href="<?= base_url('uploads/files/'.$item['linked_file'])?>" class="btn btn-default pt-0 pl-0"  role="button" >
-                        <?= lang('MY_application.btn_linked_doc'); ?>
-                    </a>
-                <?php else: ?>
-                    <a href="#" class="btn btn-default pt-0 pl-0 disabled"  role="button">
-                        <?= lang('MY_application.btn_linked_doc'); ?>
-                    </a>
-                <?php endif; ?>
+                <a href="<?= !empty($item['linked_file']) ? base_url('uploads/files/'.$item['linked_file']) : ''?>" class="btn btn-default pt-0 pl-0 <?= !empty($item['linked_file']) ? '' : 'disabled' ?>"  role="button" >
+                    <?= lang('MY_application.btn_linked_doc'); ?>
+                </a>
             </div>
         </div>
         <div class="col-4">
@@ -53,5 +47,76 @@
     </div>
     <hr>
     <!-- Item details list -->
-    
+    <?php foreach($items as $item): ?>
+        <div class="row col-12">
+            <div class="col-3">
+                <div class="row">
+                    <div class="col-12">
+                        <h4><?= $item['inventory_number']; ?></h4>
+                    </div>
+                    <div class="col-12">
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="row">
+                    <!-- Stocking Place -->
+                    <div class="col-12">
+                        <label><?= lang('MY_application.field_stocking_place'); ?> :</label>
+                    </div>
+                    <div class="col-12">
+                        <?= !is_null($item['stocking_place']) ? esc($item['stocking_place']['name']) : ''; ?>
+                    </div>
+
+                    <!-- Remarks -->
+                    <div class="col-12 pt-3">
+                        <label><?= lang('MY_application.field_remarks'); ?> :</label>
+                    </div>
+                    <div class="col-12">
+                        <?= esc($item['remarks']); ?>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="row">
+                    <!-- Supplier -->
+                    <div class="col-12">
+                        <label><?= lang('MY_application.field_supplier'); ?> :</label>
+                    </div>
+                    <div class="col-12">
+                        <?= !is_null($item['supplier']) ? $item['supplier']['name'] : ''; ?>
+                    </div>
+
+                    <!-- Buying Price -->
+                    <div class="col-12 pt-3">
+                        <label><?= lang('MY_application.field_buying_price'); ?> :</label>
+                    </div>
+                    <div class="col-12">
+                        <?= $item['buying_price']; ?>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="row">
+                    <!-- Supplier Ref -->
+                    <div class="col-12">
+                        <label><?= lang('MY_application.field_supplier_ref'); ?> :&nbsp;</label>
+                    </div>
+                    <div class="col-12">
+                        <?= !empty($item['supplier_ref']) ? esc($item['supplier_ref']) : '-'; ?>
+                    </div>
+
+                    <!-- Buying Date -->
+                    <div class="col-12 pt-3">
+                        <label><?= lang('MY_application.field_buying_date'); ?> :</label>
+                    </div>
+                    <div class="col-12">
+                        <?= !empty($item['buying_date']) ? databaseToShortDate($item['buying_date']) : ''; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+    <?php endforeach; ?>
 </div>

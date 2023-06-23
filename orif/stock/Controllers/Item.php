@@ -285,7 +285,7 @@ class Item extends BaseController {
                     $item_common['image'] = $this->item_common_model->getImagePath($item_common);
                     $item_common['item_group'] = $this->item_common_model->getItemGroup($item_common);
                     
-                    foreach ($items as $item) {
+                    foreach ($items as $key => $item) {
                         $item['supplier'] = $this->item_model->getSupplier($item);
                         $item['stocking_place'] = $this->item_model->getStockingPlace($item);
                         $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
@@ -297,6 +297,8 @@ class Item extends BaseController {
                         if (!is_null($item['last_inventory_control'])) {
                             $item['last_inventory_control']['controller'] = $this->inventory_control_model->getUser($item['last_inventory_control']['controller_id']);
                         }
+
+                        $items[$key] = $item;
                     }
 
                     if (isset($_SESSION['user_id']) && !is_null($items)) {
