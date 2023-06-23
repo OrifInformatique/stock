@@ -272,33 +272,45 @@ class Item extends BaseController {
         }
 
         // Get item object and related objects
-        $item = $this->item_model->asArray()->where(["item_id"=>$id])->first();
+        $item_common_id = $this->item_model->asArray()->where(["item_id" => $id])->findColumn('item_common_id');
 
-        if (isset($_SESSION['user_id']) && !is_null($item)) {
-            $output['can_modify'] = $this->user_entity_model->check_user_item_entity($_SESSION['user_id'], $id);
-        }
-
-        if (!is_null($item)) {
-            $item_common = $this->item_common_model->find($item['item_common_id']);
+        if (count($item_common_id) > 0) {
+            $item_common = $this->item_common_model->where('item_common_id', $item_common_id)->first();
 
             if (!is_null($item_common)) {
-                $item['supplier'] = $this->item_model->getSupplier($item);
-                $item['stocking_place'] = $this->item_model->getStockingPlace($item);
-                $item['item_condition'] = $this->item_model->getItemCondition($item);
-                $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
-                $item['current_loan'] = $this->item_model->getCurrentLoan($item);
-                $item['warranty_status'] = $this->item_model->getWarrantyStatus($item);
-                $item['last_inventory_control'] = $this->item_model->getLastInventoryControl($item);
+                $items = $this->item_model->where('item_common_id', $item_common['item_common_id'])->findAll();
 
-                $item_common['tags'] = $this->item_common_model->getTags($item_common);
-                $item_common['image'] = $this->item_common_model->getImagePath($item_common);
-                $item_common['item_group'] = $this->item_common_model->getItemGroup($item_common);
-                if (!is_null($item['last_inventory_control'])) {
-                    $item['last_inventory_control']['controller'] = $this->inventory_control_model->getUser($item['last_inventory_control']['controller_id']);
+                if (count($items) > 0) {
+                    $item_common['tags'] = $this->item_common_model->getTags($item_common);
+                    $item_common['image'] = $this->item_common_model->getImagePath($item_common);
+                    $item_common['item_group'] = $this->item_common_model->getItemGroup($item_common);
+                    
+                    foreach ($items as $item) {
+                        $item['supplier'] = $this->item_model->getSupplier($item);
+                        $item['stocking_place'] = $this->item_model->getStockingPlace($item);
+                        $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
+                        $item['condition'] = $this->item_model->getItemCondition($item);
+                        $item['current_loan'] = $this->item_model->getCurrentLoan($item);
+                        $item['warranty_status'] = $this->item_model->getWarrantyStatus($item);
+                        $item['last_inventory_control'] = $this->item_model->getLastInventoryControl($item);
+
+                        if (!is_null($item['last_inventory_control'])) {
+                            $item['last_inventory_control']['controller'] = $this->inventory_control_model->getUser($item['last_inventory_control']['controller_id']);
+                        }
+                    }
+
+                    if (isset($_SESSION['user_id']) && !is_null($items)) {
+                        $output['can_modify'] = $this->user_entity_model->check_user_item_entity($_SESSION['user_id'], $id);
+                    }
+
+                    $output['item_common'] = $item_common;
+                    $output['items'] = $items;
+
+                    $this->display_view('Stock\Views\item\item_common_details', $output);
+                } else {
+                    // $id is not valid, display an error message
+                    $this->display_view('Stock\Views\errors\application\inexistent_item');
                 }
-                $output['item_common'] = $item_common;
-                $output['item'] = $item;
-                $this->display_view('Stock\Views\item\detail', $output);
             } else {
                 // $id is not valid, display an error message
                 $this->display_view('Stock\Views\errors\application\inexistent_item');

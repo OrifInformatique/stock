@@ -40,6 +40,8 @@ return[
 // Fields labels
 'field_active'                          => 'Actif',
 'field_name'                            => 'Nom',
+'field_description'                     => 'Description',
+'field_linked_file'                     => 'Fichier joint',
 'field_short_name'                      => 'Nom court',
 'field_address'                         => 'Adresse',
 'field_first_address_line'              => 'Première ligne d\'adresse',
