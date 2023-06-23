@@ -260,9 +260,9 @@ class Item_model extends MyModel
             // Prepare WHERE clause
             $where_textSearchFilter .= '(';
             $where_textSearchFilter .=
-                "item.name LIKE '%" . $text_search_content . "%' "
-                . "OR description LIKE '%" . $text_search_content . "%' "
-                . "OR serial_number LIKE '%" . $text_search_content . "%' ";
+                "item_common.name LIKE '%" . $text_search_content . "%' "
+                . "OR item_common.description LIKE '%" . $text_search_content . "%' "
+                . "OR item.serial_number LIKE '%" . $text_search_content . "%' ";
 
             if (isset($item_id)) {
                 if (isset($inventory_number) && $inventory_number != '') {
