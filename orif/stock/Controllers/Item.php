@@ -247,7 +247,7 @@ class Item extends BaseController {
     }
 
     public function load_list_json($page = 1){
-        echo json_encode($this->load_list($page));
+        return json_encode($this->load_list($page));
     }
 
     public function load_pagination($nbr_items, $page)
@@ -342,7 +342,7 @@ class Item extends BaseController {
                 return redirect()->to(base_url());
             }
 
-            $validation = $this->set_validation_rules();
+            $validation = $this->set_validation_rules(isset($_POST['item_common_name']) && !empty($_POST['item_common_name']));
 
             $data['upload_errors'] = "";
 
@@ -404,13 +404,22 @@ class Item extends BaseController {
 
                 $itemArray["created_by_user_id"] = $_SESSION['user_id'];
 
-                $item_id = $this->item_model->insert($itemArray); // TODO
-
-                foreach ($linkArray as $tag) {
-                    $this->item_tag_link_model->insert(array("item_tag_id" => $tag, "item_id" => ($item_id)));
+                if (!empty($itemArray['item_common_name'])) {
+                    $itemCommon = $this->item_common_model->where('name', $_POST['item_common_name'])->first();
+                    $itemArray['item_common_id'] = $itemCommon['item_common_id'];
+                    unset($itemArray['item_common_name'], $itemArray['fk_entity_id']);
+                } else {
+                    $itemCommonId = $this->item_common_model->insert($itemArray);
+                    $itemArray['item_common_id'] = $itemCommonId;
                 }
 
-                return redirect()->to("/item/view/" . $item_id);
+                $item_id = $this->item_model->insert($itemArray); // TODO: fix
+
+                foreach ($linkArray as $tag) {
+                    $this->item_tag_link_model->insert(array("item_tag_id" => $tag, "item_common_id" => ($itemArray['item_common_id'])));
+                }
+
+                return redirect()->to(base_url("/item/view/" . $item_id));
             } else {
                 // Remember checked tags to display them checked again
                 $tags = $_POST;
@@ -507,10 +516,13 @@ class Item extends BaseController {
             // If there is no submit
             if (empty($_POST)) {
                 // get the data from the item with this id,
-                $data = $this->item_model->find($id);
-                // including its tags
-                $data['tag_links'] = $this->item_tag_link_model->where("item_id", $id)->findAll();
+                $data['item'] = $this->item_model->find($id);
 
+                // Get the item_common data
+                $data['item_common'] = $this->item_common_model->find($data['item']['item_common_id']);
+
+                // including its tags
+                $data['tag_links'] = $this->item_tag_link_model->where("item_common_id", $data['item']['item_common_id'])->findAll();
             } else {
                 $validation = $this->set_validation_rules();
 
@@ -594,10 +606,11 @@ class Item extends BaseController {
 
             $data['modify'] = true;
             $data['item_id'] = $id;
-            //$_SESSION['picture_prefix'] = $data['inventory_id'];
 
             // Load the options
             $this->supplier_model = new Supplier_model();
+
+            $data['item_common_list'] = $this->item_common_model->findAll();
 
             $data['stocking_places'] = $this->stocking_place_model->findAll();
             $data['suppliers'] = $this->supplier_model->findAll();
@@ -1073,15 +1086,15 @@ class Item extends BaseController {
 
         // Get Loans and corresponding items
         if (isset($filters['e'])) {
-            $builder = $this->db->table('entity');
-            $entity = $builder->where('entity_id', $filters['e']);
-            $return_date = $entity->where('real_return_date', null);
-            $join_item_group = $return_date->join('item_group', 'item_group.fk_entity_id = entity.entity_id', 'inner');
-            $join_stocking_place = $join_item_group->join('stocking_place', 'stocking_place.fk_entity_id = entity.entity_id', 'inner');
-            $join_items = $join_stocking_place->join('item', 'item.item_group_id = item_group.item_group_id AND item.stocking_place_id = stocking_place.stocking_place_id', 'inner');
-            $join_loans = $join_items->join('loan', 'loan.item_id = item.item_id', 'inner');
-            $join_loans->select(['loan.loan_id', 'loan.date', 'loan.item_localisation', 'loan.remarks', 'loan.planned_return_date', 'loan.real_return_date', 'loan.item_id', 'loan.loan_by_user_id', 'loan.loan_to_user_id', 'loan.borrower_email']);
-            $loans = $join_loans->get()->getResultArray();
+            $loans = $this->db->table('entity')
+                              ->where('entity_id', $filters['e'])
+                              ->where('real_return_date', null)
+                              ->join('item_group', 'item_group.fk_entity_id = entity.entity_id', 'inner')
+                              ->join('stocking_place', 'stocking_place.fk_entity_id = entity.entity_id', 'inner')
+                              ->join('item', 'item.stocking_place_id = stocking_place.stocking_place_id', 'inner')
+                              ->join('loan', 'loan.item_id = item.item_id', 'inner')
+                              ->select(['loan.loan_id', 'loan.date', 'loan.item_localisation', 'loan.remarks', 'loan.planned_return_date', 'loan.real_return_date', 'loan.item_id', 'loan.loan_by_user_id', 'loan.loan_to_user_id', 'loan.borrower_email'])
+                              ->get()->getResultArray();
 
             $late_loans_count = $this->loan_model->get_late_loans_by_entity($filters['e']);
         } else {
@@ -1170,12 +1183,12 @@ class Item extends BaseController {
      * @param integer $id
      * @return mixed
      */
-    private function set_validation_rules() {
+    private function set_validation_rules($limitedFields = false) {
         $validation = \Config\Services::validation();
 
-        $validation->setRule("name", lang('MY_application.field_item_name'), 'required');
+        !$limitedFields ? $validation->setRule("name", lang('MY_application.field_item_name'), 'required') : null;
+        !$limitedFields ? $validation->setRule("item_group_id", lang('MY_application.field_group'), 'required') : null;
         $validation->setRule("inventory_prefix", lang('MY_application.field_inventory_number'), 'required');
-        $validation->setRule("item_group_id", lang('MY_application.field_group'), 'required');
         $validation->setRule("stocking_place_id", lang('MY_application.field_stocking_place'), 'required');
 
         return $validation;

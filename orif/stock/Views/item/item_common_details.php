@@ -1,0 +1,1 @@
+<div>item common details works!</div>

@@ -22,6 +22,7 @@ class Item_model extends MyModel
     protected $table = 'item';
     protected $primaryKey = 'item_id';
     protected $allowedFields = [
+        'item_common_id',
         'inventory_prefix',
         'serial_number',
         'buying_price',
@@ -48,11 +49,12 @@ class Item_model extends MyModel
     protected Item_condition_model $item_condition_model;
     protected Inventory_control_model $inventory_control_model;
     protected Item_tag_link_model $item_tag_link_model;
+    protected Item_common_model $item_common_model;
 
     /**
      * Constructor
      */
-    public function __construct()
+    public function initialize()
     {
         $this->user_model = new User_model();
         $this->loan_model = new Loan_model();
@@ -62,6 +64,7 @@ class Item_model extends MyModel
         $this->item_condition_model = new Item_condition_model();
         $this->inventory_control_model = new Inventory_control_model();
         $this->item_tag_link_model = new Item_tag_link_model();
+        $this->item_common_model = new Item_common_model();
         
         $this->db = \Config\Database::connect();
     }
@@ -223,6 +226,8 @@ class Item_model extends MyModel
         // Initialize a global WHERE clause for filtering
         $where_itemsFilters = '';
 
+        $join_item_common = '';
+
         /*********************
          ** TEXT SEARCH FILTER
          **********************/
@@ -315,7 +320,7 @@ class Item_model extends MyModel
             // Prepare WHERE clause
             $where_itemGroupFilter .= '(';
             foreach ($item_groups_selection as $item_group_id) {
-                $where_itemGroupFilter .= 'item.item_group_id=' . $item_group_id . ' OR ';
+                $where_itemGroupFilter .= 'item_common.item_group_id=' . $item_group_id . ' OR ';
             }
             // Remove the last " OR "
             $where_itemGroupFilter = substr($where_itemGroupFilter, 0, -4);
@@ -379,7 +384,7 @@ class Item_model extends MyModel
             // Prepare WHERE clause for all corresponding items
             $where_itemTagsFilter .= '(';
             foreach ($item_tag_links as $item_tag_link) {
-                $where_itemTagsFilter .= 'item_id=' . $item_tag_link['item_id'] . ' OR ';
+                $where_itemTagsFilter .= 'item.item_common_id=' . $item_tag_link['item_common_id'] . ' OR ';
             }
             // Remove the last " OR "
             if ($where_itemTagsFilter != "(") {
@@ -388,7 +393,7 @@ class Item_model extends MyModel
             } else {
                 // No item_tag_link found : no item correspond to the filter.
                 // We use "item_id=-1" filter to return no item.
-                $where_itemTagsFilter = 'item_id=-1';
+                $where_itemTagsFilter = 'item.item_common_id=-1';
             }
 
             // Add this part of WHERE clause to the global WHERE clause
@@ -399,16 +404,21 @@ class Item_model extends MyModel
             $where_itemsFilters .= $where_itemTagsFilter;
         }
 
+        if ($where_itemGroupFilter !== '') {
+            $join_item_common = 'item_common.item_common_id = item.item_common_id';
+        }
+
         /*********************
          ** ENTITY TAG FILTERS
          **********************/
 
         if (isset($filters['e']) && $filters['e'] !== 0) {
-            $builder = $this->db->table('entity');
-            $entity = $builder->where('entity_id', $filters['e']);
-            $join_item_group = $entity->join('item_group', 'item_group.fk_entity_id = entity.entity_id', 'inner');
-            $join_stocking_place = $join_item_group->join('stocking_place', 'stocking_place.fk_entity_id = entity.entity_id', 'inner');
-            $join_items = $join_stocking_place->join('item', 'item.item_group_id = item_group.item_group_id AND item.stocking_place_id = stocking_place.stocking_place_id', 'inner');
+            $join_items = $this->db->table('entity')
+                                   ->where('entity_id', $filters['e'])
+                                   ->join('item_group', 'item_group.fk_entity_id = entity.entity_id', 'inner')
+                                   ->join('stocking_place', 'stocking_place.fk_entity_id = entity.entity_id', 'inner')
+                                   ->join('item_common', 'item_common.item_group_id = item_group.item_group_id', 'inner')
+                                   ->join('item', 'item.stocking_place_id = stocking_place.stocking_place_id AND item.item_common_id = item_common.item_common_id', 'inner');
         }
 
         /*********************
@@ -417,7 +427,7 @@ class Item_model extends MyModel
         if (isset($filters['e']) && $filters['e'] !== 0) {
             $items = $join_items->where($where_itemsFilters)->get()->getResultArray();
         } else {
-            $items = $this->asArray()->where($where_itemsFilters)->find();
+            $items = $this->asArray()->where($where_itemsFilters)->join('item_common', 'item_common.item_common_id = item.item_common_id')->find();
         }
 
         foreach ($items as &$item) {
@@ -425,9 +435,10 @@ class Item_model extends MyModel
             $item['inventory_number'] = $this->getInventoryNumber($item);
             $item['condition'] = $this->getItemCondition($item);
             $item['current_loan'] = $this->getCurrentLoan($item);
-            $item['image'] = $this->getImage($item);
-            $item['image_path'] = $this->getImagePath($item);
+            $item['image'] = $this->item_common_model->getImage($item);
+            $item['image_path'] = $this->item_common_model->getImagePath($item);
         }
+
         return $items;
     }
 

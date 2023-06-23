@@ -4,31 +4,34 @@ $config = config('\Stock\Config\StockConfig');
 <form class="container" method="post" enctype="multipart/form-data">
     <!-- BUTTONS -->
     <div class="row">
-        <div class="form-group col-xs-12">
+        <div class="form-group col-12">
             <button type="submit" class="btn btn-success"><?= lang('MY_application.btn_save'); ?></button>
             <a href="<?= isset($_SESSION['items_list_url']) ? $_SESSION['items_list_url'] : base_url() ?>" class="btn btn-danger"><?= lang('MY_application.btn_cancel');?></a>
         </div>
     </div>
 
     <!-- ERROR MESSAGES -->
-    <div class="row">
-    <?php
-        if ((isset($errors) && !empty($errors)) || (isset($upload_errors) && !empty($upload_errors))) {
-            if ((isset($errors) && !empty($errors)) && (isset($upload_errors) && !empty($upload_errors))) $errors = array_merge($errors, $upload_errors);
-            echo '<div class="alert alert-danger">';
-            if (isset($errors) && !empty($errors)) {
-                echo implode('<br>', array_values($errors));
+    <div class="row col-12">
+        <?php
+            if ((isset($errors) && !empty($errors)) || (isset($upload_errors) && !empty($upload_errors))) {
+                if ((isset($errors) && !empty($errors)) && (isset($upload_errors) && !empty($upload_errors))) $errors = array_merge($errors, $upload_errors);
+                echo '<div class="alert alert-danger">';
+                if (isset($errors) && !empty($errors)) {
+                    echo implode('<br>', array_values($errors));
+                }
+                echo '</div>';
             }
-            echo '</div>';
-        }
-    ?>
+        ?>
     </div>
 
     <!-- ITEM_COMMON, ITEM NAME AND DESCRIPTION -->
     <div class="row">
-        <div class="form-group col-11">
+        <div class="col-12 form-group">
+            <div id="itemCommonInfo" class="alert alert-warning">
+                <?= lang('stock_lang.add_item_common_info'); ?>
+            </div>
             <?= form_label(lang('stock_lang.item_common'), 'item_common_name'); ?>
-            <?= form_input('item_common_name', '', [
+            <?= form_input('item_common_name', isset($item_common) ? $item_common['name'] : '', [
                 'placeholder' => lang('stock_lang.item_common'),
                 'class' => 'form-control', 
                 'id' => 'item_common_name',
@@ -46,7 +49,7 @@ $config = config('\Stock\Config\StockConfig');
                         </div>
                         <div class="form-group search-sticky">
                             <?= form_label(lang('stock_lang.field_search_item_common'), 'search_item_common', ['class' => '']) ?>
-                            <?= form_input('search_item_common', '', [
+                            <?= form_input('', '', [
                                 'placeholder' => lang('stock_lang.field_search_item_common'),
                                 'class' => 'form-control bg-white', 'id' => 'search_item_common'
                                 ]); 
@@ -94,23 +97,23 @@ $config = config('\Stock\Config\StockConfig');
             <div class="form-group">
                 <input type="text" id="name" class="form-control input-bold" name="name"
                         placeholder="<?= lang('MY_application.field_item_name') ?>"
-                        value="<?php if(isset($name)) {echo set_value('name',$name);} else {echo set_value('name');} ?>" />
+                        value="<?= isset($item_common) ? $item_common['name'] : set_value('name') ?>" />
             </div>
             <div class="form-group">
                 <input type="text" id="description" class="form-control" name="description"
                         placeholder="<?= lang('MY_application.field_item_description') ?>"
-                        value="<?php if(isset($description)) {echo set_value('description',$description);} else {echo set_value('description');} ?>" />
+                        value="<?= isset($item_common) ? $item_common['description'] : set_value('description') ?>" />
             </div>
         </div>
         <div class="col-md-4">
             <div class="row">
-                <div class="form-group col-xs-7">
+                <div class="form-group col-12">
                     <input type="text" class="form-control input-bold" name="inventory_prefix"
                            id="inventory_prefix"
                            placeholder="<?php echo lang('MY_application.field_inventory_number') ?>"
-                           value="<?php if(isset($inventory_prefix)) {echo set_value('inventory_prefix',$inventory_prefix);} else {echo set_value('inventory_prefix');} ?>" />
+                           value="<?= isset($item) ? $item['inventory_prefix'] : set_value('inventory_prefix') ?>" />
                 </div>
-                <div class="form-group col-xs-5">
+                <div class="form-group col-12">
                     <input type="text" class="form-control" name="inventory_id"
                            id="inventory_id"
                            value="<?php if(isset($inventory_id)) {echo set_value('inventory_id',$inventory_id);} else {echo set_value('inventory_id');} ?>"
@@ -118,7 +121,7 @@ $config = config('\Stock\Config\StockConfig');
                 </div>
             </div>
             <div class="row">
-                <div class="form-group col-xs-12">
+                <div class="form-group col-12">
                     <input type="button" class="form-control btn btn-primary" name="inventory_number_button"
                            value="<?= lang('MY_application.btn_generate_inventory_nb') ?>" onclick="createInventoryNo()">
                 </div>
@@ -143,7 +146,7 @@ $config = config('\Stock\Config\StockConfig');
     <div class="row">
         <div class="col-md-4">
             <div class="form-group">
-                <input name="photoSubmit" type="submit" value="<?= lang('MY_application.field_add_modify_photo')?>" class="btn btn-primary" />
+                <input id="photoSubmit" name="photoSubmit" type="submit" value="<?= lang('MY_application.field_add_modify_photo')?>" class="btn btn-primary col-12" />
             </div>
 
             <div class="form-group">
@@ -197,7 +200,7 @@ $config = config('\Stock\Config\StockConfig');
         </div>
 
         <!-- Button to display linked file -->
-        <div class="form-group col-xs-12">
+        <div class="form-group col-12">
             <label for="linked_file"><?= lang('MY_application.field_linked_file_upload'); ?></label>
             <input type="file" id="linked_file" name="linked_file" accept=".pdf, .doc, .docx" class="form-control-file" />
         </div>
@@ -295,7 +298,7 @@ $config = config('\Stock\Config\StockConfig');
         </div>
     </div>
     <div class="row">
-        <div class="checkbox col-xs-12">
+        <div class="checkbox col-12">
 			<?php foreach ($item_tags as $item_tag) { ?>
                 <label class="checkbox-inline">
                     <input class="tag-checkbox" type="checkbox" name="tag<?= $item_tag['item_tag_id']; ?>" value="<?= $item_tag['item_tag_id']; ?>"
@@ -327,6 +330,11 @@ $(document).ready(function() {
     // Changing the src attribute forces browser to update.
     d = new Date();
     $("#picture").attr("src", "<?= base_url($config->images_upload_path.$imagePath); ?>?"+d.getTime());
+
+    if ($("#item_common_name").val() !== "") {
+        toggleItemCommon();
+        $("#itemCommonInfo").toggle(false);
+    }
     
     $("#itemCommonBrowse tr").click(function() {
         $(this).addClass('highlight').siblings().removeClass('highlight');
@@ -353,19 +361,7 @@ $(document).ready(function() {
     });
 
     $('#item_common_name').on('change', (e) => {
-        let name = $('#name');
-        let description = $('#description');
-        let itemGroup = $('#item_group_id');
-        if (e.target.value === "") {
-            name.prop('disabled', false);
-            description.prop('disabled', false);
-            itemGroup.prop('disabled', false);
-        } else {
-            name.prop('disabled', true);
-            description.prop('disabled', true);
-            itemGroup.prop('disabled', true);
-        }
-        console.log(e.target.value);
+        toggleItemCommon();
     });
 });
 
@@ -504,6 +500,35 @@ function initItemGroup(el){
             element.selected=true;
         }
     });
+}
+
+function toggleItemCommon() {
+    let name = $('#name');
+    let description = $('#description');
+    let itemGroup = $('#item_group_id');
+    let image = $('#photoSubmit');
+    let linkedFile = $('#linked_file');
+    let tags = $('.tag-checkbox');
+    let itemCommonInfo = $('#itemCommonInfo');
+    let itemCommonValue = $("#item_common_name").val();
+
+    if (itemCommonValue === "") {
+        name.prop('disabled', false);
+        description.prop('disabled', false);
+        itemGroup.prop('disabled', false);
+        image.prop('disabled', false);
+        linkedFile.prop('disabled', false);
+        tags.prop('disabled', false);
+        itemCommonInfo.text('<?= lang("stock_lang.add_item_common_info") ?>');
+    } else {
+        name.prop('disabled', true);
+        description.prop('disabled', true);
+        itemGroup.prop('disabled', true);
+        image.prop('disabled', true);
+        linkedFile.prop('disabled', true);
+        tags.prop('disabled', true);
+        itemCommonInfo.text(`<?= lang("stock_lang.add_item_info") ?> ${itemCommonValue}`);
+    }
 }
 
 initStockingPlace(document.querySelector('#entity_selector'));

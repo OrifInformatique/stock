@@ -73,6 +73,8 @@ return[
 'item_group'                            => 'Groupe d\'objets',
 'item_common'                           => 'Objet commun',
 'no_item_common_found'                  => 'Aucun objet commun n\'a été trouvé',
+'add_item_common_info'                  => 'Un objet commun va être créé',
+'add_item_info'                         => 'Un objet sera créé et lié à l\'objet commun:',
 
 'tag_deletion_explanation'              => 'La désactivation d\'un tag permet de le rendre inutilisable tout en conservant ses informations dans les archives. ' 
                                                 . 'Cela permet notamment de garder l\'historique de ses actions. <br> <br>' 
