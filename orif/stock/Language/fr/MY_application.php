@@ -50,6 +50,8 @@ return[
 'field_item_name'                => 'Nom de l\'objet',
 'field_item_description'         => 'Description de l\'objet',
 'field_item_condition'           => 'État de l\'objet',
+'field_item_loan'                => 'État des prêts',
+'field_item_warranty'            => 'État de la garantie',
 'field_image'                    => 'Photo de l\'objet',
 'field_image_upload'             => 'Ajoutez une image<br />(hauteur et largeur max. 360px)',
 'field_linked_file_upload'       => 'Ajoutez un fichier joint<br />(un seul fichier possible, pdf ou Word, max. 2Mo)',
@@ -222,7 +224,7 @@ return[
 // Other texts
 'text_months'                    => 'mois',
 'text_none'                      => 'aucun',
-'text_warranty_status'           => [0 => '',
+'text_warranty_status'           => [0 => '-',
                                     1 => 'Sous garantie',
                                     2 => 'Échéance proche',
                                     3 => 'Garantie expirée'],
