@@ -89,8 +89,58 @@ class ItemCommon extends BaseController {
         // Initialize db for query builder
         $this->db = \Config\Database::connect();
     }
-    
-    public function hello() {
-        echo 'world';
+
+    public function modify($id) {
+        // Check if access is allowed
+        if (isset($_SESSION['logged_in']) &&
+            $_SESSION['logged_in'] == true &&
+            isset($_SESSION['user_id']) &&
+            $this->user_entity_model->check_user_item_common_entity($_SESSION['user_id'], $id) &&
+            $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) 
+        {
+
+            // Define image path variables
+            $_SESSION['picture_prefix'] = str_pad($id, $this->config->inventory_number_chars, "0", STR_PAD_LEFT);
+
+            if (!is_null($this->request->getVar('btn_submit'))) {
+                dd($_POST);
+            } else if (!is_null($this->request->getVar('btn_submit_photo'))) {
+                $_SESSION['POST'] = $_POST;
+                return redirect()->to(base_url("picture/select_picture"));
+            }
+
+            $item_common = $this->item_common_model->find($id);
+            $entity_id = $this->item_group_model->where('item_group_id', $item_common['item_group_id'])->findColumn('fk_entity_id');
+            $item_groups = $this->item_group_model->where('fk_entity_id', reset($entity_id))->findAll();
+            $item_tags = $this->item_tag_model->findAll();
+            $item_tag_ids = $this->item_tag_link_model->where('item_common_id', $id)->findColumn('item_tag_id');
+
+            $output['item_common'] = $item_common;
+            $output['item_groups'] = $this->dropdown($item_groups, 'item_group_id');
+            $output['item_tags'] = $this->dropdown($item_tags, 'item_tag_id');
+            $output['item_tag_ids'] = $item_tag_ids;
+            $output['config'] = config('\Stock\Config\StockConfig');
+            $output['title'] = 'Test';
+
+            if (isset($_SESSION['POST'])) {
+                foreach ($_SESSION['POST'] as $key => $value) {
+                    // If it is a tag
+                    if (substr($key, 0, 3) == "tag") {
+                        // put it in the output array
+                        $tag_link = [];
+                        $tag_link['item_tag_id'] = substr($key, 3);
+                        $output['item_tag_ids'][] = $tag_link;
+                    }else{
+                        $output[$key] = $value;
+                    }
+                }
+            }
+            unset($_SESSION['POST']);
+
+            $this->display_view('Stock\Views\item_common\form', $output);
+        } else {
+            // Access not allowed
+            return redirect()->to(base_url());
+        }
     }
 }

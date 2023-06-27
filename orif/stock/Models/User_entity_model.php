@@ -39,7 +39,9 @@ class User_entity_model extends MyModel
     // Properties
     protected Item_model $item_model;
     protected Stocking_place_model $stocking_place_model;
+    protected Item_group_model $item_group_model;
     protected Loan_model $loan_model;
+    protected Item_common_model $item_common_model;
 
     /**
      * Check if user has the provided entity
@@ -68,6 +70,27 @@ class User_entity_model extends MyModel
         if (!is_null($item)) {
             $user_entities = $this->where('fk_user_id', $user_id)->findColumn('fk_entity_id');
             $item_entity = $this->stocking_place_model->where('stocking_place_id', $this->item_model->where('item_id', $item['item_id'])->findColumn('stocking_place_id'))->findColumn('fk_entity_id');
+    
+            return in_array(reset($item_entity), $user_entities);
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Check if user and item_common share the same entity
+     *
+     * @param  mixed $user_id
+     * @param  mixed $item
+     * @return bool
+     */
+    public function check_user_item_common_entity($user_id, $item_common_id): bool {
+        $this->item_common_model = new Item_common_model();
+        $this->item_group_model = new Item_group_model();
+        $item_common = $this->item_common_model->find($item_common_id);
+        if (!is_null($item_common)) {
+            $user_entities = $this->where('fk_user_id', $user_id)->findColumn('fk_entity_id');
+            $item_entity = $this->item_group_model->where('item_group_id', $this->item_common_model->where('item_common_id', $item_common['item_common_id'])->findColumn('item_group_id'))->findColumn('fk_entity_id');
     
             return in_array(reset($item_entity), $user_entities);
         } else {

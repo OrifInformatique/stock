@@ -308,7 +308,7 @@ class Item extends BaseController {
                     $output['item_common'] = $item_common;
                     $output['items'] = $items;
 
-                    $this->display_view('Stock\Views\item\item_common_details', $output);
+                    $this->display_view('Stock\Views\item_common\item_common_details', $output);
                 } else {
                     // $id is not valid, display an error message
                     $this->display_view('Stock\Views\errors\application\inexistent_item');
@@ -1244,23 +1244,6 @@ class Item extends BaseController {
     public function return_loan() {
         echo 'Retour du prêt';
         
-    }
-
-    /**
-     * Transform the array for dropdown display 
-     *
-     * @param  array $array 
-     * @param  string $id = column name of the id
-     * @return array
-     */
-    private function dropdown($array, $id) {
-        $result = array();
-
-        foreach ($array as $row) {
-            $result[$row[$id]] = $row['name'];
-        }
-
-        return $result;
     }
 
     /**

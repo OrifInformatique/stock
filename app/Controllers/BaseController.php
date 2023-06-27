@@ -164,4 +164,21 @@ abstract class BaseController extends Controller
         // Display common footer
         echo view('Common\footer');
     }
+
+    /**
+     * Transform the array for dropdown display 
+     *
+     * @param  array $array 
+     * @param  string $id = column name of the id
+     * @return array
+     */
+    protected function dropdown($array, $id) {
+        $result = array();
+
+        foreach ($array as $row) {
+            $result[$row[$id]] = $row['name'];
+        }
+
+        return $result;
+    }
 }
