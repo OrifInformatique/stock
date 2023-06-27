@@ -13,5 +13,6 @@ $routes->add('stock/export_excel','\Stock\Controllers\ExcelExport::index');
 $routes->add('stock/export_excel/(:any)','\Stock\Controllers\ExcelExport::$1');
 $routes->add('stock/item/has_items/(:any)/(:any)','\Stock\Controllers\Item::has_items/$1/$2');
 $routes->add('item/(:any)', '\Stock\Controllers\Item::$1');
+$routes->add('item_common/(:any)', '\Stock\Controllers\ItemCommon::$1');
 
 ?>

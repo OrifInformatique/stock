@@ -10,7 +10,7 @@
             <div class="col-4"><?= lang('MY_application.field_tags') . ':'; ?></div>
             <div class="col-8">
                 <?php if (!empty($item_common['tags'])): ?>
-                    <?php foreach($item_common['tags'] as $tag): ?>
+                    <?php foreach ($item_common['tags'] as $tag): ?>
                         <span class="badge badge-dark"><?= esc($tag[0]['name']) ?></span>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -31,26 +31,38 @@
         </div>
         <div class="col-2">
             <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && isset($can_modify) && $can_modify && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered): ?>
-                <a href="<?= base_url('item/modify/' . $item_common['item_common_id']); ?>" class="btn btn-success mb-1 w-100" role="button">
+                <a href="<?= base_url('item/create/' . $item_common['item_common_id']); ?>" class="btn btn-success mb-1 w-100" role="button">
                     <?= lang('common_lang.btn_add'); ?>
                 </a>
-                <a href="<?= base_url('item/modify/' . $item_common['item_common_id']); ?>" class="btn btn-warning mb-1 w-100" role="button">
+                <a href="<?= base_url('item_common/modify/' . $item_common['item_common_id']); ?>" class="btn btn-warning mb-1 w-100" role="button">
                     <?= lang('MY_application.btn_modify'); ?>
                 </a>
                 <?php if ($_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_admin): ?>
-                    <a href="<?= base_url('item/delete/' . $item_common['item_common_id']); ?>" class="btn btn-danger w-100" role="button">
+                    <a href="<?= base_url('item_common/delete/' . $item_common['item_common_id']); ?>" class="btn btn-danger w-100" role="button">
                         <?= lang('MY_application.btn_delete'); ?>
                     </a>
                 <?php endif; ?>
             <?php endif; ?>
         </div>
     </div>
-    <hr>
     <!-- Item details list -->
-    <?php foreach($items as $item): ?>
+    <?php foreach ($items as $item): ?>
+        <hr>
         <div class="row col-12">
-            <div class="col-12">
+            <div class="col-6">
                 <h4><?= $item['inventory_number']; ?></h4>
+            </div>
+            <div class="col-6 text-right">
+                <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && isset($can_modify) && $can_modify && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered): ?>
+                    <a href="<?= base_url('item/modify/' . $item['item_id']); ?>" class="btn btn-warning" role="button">
+                        <?= lang('MY_application.btn_modify'); ?>
+                    </a>
+                <?php endif; ?>
+                <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && isset($can_modify) && $can_modify && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_admin): ?>
+                    <a href="<?= base_url('item/delete/' . $item['item_id']); ?>" class="btn btn-danger" role="button">
+                        <?= lang('MY_application.btn_delete'); ?>
+                    </a>
+                <?php endif; ?>
             </div>
             <div class="col-3">
                 <div class="row">
@@ -139,7 +151,7 @@
                         <?= !empty($item['buying_date']) ? databaseToShortDate($item['buying_date']) : '-'; ?>
                     </div>
                     <div class="col-12 pt-3">
-                       <label><?= lang('MY_application.field_item_warranty') ?> :</label>
+                    <label><?= lang('MY_application.field_item_warranty') ?> :</label>
                     </div>
                     <div class="col-12">
                         <?php 
@@ -157,6 +169,10 @@
                     </div>
                 </div>
             </div>
+
+            <?php if ($item): ?>
+            <?php else: ?>
+            <?php endif ?>
 
             <!-- Loans and controls -->
             <div class="row col-12 pt-3">
@@ -196,6 +212,5 @@
                 <?php endif; ?>
             </div>
         </div>
-        <hr>
     <?php endforeach; ?>
 </div>

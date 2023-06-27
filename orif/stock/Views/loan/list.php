@@ -15,11 +15,11 @@
 	<a style="color:inherit;" href="<?= $item_page; ?>">
     <div class="row">
         <div class="col-md-4"><h3><?= $item['inventory_number']; ?></h3></div>
-        <div class="col-md-7"><h3><?= $item['name']; ?></h3></div>
+        <div class="col-md-7"><h3><?= $item_common['name']; ?></h3></div>
         <div class="col-md-1"><h6 class="text-right">ID <?= $item['item_id']; ?></h6></div>
     </div>
     <div class="row">
-        <div class="col-md-12"><p><?= $item['description']; ?></p></div>
+        <div class="col-md-12"><p><?= $item_common['description']; ?></p></div>
     </div>
 	</a>
 

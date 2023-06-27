@@ -65,10 +65,14 @@ class User_entity_model extends MyModel
         $this->item_model = new Item_model();
         $this->stocking_place_model = new Stocking_place_model();
         $item = $this->item_model->find($item_id);
-        $user_entities = $this->where('fk_user_id', $user_id)->findColumn('fk_entity_id');
-        $item_entity = $this->stocking_place_model->where('stocking_place_id', $this->item_model->where('item_id', $item['item_id'])->findColumn('stocking_place_id'))->findColumn('fk_entity_id');
-
-        return in_array(reset($item_entity), $user_entities);
+        if (!is_null($item)) {
+            $user_entities = $this->where('fk_user_id', $user_id)->findColumn('fk_entity_id');
+            $item_entity = $this->stocking_place_model->where('stocking_place_id', $this->item_model->where('item_id', $item['item_id'])->findColumn('stocking_place_id'))->findColumn('fk_entity_id');
+    
+            return in_array(reset($item_entity), $user_entities);
+        } else {
+            return false;
+        }
     }
 
     /**

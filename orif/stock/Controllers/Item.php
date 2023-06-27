@@ -802,6 +802,7 @@ class Item extends BaseController {
 
             // Get item object with related inventory controls
             $output['item'] = $this->item_model->find($id);
+            $output['item_common'] = $this->item_common_model->find($output['item']['item_common_id']);
             $output['inventory_controls'] = $this->inventory_control_model->where('item_id='.$id)->findAll();
             $output['item']['inventory_number'] = $this->item_model->getInventoryNumber($output['item']);
             array_walk($output['inventory_controls'], function(&$control) {
@@ -812,7 +813,7 @@ class Item extends BaseController {
         } else {
 
             // No item specified or access not allowed, display items list
-            return redirect()->to('/item');
+            return redirect()->to(base_url());
         }
     }
 
@@ -999,6 +1000,7 @@ class Item extends BaseController {
 
             // Get item object and related loans
             $item = $this->item_model->find($id);
+            $item_common = $this->item_common_model->find($item['item_common_id']);
             $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
             $loans = $this->loan_model->where('item_id', $item['item_id'])->findAll();
             array_walk($loans, function(&$loan) {
@@ -1016,6 +1018,7 @@ class Item extends BaseController {
             });
 
             $output['item'] = $item;
+            $output['item_common'] = $item_common;
             $output['loans'] = $loans;
 
             $this->display_view('Stock\Views\loan\list', $output);
