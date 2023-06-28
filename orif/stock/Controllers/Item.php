@@ -1248,7 +1248,7 @@ class Item extends BaseController {
         $item = $this->item_model->find($loan['item_id']);
         $item['inventory_item_nb'] = $this->item_model->getInventoryNumber($item);
         $user_model = new User_model();
-        $loaner = $user_model->find($loan['loan_by_user_id']);
+        $loaner = $user_model->withDeleted()->find($loan['loan_by_user_id']);
 
         $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
         $data['title'] = lang('MY_application.page_return_loan');

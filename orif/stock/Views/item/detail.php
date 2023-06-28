@@ -127,11 +127,11 @@
                     //Button to create new loan -->
                     if(empty($item['current_loan']['planned_return_date'])){                
                         echo '<a href="'.base_url('/item/create_loan/'.$item['item_id']).'" '.
-                         'class="btn btn-primary"  role="button" >'.
+                         'class="btn btn-primary mr-2"  role="button" >'.
                          lang('MY_application.btn_create_loan').'</a>'; }
                     else {
                         echo '<a href="'.base_url('/item/return_loan/'.$item['current_loan']['loan_id']).'" '.
-                        'class="btn btn-primary"  role="button" >'.
+                        'class="btn btn-primary mr-2"  role="button" >'.
                         lang('MY_application.btn_return_loan').'</a>';
                     }
 
