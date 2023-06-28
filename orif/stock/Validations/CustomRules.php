@@ -20,7 +20,7 @@ class CustomRules
      *
      * @param string $name = name to check
      * @param string $params = contains every parameters needed separated with a comma
-     * @return boolean = TRUE if the name is unique, FALSE otherwise
+     * @return boolean = TRUE if the name is unique in the given entity, FALSE otherwise
      */
     public function is_unique_group_name_by_entity(string $name, string $params) : bool
     {
@@ -42,7 +42,7 @@ class CustomRules
      *
      * @param string $short name = short name to check
      * @param string $params = contains every parameters needed separated with a comma
-     * @return boolean = TRUE if the short_name is unique, FALSE otherwise
+     * @return boolean = TRUE if the short_name is unique in the given entity, FALSE otherwise
      */
     public function is_unique_group_short_name_by_entity(string $short_name, string $params) : bool
     {
@@ -60,11 +60,11 @@ class CustomRules
     }
 
     /**
-     * Checks that a name doesn't already exist in an entity
+     * Checks that a stocking place's name doesn't already exist in an entity
      *
      * @param string $name = name to check
      * @param string $params = contains every parameters needed separated with a comma
-     * @return boolean = TRUE if the name is unique, FALSE otherwise
+     * @return boolean = TRUE if the name is unique in the given entity, FALSE otherwise
      */
     public function is_unique_place_name_by_entity(string $name, string $params) : bool
     {
@@ -82,11 +82,11 @@ class CustomRules
     }
 
     /**
-     * Checks that a short_name doesn't already exist in an entity
+     * Checks that a stocking place's short_name doesn't already exist in an entity
      *
      * @param string $short_name = short name to check
      * @param string $params = contains every parameters needed separated with a comma
-     * @return boolean = TRUE if the short_name is unique, FALSE otherwise
+     * @return boolean = TRUE if the short_name is unique in the given entity, FALSE otherwise
      */
     public function is_unique_place_short_name_by_entity(string $short_name, string $params) : bool
     {
@@ -104,11 +104,12 @@ class CustomRules
     }
 
     /**
-     * Checks that an entity change on an item_group does not affect any item
+     * Checks that an entity change on an item_group does not affect any item.
+     * The stocking place is also linked with the entity and we have to avoid data inconsistency.
      *
      * @param string $entity_id = entity id to check
      * @param string $params = contains every parameters needed separated with a comma
-     * @return boolean = TRUE if the $entity_id equals fk_entity_id from the query or no result was found, FALSE otherwise
+     * @return boolean = TRUE if no item linked to a stocking place in the current entity is affected by the change. FALSE otherwise.
      */
     public function item_group_has_same_entity(string $entity_id, string $params) : bool
     {
@@ -133,10 +134,11 @@ class CustomRules
 
     /**
      * Checks that an entity change on a stocking_place does not affect any item
+     * The item group is also linked with the entity and we have to avoid data inconsistency.
      *
      * @param string $entity_id = entity id to check
      * @param string $params = contains every parameters needed separated with a comma
-     * @return boolean = TRUE if the $entity_id equals fk_entity_id from the query or no result was found, FALSE otherwise
+     * @return boolean = TRUE if no item linked to an item group in the current entity is affected by the change. FALSE otherwise.
      */
     public function stocking_place_has_same_entity(string $entity_id, string $params) : bool
     {
