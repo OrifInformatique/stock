@@ -32,6 +32,7 @@ else
                 <option value="<?=$entity['entity_id']?>" <?=isset($stocking_place['fk_entity_id'])&&$stocking_place['fk_entity_id']==$entity['entity_id']?'selected=true':''?>><?=$entity['name']?></option>
             <?php endforeach;?>
         </select>
+        <span class="text-danger"><?= $validation->showError('fk_entity_id'); ?></span>
       </div>
     </div>
   </div>
