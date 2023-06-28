@@ -111,8 +111,8 @@ $config = config('\Stock\Config\StockConfig');
                         <option value="" disabled> -- <?= lang('MY_application.field_group'); ?> -- </option>
                         <?php
                         foreach ($item_groups as $item_group) :?>
-                        <option value="<?=$item_group['item_group_id']?>" <?php echo (isset($item_group_id) && $item_group_id == $item_group['item_group_id'] ? 'selected' : $item_group['item_group_id'] == $config->items_default_group) ? 'selected' : '' ?> data-fk_entity="<?=$item_group['fk_entity_id']?>"><?=$item_group['name']?></option>
-                        <?php endforeach;?>
+                            <option value="<?=$item_group['item_group_id']?>" <?php echo (isset($item_group_id) && $item_group_id == $item_group['item_group_id'] ? 'selected' : $item_group['item_group_id'] == $config->items_default_group) ? 'selected' : '' ?> data-fk_entity="<?=$item_group['fk_entity_id']?>"><?=$item_group['name']?></option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
                 <div class="form-group col-md-8">
@@ -260,6 +260,9 @@ $(document).ready(function() {
     // Changing the src attribute forces browser to update.
     d = new Date();
     $("#picture").attr("src", "<?= base_url($config->images_upload_path.$imagePath); ?>?"+d.getTime());
+
+    initStockingPlace(document.querySelector('#entity_selector'));
+    initItemGroup(document.querySelector('#entity_selector'));
 });
 
 function get(objectName){
@@ -363,44 +366,54 @@ function getFirstTagShortName(){
     return firstTagShortName;
 }
 
-function initStockingPlace(el){
-    const fk_entity_id=el.value;
-    document.querySelector('#stocking_place_id').querySelectorAll('option').forEach((element)=>{
-        if (element.value===""){
-            element.selected=true;
-        }
-        else if (element.dataset.fk_entity===fk_entity_id){
-            element.style.display='unset';
-            element.parentElement.value=element.value;
-            element.selected=true;
-        }
-        else {
-            element.style.display='none';
-        }
-    })
-}
+function initStockingPlace(el) {
+    const fk_entity_id = el.value;
+    const selectElement = document.querySelector('#stocking_place_id');
+    let selectedParentElement = null;
 
-function initItemGroup(el){
-    const fk_entity_id=el.value;
-    document.querySelector('#item_group_id').querySelectorAll('option').forEach((element)=>{
-        if (element.value===""){
-            element.selected=true;
+    selectElement.querySelectorAll('option').forEach((element) => {
+        if (element.value === '') {
+            element.selected = true;
+        } else if (element.dataset.fk_entity === fk_entity_id) {
+            element.style.display = 'unset';
+            if (selectedParentElement === null) {
+                selectedParentElement = element.parentElement;
+                selectedParentElement.value = element.value;
+            }
+        } else {
+            element.style.display = 'none';
         }
-        else if (element.dataset.fk_entity===fk_entity_id){
-            element.style.display='unset';
-            element.parentElement.value=element.value;
-        }
-        else {
-            element.style.display='none';
-        }
-        if (element.value==='<?=isset($item_group_id)?$item_group_id:'NONE'?>'){
-            element.selected=true;
+
+        if (element.value === '<?=isset($stocking_place_id) ? $stocking_place_id : 'NONE'?>') {
+            element.selected = true;
         }
     });
 }
 
-initStockingPlace(document.querySelector('#entity_selector'));
-initItemGroup(document.querySelector('#entity_selector'));
+function initItemGroup(el) {
+    const fk_entity_id = el.value;
+    const selectElement = document.querySelector('#item_group_id');
+    let selectedParentElement = null;
+
+    selectElement.querySelectorAll('option').forEach((element) => {
+        if (element.value === '') {
+            element.selected = true;
+        } else if (element.dataset.fk_entity === fk_entity_id) {
+            element.style.display = 'unset';
+            if (selectedParentElement === null) {
+                selectedParentElement = element.parentElement;
+                selectedParentElement.value = element.value;
+            }
+        } else {
+            element.style.display = 'none';
+        }
+
+        if (element.value === '<?=isset($item_group_id) ? $item_group_id : 'NONE'?>') {
+            element.selected = true;
+        }
+    });
+}
+
 
 change_warranty();
 
