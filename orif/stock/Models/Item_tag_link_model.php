@@ -19,7 +19,7 @@ class Item_tag_link_model extends MyModel
     /* MY_Model variables definition */
     protected $table = 'item_tag_link';
     protected $primaryKey = 'item_tag_link_id';
-    protected $allowedFields = ['item_tag_id', 'item_id'];
+    protected $allowedFields = ['item_tag_id', 'item_common_id'];
 
     public function getTags($item_common){
         $item_tag_model = new Item_tag_model();

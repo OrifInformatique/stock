@@ -427,7 +427,7 @@ class Item extends BaseController {
                     $itemArray['item_common_id'] = $itemCommonId;
                 }
 
-                $item_id = $this->item_model->insert($itemArray); // TODO: fix
+                $item_id = $this->item_model->insert($itemArray);
 
                 foreach ($linkArray as $tag) {
                     $this->item_tag_link_model->insert(array("item_tag_id" => $tag, "item_common_id" => ($itemArray['item_common_id'])));

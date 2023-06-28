@@ -25,7 +25,30 @@ class Item_common_model extends MyModel
 
     public function __construct(ConnectionInterface &$db = null, ValidationInterface $validation = null)
     {
-        $this->validationRules = [];
+        $this->validationRules = [
+            'name' => [
+                'label' => strtolower(lang('stock_lang.field_name')),
+                'rules' => 'trim|required|alpha_numeric_accent_space|'
+                    . 'min_length['.config("\Stock\Config\StockConfig")->name_min_length.']|'
+                    . 'max_length['.config("\Stock\Config\StockConfig")->name_max_length.']'
+            ],
+            'description' => [
+                'label' => strtolower(lang('stock_lang.field_description')),
+                'rules' => 'permit_empty'
+            ],
+            'image' => [
+                'label' => strtolower(lang('MY_application.field_image')),
+                'rules' => 'permit_empty'
+            ],
+            'linked_file' => [
+                'label' => strtolower(lang('stock_lang.field_linked_file')),
+                'rules' => 'permit_empty'
+            ],
+            'item_group_id' => [
+                'label' => strtolower(lang('MY_application.field_group')),
+                'rules' => 'required|numeric'
+            ]
+        ];
 
         $this->validationMessages = [];
 

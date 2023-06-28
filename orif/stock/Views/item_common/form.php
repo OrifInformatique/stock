@@ -1,6 +1,18 @@
 <div class="container">
-    <?= form_open(base_url("item_common/modify/{$item_common['item_common_id']}")); ?>
+    <?= form_open(base_url("item_common/modify/{$item_common['item_common_id']}"), [
+            'enctype' => 'multipart/form-data'
+        ]); 
+    ?>
         <div class="row">
+            <!-- ERROR MESSAGES -->
+            <div class="row col-12">
+                <?php if (isset($upload_errors) && !empty($upload_errors)): ?>
+                    <div class="alert alert-danger">
+                        <?= implode('<br>', array_values($upload_errors)); ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+
             <!-- Buttons -->
             <div class="col-12 mb-3">
                 <input type="submit" class="btn btn-success" id="btn_submit" name="btn_submit" value="<?= lang('MY_application.btn_save'); ?>" />
@@ -19,6 +31,7 @@
                                 'id' => 'item_common_name'
                             ]); 
                         ?>
+                        <span class="text-danger"><?= isset($errors['name']) ? $errors['name']: ''; ?></span>
                     </div>
                 </div>
                     
@@ -28,12 +41,13 @@
                         <?= form_label(lang('stock_lang.field_description'), 'item_common_description'); ?>
                     </div>
                     <div class="col-8">
-                    <?= form_input('item_common_description', isset($item_common_description) ? $item_common_description : $item_common['description'], [
-                            'placeholder' => lang('stock_lang.field_item_common_name'),
-                            'class' => 'form-control', 
-                            'id' => 'item_common_description'
-                        ]); 
-                    ?>
+                        <?= form_input('item_common_description', isset($item_common_description) ? $item_common_description : $item_common['description'], [
+                                'placeholder' => lang('stock_lang.field_item_common_name'),
+                                'class' => 'form-control', 
+                                'id' => 'item_common_description'
+                            ]); 
+                        ?>
+                        <span class="text-danger"><?= isset($errors['description']) ? $errors['description']: ''; ?></span>
                     </div>
                 </div>
 
@@ -44,10 +58,11 @@
                     </div>
                     <div class="col-8">
                         <?= form_dropdown('item_common_group', $item_groups, isset($item_common_group) ? $item_common_group : $item_common['item_group_id'], [
-                            'class' => 'form-control',
-                            'id' => 'item_common_group'
-                        ]);
-                    ?>
+                                'class' => 'form-control',
+                                'id' => 'item_common_group'
+                            ]);
+                        ?>
+                        <span class="text-danger"><?= isset($errors['item_group_id']) ? $errors['item_group_id']: ''; ?></span>
                     </div>
                 </div>
 
@@ -57,7 +72,7 @@
                         <?= form_label(lang('MY_application.field_tags'), 'item_tags-multiselect'); ?>
                     </div>
                     <div class="col-8">
-                        <?= form_multiselect('item_common_tags[]', $item_tags, isset($item_common_tags) ? $item_common_tags : $item_tag_ids,'id="item_tags-multiselect" multiple="multiple"'); ?>
+                        <?= form_multiselect('item_common_tags[]', $item_tags, isset($item_common_tags) ? $item_common_tags : (!is_null($item_tag_ids) ? $item_tag_ids : []),'id="item_tags-multiselect" multiple="multiple"'); ?>
                     </div>
                 </div>
 
@@ -71,7 +86,9 @@
                             'class' => 'form-control-file',
                             'accept' => '.pdf, .doc, .docx',
                             'id' => 'item_common_linked_file'
-                            ], 'file') ?>
+                            ], 'file');
+                        ?>
+                        <span class="text-danger"><?= isset($errors['linked_file']) ? $errors['linked_file']: ''; ?></span>
                     </div>
                 </div>
             </div>
@@ -112,8 +129,7 @@
             nonSelectedText: no_filter,
             buttonWidth: '100%',
             buttonClass: 'text-left form-control',
-            numberDisplayed: 10,
-            includeSelectAllOption: true
+            numberDisplayed: 10
         });
     });
 </script>

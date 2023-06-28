@@ -43,6 +43,8 @@ class StockConfig extends BaseConfig
     public $database_datetime_format    =   'Y-m-d H:i:s';
     public $image_upload_width          =   360;
     public $image_upload_height         =   360;
+    public $name_min_length             = 3;
+    public $name_max_length             = 100;
 
     public $access_lvl_manager          =   2;
     public $access_lvl_admin            =   4;

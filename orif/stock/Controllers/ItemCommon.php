@@ -98,12 +98,100 @@ class ItemCommon extends BaseController {
             $this->user_entity_model->check_user_item_common_entity($_SESSION['user_id'], $id) &&
             $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) 
         {
+            $upload_failed = false;
 
             // Define image path variables
             $_SESSION['picture_prefix'] = str_pad($id, $this->config->inventory_number_chars, "0", STR_PAD_LEFT);
+            $temp_image_name = $_SESSION["picture_prefix"].$this->config->image_picture_suffix.$this->config->image_tmp_suffix.$this->config->image_extension;
+            $new_image_name = $_SESSION["picture_prefix"].$this->config->image_picture_suffix.$this->config->image_extension;
 
-            if (!is_null($this->request->getVar('btn_submit'))) {
-                dd($_POST);
+            // Check if the user cancelled the form
+            if(isset($_POST['submitCancel'])) {
+                $files = glob($this->config->images_upload_path.$temp_image_name);
+                if (count($files)) $tmp_image_file = glob($this->config->images_upload_path.$temp_image_name)[0];
+                else $tmp_image_file = false;
+
+                // Check if there is a temporary image file, if yes then delete it
+                if($tmp_image_file != null || $tmp_image_file != false){
+                    unlink($tmp_image_file);
+                }
+
+                return redirect()->to(base_url("item/view/".$id)); //false id
+            }
+
+            if (isset($_FILES['linked_file']) && $_FILES['linked_file']['name'] != '') {
+
+                // LINKED FILE UPLOADING
+                $upload_path = '../../public/uploads/files/';
+                $allowed_types = [
+                    'application/pdf', //pdf
+                    'application/msword', //doc
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document', //docx
+                ];
+                $max_size = 2 * 1024 * 1024; //2MB max
+
+                $file = $this->request->getFile('linked_file');
+
+                if (!is_null($file) && $file->isValid() && $file->getSize() <= $max_size && in_array($file->getMimeType(), $allowed_types)) {
+                    $file->store($upload_path);
+                    $linked_file = $file->getName();
+                } else {
+                    $upload_failed = true;
+                    $output['upload_errors'] = [];
+                    // Manually shove in the errors, as the upload library is no longer a thing
+                    if (is_null($file) || !$file->isValid()) $data['upload_errors'][] = lang('upload.upload_file_partial');
+                    if (!is_null($file) && $file->getSize() > $max_size) $data['upload_errors'][] = lang('upload.upload_file_exceeds_form_limit');
+                    if (!is_null($file) && !in_array($file->getMimeType(), $allowed_types)) $data['upload_errors'][] = lang('upload.upload_invalid_filetype');
+                }
+            }
+
+            if (!is_null($this->request->getVar('btn_submit')) && !$upload_failed) {
+                // Turn Temporaty Image into a final one if there is one
+                if (file_exists($this->config->images_upload_path.$temp_image_name)) {
+                    rename($this->config->images_upload_path.$temp_image_name, $this->config->images_upload_path.$new_image_name);
+                    $itemArray['image'] = $new_image_name;
+                }
+
+                $itemCommonUpdate = array(
+                    'item_common_id' => $id,
+                    'name' => $this->request->getPost('item_common_name'),
+                    'description' => $this->request->getPost('item_common_description'),
+                    'image' => $new_image_name,
+                    'linked_file' => isset($linked_file) ? $linked_file : null,
+                    'item_group_id' => $this->request->getPost('item_common_group'),
+                );
+
+                $this->item_common_model->save($itemCommonUpdate);
+
+                if (count($this->item_common_model->errors()) == 0) {
+                    $item_tags_update = $this->request->getPost('item_common_tags');
+                    $current_item_tags = $this->item_tag_link_model->where('item_common_id', $id)->findColumn('item_tag_id');
+
+                    if (is_null($item_tags_update)) {
+                        $this->item_tag_link_model->where('item_common_id', $id)->delete();
+                    } else if (is_null($current_item_tags)) {
+                        foreach ($item_tags_update as $item_tag) {
+                            $this->item_tag_link_model->insert([
+                                'item_tag_id' => $item_tag,
+                                'item_common_id' => $id
+                            ]);
+                        }
+                    } else {
+                        $new_item_tags = array_diff($item_tags_update, $current_item_tags);
+
+                        if (count($new_item_tags) > 0) {
+                            foreach ($new_item_tags as $new_tag) {
+                                $this->item_tag_link_model->insert([
+                                    'item_tag_id' => $new_tag,
+                                    'item_common_id' => $id
+                                ]);
+                            }
+                        }
+                    }
+
+                } else {
+                    $output['errors'] = $this->item_common_model->errors();
+                }
             } else if (!is_null($this->request->getVar('btn_submit_photo'))) {
                 $_SESSION['POST'] = $_POST;
                 return redirect()->to(base_url("picture/select_picture"));
@@ -130,7 +218,7 @@ class ItemCommon extends BaseController {
                         $tag_link = [];
                         $tag_link['item_tag_id'] = substr($key, 3);
                         $output['item_tag_ids'][] = $tag_link;
-                    }else{
+                    } else {
                         $output[$key] = $value;
                     }
                 }

@@ -9,7 +9,7 @@
 
 namespace Stock\Validations;
 
-
+use Stock\Models\Item_common_model;
 use Stock\Models\Item_group_model;
 use Stock\Models\Stocking_place_model;
 use User\Models\User_model;
@@ -132,14 +132,28 @@ class CustomRules
         $user = (new User_model())->withDeleted()->where('username', [$username])->first();
         return is_null($user) || $user['id'] == $user_id;
     }
+
     /**
-     * Checks that an user type exists
+     * Checks that a name doesn't already exist
      *
-     * @param integer $user_type_id = Id of the user type to check
-     * @return boolean = TRUE if the user type exists, FALSE otherwise
+     * @param string $name = Name to check
+     * @param int $id = id of the item_common if it is an update
+     * @return boolean = TRUE if the name is unique, FALSE otherwise
      */
-    public function cb_not_null_user_type($user_type_id) : bool
+    public function cb_unique_name($name, $id) : bool
     {
-        return !is_null((new User_type_model())->find($user_type_id));
+        $item_common = (new Item_common_model())->where('name', [$name])->first();
+        return is_null($item_common) || $item_common['item_common_id'] == $id;
+    }
+
+    /**
+     * Checks if string is made of alpha numeric and accented characters and spaces
+     *
+     * @param string $str string to check
+     * @return boolean = TRUE if the matches with the received string
+     */
+    public function alpha_numeric_accent_space($str)
+    {
+        return (bool) preg_match('/^[A-zÀ-ÿ0-9 ]+$/i', $str);
     }
 }
