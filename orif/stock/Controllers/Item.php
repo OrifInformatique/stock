@@ -1022,7 +1022,7 @@ class Item extends BaseController {
      * 
      * @param $id : The id of the concerned loan
      */
-    public function post_loan_update($id) {
+    public function save_loan_return_date($id) {
         // Check if this is allowed
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
 

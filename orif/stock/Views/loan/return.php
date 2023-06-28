@@ -1,4 +1,4 @@
-<form class="container" method="post" action="<?= base_url('item/post_loan_update/'. $loan['loan_id']); ?>" enctype="multipart/form-data">
+<form class="container" method="post" action="<?= base_url('item/save_loan_return_date/'. $loan['loan_id']); ?>" enctype="multipart/form-data">
     <!-- ERROR MESSAGES -->
     <div class="row">
     <?php
