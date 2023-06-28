@@ -15,11 +15,34 @@ It is based on the CodeIgniter 4.x framework.
 
 1. Download [our latest release](https://github.com/OrifInformatique/stock/releases)
 2. Unzip your download in your project's directory (in your local PHP server)
-3. Rename .env_dist file to .env and adapt it for your server's parameters
-4. Generate a local database running CodeIgniter's spark migrate command
+3. Copy .env_dist file and rename to .env, then adapt it for your server's parameters
+```
+FOR EXAMPLE
+
+[...]
+
+CI_ENVIRONMENT = development
+
+[...]
+
+app.baseURL = 'http://localhost/stock/public/'
+
+[...]
+
+database.default.hostname = localhost
+database.default.database = stock
+database.default.username = root
+database.default.password = 
+database.default.DBDriver = MySQLi
+
+[...]
+
+```
+4. Generate a local database running CodeIgniter's spark migrate commands
 
 ```bash
-php spark migrate -all
+php spark migrate -n Stock
+php spark migrate -n User
 ```
 
 ## Upgrade Version 1.6 to Version 4.0

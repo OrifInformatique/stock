@@ -18,7 +18,7 @@ class Stocking_place_model extends MyModel
 {
     protected $table = 'stocking_place';
     protected $primaryKey = 'stocking_place_id';
-    protected $allowedFields = ['name', 'short', 'archive'];
+    protected $allowedFields = ['fk_entity_id','name', 'short', 'archive'];
     protected $useSoftDeletes = true;
     protected $deletedField = 'archive';
 

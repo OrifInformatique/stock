@@ -6,7 +6,7 @@ $config = config('\Stock\Config\StockConfig');
     <div class="row">
         <div class="form-group col-xs-12">
             <button type="submit" class="btn btn-success"><?= lang('MY_application.btn_save'); ?></button>
-            <button type="submit" class="btn btn-danger" name="submitCancel"><?= lang('MY_application.btn_cancel');?></button>
+            <a href="<?= isset($_SESSION['items_list_url']) ? $_SESSION['items_list_url'] : base_url() ?>" class="btn btn-danger"><?= lang('MY_application.btn_cancel');?></a>
         </div>
     </div>
 
@@ -60,6 +60,14 @@ $config = config('\Stock\Config\StockConfig');
                 </div>
             </div>
         </div>
+        <div class="row-responsive-2 pl-3 pr-3" style="width: 100%;min-width: 50vw;max-width: 1000px">
+            <label for="entity_selector"><?=lang('stock_lang.entity_name')?></label>
+            <select class="form-control mb-3" name="fk_entity_id" id="entity_selector" onchange="initStockingPlace(this);initItemGroup(this)">
+                <?php foreach ($entities as $entity):?>
+                    <option value="<?=$entity['entity_id']?>"  data-tag-name="<?=$entity['shortname']?>" <?=isset($entity_id)&&$entity_id==$entity['entity_id'] ? 'selected': (isset($selected_entity_id) && $selected_entity_id == $entity['entity_id'] ? 'selected' : '')?>><?=$entity['name']?></option>
+                <?php endforeach;?>
+            </select>
+        </div>
     </div>
 
     <!-- ITEM DETAILS -->
@@ -99,18 +107,13 @@ $config = config('\Stock\Config\StockConfig');
             <div class="row">
                 <div class="form-group col-md-4">
                     <label for="item_group_id"><?= lang('MY_application.field_group'); ?>&nbsp;</label>
-                    <?php
-                    if (isset($_POST['item_group_id'])) {
-                        // A group has allready been selected, keep it selected
-                        echo form_dropdown('item_group_id', $item_groups_name, $_POST['item_group_id'], 'class="form-control" id="item_group_id"');
-                    } elseif (isset($item_group_id)) {
-                        // The item exists, get its group and select it
-                        echo form_dropdown('item_group_id', $item_groups_name, $item_group_id, 'class="form-control" id="item_group_id"');
-                    } else {
-                        // No group selected
-                        echo form_dropdown('item_group_id', $item_groups_name, $config->items_default_group, 'class="form-control" id="item_group_id"');
-                    }
-                    ?>
+                    <select id="item_group_id" name="item_group_id" class="form-control" >
+                        <option value="" disabled> -- <?= lang('MY_application.field_group'); ?> -- </option>
+                        <?php
+                        foreach ($item_groups as $item_group) :?>
+                        <option value="<?=$item_group['item_group_id']?>" <?php echo (isset($item_group_id) && $item_group_id == $item_group['item_group_id'] ? 'selected' : $item_group['item_group_id'] == $config->items_default_group) ? 'selected' : '' ?> data-fk_entity="<?=$item_group['fk_entity_id']?>"><?=$item_group['name']?></option>
+                        <?php endforeach;?>
+                    </select>
                 </div>
                 <div class="form-group col-md-8">
                     <label for="serial_number"><?= lang('MY_application.field_serial_number'); ?>&nbsp;</label>
@@ -119,7 +122,7 @@ $config = config('\Stock\Config\StockConfig');
                 </div>
             </div>
             <div class="row">
-                <div class="form-group col-xs-12">
+                <div class="form-group col-md-12">
                     <label for="remarks"><?= lang('MY_application.field_remarks'); ?></label>
                     <textarea id="remarks" name="remarks" class="form-control"><?php
                         // Don't move the <php> markups or they will be white spaces in textarea
@@ -157,16 +160,20 @@ $config = config('\Stock\Config\StockConfig');
         </div>
         <div class="form-group col-md-4">
             <label for="stocking_place_id"><?= lang('MY_application.field_stocking_place'); ?></label>
-			<select id="stocking_place_id" name="stocking_place_id" class="form-control"><?php
+			<select id="stocking_place_id" name="stocking_place_id" class="form-control">
+                <option value="" disabled> -- <?= lang('MY_application.field_stocking_place'); ?> -- </option>
+                <?php
 				foreach ($stocking_places as $stocking_place) {
+
 				?><option value="<?= $stocking_place['stocking_place_id']; ?>" <?php
                     if (isset($stocking_place_id) && $stocking_place_id == $stocking_place['stocking_place_id']) {
                         echo "selected";
                     }
-                ?> ><?= $stocking_place['name']; ?></option><?php
+                ?> data-fk_entity="<?=$stocking_place['fk_entity_id']?>"><?= $stocking_place['name']; ?></option><?php
 				} ?>
 			</select>
         </div>
+
     </div>
 
     <!-- ITEM SUPPLIER, BUYING AND WARRANTY INFORMATIONS -->
@@ -320,12 +327,12 @@ function createInventoryNo(){
     var inventoryNumberField = document.getElementById('inventory_prefix');
     var inventoryNumber = "";
     var inventoryIdField = document.getElementById('inventory_id');
-
+    var entityTag=document.querySelector(`option[value='${document.getElementById('entity_selector').value}']`).getAttribute('data-tag-name');
     date = date.toString().slice(2,4);
     if(date == "N"){
         date = "00";
     }
-    inventoryNumber = get("INVENTORY_PREFIX") + "." + objectGroups[objectGroupField.value-1] + tagShortName + date;
+    inventoryNumber = entityTag + "." + objectGroups[objectGroupField.value-1] + tagShortName + date;
     inventoryNumberField.value = inventoryNumber;
 
     // If inventory_id field is empty, complete it
@@ -356,5 +363,45 @@ function getFirstTagShortName(){
     return firstTagShortName;
 }
 
+function initStockingPlace(el){
+    const fk_entity_id=el.value;
+    document.querySelector('#stocking_place_id').querySelectorAll('option').forEach((element)=>{
+        if (element.value===""){
+            element.selected=true;
+        }
+        else if (element.dataset.fk_entity===fk_entity_id){
+            element.style.display='unset';
+            element.parentElement.value=element.value;
+            element.selected=true;
+        }
+        else {
+            element.style.display='none';
+        }
+    })
+}
+
+function initItemGroup(el){
+    const fk_entity_id=el.value;
+    document.querySelector('#item_group_id').querySelectorAll('option').forEach((element)=>{
+        if (element.value===""){
+            element.selected=true;
+        }
+        else if (element.dataset.fk_entity===fk_entity_id){
+            element.style.display='unset';
+            element.parentElement.value=element.value;
+        }
+        else {
+            element.style.display='none';
+        }
+        if (element.value==='<?=isset($item_group_id)?$item_group_id:'NONE'?>'){
+            element.selected=true;
+        }
+    });
+}
+
+initStockingPlace(document.querySelector('#entity_selector'));
+initItemGroup(document.querySelector('#entity_selector'));
+
 change_warranty();
+
 </script>

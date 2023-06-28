@@ -48,13 +48,9 @@ class MyModel extends Model
 
         $options = array();
 
-      //  echo var_dump($result);
-
-
         foreach ($result as $row)
         {
             $options[$row[$key]] = $row[$value];
-         //   $options[$row->{$key}] = $row->{$value};
         }
 
         $options = $this->trigger('after_dropdown', $options);

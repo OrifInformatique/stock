@@ -29,7 +29,6 @@ class UpdateUser extends Migration
 		// Drop user firstname and lastname from user table as they moved to user_details table
 		$this->forge->dropColumn('user', ['lastname', 'firstname']);
 		
-		
 		// Rename PK user_type_id
 		$this->forge->dropForeignKey('user', 'fk_user_type_id');
 

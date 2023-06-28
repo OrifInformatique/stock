@@ -5,7 +5,6 @@ namespace Config;
 use CodeIgniter\Validation\CreditCardRules;
 use CodeIgniter\Validation\FileRules;
 use CodeIgniter\Validation\FormatRules;
-use CodeIgniter\Validation\PasswordRules;
 use CodeIgniter\Validation\Rules;
 
 class Validation
@@ -25,7 +24,8 @@ class Validation
 		FormatRules::class,
 		FileRules::class,
 		CreditCardRules::class,
-        \User\Validation\CustomRules::class
+        \User\Validation\CustomRules::class,
+        \Stock\Validations\CustomRules::class
 	];
 
 	/**

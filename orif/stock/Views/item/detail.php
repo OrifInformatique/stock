@@ -4,7 +4,7 @@
        class="btn btn-primary" role="button"><?= lang('MY_application.btn_back_to_list'); ?></a>
 
     <!-- *** ADMIN *** -->
-	<?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered) { ?>
+	<?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && isset($can_modify) && $can_modify && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered) { ?>
     	<a href="<?= base_url('item/modify/'.$item['item_id']); ?>" class="btn btn-warning" role="button"><?= lang('MY_application.btn_modify'); ?></a>
         <?php if($_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_admin) { ?>
     	   <a href="<?= base_url('item/delete/'.$item['item_id']); ?>" class="btn btn-danger" role="button"><?= lang('MY_application.btn_delete'); ?></a>
@@ -123,7 +123,7 @@
             <?php } ?>
             <div class="row"><div class="col-12">
 
-                <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered) {
+            <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && isset($can_modify) && $can_modify && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered) {
                     //Button to create new loan -->
                     if(empty($item['current_loan']['planned_return_date'])){                
                         echo '<a href="'.base_url('/item/create_loan/'.$item['item_id']).'" '.
@@ -137,10 +137,11 @@
 
                     // Button to display loans history -->
                     echo '<a href="'.base_url('/item/loans/'.$item['item_id']).'" '.
-                        'class="btn btn-default"  role="button" >'.
+                        'class="btn btn-secondary"  role="button" >'.
                         lang('MY_application.btn_loans_history').
                     '   </a>';
-                }?>
+                }
+            ?>
             </div></div>
         </div>
         <div class="col-md-8">
@@ -174,7 +175,7 @@
                 </div>
             </div>
             <div class="row"><div class="col-12">
-                <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered) {
+                <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && isset($can_modify) && $can_modify && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered) {
                     // Button to create new inventory control
                     echo '<a href="'.base_url('/item/create_inventory_control/'.$item['item_id']).
                             '" class="btn btn-primary"  role="button" >'.

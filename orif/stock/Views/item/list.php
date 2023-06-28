@@ -1,18 +1,36 @@
-
 <div class="container">
 
     <!-- *** ADMIN *** -->
-    <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered) { ?>
+    <?php
+
+    if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered) { ?>
         <div class="row bottom-margin">
             <div class="col-12">
                 <!-- Button for new item -->
-                <a href="<?php echo base_url("item/create/"); ?>"
+                <a id="btn_add" href="<?php echo base_url("item/create/"); ?>"
                         class="btn btn-success mb-3"><?php echo htmlspecialchars(lang('MY_application.btn_new')); ?></a>
             </div>
         </div>
     <?php } ?>
     <!-- *** END OF ADMIN *** -->
 
+    <div class="row pb-3">
+        <div id="e" class="col-sm-12">
+            <?= form_label(lang('stock_lang.entity_name'),'entities_list_label').form_dropdown('e', $entities, isset($_GET["e"]) ? $_GET["e"] : $default_entity,'id="entities_list"');?>
+        </div>
+    </div>
+
+    <div id="alert_no_entities" class="d-none alert alert-warning text-center" role="alert">
+       <?= lang('stock_lang.msg_no_entities_exist') ?>
+    </div>
+
+    <div id="alert_entities_has_no_items" class="<?= $entities_has_items ? 'd-none' : '' ?> alert alert-warning text-center" role="alert">
+       <?= lang('stock_lang.msg_entities_has_no_items') ?>
+    </div>
+
+    <div id="alert_user_has_no_entities" class="<?= $has_entities ? 'd-none' : '' ?> alert alert-warning text-center" role="alert">
+       <?= lang('stock_lang.msg_user_has_no_entities') ?>
+    </div>
     <!-- FILTERS AND SORT FORM -->
     <form id="filters" class="" style="overflow: visible;" method="get" action="<?=base_url("item/index/1") . "/"?>">
         <div class="row">
@@ -20,6 +38,7 @@
             <div class="col-sm-8 top-margin">
                 <!-- HEADING -->
                 <p class="bg-primary">&nbsp;<?php echo htmlspecialchars(lang('MY_application.text_search_filters')); ?></p>
+                
 
                 <div class="row">
                     <!-- TEXT FILTER -->
@@ -34,6 +53,7 @@
                 </div>
 
                 <div class="row">
+
                     <!-- TAGS FILTER -->
                     <div id="t" class="col-sm-8 top-margin">
                         <?= form_label(lang('MY_application.field_tags'),'item_conditions-multiselect').form_dropdown('t[]', $item_tags, isset($_GET["t"])?$_GET["t"]:"",'id="item_tags-multiselect" multiple="multiple"');?>
@@ -58,7 +78,7 @@
             <!-- SORT ORDER -->
             <div class="col-sm-4 top-margin">
                 <!-- HEADING -->
-                <p class="bg-primary">&nbsp;<?php echo htmlspecialchars(lang('MY_application.text_sort_order')); ?></p>
+                <p class="bg-primary mt-3 mt-sm-0">&nbsp;<?php echo htmlspecialchars(lang('MY_application.text_sort_order')); ?></p>
 
                 <div class="row">
                     <!-- SORT ORDER -->
@@ -79,20 +99,27 @@
                 </div>
                 <div class="text-right">
                     <a href="<?= base_url("item/index/") . "/"?>" class="btn btn-default"><?php echo htmlspecialchars(lang('MY_application.btn_remove_filters')); ?></a>
-                    <a href="<?= base_url("item/list_loans/") . "/"?>" class="btn btn-primary">
+                    <a href="<?= base_url("item/list_loans/") . "/"?>" id="btn_late_loans" class="btn btn-primary">
                         <?php echo htmlspecialchars(lang('MY_application.btn_to_loans')); ?>
-                        <?php if(isset($late_loans_count) && $late_loans_count > 0): ?>
-                            <span class="badge badge-danger"><?= $late_loans_count ?></span>
-                        <?php endif ?>
+                            <span id="late_loans" class="badge badge-danger"></span>
                     </a>
                 </div>
+                <?php if (isset($_SESSION['user_access'])&&$_SESSION['user_access']>=config('\Stock\Config\StockConfig')->access_lvl_manager):?>
+                    <p class="bg-primary mt-1 pl-1 mb-1"><?=lang('stock_lang.title_excel_export')?></p>
+                    <a href="<?=base_url('stock/export_excel')?>" class="btn btn-primary col-sm-12"><?=lang('stock_lang.excel_export_btn')?>
+                        <svg xmlns="http://www.w3.org/2000/svg" style="color: #217346" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-excel-fill" viewBox="0 0 16 16">
+                            <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0zM9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1zM5.884 6.68 8 9.219l2.116-2.54a.5.5 0 1 1 .768.641L8.651 10l2.233 2.68a.5.5 0 0 1-.768.64L8 10.781l-2.116 2.54a.5.5 0 0 1-.768-.641L7.349 10 5.116 7.32a.5.5 0 1 1 .768-.64z"/>
+                        </svg>
+                    </a>
+                <?php endif;?>
+
             </div>
         </div>
     </form>
     <!-- END OF FILTERS AND SORT FORM -->
 
     <!-- PAGINATION -->
-    <div class="row"><div class="col-12">
+    <div class="row"><div class="col-12 text-center">
         <div id="pagination_top"></div>
     </div></div>
 
@@ -106,7 +133,7 @@
     </div>
 
     <!-- PAGINATION -->
-    <div class="row"><div class="col-12">
+    <div class="row"><div class="col-12 text-center">
         <div id="pagination_bottom"></div>
     </div></div>
 </div>
@@ -125,7 +152,7 @@ $(document).ready(function() {
         buttonClass: 'btn btn-outline-primary',
         numberDisplayed: 10
     });
-    $('#item_conditions-multiselect, #item_groups-multiselect, #stocking_places-multiselect, #sort_order, #sort_asc_desc').multiselect({
+    $('#item_conditions-multiselect, #item_groups-multiselect, #stocking_places-multiselect, #sort_order, #sort_asc_desc, #entities_list').multiselect({
         nonSelectedText: no_filter,
         buttonWidth: '100%',
         buttonClass: 'btn btn-outline-primary',
@@ -141,12 +168,20 @@ $(document).ready(function() {
     filters = location.search;
     load_items(page, filters);
 
+    // Reload the page entirely if entity has been changed
+    $('#e ul.multiselect-container input[type=radio]').change(() => {
+        // Load page 1 with new filters
+        load_items(1, getFilters()).finally(() => {
+            location.reload();
+        });
+    });
+
     // Reload items list on filter update
-    $("input[type=checkbox], input[type=radio]").change(function(){
+    $("input[type=checkbox], input[type=radio]").change(function() {
         // Load page 1 with new filters
         load_items(1, getFilters());
     });
-    $("#text_search").on("change blur", function(){
+    $("#text_search").on("change blur", function() {
         // Load page 1 with new filters
         load_items(1, getFilters());
     });
@@ -158,7 +193,7 @@ $(document).ready(function() {
 // ******************************************
 let populating = false;
 
-function load_items(page, filters){
+async function load_items(page, filters) {
     if (populating) return;
     populating = true;
 
@@ -169,6 +204,8 @@ function load_items(page, filters){
     $("#no_item_message").toggle(false);
     $("#error_message").toggle(false);
     $("#table_item").toggle(false);
+    $("#late_loans").toggle(false);
+    $("#btn_add").toggle(false);
     $("#list_item").empty();
     $("#pagination_bottom, #pagination_top").empty();
 
@@ -176,7 +213,7 @@ function load_items(page, filters){
     // URL for ajax call to PHP controller                      Stock\Controllers\
     url = "<?= base_url("/Item/load_list_json")?>"+ "/" + page+filters;
 
-    $.ajax({
+    await $.ajax({
         url: url,
         type: "get",
         success: function (response) {
@@ -184,7 +221,8 @@ function load_items(page, filters){
             page = result.number_page;
             filters=getFilters();
             history.pushState(null, "", "<?= base_url("item/index/")?>"+ "/"+page+filters);
-
+            eItems = $("#e .multiselect-container .active input");
+            
             // Empty list before filling it
             if (result.items.length > 0){
                 $("#table_item").toggle(true);
@@ -194,6 +232,26 @@ function load_items(page, filters){
             } else {
                 $("#no_item_message").toggle(true);
             }
+
+            if (result.late_loans_count > 0) {
+                $("#late_loans").toggle(true);
+                $("#late_loans").text(result.late_loans_count);
+            } else {
+                $("#late_loans").toggle(false);
+            }
+
+            if (eItems.length > 0) {
+                $("#btn_late_loans").attr("href", '<?= base_url('item/list_loans') ?>' + '/1?e=' + eItems[0].value);
+                
+                if (result.user_entities) {
+                    $("#btn_add").attr("href", '<?= base_url('item/create') ?>' + '/' + eItems[0].value);
+                    $("#btn_add").toggle(result.user_entities.includes($("#e .multiselect-container .active input")[0].value));
+                } else {
+                    $("#btn_add").toggle(false);
+                }
+            }
+
+            
 
             $("#pagination_top, #pagination_bottom").html(result.pagination);
 
@@ -254,7 +312,16 @@ function getFilters() {
     // Sort ascending/descending
     ad = $("#ad .multiselect-container .active input")[0].value;
 
-    return "?ts="+ts+t+g+s+c+"&o="+o+"&ad="+ad;
+    //entity_filter
+    e = "";
+    eItems = $("#e .multiselect-container .active input");
+    if (eItems.length > 0) {
+        e = "&e=" + eItems[0].value;
+    } else {
+        $('#alert_no_entities').removeClass('d-none');
+    }
+
+    return "?ts="+ts+t+g+s+c+"&o="+o+"&ad="+ad+e;
 }
 
 function display_item(item){
