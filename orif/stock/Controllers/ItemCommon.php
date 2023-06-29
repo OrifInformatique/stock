@@ -322,45 +322,47 @@ class ItemCommon extends BaseController {
                     $this->display_view('Stock\Views\item_common\delete', $output);
                     break;
                 case 1: // Delete item_common and related items
-                        $items = $this->item_model->where('item_common_id', $id)->findAll();
+                    $items = $this->item_model->where('item_common_id', $id)->findAll();
 
-                        if (count($items) > 0) {
-                            foreach ($items as $item) {
-                                $this->inventory_control_model->where('item_id', $id)->delete();
-                                $this->item_tag_link_model->where('item_id', $id)->delete();
-                                $this->loan_model->where('item_id', $id)->delete();
-                                $this->item_model->delete($id);
-                            }
+                    if (count($items) > 0) {
+                        foreach ($items as $item) {
+                            $this->inventory_control_model->where('item_id', $item['item_id'])->delete();
+                            $this->loan_model->where('item_id', $item['item_id'])->delete();
+
+                            $this->item_model->delete($item['item_id']);
                         }
+                    }
 
-                        // Delete image file
-                        if (!is_null($item_common['image']) && $item_common['image'] != $this->config->item_no_image) {
-                            $items = $this->item_common_model->asArray()->where('image', $item_common['image'])->findAll();
-                            $path_to_image = ROOTPATH.'public/' . $this->config->images_upload_path . $item_common['image'];
-                            $image_file_exists = file_exists($path_to_image);
+                    // Delete image file
+                    if (!is_null($item_common['image']) && $item_common['image'] != $this->config->item_no_image) {
+                        $items_using_imgage = $this->item_common_model->asArray()->where('image', $item_common['image'])->findAll();
+                        $path_to_image = ROOTPATH.'public/' . $this->config->images_upload_path . $item_common['image'];
+                        $image_file_exists = file_exists($path_to_image);
 
-                            // Change this if soft deleting items is enabled
-                            // Check if any other item uses this image
-                            if ($image_file_exists && count($items) < 2) {
-                                unlink($path_to_image);
-                            }
+                        // Change this if soft deleting items is enabled
+                        // Check if any other item uses this image
+                        if ($image_file_exists && count($items_using_imgage) < 2) {
+                            unlink($path_to_image);
                         }
+                    }
 
-                        // Delete linked file
-                        if (!is_null($item['linked_file']) && $item['linked_file']) {
-                            $items = $this->item_common_model->asArray()->where('linked_file', $item['linked_file'])->findAll();
-                            $path_to_file = ROOTPATH.'public/' . $this->config->files_upload_path . $item['linked_file'];
-                            $linked_file_exists = file_exists($path_to_file);
+                    // Delete linked file
+                    if (!is_null($item_common['linked_file']) && $item_common['linked_file']) {
+                        $items_using_linked_file = $this->item_common_model->asArray()->where('linked_file', $item_common['linked_file'])->findAll();
+                        $path_to_file = ROOTPATH.'public/' . $this->config->files_upload_path . $item_common['linked_file'];
+                        $linked_file_exists = file_exists($path_to_file);
 
-                            // Change this if soft deleting items is enabled
-                            // Check if any other item uses this linked_file
-                            if ($linked_file_exists && count($items) < 2) {
-                                unlink($path_to_file);
-                            }
+                        // Change this if soft deleting items is enabled
+                        // Check if any other item uses this linked_file
+                        if ($linked_file_exists && count($items_using_linked_file) < 2) {
+                            unlink($path_to_file);
                         }
+                    }
 
-                        $this->item_common_model->delete($id, TRUE);
-                    return redirect()->to('/user/admin/list_user');
+                    $this->item_tag_link_model->where('item_common_id', $id)->delete();
+
+                    $this->item_common_model->delete($id, TRUE);
+                    return redirect()->to(base_url());
                 default: // Do nothing
                     return redirect()->to("/item_common/view/{$item_common['item_common_id']}");
             }

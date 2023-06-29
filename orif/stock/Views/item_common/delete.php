@@ -33,7 +33,7 @@
                             <div class="modal-body">
                                 <div class="alert alert-danger text-center"><?= lang('stock_lang.hard_delete_item_explanation'); ?></div>
                             </div>
-                            <div class="modal-footer justify-content-center">
+                            <div class="modal-footer justify-content-right">
                                 <button type="button" class="btn btn-default" data-dismiss="modal"><?= lang('common_lang.btn_cancel'); ?></button>
                                 <a href="<?= base_url(uri_string().'/1'); ?>" class="btn btn-danger">
                                     <?= lang('stock_lang.btn_delete_item_common'); ?>
