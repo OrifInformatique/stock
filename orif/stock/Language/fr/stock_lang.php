@@ -34,6 +34,7 @@ return[
 'btn_soft_delete_supplier'              => 'Désactiver ce fournisseur',
 'btn_soft_delete_item_group'            => 'Désactiver ce groupe d\'objets',
 'btn_delete_item_group'                 => 'Supprimer ce groupe d\'objets',
+'btn_delete_item_common'                => 'Supprimer cet objet commun',
 'btn_export'                            => 'Exporter',
 
 
@@ -91,8 +92,11 @@ return[
 'reactivate_stocking_place'             => 'Réactiver ce lieu de stockage',
 'stocking_place_already_disabled'       => 'Ce lieu de stockage est déjà désactivé. Voulez-vous le supprimer définitivement ?',
 'stocking_place_deletion_explanation'   => 'La désactivation d\'un lieu de stockage permet de le rendre inutilisable tout en conservant ses informations dans les archives. ' 
-. 'Cela permet notamment de garder l\'historique de ses actions. <br> <br>' 
-. 'En cas de suppression définitive, toutes les informations concernant ce lieu de stockage seront supprimées.',
+                                                . 'Cela permet notamment de garder l\'historique de ses actions. <br> <br>' 
+                                                . 'En cas de suppression définitive, toutes les informations concernant ce lieu de stockage seront supprimées.',
+'item_common_delete_explanation'        => 'La suppression d\'un objet commun est définitive et toutes les informations des objets liés, ainsi que de l\'objet commun seront supprimées.',
+'really_want_to_delete_item_common'     => 'Voulez-vous vraiment supprimer cet objet commun?',
+'hard_delete_item_explanation'          => 'Toutes ses données ainsi que ses objets liés seront définitivement effacés.',
 
 'supplier_already_disabled'             => 'Ce fournisseur est déjà désactivé. Voulez-vous le supprimer définitivement ?',
 'delete_supplier'                       => 'Désactiver ou supprimer ce fournisseur',

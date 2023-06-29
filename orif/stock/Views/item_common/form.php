@@ -16,7 +16,7 @@
             <!-- Buttons -->
             <div class="col-12 mb-3">
                 <input type="submit" class="btn btn-success" id="btn_submit" name="btn_submit" value="<?= lang('MY_application.btn_save'); ?>" />
-                <a href="<?= base_url("item/view/{$item_common['item_common_id']}"); ?>" class="btn btn-danger"><?= lang('MY_application.btn_cancel'); ?></a>
+                <a href="<?= base_url("item_common/view/{$item_common['item_common_id']}"); ?>" class="btn btn-danger"><?= lang('MY_application.btn_cancel'); ?></a>
             </div>
             <div class="row col-12 col-md-8">
                 <!-- Name -->

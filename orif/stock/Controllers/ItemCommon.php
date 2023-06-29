@@ -90,6 +90,69 @@ class ItemCommon extends BaseController {
         $this->db = \Config\Database::connect();
     }
 
+    /**
+     * Display details of one single item
+     *
+     * @param $id : the item to display
+     * @return void
+     */
+    public function view($id = NULL) {
+
+        if (is_null($id)) {
+            // No item selected, display items list
+            return redirect()->to(base_url());
+        }
+
+        $item_common = $this->item_common_model->where('item_common_id', $id)->first();
+
+        if (!is_null($item_common)) {
+            $items = $this->item_model->where('item_common_id', $item_common['item_common_id'])->findAll();
+
+            if (count($items) > 0) {
+                $item_common['tags'] = $this->item_common_model->getTags($item_common);
+                $item_common['image'] = $this->item_common_model->getImagePath($item_common);
+                $item_common['item_group'] = $this->item_common_model->getItemGroup($item_common);
+                
+                foreach ($items as $key => $item) {
+                    $item['supplier'] = $this->item_model->getSupplier($item);
+                    $item['stocking_place'] = $this->item_model->getStockingPlace($item);
+                    $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
+                    $item['condition'] = $this->item_model->getItemCondition($item);
+                    $item['current_loan'] = $this->item_model->getCurrentLoan($item);
+                    $item['warranty_status'] = $this->item_model->getWarrantyStatus($item);
+                    $item['last_inventory_control'] = $this->item_model->getLastInventoryControl($item);
+
+                    if (!is_null($item['last_inventory_control'])) {
+                        $item['last_inventory_control']['controller'] = $this->inventory_control_model->getUser($item['last_inventory_control']['controller_id']);
+                    }
+
+                    $items[$key] = $item;
+                }
+
+                if (isset($_SESSION['user_id']) && !is_null($items)) {
+                    $output['can_modify'] = $this->user_entity_model->check_user_item_entity($_SESSION['user_id'], $items[0]['item_id']);
+                }
+
+                $output['item_common'] = $item_common;
+                $output['items'] = $items;
+
+                $this->display_view('Stock\Views\item_common\item_common_details', $output);
+            } else {
+                // $id is not valid, display an error message
+                $this->display_view('Stock\Views\errors\application\inexistent_item');
+            }
+        } else {
+            // $id is not valid, display an error message
+            $this->display_view('Stock\Views\errors\application\inexistent_item');
+        }
+    }
+
+    /**
+     * Modify an item common
+     *
+     * @param $id : the item common to modify
+     * @return void
+     */
     public function modify($id) {
         // Check if access is allowed
         if (isset($_SESSION['logged_in']) &&
@@ -116,7 +179,7 @@ class ItemCommon extends BaseController {
                     unlink($tmp_image_file);
                 }
 
-                return redirect()->to(base_url("item/view/".$id)); //false id
+                return redirect()->to(base_url("item_common/view/".$id)); //false id
             }
 
             if (isset($_FILES['linked_file']) && $_FILES['linked_file']['name'] != '') {
@@ -189,6 +252,7 @@ class ItemCommon extends BaseController {
                         }
                     }
 
+                    return redirect()->to(base_url("item_common/view/{$id}"));
                 } else {
                     $output['errors'] = $this->item_common_model->errors();
                 }
@@ -226,6 +290,80 @@ class ItemCommon extends BaseController {
             unset($_SESSION['POST']);
 
             $this->display_view('Stock\Views\item_common\form', $output);
+        } else {
+            // Access not allowed
+            return redirect()->to(base_url());
+        }
+    }
+
+    /**
+     * Delete an item
+     * ACCESS RESTRICTED FOR ADMINISTRATORS ONLY
+     *
+     * @param integer $id
+     * @return void
+     */
+    public function delete($id, $action = 0) {
+        // Check if this is allowed
+        if (isset($_SESSION['logged_in']) &&
+            $_SESSION['logged_in'] == true &&
+            isset($_SESSION['user_id']) &&
+            $this->user_entity_model->check_user_item_common_entity($_SESSION['user_id'], $id) &&
+            $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_admin)
+        {
+            $item_common = $this->item_common_model->find($id);
+
+            switch($action) {
+                case 0: // Display confirmation
+                    $output = array(
+                        'item_common' => $item_common,
+                        'title' => lang('user_lang.title_user_delete')
+                    );
+                    $this->display_view('Stock\Views\item_common\delete', $output);
+                    break;
+                case 1: // Delete item_common and related items
+                        $items = $this->item_model->where('item_common_id', $id)->findAll();
+
+                        if (count($items) > 0) {
+                            foreach ($items as $item) {
+                                $this->inventory_control_model->where('item_id', $id)->delete();
+                                $this->item_tag_link_model->where('item_id', $id)->delete();
+                                $this->loan_model->where('item_id', $id)->delete();
+                                $this->item_model->delete($id);
+                            }
+                        }
+
+                        // Delete image file
+                        if (!is_null($item_common['image']) && $item_common['image'] != $this->config->item_no_image) {
+                            $items = $this->item_common_model->asArray()->where('image', $item_common['image'])->findAll();
+                            $path_to_image = ROOTPATH.'public/' . $this->config->images_upload_path . $item_common['image'];
+                            $image_file_exists = file_exists($path_to_image);
+
+                            // Change this if soft deleting items is enabled
+                            // Check if any other item uses this image
+                            if ($image_file_exists && count($items) < 2) {
+                                unlink($path_to_image);
+                            }
+                        }
+
+                        // Delete linked file
+                        if (!is_null($item['linked_file']) && $item['linked_file']) {
+                            $items = $this->item_common_model->asArray()->where('linked_file', $item['linked_file'])->findAll();
+                            $path_to_file = ROOTPATH.'public/' . $this->config->files_upload_path . $item['linked_file'];
+                            $linked_file_exists = file_exists($path_to_file);
+
+                            // Change this if soft deleting items is enabled
+                            // Check if any other item uses this linked_file
+                            if ($linked_file_exists && count($items) < 2) {
+                                unlink($path_to_file);
+                            }
+                        }
+
+                        $this->item_common_model->delete($id, TRUE);
+                    return redirect()->to('/user/admin/list_user');
+                default: // Do nothing
+                    return redirect()->to("/item_common/view/{$item_common['item_common_id']}");
+            }
         } else {
             // Access not allowed
             return redirect()->to(base_url());
