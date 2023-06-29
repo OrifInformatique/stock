@@ -106,13 +106,19 @@ class ItemCommon extends BaseController {
         $item_common = $this->item_common_model->where('item_common_id', $id)->first();
 
         if (!is_null($item_common)) {
+            $item_common['tags'] = $this->item_common_model->getTags($item_common);
+            $item_common['image'] = $this->item_common_model->getImagePath($item_common);
+            $item_common['item_group'] = $this->item_common_model->getItemGroup($item_common);
+            
+            $output['item_common'] = $item_common;
+
+            if (isset($_SESSION['user_id'])) {
+                $output['can_modify'] = $this->user_entity_model->check_user_item_common_entity($_SESSION['user_id'], $item_common['item_common_id']);
+            }
+
             $items = $this->item_model->where('item_common_id', $item_common['item_common_id'])->findAll();
 
             if (count($items) > 0) {
-                $item_common['tags'] = $this->item_common_model->getTags($item_common);
-                $item_common['image'] = $this->item_common_model->getImagePath($item_common);
-                $item_common['item_group'] = $this->item_common_model->getItemGroup($item_common);
-                
                 foreach ($items as $key => $item) {
                     $item['supplier'] = $this->item_model->getSupplier($item);
                     $item['stocking_place'] = $this->item_model->getStockingPlace($item);
@@ -129,17 +135,12 @@ class ItemCommon extends BaseController {
                     $items[$key] = $item;
                 }
 
-                if (isset($_SESSION['user_id']) && !is_null($items)) {
-                    $output['can_modify'] = $this->user_entity_model->check_user_item_entity($_SESSION['user_id'], $items[0]['item_id']);
-                }
-
-                $output['item_common'] = $item_common;
                 $output['items'] = $items;
 
                 $this->display_view('Stock\Views\item_common\item_common_details', $output);
             } else {
-                // $id is not valid, display an error message
-                $this->display_view('Stock\Views\errors\application\inexistent_item');
+                // No items so we display the page with a concise message
+                $this->display_view('Stock\Views\item_common\item_common_details', $output);
             }
         } else {
             // $id is not valid, display an error message
@@ -317,7 +318,7 @@ class ItemCommon extends BaseController {
                 case 0: // Display confirmation
                     $output = array(
                         'item_common' => $item_common,
-                        'title' => lang('user_lang.title_user_delete')
+                        'title' => lang('stock_lang.title_delete_item_common')
                     );
                     $this->display_view('Stock\Views\item_common\delete', $output);
                     break;

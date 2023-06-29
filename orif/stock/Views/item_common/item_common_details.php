@@ -46,171 +46,178 @@
         </div>
     </div>
     <!-- Item details list -->
-    <?php foreach ($items as $item): ?>
+    <?php if (isset($items)): ?>
+        <?php foreach ($items as $item): ?>
+            <hr>
+            <div class="row col-12">
+                <div class="col-6">
+                    <h4><?= $item['inventory_number']; ?></h4>
+                </div>
+                <div class="col-6 text-right">
+                    <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && isset($can_modify) && $can_modify && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered): ?>
+                        <a href="<?= base_url('item/modify/' . $item['item_id']); ?>" class="btn btn-warning" role="button">
+                            <?= lang('MY_application.btn_modify'); ?>
+                        </a>
+                    <?php endif; ?>
+                    <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && isset($can_modify) && $can_modify && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_admin): ?>
+                        <a href="<?= base_url('item/delete/' . $item['item_id']); ?>" class="btn btn-danger" role="button">
+                            <?= lang('MY_application.btn_delete'); ?>
+                        </a>
+                    <?php endif; ?>
+                </div>
+                <div class="col-3">
+                    <div class="row">
+                        <!-- Item condition -->
+                        <div class="col-12">
+                            <label><?= lang('MY_application.field_item_condition'); ?> :</label>
+                        </div>
+                        <div class="col-12">
+                            <?= !is_null($item['condition']) ? $item['condition']['bootstrap_label'] : '-'; ?>
+                        </div>
+
+                        <!-- Loan status -->
+                        <div class="col-12 pt-3">
+                            <label><?= lang('MY_application.field_item_loan'); ?> :</label>
+                        </div>
+                        <div class="col-12">
+                            <?= $item['current_loan']['bootstrap_label']; ?>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="row">
+                        <!-- Stocking Place -->
+                        <div class="col-12">
+                            <label><?= lang('MY_application.field_stocking_place'); ?> :</label>
+                        </div>
+                        <div class="col-12">
+                            <?= !is_null($item['stocking_place']) ? esc($item['stocking_place']['name']) : '-'; ?>
+                        </div>
+
+                        <!-- Remarks -->
+                        <div class="col-12 pt-3">
+                            <label><?= lang('MY_application.field_remarks'); ?> :</label>
+                        </div>
+                        <div class="col-12">
+                            <?= !empty($item['remarks']) ? $item['remarks'] : '-'; ?>
+                        </div>
+                        <div class="col-12 pt-3">
+                            <label><?= lang('MY_application.field_serial_number'); ?> :</label>
+                        </div>
+                        <div class="col-12">
+                            <?= !empty($item['serial_number']) ? esc($item['serial_number']) : '-'; ?>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="row">
+                        <!-- Supplier -->
+                        <div class="col-12">
+                            <label><?= lang('MY_application.field_supplier'); ?> :</label>
+                        </div>
+                        <div class="col-12">
+                            <?= !is_null($item['supplier']) ? $item['supplier']['name'] : '-'; ?>
+                        </div>
+
+                        <!-- Buying Price -->
+                        <div class="col-12 pt-3">
+                            <label><?= lang('MY_application.field_buying_price'); ?> :</label>
+                        </div>
+                        <div class="col-12">
+                            <?= $item['buying_price']; ?>
+                        </div>
+                        <div class="col-12 pt-3">
+                            <label><?= lang('MY_application.field_warranty_duration'); ?> :</label>
+                        </div>
+                        <div class="col-12">
+                            <?= !empty($item['warranty_duration']) ? $item['warranty_duration'].' '.lang('MY_application.text_months') : '-' ?>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="row">
+                        <!-- Supplier Ref -->
+                        <div class="col-12">
+                            <label><?= lang('MY_application.field_supplier_ref'); ?> :</label>
+                        </div>
+                        <div class="col-12">
+                            <?= !empty($item['supplier_ref']) ? esc($item['supplier_ref']) : '-'; ?>
+                        </div>
+
+                        <!-- Buying Date -->
+                        <div class="col-12 pt-3">
+                            <label><?= lang('MY_application.field_buying_date'); ?> :</label>
+                        </div>
+                        <div class="col-12">
+                            <?= !empty($item['buying_date']) ? databaseToShortDate($item['buying_date']) : '-'; ?>
+                        </div>
+                        <div class="col-12 pt-3">
+                        <label><?= lang('MY_application.field_item_warranty') ?> :</label>
+                        </div>
+                        <div class="col-12">
+                            <?php 
+                                if ($item['warranty_status'] == 1):
+                                    echo '<span class="badge badge-success" >'; // UNDER WARRANTY
+                                elseif ($item['warranty_status'] == 2):
+                                    echo '<span class="badge badge-warning" >'; // WARRANTY EXPIRES SOON
+                                elseif ($item['warranty_status'] == 3):
+                                    echo '<span class="badge badge-danger" >';  // WARRANTY EXPIRED
+                                else: 
+                                    echo '<span>' . lang('MY_application.text_warranty_status.' . $item['warranty_status']); 
+                                endif;
+                            ?>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <?php if ($item): ?>
+                <?php else: ?>
+                <?php endif ?>
+
+                <!-- Loans and controls -->
+                <div class="row col-12 pt-3">
+                    <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && isset($can_modify) && $can_modify && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered): ?>
+                        <!-- Button to create new loan -->              
+                        <div class="col-3">
+                            <a href="<?=base_url('/item/create_loan/' . $item['item_id'])?>"
+                                class="btn btn-primary w-100"  role="button" >
+                                <?= lang('MY_application.btn_create_loan'); ?>
+                            </a>
+                        </div>
+
+                        <!-- Button to display loans history -->
+                        <div class="col-3">
+                            <a href="<?=base_url('/item/loans/' . $item['item_id'])?>"
+                                class="btn btn-default"  role="button" >
+                                <?= lang('MY_application.btn_loans_history'); ?>
+                            </a>
+                        </div>
+                    <?php endif; ?>
+                    <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && isset($can_modify) && $can_modify && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered): ?>
+                        <!-- Button to create new inventory control -->
+                        <div class="col-3">
+                            <a href="<?= base_url('/item/create_inventory_control/'.$item['item_id']); ?>"
+                                class="btn btn-primary w-100"  role="button">
+                                <?= lang('MY_application.btn_create_inventory_control'); ?>
+                            </a>
+                        </div>
+
+                        <!-- Button for controls history -->
+                        <div class="col-3">
+                            <a href="<?= base_url('/item/inventory_controls/'.$item['item_id']); ?>"
+                                class="btn btn-default"  role="button" >
+                                <?= lang('MY_application.btn_inventory_control_history'); ?>
+                            </a>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    <?php else: ?>
         <hr>
-        <div class="row col-12">
-            <div class="col-6">
-                <h4><?= $item['inventory_number']; ?></h4>
-            </div>
-            <div class="col-6 text-right">
-                <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && isset($can_modify) && $can_modify && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered): ?>
-                    <a href="<?= base_url('item/modify/' . $item['item_id']); ?>" class="btn btn-warning" role="button">
-                        <?= lang('MY_application.btn_modify'); ?>
-                    </a>
-                <?php endif; ?>
-                <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && isset($can_modify) && $can_modify && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_admin): ?>
-                    <a href="<?= base_url('item/delete/' . $item['item_id']); ?>" class="btn btn-danger" role="button">
-                        <?= lang('MY_application.btn_delete'); ?>
-                    </a>
-                <?php endif; ?>
-            </div>
-            <div class="col-3">
-                <div class="row">
-                    <!-- Item condition -->
-                    <div class="col-12">
-                        <label><?= lang('MY_application.field_item_condition'); ?> :</label>
-                    </div>
-                    <div class="col-12">
-                        <?= !is_null($item['condition']) ? $item['condition']['bootstrap_label'] : '-'; ?>
-                    </div>
-
-                    <!-- Loan status -->
-                    <div class="col-12 pt-3">
-                        <label><?= lang('MY_application.field_item_loan'); ?> :</label>
-                    </div>
-                    <div class="col-12">
-                        <?= $item['current_loan']['bootstrap_label']; ?>
-                    </div>
-                </div>
-            </div>
-            <div class="col-3">
-                <div class="row">
-                    <!-- Stocking Place -->
-                    <div class="col-12">
-                        <label><?= lang('MY_application.field_stocking_place'); ?> :</label>
-                    </div>
-                    <div class="col-12">
-                        <?= !is_null($item['stocking_place']) ? esc($item['stocking_place']['name']) : '-'; ?>
-                    </div>
-
-                    <!-- Remarks -->
-                    <div class="col-12 pt-3">
-                        <label><?= lang('MY_application.field_remarks'); ?> :</label>
-                    </div>
-                    <div class="col-12">
-                        <?= !empty($item['remarks']) ? $item['remarks'] : '-'; ?>
-                    </div>
-                    <div class="col-12 pt-3">
-                        <label><?= lang('MY_application.field_serial_number'); ?> :</label>
-                    </div>
-                    <div class="col-12">
-                        <?= !empty($item['serial_number']) ? esc($item['serial_number']) : '-'; ?>
-                    </div>
-                </div>
-            </div>
-            <div class="col-3">
-                <div class="row">
-                    <!-- Supplier -->
-                    <div class="col-12">
-                        <label><?= lang('MY_application.field_supplier'); ?> :</label>
-                    </div>
-                    <div class="col-12">
-                        <?= !is_null($item['supplier']) ? $item['supplier']['name'] : '-'; ?>
-                    </div>
-
-                    <!-- Buying Price -->
-                    <div class="col-12 pt-3">
-                        <label><?= lang('MY_application.field_buying_price'); ?> :</label>
-                    </div>
-                    <div class="col-12">
-                        <?= $item['buying_price']; ?>
-                    </div>
-                    <div class="col-12 pt-3">
-                        <label><?= lang('MY_application.field_warranty_duration'); ?> :</label>
-                    </div>
-                    <div class="col-12">
-                        <?= !empty($item['warranty_duration']) ? $item['warranty_duration'].' '.lang('MY_application.text_months') : '-' ?>
-                    </div>
-                </div>
-            </div>
-            <div class="col-3">
-                <div class="row">
-                    <!-- Supplier Ref -->
-                    <div class="col-12">
-                        <label><?= lang('MY_application.field_supplier_ref'); ?> :</label>
-                    </div>
-                    <div class="col-12">
-                        <?= !empty($item['supplier_ref']) ? esc($item['supplier_ref']) : '-'; ?>
-                    </div>
-
-                    <!-- Buying Date -->
-                    <div class="col-12 pt-3">
-                        <label><?= lang('MY_application.field_buying_date'); ?> :</label>
-                    </div>
-                    <div class="col-12">
-                        <?= !empty($item['buying_date']) ? databaseToShortDate($item['buying_date']) : '-'; ?>
-                    </div>
-                    <div class="col-12 pt-3">
-                    <label><?= lang('MY_application.field_item_warranty') ?> :</label>
-                    </div>
-                    <div class="col-12">
-                        <?php 
-                            if ($item['warranty_status'] == 1):
-                                echo '<span class="badge badge-success" >'; // UNDER WARRANTY
-                            elseif ($item['warranty_status'] == 2):
-                                echo '<span class="badge badge-warning" >'; // WARRANTY EXPIRES SOON
-                            elseif ($item['warranty_status'] == 3):
-                                echo '<span class="badge badge-danger" >';  // WARRANTY EXPIRED
-                            else: 
-                                echo '<span>' . lang('MY_application.text_warranty_status.' . $item['warranty_status']); 
-                            endif;
-                        ?>
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <?php if ($item): ?>
-            <?php else: ?>
-            <?php endif ?>
-
-            <!-- Loans and controls -->
-            <div class="row col-12 pt-3">
-                <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && isset($can_modify) && $can_modify && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered): ?>
-                    <!-- Button to create new loan -->              
-                    <div class="col-3">
-                        <a href="<?=base_url('/item/create_loan/' . $item['item_id'])?>"
-                            class="btn btn-primary w-100"  role="button" >
-                            <?= lang('MY_application.btn_create_loan'); ?>
-                        </a>
-                    </div>
-
-                    <!-- Button to display loans history -->
-                    <div class="col-3">
-                        <a href="<?=base_url('/item/loans/' . $item['item_id'])?>"
-                            class="btn btn-default"  role="button" >
-                            <?= lang('MY_application.btn_loans_history'); ?>
-                        </a>
-                    </div>
-                <?php endif; ?>
-                <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && isset($can_modify) && $can_modify && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered): ?>
-                    <!-- Button to create new inventory control -->
-                    <div class="col-3">
-                        <a href="<?= base_url('/item/create_inventory_control/'.$item['item_id']); ?>"
-                            class="btn btn-primary w-100"  role="button">
-                            <?= lang('MY_application.btn_create_inventory_control'); ?>
-                        </a>
-                    </div>
-
-                    <!-- Button for controls history -->
-                    <div class="col-3">
-                        <a href="<?= base_url('/item/inventory_controls/'.$item['item_id']); ?>"
-                            class="btn btn-default"  role="button" >
-                            <?= lang('MY_application.btn_inventory_control_history'); ?>
-                        </a>
-                    </div>
-                <?php endif; ?>
-            </div>
+        <div class="alert alert-info">
+            <?= lang('stock_lang.item_common_no_item'); ?>
         </div>
-    <?php endforeach; ?>
+    <?php endif; ?>
 </div>

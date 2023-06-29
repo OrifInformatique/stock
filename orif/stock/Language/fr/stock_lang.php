@@ -15,6 +15,8 @@ return[
 'title_item_groups'                     => 'Liste des groupes d\'objets',
 'title_entity_list'                     => 'Liste des sites',
 'title_excel_export'                    => 'Exportation Excel',
+'title_delete_item_common'              => 'Supprimer un objet commun',
+'title_delete_item'                     => 'Supprimer un objet',
 
 
 // Buttons
@@ -35,6 +37,7 @@ return[
 'btn_soft_delete_item_group'            => 'Désactiver ce groupe d\'objets',
 'btn_delete_item_group'                 => 'Supprimer ce groupe d\'objets',
 'btn_delete_item_common'                => 'Supprimer cet objet commun',
+'btn_delete_item'                       => 'Supprimer cet objet',
 'btn_export'                            => 'Exporter',
 
 
@@ -96,7 +99,12 @@ return[
                                                 . 'En cas de suppression définitive, toutes les informations concernant ce lieu de stockage seront supprimées.',
 'item_common_delete_explanation'        => 'La suppression d\'un objet commun est définitive et toutes les informations des objets liés, ainsi que de l\'objet commun seront supprimées.',
 'really_want_to_delete_item_common'     => 'Voulez-vous vraiment supprimer cet objet commun?',
-'hard_delete_item_explanation'          => 'Toutes ses données ainsi que ses objets liés seront définitivement effacés.',
+'hard_delete_item_common_explanation'   => 'Toutes ses données ainsi que ses objets liés seront définitivement effacés.',
+'item_common_no_item'                   => 'Aucun objet n\'est lié à cet objet commun.',
+
+'item_delete_explanation'               => 'La suppression d\'un objet est définitive et toutes les informations des contrôles d\'inventaire et des prêts seront supprimées.',
+'really_want_to_delete_item'            => 'Voulez-vous vraiment supprimer cet objet commun?',
+'hard_delete_item_explanation'          => 'Toutes ses données ainsi que ses contrôles d\'inventaires et ses prêts liés seront définitivement effacés.',
 
 'supplier_already_disabled'             => 'Ce fournisseur est déjà désactivé. Voulez-vous le supprimer définitivement ?',
 'delete_supplier'                       => 'Désactiver ou supprimer ce fournisseur',

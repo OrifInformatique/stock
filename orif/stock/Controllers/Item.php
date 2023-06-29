@@ -434,63 +434,40 @@ class Item extends BaseController {
      * ACCESS RESTRICTED FOR ADMINISTRATORS ONLY
      *
      * @param integer $id
-     * @param [type] $command
      * @return void
      */
-    public function delete($id, $command = NULL) {
+    public function delete($id, $action = 0) {
         // Check if this is allowed
         if (isset($_SESSION['logged_in']) &&
             $_SESSION['logged_in'] == true &&
             isset($_SESSION['user_id']) &&
             $this->user_entity_model->check_user_item_entity($_SESSION['user_id'], $id) &&
-            $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_admin) {
+            $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_admin)
+        {
+            $item = $this->item_model->find($id);
+            $item_common = $this->item_common_model->find($item['item_common_id']);
 
-            if (empty($command)) {
-                $data['db'] = 'item';
-                $data['id'] = $id;
+            switch($action) {
+                case 0: // Display confirmation
+                    $output = array(
+                        'item_common' => $item_common,
+                        'inventory_number' => $this->item_model->getInventoryNumber($item),
+                        'title' => lang('stock_lang.title_delete_item')
+                    );
+                    $this->display_view('Stock\Views\item\confirm_delete', $output);
+                    break;
+                case 1: // Delete item_common and related items
+                    $this->inventory_control_model->where('item_id', $item['item_id'])->delete();
+                    $this->loan_model->where('item_id', $item['item_id'])->delete();
 
-                $this->display_view('Stock\Views\item\confirm_delete', $data);
-            } else {
-                $this->item_model->update($id, array("description" => "FAC"));
-
-                $item = $this->item_model->find($id);
-
-                // Delete image file
-                if (!is_null($item['image']) && $item['image'] != $this->config->item_no_image) {
-                    $items = $this->item_model->asArray()->where('image', $item['image'])->findAll();
-                    $path_to_image = ROOTPATH.'public/' . $this->config->images_upload_path . $item['image'];
-                    $image_file_exists = file_exists($path_to_image);
-
-                    // Change this if soft deleting items is enabled
-                    // Check if any other item uses this image
-                    if ($image_file_exists && count($items) < 2) {
-                        unlink($path_to_image);
-                    }
-                }
-
-                // Delete linked file
-                if (!is_null($item['linked_file']) && $item['linked_file']) {
-                    $items = $this->item_model->asArray()->where('linked_file', $item['linked_file'])->findAll();
-                    $path_to_file = ROOTPATH.'public/' . $this->config->files_upload_path . $item['linked_file'];
-                    $linked_file_exists = file_exists($path_to_file);
-
-                    // Change this if soft deleting items is enabled
-                    // Check if any other item uses this linked_file
-                    if ($linked_file_exists && count($items) < 2) {
-                        unlink($path_to_file);
-                    }
-                }
-
-                $this->inventory_control_model->where('item_id', $id)->delete();
-                $this->item_tag_link_model->where('item_id', $id)->delete();
-                $this->loan_model->where('item_id', $id)->delete();
-                $this->item_model->delete($id);
-
-                return redirect()->to('/item');
+                    $this->item_model->delete($item['item_id']);
+                    return redirect()->to(base_url("item_common/view/{$item_common['item_common_id']}"));
+                default: // Do nothing
+                    return redirect()->to("/item_common/view/{$item_common['item_common_id']}");
             }
         } else {
-            // Access is not allowed
-            return redirect()->to('/item');
+            // Access not allowed
+            return redirect()->to(base_url());
         }
     }
 

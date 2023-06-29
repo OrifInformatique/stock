@@ -2,7 +2,7 @@
 /**
  * View delete_user
  *
- * @author      Orif (ViDi,HeMa)
+ * @author      Orif (ViDi,AeDa)
  * @link        https://github.com/OrifInformatique
  * @copyright   Copyright (c), Orif (https://www.orif.ch)
  */
@@ -31,7 +31,7 @@
                                 <h2 class="modal-title" style="margin: 0 auto;"><?= lang('stock_lang.really_want_to_delete_item_common'); ?></h2>
                             </div>
                             <div class="modal-body">
-                                <div class="alert alert-danger text-center"><?= lang('stock_lang.hard_delete_item_explanation'); ?></div>
+                                <div class="alert alert-danger text-center"><?= lang('stock_lang.hard_delete_item_common_explanation'); ?></div>
                             </div>
                             <div class="modal-footer justify-content-right">
                                 <button type="button" class="btn btn-default" data-dismiss="modal"><?= lang('common_lang.btn_cancel'); ?></button>
