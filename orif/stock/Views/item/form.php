@@ -29,7 +29,9 @@ $config = config('\Stock\Config\StockConfig');
         <!-- Entities -->
         <div class="row">
             <div id="e" class="col-12 mb-3">
-                <?= form_label(lang('stock_lang.entity_name'),'entities_list_label').form_dropdown('e', $entities, $selected_entity_id, 'id="entities_list"');?>
+                <?= form_label(lang('stock_lang.entity_name'),'entities_list_label').form_dropdown('e', $entities, $selected_entity_id, [
+                    'id' => 'entities_list'
+                ]);?>
             </div>
         </div>
 
@@ -119,14 +121,15 @@ $config = config('\Stock\Config\StockConfig');
             </div>
         </div>
 
-        <!-- ITEM_COMMON, ITEM NAME AND DESCRIPTION -->
+        <!-- INVENTORY PREFIX, INVENTORY NUMBER, SERIAL NUMBER AND REMARKS -->
         <div class="row">
             <div class="col-md-4">
                 <div class="row">
                     <div class="form-group col-12">
+                        <?= form_label(lang('MY_application.field_inventory_number'), 'inventory_prefix'); ?>
                         <input type="text" class="form-control input-bold" name="inventory_prefix"
                             id="inventory_prefix"
-                            placeholder="<?php echo lang('MY_application.field_inventory_number') ?>"
+                            placeholder="<?= lang('MY_application.field_inventory_number') ?>"
                             value="<?= isset($item) ? $item['inventory_prefix'] : set_value('inventory_prefix') ?>" />
                     </div>
                     <div class="form-group col-12">
@@ -143,13 +146,9 @@ $config = config('\Stock\Config\StockConfig');
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- ITEM DETAILS -->
-        <div class="row">
             <div class="col-md-8">
                 <div class="row">
-                    <div class="form-group col-md-8">
+                    <div class="form-group col-md-12">
                         <label for="serial_number"><?= lang('MY_application.field_serial_number'); ?>&nbsp;</label>
                         <input type="text" id="serial_number" name="serial_number" class="form-control"
                                 value="<?php if(isset($serial_number)) {echo set_value('serial_number',$serial_number);} else {echo set_value('serial_number');} ?>" />
@@ -309,23 +308,17 @@ function change_warranty() {
 
 	var remaining_months = (buying_date.getFullYear() * 12 + buying_date.getMonth()) + duration - (current_date.getFullYear() * 12 + current_date.getMonth());
 
-	if (buying_date.getDate() >= current_date.getDate())
-		remaining_months++;
+	if (buying_date.getDate() >= current_date.getDate()) remaining_months++;
 
-	if (remaining_months > 3)
-	{
+	if (remaining_months > 3) {
 		// Under warranty
 		span_garantie.innerHTML = "<?= lang('MY_application.text_warranty_status')[1]; ?>";
 		span_garantie.class = "label label-success";
-	}
-	else if (remaining_months > 0)
-	{
+	} else if (remaining_months > 0) {
 		// Warranty expires soon
 		span_garantie.innerHTML = "<?= lang('MY_application.text_warranty_status')[2]; ?>";
 		span_garantie.class = "label label-warning";
-	}
-	else
-	{
+	} else {
 		// Warranty expired
 		span_garantie.innerHTML = "<?= lang('MY_application.text_warranty_status')[3]; ?>";
 		span_garantie.class = "label label-danger";
@@ -333,7 +326,9 @@ function change_warranty() {
 }
 
 function createInventoryNo() {
-    var objectGroupField = document.getElementById('item_group_id');
+    let entities = JSON.parse('<?= json_encode($entities_list); ?>');
+    let eItems = $("#e .multiselect-container .active input");
+    var objectGroupField = $('#item_common_group').val();
 
     var objectGroups = get("item_groups");
 
@@ -343,12 +338,15 @@ function createInventoryNo() {
     var inventoryNumberField = document.getElementById('inventory_prefix');
     var inventoryNumber = "";
     var inventoryIdField = document.getElementById('inventory_id');
-    var entityTag=document.querySelector(`option[value='${document.getElementById('entity_selector').value}']`).getAttribute('data-tag-name');
+    var entityTag = '';
+    $(entities).each((entity) => {
+        if (entities[entity].entity_id == eItems[0].value) entityTag = entities[entity].shortname;
+    });
     date = date.toString().slice(2,4);
     if(date == "N"){
         date = "00";
     }
-    inventoryNumber = entityTag + "." + objectGroups[objectGroupField.value-1] + tagShortName + date;
+    inventoryNumber = entityTag + "." + objectGroups[objectGroupField-1] + tagShortName + date;
     inventoryNumberField.value = inventoryNumber;
 
     // If inventory_id field is empty, complete it

@@ -394,10 +394,12 @@ class Item extends BaseController {
                 // Load the comboboxes options
                 if (isset($_SESSION['user_access']) && isset($_SESSION['user_id']) && $_SESSION['user_access'] < config('\User\Config\UserConfig')->access_lvl_admin) {
                     $entity_ids = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->findColumn('fk_entity_id');
-                    $data['entities'] = $this->dropdown($this->entity_model->find($entity_ids), 'entity_id');
+                    $data['entities_list'] = $this->entity_model->find($entity_ids);
                 } else {
-                    $data['entities'] = $this->dropdown($this->entity_model->findAll(), 'entity_id');
+                    $data['entities_list'] = $this->entity_model->findAll();
                 }
+                
+                $data['entities'] = $this->dropdown($data['entities_list'], 'entity_id');
 
                 $data['stocking_places'] = $this->dropdown($this->stocking_place_model->where('fk_entity_id', $entity_id)->findAll(), 'stocking_place_id');
 
