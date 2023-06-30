@@ -1,377 +1,291 @@
 <?php
 $config = config('\Stock\Config\StockConfig');
 ?>
-<form class="container" method="post" enctype="multipart/form-data">
-    <!-- BUTTONS -->
-    <div class="row">
-        <div class="form-group col-12">
-            <button type="submit" class="btn btn-success"><?= lang('MY_application.btn_save'); ?></button>
-            <a href="<?= isset($_SESSION['items_list_url']) ? $_SESSION['items_list_url'] : base_url() ?>" class="btn btn-danger"><?= lang('MY_application.btn_cancel');?></a>
-        </div>
-    </div>
 
-    <!-- ERROR MESSAGES -->
-    <div class="row col-12">
-        <?php
-            if ((isset($errors) && !empty($errors)) || (isset($upload_errors) && !empty($upload_errors))) {
-                if ((isset($errors) && !empty($errors)) && (isset($upload_errors) && !empty($upload_errors))) $errors = array_merge($errors, $upload_errors);
-                echo '<div class="alert alert-danger">';
-                if (isset($errors) && !empty($errors)) {
-                    echo implode('<br>', array_values($errors));
-                }
-                echo '</div>';
-            }
-        ?>
-    </div>
-
-    <!-- ITEM_COMMON, ITEM NAME AND DESCRIPTION -->
-    <div class="row">
-        <div class="col-12 form-group">
-            <div id="itemCommonInfo" class="alert alert-warning">
-                <?= lang('stock_lang.add_item_common_info'); ?>
+<div class="container">
+    <?= form_open(base_url(""), [
+            'enctype' => 'multipart/form-data'
+        ]); 
+    ?>
+        <!-- ERROR MESSAGES -->
+        <?php if (isset($upload_errors) && !empty($upload_errors)): ?>
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-danger">
+                        <?= implode('<br>', array_values($upload_errors)); ?>
+                    </div>
+                </div>
             </div>
-            <?= form_label(lang('stock_lang.item_common'), 'item_common_name'); ?>
-            <?= form_input('item_common_name', isset($item_common) ? $item_common['name'] : '', [
-                'placeholder' => lang('stock_lang.item_common'),
-                'class' => 'form-control', 
-                'id' => 'item_common_name',
-                'readonly' => 'true',
-                'onClick' => "$('#itemCommonBrowse').modal('show');"
-                ]); 
-            ?>
+        <?php endif; ?>
 
-            <!-- Modal -->
-            <div class="modal fade" id="itemCommonBrowse" tabindex="-1" aria-labelledby="itemCommonBrowseLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-scrollable">
-                    <div class="modal-content col-10">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="itemCommonBrowseLabel"><?= lang('stock_lang.item_common'); ?></h5>
-                        </div>
-                        <div class="form-group search-sticky">
-                            <?= form_label(lang('stock_lang.field_search_item_common'), 'search_item_common', ['class' => '']) ?>
-                            <?= form_input('', '', [
-                                'placeholder' => lang('stock_lang.field_search_item_common'),
-                                'class' => 'form-control bg-white', 'id' => 'search_item_common'
-                                ]); 
-                            ?>
-                        </div>
-                        <div class="modal-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover" style="overflow-x: auto;">
-                                    <thead>
-                                        <tr role="button">
-                                            <th scope="col"></th>
-                                            <th scope="col"><?= lang('stock_lang.field_item_common_name'); ?></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="itemCommonList">
-                                        <tr>
-                                            <td>
-                                                <img src="<?= base_url('uploads/images') . '/' . $config->item_no_image ?>" width="100px" height="100px" alt="">
-                                            </td>
-                                            <td></td>
-                                        </tr>
-                                        <?php foreach($item_common_list as $item_common): ?>
-                                            <?php if (! is_null($item_common)): ?>
-                                                <tr>
-                                                    <td>
-                                                        <img src="<?= base_url('uploads/images') . '/' . $item_common['image'] ?>" width="100px" height="100px" alt="">
-                                                    </td>
-                                                    <td><?= $item_common['name']; ?></td>
-                                                </tr>
-                                            <?php endif; ?>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                                <div id="noItemFoundMessage" class="alert alert-info"><?= lang('stock_lang.no_item_common_found'); ?></div>
-                            </div>
-                        </div>
-                        <div class="modal-footer justify-content-center">
-                            <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal" onclick="$('#itemCommonBrowse').modal('hide');"><?= lang('stock_lang.save_and_quit'); ?></button>
-                        </div>
+        <!-- Buttons -->
+        <div class="row">
+            <div class="col-12 mb-3">
+                <input type="submit" class="btn btn-success" id="btn_submit" name="btn_submit" value="<?= lang('MY_application.btn_save'); ?>" />
+                <a href="<?= base_url(""); ?>" class="btn btn-danger"><?= lang('MY_application.btn_cancel'); ?></a>
+            </div>
+        </div>
+
+        <!-- Entities -->
+        <div class="row">
+            <div id="e" class="col-12 mb-3">
+                <?= form_label(lang('stock_lang.entity_name'),'entities_list_label').form_dropdown('e', $entities, $selected_entity_id, 'id="entities_list"');?>
+            </div>
+        </div>
+
+        <!-- ITEM COMMON -->
+        <div class="row">
+            <div class="col-12">
+                <p class="bg-primary">&nbsp;<?= lang('stock_lang.item_common'); ?></p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-8">
+                <!-- Name -->
+                <div class="mb-3">
+                    <?= form_label(lang('stock_lang.field_name'), 'item_common_name').form_input('item_common_name', isset($item_common_name) ? $item_common_name : (isset($item_common['name']) ? $item_common['name'] : ''), [
+                            'placeholder' => lang('stock_lang.field_item_common_name'),
+                            'class' => 'form-control', 
+                            'id' => 'item_common_name'
+                        ]); 
+                    ?>
+                    <span class="text-danger"><?= isset($errors['name']) ? $errors['name']: ''; ?></span>
+                </div>
+                    
+                <!-- Description -->
+                <div class="mb-3">
+                    <?= form_label(lang('stock_lang.field_description'), 'item_common_description').form_input('item_common_description', isset($item_common_description) ? $item_common_description : (isset($item_common['description']) ? $item_common['description'] : ''), [
+                            'placeholder' => lang('stock_lang.field_item_common_description'),
+                            'class' => 'form-control', 
+                            'id' => 'item_common_description'
+                        ]); 
+                    ?>
+                    <span class="text-danger"><?= isset($errors['description']) ? $errors['description']: ''; ?></span>
+                </div>
+
+                <!-- Item Group -->
+                <div class="mb-3">
+                    <?= form_label(lang('MY_application.field_group'), 'item_common_group').form_dropdown('item_common_group', $item_groups, isset($item_common_group) ? $item_common_group : (isset($item_common['item_group_id']) ? $item_common['item_group_id'] : ''), [
+                            'class' => 'form-control',
+                            'id' => 'item_common_group'
+                        ]);
+                    ?>
+                    <span class="text-danger"><?= isset($errors['item_group_id']) ? $errors['item_group_id']: ''; ?></span>
+                </div>
+
+                <!-- Item Tags -->
+                <div class="mb-3">
+                    <?= form_label(lang('MY_application.field_tags'), 'item_tags-multiselect').form_multiselect('item_common_tags[]', $item_tags, isset($item_common_tags) ? $item_common_tags : (isset($item_tag_ids) ? $item_tag_ids : []),'id="item_tags-multiselect" multiple="multiple"'); ?>
+                </div>
+
+                <!-- Linked File -->
+                <div class="mb-3">
+                    <?= form_label(lang('stock_lang.field_linked_file'), 'item_common_linked_file').form_input('linked_file', '', [
+                        'class' => 'form-control-file',
+                        'accept' => '.pdf, .doc, .docx',
+                        'id' => 'item_common_linked_file'
+                        ], 'file');
+                    ?>
+                    <span class="text-danger"><?= isset($errors['linked_file']) ? $errors['linked_file']: ''; ?></span>
+                </div>
+            </div>
+
+            <!-- Image -->
+            <div class="col-md-4 mb-3">
+                <input type="submit" class="btn btn-primary w-100 mb-1" name="btn_submit_photo" id="btn_submit_photo" value="<?= lang('MY_application.field_add_modify_photo') ?>"/>
+                <?php
+                    $temp_path = $_SESSION['picture_prefix'].$config->image_picture_suffix.$config->image_tmp_suffix.$config->image_extension;
+                    if (file_exists($config->images_upload_path.$temp_path)) {
+                        $imagePath = $temp_path;
+                    } else if (isset($item_common['image']) && $item_common['image'] != '') {
+                        $imagePath = $item_common['image'];
+                    } else {
+                        $imagePath = $config->item_no_image;
+                    }
+                ?>
+                <img id="picture"
+                    src="<?= base_url($config->images_upload_path.$imagePath); ?>"
+                    width="100%"
+                    alt="<?= lang('MY_application.field_image'); ?>"/>
+                <div class="form-group">
+                    <input type="hidden" id="image" name="image" value="<? isset($imagePath) ? $imagePath : ''; ?>"/>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <p class="bg-primary">&nbsp;<?= lang('MY_application.header_item_name'); ?></p>
+            </div>
+        </div>
+
+        <!-- ITEM_COMMON, ITEM NAME AND DESCRIPTION -->
+        <div class="row">
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="form-group col-12">
+                        <input type="text" class="form-control input-bold" name="inventory_prefix"
+                            id="inventory_prefix"
+                            placeholder="<?php echo lang('MY_application.field_inventory_number') ?>"
+                            value="<?= isset($item) ? $item['inventory_prefix'] : set_value('inventory_prefix') ?>" />
+                    </div>
+                    <div class="form-group col-12">
+                        <input type="text" class="form-control" name="inventory_id"
+                            id="inventory_id"
+                            value="<?php if(isset($inventory_id)) {echo set_value('inventory_id',$inventory_id);} else {echo set_value('inventory_id');} ?>"
+                                disabled />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-12">
+                        <input type="button" class="form-control btn btn-primary" name="inventory_number_button"
+                            value="<?= lang('MY_application.btn_generate_inventory_nb') ?>" onclick="createInventoryNo()">
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-8">
-            <div class="form-group">
-                <input type="text" id="name" class="form-control input-bold" name="name"
-                        placeholder="<?= lang('MY_application.field_item_name') ?>"
-                        value="<?= isset($item_common) ? $item_common['name'] : set_value('name') ?>" />
-            </div>
-            <div class="form-group">
-                <input type="text" id="description" class="form-control" name="description"
-                        placeholder="<?= lang('MY_application.field_item_description') ?>"
-                        value="<?= isset($item_common) ? $item_common['description'] : set_value('description') ?>" />
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="row">
-                <div class="form-group col-12">
-                    <input type="text" class="form-control input-bold" name="inventory_prefix"
-                           id="inventory_prefix"
-                           placeholder="<?php echo lang('MY_application.field_inventory_number') ?>"
-                           value="<?= isset($item) ? $item['inventory_prefix'] : set_value('inventory_prefix') ?>" />
-                </div>
-                <div class="form-group col-12">
-                    <input type="text" class="form-control" name="inventory_id"
-                           id="inventory_id"
-                           value="<?php if(isset($inventory_id)) {echo set_value('inventory_id',$inventory_id);} else {echo set_value('inventory_id');} ?>"
-                            disabled />
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-12">
-                    <input type="button" class="form-control btn btn-primary" name="inventory_number_button"
-                           value="<?= lang('MY_application.btn_generate_inventory_nb') ?>" onclick="createInventoryNo()">
-                </div>
-            </div>
-        </div>
-        <div class="row-responsive-2 pl-3 pr-3" style="width: 100%;min-width: 50vw;max-width: 1000px">
-            <label for="entity_selector"><?=lang('stock_lang.entity_name')?></label>
-            <select class="form-control mb-3" name="fk_entity_id" id="entity_selector" onchange="initStockingPlace(this);initItemGroup(this)">
-                <?php foreach ($entities as $entity):?>
-                    <option value="<?=$entity['entity_id']?>"  data-tag-name="<?=$entity['shortname']?>" <?=isset($entity_id)&&$entity_id==$entity['entity_id'] ? 'selected': (isset($selected_entity_id) && $selected_entity_id == $entity['entity_id'] ? 'selected' : '')?>><?=$entity['name']?></option>
-                <?php endforeach;?>
-            </select>
-        </div>
-    </div>
 
-    <!-- ITEM DETAILS -->
-    <div class="row">
-        <div class="col-md-12">
-            <p class="bg-primary">&nbsp;<?= lang('MY_application.text_item_detail'); ?></p>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-4">
-            <div class="form-group">
-                <input id="photoSubmit" name="photoSubmit" type="submit" value="<?= lang('MY_application.field_add_modify_photo')?>" class="btn btn-primary col-12" />
-            </div>
-
-            <div class="form-group">
-                <?php
-                $temp_path = $_SESSION['picture_prefix'].$config->image_picture_suffix.$config->image_tmp_suffix.$config->image_extension;
-                if(file_exists($config->images_upload_path.$temp_path)){
-                    $imagePath = $temp_path;
-                }else if (isset($image) && $image!='') {
-                    $imagePath = $image;
-                }else{
-                    $imagePath = $config->item_no_image;
-                }
-                ?>
-                    <img id="picture"
-                         src="<?= base_url($config->images_upload_path.$imagePath); ?>"
-                         width="100%"
-                         alt="<?= lang('MY_application.field_image'); ?>" />
-            </div>
-
-            <div class="form-group">
-                <input type="hidden" id="image" name="image" value="<?php if(isset($imagePath)){ echo $imagePath; }?>"/>
-            </div>
-        </div>
-        <div class="col-md-8">
-            <div class="row">
-                <div class="form-group col-md-4">
-                    <label for="item_group_id"><?= lang('MY_application.field_group'); ?>&nbsp;</label>
-                    <select id="item_group_id" name="item_group_id" class="form-control" >
-                        <option value="" disabled> -- <?= lang('MY_application.field_group'); ?> -- </option>
-                        <?php
-                        foreach ($item_groups as $item_group) :?>
-                        <option value="<?=$item_group['item_group_id']?>" <?php echo (isset($item_group_id) && $item_group_id == $item_group['item_group_id'] ? 'selected' : $item_group['item_group_id'] == $config->items_default_group) ? 'selected' : '' ?> data-fk_entity="<?=$item_group['fk_entity_id']?>"><?=$item_group['name']?></option>
-                        <?php endforeach;?>
-                    </select>
+        <!-- ITEM DETAILS -->
+        <div class="row">
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="form-group col-md-8">
+                        <label for="serial_number"><?= lang('MY_application.field_serial_number'); ?>&nbsp;</label>
+                        <input type="text" id="serial_number" name="serial_number" class="form-control"
+                                value="<?php if(isset($serial_number)) {echo set_value('serial_number',$serial_number);} else {echo set_value('serial_number');} ?>" />
+                    </div>
                 </div>
-                <div class="form-group col-md-8">
-                    <label for="serial_number"><?= lang('MY_application.field_serial_number'); ?>&nbsp;</label>
-                    <input type="text" id="serial_number" name="serial_number" class="form-control"
-                            value="<?php if(isset($serial_number)) {echo set_value('serial_number',$serial_number);} else {echo set_value('serial_number');} ?>" />
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-md-12">
-                    <label for="remarks"><?= lang('MY_application.field_remarks'); ?></label>
-                    <textarea id="remarks" name="remarks" class="form-control"><?php
-                        // Don't move the <php> markups or they will be white spaces in textarea
-                        if(isset($remarks)) {echo set_value('remarks',$remarks);} else {echo set_value('remarks');}
-                    ?></textarea>
+                <div class="row">
+                    <div class="form-group col-md-12">
+                        <label for="remarks"><?= lang('MY_application.field_remarks'); ?></label>
+                        <textarea id="remarks" name="remarks" class="form-control"><?php
+                            // Don't move the <php> markups or they will be white spaces in textarea
+                            if(isset($remarks)) {echo set_value('remarks',$remarks);} else {echo set_value('remarks');}
+                        ?></textarea>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Button to display linked file -->
-        <div class="form-group col-12">
-            <label for="linked_file"><?= lang('MY_application.field_linked_file_upload'); ?></label>
-            <input type="file" id="linked_file" name="linked_file" accept=".pdf, .doc, .docx" class="form-control-file" />
+        <!-- ITEM STATUS, LOAN STATUS AND HISTORY -->
+        <div class="row">
+            <div class="col-md-12">
+                <p class="bg-primary">&nbsp;<?= lang('MY_application.text_item_loan_status'); ?></p>
+            </div>
         </div>
-    </div>
-
-    <!-- ITEM STATUS, LOAN STATUS AND HISTORY -->
-    <div class="row">
-        <div class="col-md-12">
-            <p class="bg-primary">&nbsp;<?= lang('MY_application.text_item_loan_status'); ?></p>
-        </div>
-    </div>
-    <div class="row">
-        <div class="form-group col-md-4">
-            <label for="item_condition_id"><?= lang('MY_application.text_item_condition'); ?></label>
-            <select id="item_condition_id" name="item_condition_id" class="form-control"><?php
-                foreach ($condishes as $item_condition) {
-                    ?><option value="<?= $item_condition['item_condition_id']; ?>" <?php
-                        if (isset($item_condition_id) && $item_condition_id == $item_condition['item_condition_id']) {
-                            echo "selected";
-                        }
-                    ?> ><?= $item_condition['name']; ?></option><?php
-                } ?>
-            </select>
-        </div>
-        <div class="form-group col-md-4">
-            <label for="stocking_place_id"><?= lang('MY_application.field_stocking_place'); ?></label>
-			<select id="stocking_place_id" name="stocking_place_id" class="form-control">
-                <option value="" disabled> -- <?= lang('MY_application.field_stocking_place'); ?> -- </option>
-                <?php
-				foreach ($stocking_places as $stocking_place) {
-
-				?><option value="<?= $stocking_place['stocking_place_id']; ?>" <?php
-                    if (isset($stocking_place_id) && $stocking_place_id == $stocking_place['stocking_place_id']) {
-                        echo "selected";
-                    }
-                ?> data-fk_entity="<?=$stocking_place['fk_entity_id']?>"><?= $stocking_place['name']; ?></option><?php
-				} ?>
-			</select>
-        </div>
-
-    </div>
-
-    <!-- ITEM SUPPLIER, BUYING AND WARRANTY INFORMATIONS -->
-    <div class="row">
-        <div class="col-md-12">
-            <p class="bg-primary">&nbsp;<?= lang('MY_application.text_item_buying_warranty'); ?></p>
-        </div>
-    </div>
-    <div class="row">
-        <div class ="col-md-4">
-            <div class="form-group">
-                <label for="supplier_id"><?= lang('MY_application.field_supplier'); ?></label>
-                <select id="supplier_id" name="supplier_id" class="form-control"><?php
-                    foreach ($suppliers as $supplier) {
-    				?><option value="<?= $supplier['supplier_id']; ?>" <?php
-                        if (isset($supplier_id) && $supplier_id == $supplier['supplier_id']) {
-                            echo "selected";
-                        }
-                    ?> ><?= $supplier['name']; ?></option><?php
-    				} ?>
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label for="item_condition_id"><?= lang('MY_application.text_item_condition'); ?></label>
+                <select id="item_condition_id" name="item_condition_id" class="form-control"><?php
+                    foreach ($condishes as $item_condition) {
+                        ?><option value="<?= $item_condition['item_condition_id']; ?>" <?php
+                            if (isset($item_condition_id) && $item_condition_id == $item_condition['item_condition_id']) {
+                                echo "selected";
+                            }
+                        ?> ><?= $item_condition['name']; ?></option><?php
+                    } ?>
                 </select>
             </div>
-            <div class="form-group">
-                <label for="supplier_ref"><?= lang('MY_application.field_supplier_ref'); ?></label>
-                <input type="text" id="supplier_ref" name="supplier_ref" class="form-control"
-                       value="<?php if(isset($supplier_ref)) {echo set_value('supplier_ref',$supplier_ref);} else {echo set_value('supplier_ref');} ?>" />
+            <div class="form-group col-md-6">
+                <label for="stocking_place_id"><?= lang('MY_application.field_stocking_place'); ?></label>
+                <?= form_dropdown('', $stocking_places, [], [
+                    'class' => 'form-control'
+                ]); ?>
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="form-group">
-                <label for="buying_price"><?= lang('MY_application.field_buying_price'); ?></label>
-                <input type="number" id="buying_price" name="buying_price" class="form-control" min="0" step="0.05"
-                       value="<?php if(isset($buying_price)) {echo set_value('buying_price',$buying_price);} else {echo set_value('buying_price');} ?><?= set_value('buying_price'); ?>" />
-            </div>
-            <div class="form-group">
-                <label for="buying_date"><?= lang('MY_application.field_buying_date'); ?></label>
-                <input type="date" id="buying_date" name="buying_date" class="form-control"
-                       value="<?php if(isset($buying_date)) {echo set_value('buying_date',$buying_date);} else {echo set_value('buying_date', date(config('\Stock\Config\StockConfig')->database_date_format));} ?>" onblur="change_warranty()" />
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="form-group">
-                <label for="warranty_duration"><?= lang('MY_application.field_warranty_duration'); ?></label>
-                <input type="number" id="warranty_duration" name="warranty_duration" class="form-control" min="0" max="1000"
-                       value="<?php if(isset($warranty_duration)) {echo set_value('warranty_duration',$warranty_duration);} else {echo set_value('warranty_duration');} ?>" onblur="change_warranty()" />
-            </div>
-            <span class="label label-success" id="garantie">Sous garantie</span>
-        </div>
-    </div>
 
-    <!-- ITEM TAGS -->
-    <div class="row">
-        <div class="col-md-12">
-            <p class="bg-primary">&nbsp;<?= lang('MY_application.text_item_tags'); ?></p>
         </div>
-    </div>
-    <div class="row">
-        <div class="checkbox col-12">
-			<?php foreach ($item_tags as $item_tag) { ?>
-                <label class="checkbox-inline">
-                    <input class="tag-checkbox" type="checkbox" name="tag<?= $item_tag['item_tag_id']; ?>" value="<?= $item_tag['item_tag_id']; ?>"
-                        <?php
-                        // Check the checkbox if tag is assigned to this item
-                        if (isset($tag_links)) {
-                            foreach ($tag_links as $tag_link) {
-                                if ($tag_link['item_tag_id'] == $item_tag['item_tag_id']){
-                                    echo 'checked';
-                                    break;
-                                }
+
+        <!-- ITEM SUPPLIER, BUYING AND WARRANTY INFORMATIONS -->
+        <div class="row">
+            <div class="col-md-12">
+                <p class="bg-primary">&nbsp;<?= lang('MY_application.text_item_buying_warranty'); ?></p>
+            </div>
+        </div>
+        <div class="row">
+            <div class ="col-md-4">
+                <div class="form-group">
+                    <label for="supplier_id"><?= lang('MY_application.field_supplier'); ?></label>
+                    <select id="supplier_id" name="supplier_id" class="form-control"><?php
+                        foreach ($suppliers as $supplier) {
+                        ?><option value="<?= $supplier['supplier_id']; ?>" <?php
+                            if (isset($supplier_id) && $supplier_id == $supplier['supplier_id']) {
+                                echo "selected";
                             }
-                        }
-                        ?>
-                    />
-
-                    <?= $item_tag['name']; ?>
-                </label>
-			<?php } ?>
+                        ?> ><?= $supplier['name']; ?></option><?php
+                        } ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="supplier_ref"><?= lang('MY_application.field_supplier_ref'); ?></label>
+                    <input type="text" id="supplier_ref" name="supplier_ref" class="form-control"
+                        value="<?php if(isset($supplier_ref)) {echo set_value('supplier_ref',$supplier_ref);} else {echo set_value('supplier_ref');} ?>" />
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="buying_price"><?= lang('MY_application.field_buying_price'); ?></label>
+                    <input type="number" id="buying_price" name="buying_price" class="form-control" min="0" step="0.05"
+                        value="<?php if(isset($buying_price)) {echo set_value('buying_price',$buying_price);} else {echo set_value('buying_price');} ?><?= set_value('buying_price'); ?>" />
+                </div>
+                <div class="form-group">
+                    <label for="buying_date"><?= lang('MY_application.field_buying_date'); ?></label>
+                    <input type="date" id="buying_date" name="buying_date" class="form-control"
+                        value="<?php if(isset($buying_date)) {echo set_value('buying_date',$buying_date);} else {echo set_value('buying_date', date(config('\Stock\Config\StockConfig')->database_date_format));} ?>" onblur="change_warranty()" />
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="warranty_duration"><?= lang('MY_application.field_warranty_duration'); ?></label>
+                    <input type="number" id="warranty_duration" name="warranty_duration" class="form-control" min="0" max="1000"
+                        value="<?php if(isset($warranty_duration)) {echo set_value('warranty_duration',$warranty_duration);} else {echo set_value('warranty_duration');} ?>" onblur="change_warranty()" />
+                </div>
+                <span class="label label-success" id="garantie">Sous garantie</span>
+            </div>
         </div>
-    </div>
-</form>
+    <?= form_close(); ?>
+</div>
 
 <!-- SCRIPT -->
 <script>
 $(document).ready(function() {
-    $("#noItemFoundMessage").toggle(false);
+    // Set bootstrap class for the multiselect dropdown list
+    let no_filter = "<?= esc(lang('MY_application.field_no_filter')); ?>";
+    $('#item_tags-multiselect').multiselect({
+        nonSelectedText: no_filter,
+        buttonWidth: '100%',
+        buttonClass: 'text-left form-control',
+        numberDisplayed: 10
+    });
+    $('#entities_list').multiselect({
+        nonSelectedText: no_filter,
+        buttonWidth: '100%',
+        buttonClass: 'form-control',
+        numberDisplayed: 5
+    });
+
+    // Reload the page entirely if entity has been changed
+    $('#e ul.multiselect-container input[type=radio]').change(() => {
+        let url = location.href;
+        let eItems = $("#e .multiselect-container .active input");
+        if (eItems.length > 0) {
+            url = url.replace(/\/\d+/, `/${eItems[0].value}`);
+            location.href = url;
+        }
+    });
+
     // Refresh the image to prevent display of an old cach image.
     // Changing the src attribute forces browser to update.
     d = new Date();
-    $("#picture").attr("src", "<?= base_url($config->images_upload_path.$imagePath); ?>?"+d.getTime());
-
-    if ($("#item_common_name").val() !== "") {
-        toggleItemCommon();
-        $("#itemCommonInfo").toggle(false);
-    }
-    
-    $("#itemCommonBrowse tr").click(function() {
-        $(this).addClass('highlight').siblings().removeClass('highlight');
-        var text = $(this).find('td:eq(1)').text();
-        $('#item_common_name').val(text).trigger('change');
-    });
-
-    $("#search_item_common").on("keyup", function() {
-        let value = $(this).val().toLowerCase();
-        let found = false; // Flag to check if any item is found
-        
-        $("#itemCommonList tr").filter(function() {
-            let rowText = $(this).text().toLowerCase();
-            let isVisible = rowText.indexOf(value) > -1;
-            $(this).toggle(isVisible);
-            
-            if (isVisible) {
-                found = true;
-            }
-        });
-        
-        // Toggle the message based on whether any item is found
-        $("#noItemFoundMessage").toggle(!found);
-    });
-
-    $('#item_common_name').on('change', (e) => {
-        toggleItemCommon();
-    });
+    $("#picture").attr("src", "<?= base_url($config->images_upload_path.$imagePath); ?>?"+d.getTime()); 
 });
 
-function get(objectName){
+function get(objectName) {
     switch (objectName) {
         case "item_groups":
-            return <?php $array = ""; foreach($item_groups as $item_group) $array .= "'".$item_group['short_name']."',"; echo "[$array]"; ?>;
+            return <?php $array = ""; foreach($item_groups_list as $item_group) $array .= "'".$item_group['short_name']."',"; echo "[$array]"; ?>;
 
         case "item_tags":
-            return <?php $array = ""; foreach($item_tags as $item_tag) $array .= "'".$item_tag['short_name']."',"; echo "[$array]"; ?>;
+            return <?php $array = ""; foreach($item_tags_list as $item_tag) $array .= "'".$item_tag['short_name']."',"; echo "[$array]"; ?>;
 
         case "INVENTORY_PREFIX":
             return "<?=$config->inventory_prefix; ?>" ;
@@ -419,7 +333,6 @@ function change_warranty() {
 }
 
 function createInventoryNo() {
-
     var objectGroupField = document.getElementById('item_group_id');
 
     var objectGroups = get("item_groups");
@@ -465,74 +378,6 @@ function getFirstTagShortName(){
     }
     return firstTagShortName;
 }
-
-function initStockingPlace(el){
-    const fk_entity_id=el.value;
-    document.querySelector('#stocking_place_id').querySelectorAll('option').forEach((element)=>{
-        if (element.value===""){
-            element.selected=true;
-        }
-        else if (element.dataset.fk_entity===fk_entity_id){
-            element.style.display='unset';
-            element.parentElement.value=element.value;
-            element.selected=true;
-        }
-        else {
-            element.style.display='none';
-        }
-    })
-}
-
-function initItemGroup(el){
-    const fk_entity_id=el.value;
-    document.querySelector('#item_group_id').querySelectorAll('option').forEach((element)=>{
-        if (element.value===""){
-            element.selected=true;
-        }
-        else if (element.dataset.fk_entity===fk_entity_id){
-            element.style.display='unset';
-            element.parentElement.value=element.value;
-        }
-        else {
-            element.style.display='none';
-        }
-        if (element.value==='<?=isset($item_group_id)?$item_group_id:'NONE'?>'){
-            element.selected=true;
-        }
-    });
-}
-
-function toggleItemCommon() {
-    let name = $('#name');
-    let description = $('#description');
-    let itemGroup = $('#item_group_id');
-    let image = $('#photoSubmit');
-    let linkedFile = $('#linked_file');
-    let tags = $('.tag-checkbox');
-    let itemCommonInfo = $('#itemCommonInfo');
-    let itemCommonValue = $("#item_common_name").val();
-
-    if (itemCommonValue === "") {
-        name.prop('disabled', false);
-        description.prop('disabled', false);
-        itemGroup.prop('disabled', false);
-        image.prop('disabled', false);
-        linkedFile.prop('disabled', false);
-        tags.prop('disabled', false);
-        itemCommonInfo.text('<?= lang("stock_lang.add_item_common_info") ?>');
-    } else {
-        name.prop('disabled', true);
-        description.prop('disabled', true);
-        itemGroup.prop('disabled', true);
-        image.prop('disabled', true);
-        linkedFile.prop('disabled', true);
-        tags.prop('disabled', true);
-        itemCommonInfo.text(`<?= lang("stock_lang.add_item_info") ?> ${itemCommonValue}`);
-    }
-}
-
-initStockingPlace(document.querySelector('#entity_selector'));
-initItemGroup(document.querySelector('#entity_selector'));
 
 change_warranty();
 

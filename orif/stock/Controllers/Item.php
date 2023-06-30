@@ -269,8 +269,8 @@ class Item extends BaseController {
             $_SESSION['logged_in'] == true &&
             isset($_SESSION['user_id']) &&
             $this->user_entity_model->check_user_entity($_SESSION['user_id'], $entity_id) &&
-            $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
-
+            $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) 
+        {
             // Get new item id and set picture_prefix
             $item_id = $this->item_model->getFutureId();
             $_SESSION['picture_prefix'] = str_pad($item_id, $this->config->inventory_number_chars, "0", STR_PAD_LEFT);
@@ -392,28 +392,28 @@ class Item extends BaseController {
                 }
 
                 // Load the comboboxes options
-                if (isset($_SESSION['user_access'])&&isset($_SESSION['user_id'])&&$_SESSION['user_access']<config('\User\Config\UserConfig')->access_lvl_admin){
-                    $userid = $_SESSION['user_id'];
-                    $entitiesAssociated = $this->user_entity_model->where('fk_user_id',$userid)->findColumn('fk_entity_id');
-                    $data['stocking_places'] = $this->stocking_place_model->whereIn('fk_entity_id',$entitiesAssociated)->findAll();
+                if (isset($_SESSION['user_access']) && isset($_SESSION['user_id']) && $_SESSION['user_access'] < config('\User\Config\UserConfig')->access_lvl_admin) {
+                    $entity_ids = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->findColumn('fk_entity_id');
+                    $data['entities'] = $this->dropdown($this->entity_model->find($entity_ids), 'entity_id');
+                } else {
+                    $data['entities'] = $this->dropdown($this->entity_model->findAll(), 'entity_id');
                 }
-                else{
-                    $data['stocking_places'] = $this->stocking_place_model->findAll();
-                }
+
+                $data['stocking_places'] = $this->dropdown($this->stocking_place_model->where('fk_entity_id', $entity_id)->findAll(), 'stocking_place_id');
 
                 $data['item_common_list'] = $this->item_common_model->findAll();
 
-                $data['entities']=$this->entity_model->whereIn('entity_id', $this->user_entity_model->where('fk_user_id',$_SESSION['user_id'])->findColumn('fk_entity_id'))->findAll();
                 $data['suppliers'] = $this->supplier_model->findAll();
-                $data['item_groups_name'] = $this->item_group_model->dropdown('name');
 
                 // Load item groups
-                $data['item_groups'] = $this->item_group_model->findAll();
+                $data['item_groups_list'] = $this->item_group_model->where('fk_entity_id', $entity_id)->findAll();
+                $data['item_groups'] = $this->dropdown($data['item_groups_list'], 'item_group_id');
 
                 $data['condishes'] = $this->item_condition_model->findAll();
 
                 // Load the tags
-                $data['item_tags'] = $this->item_tag_model->findAll();
+                $data['item_tags_list'] = $this->item_tag_model->findAll();
+                $data['item_tags'] = $this->dropdown($data['item_tags_list'], 'item_tag_id');
 
                 // Load entity id
                 $data['selected_entity_id'] = $entity_id;

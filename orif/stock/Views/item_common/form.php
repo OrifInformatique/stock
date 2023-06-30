@@ -26,7 +26,7 @@
                     </div>
                     <div class="col-8">
                         <?= form_input('item_common_name', isset($item_common_name) ? $item_common_name : $item_common['name'], [
-                                'placeholder' => lang('stock_lang.field_name'),
+                                'placeholder' => lang('stock_lang.field_item_common_name'),
                                 'class' => 'form-control', 
                                 'id' => 'item_common_name'
                             ]); 
@@ -42,7 +42,7 @@
                     </div>
                     <div class="col-8">
                         <?= form_input('item_common_description', isset($item_common_description) ? $item_common_description : $item_common['description'], [
-                                'placeholder' => lang('stock_lang.field_item_common_name'),
+                                'placeholder' => lang('stock_lang.field_item_common_description'),
                                 'class' => 'form-control', 
                                 'id' => 'item_common_description'
                             ]); 
@@ -115,7 +115,7 @@
                         alt="<?= lang('MY_application.field_image'); ?>"/>
                 </div>
                 <div class="form-group">
-                    <input type="hidden" id="image" name="image" value="<?php if(isset($imagePath)){ echo $imagePath; }?>"/>
+                    <input type="hidden" id="image" name="image" value="<? isset($imagePath) ? $imagePath : ''; ?>"/>
                 </div>
             </div>
         </div>

@@ -63,6 +63,7 @@ return[
 'field_user_default_entity'             => 'Site principal',
 'field_search_item_common'              => 'Rechercher un objet commun',
 'field_item_common_name'                => 'Nom de l\'objet commun',
+'field_item_common_description'         => 'Description de l\'objet commun',
 
 // Admin other labels   
 'admin_modify'                          => 'Modification',
