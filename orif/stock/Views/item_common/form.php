@@ -115,7 +115,7 @@
                         alt="<?= lang('MY_application.field_image'); ?>"/>
                 </div>
                 <div class="form-group">
-                    <input type="hidden" id="image" name="image" value="<? isset($imagePath) ? $imagePath : ''; ?>"/>
+                    <input type="hidden" id="image" name="image" value="<?= isset($imagePath) ? $imagePath : ''; ?>"/>
                 </div>
             </div>
         </div>

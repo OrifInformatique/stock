@@ -171,9 +171,9 @@ $(document).ready(function() {
     // Reload the page entirely if entity has been changed
     $('#e ul.multiselect-container input[type=radio]').change(() => {
         // Load page 1 with new filters
-        load_items(1, getFilters()).finally(() => {
-            location.reload();
-        });
+        filters = getFilters();
+        history.pushState(null, "", "<?= base_url("item/index")?>"+ "/" +page+filters);
+        location.reload();
     });
 
     // Reload items list on filter update

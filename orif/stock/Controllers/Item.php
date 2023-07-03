@@ -263,7 +263,7 @@ class Item extends BaseController {
      *
      * @return void
      */
-    public function create($entity_id) {
+    public function create($entity_id, $item_common_id = null) {
         // Check if this is allowed
         if (isset($_SESSION['logged_in']) &&
             $_SESSION['logged_in'] == true &&
@@ -271,6 +271,17 @@ class Item extends BaseController {
             $this->user_entity_model->check_user_entity($_SESSION['user_id'], $entity_id) &&
             $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) 
         {
+            if (!is_null($item_common_id)) {
+                $item_common = $this->item_common_model->find($item_common_id);
+
+                if (is_null($item_common)) {
+                    // Item common does not exist
+                    return redirect()->to(base_url());
+                } else {
+                    $data['item_common'] = $item_common;
+                }
+            }
+
             // Get new item id and set picture_prefix
             $item_id = $this->item_model->getFutureId();
             $_SESSION['picture_prefix'] = str_pad($item_id, $this->config->inventory_number_chars, "0", STR_PAD_LEFT);
@@ -280,11 +291,11 @@ class Item extends BaseController {
             $new_image_name = $_SESSION["picture_prefix"].$this->config->image_picture_suffix.$this->config->image_extension;
 
             // Check if the user cancelled the form
-            if(isset($_POST['submitCancel'])){
+            if (isset($_POST['submitCancel'])) {
                 $tmp_image_file = isset(glob($this->config->images_upload_path.$temp_image_name)[0])?glob($this->config->images_upload_path.$temp_image_name)[0]:null;
 
                 // Check if there is a temporary file, if yes then delete it
-                if($tmp_image_file != null || $tmp_image_file != false){
+                if ($tmp_image_file != null || $tmp_image_file != false) {
                     unlink($tmp_image_file);
                 }
 
@@ -296,15 +307,6 @@ class Item extends BaseController {
             $data['upload_errors'] = "";
 
             $upload_failed = false;
-
-            // If the user want to display the image form, we first save fields
-            // values in the session, then redirect him to the image form
-            if(isset($_POST['photoSubmit'])){
-                $_SESSION['POST'] = $_POST;
-                $_SESSION['item_id'] = $item_id;
-
-                return redirect()->to(base_url("picture/select_picture"));
-            }
 
             if (isset($_FILES['linked_file']) && $_FILES['linked_file']['name'] != '') {
 
@@ -332,66 +334,54 @@ class Item extends BaseController {
                 }
             }
 
-            if (!empty($_POST) && $validation->run($_POST) == TRUE && $upload_failed != TRUE) {
-                // No error, save item
-
+            if (!is_null($this->request->getVar('btn_submit')) && $upload_failed != TRUE) {
                 $linkArray = array();
 
                 foreach ($_POST as $key => $value) {
-                    if (substr($key, 0, 3) == "tag") {
+                    if (substr($key, -4, null) == "tags") {
                         // Stock links to be created when the item will exist
                         $linkArray[] = $value;
                     } else {
-                        $itemArray[$key] = $value;
+                        if (substr($key, 0, 11) == 'item_common' && is_null($item_common_id)) {
+                            $itemCommonArray[substr($key, 12, null)] = $value;
+                        } else {
+                            $itemArray[$key] = $value;
+                        }
                     }
                 }
-                // Turn Temporaty Image into a final one if there is one
-                if(file_exists($this->config->images_upload_path.$temp_image_name)){
-                    rename($this->config->images_upload_path.$temp_image_name, $this->config->images_upload_path.$new_image_name);
-                    $itemArray['image'] = $new_image_name;
+
+                if (is_null($item_common_id)) {
+                    // Turn Temporaty Image into a final one if there is one
+                    if (file_exists($this->config->images_upload_path.$temp_image_name)) {
+                        rename($this->config->images_upload_path.$temp_image_name, $this->config->images_upload_path.$new_image_name);
+                        $itemCommonArray['image'] = $new_image_name;
+                    }
+
+                    $item_common_id = $this->item_common_model->insert($itemCommonArray);
+
+                    if (count($this->item_common_model->errors()) == 0) {
+                        foreach ($linkArray as $tag) {
+                            $this->item_tag_link_model->insert(array("item_tag_id" => $tag, "item_common_id" => $item_common_id));
+                        }
+                    } else {
+                        $data['errors'] = $this->item_common_model->errors();
+                    }
                 }
 
+                $itemArray['item_common_id'] = $item_common_id;
                 $itemArray["created_by_user_id"] = $_SESSION['user_id'];
-
-                if (!empty($itemArray['item_common_name'])) {
-                    $itemCommon = $this->item_common_model->where('name', $_POST['item_common_name'])->first();
-                    $itemArray['item_common_id'] = $itemCommon['item_common_id'];
-                    unset($itemArray['item_common_name'], $itemArray['fk_entity_id']);
-                } else {
-                    $itemCommonId = $this->item_common_model->insert($itemArray);
-                    $itemArray['item_common_id'] = $itemCommonId;
-                }
 
                 $item_id = $this->item_model->insert($itemArray);
 
-                foreach ($linkArray as $tag) {
-                    $this->item_tag_link_model->insert(array("item_tag_id" => $tag, "item_common_id" => ($itemArray['item_common_id'])));
-                }
+                return redirect()->to(base_url("/item_common/view/" . $item_common_id));
+            } else if (!is_null($this->request->getVar('btn_submit_photo'))) {
+                // If the user want to display the image form, we first save fields
+                // values in the session, then redirect him to the image form
+                $_SESSION['POST'] = $_POST;
 
-                return redirect()->to(base_url("/item/view/" . $item_id));
+                return redirect()->to(base_url("picture/select_picture"));
             } else {
-                // Remember checked tags to display them checked again
-                $tags = $_POST;
-                if(isset($_SESSION['POST'])){
-                    // If the user gets back from another view, get the fields values
-                    // which have been saved in session variable.
-                    // Then reset this session variable.
-                    $tags = $_SESSION['POST'];
-                    unset($_SESSION['POST']);
-                }
-                foreach ($tags as $key => $value) {
-                    // If it is a tag
-                    if (substr($key, 0, 3) == "tag") {
-                        // put it in the data array
-                        $tag_link = [];
-                        $tag_link['item_tag_id'] = substr($key, 3);
-                        $data['tag_links'][] = $tag_link;
-                    } else {
-                        $data[$key] = $value;
-                    }
-                }
-
-                // Load the comboboxes options
+                // Load entities
                 if (isset($_SESSION['user_access']) && isset($_SESSION['user_id']) && $_SESSION['user_access'] < config('\User\Config\UserConfig')->access_lvl_admin) {
                     $entity_ids = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->findColumn('fk_entity_id');
                     $data['entities_list'] = $this->entity_model->find($entity_ids);
@@ -402,8 +392,6 @@ class Item extends BaseController {
                 $data['entities'] = $this->dropdown($data['entities_list'], 'entity_id');
 
                 $data['stocking_places'] = $this->dropdown($this->stocking_place_model->where('fk_entity_id', $entity_id)->findAll(), 'stocking_place_id');
-
-                $data['item_common_list'] = $this->item_common_model->findAll();
 
                 $data['suppliers'] = $this->supplier_model->findAll();
 
@@ -422,6 +410,14 @@ class Item extends BaseController {
 
                 $data['item_id'] = $this->item_model->getFutureId();
                 $data['errors'] = $validation->getErrors();
+
+                // Remember fields in case 
+                if (isset($_SESSION['POST'])) {
+                    foreach ($_SESSION['POST'] as $key => $value) {
+                        $data[$key] = $value;
+                    }
+                    unset($_SESSION['POST']);
+                }
 
                 $this->display_view('Stock\Views\item\form', $data);
             }

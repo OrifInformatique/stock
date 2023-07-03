@@ -109,6 +109,7 @@ class ItemCommon extends BaseController {
             $item_common['tags'] = $this->item_common_model->getTags($item_common);
             $item_common['image'] = $this->item_common_model->getImagePath($item_common);
             $item_common['item_group'] = $this->item_common_model->getItemGroup($item_common);
+            $output['entity_id'] = $item_common['item_group']['fk_entity_id'];
             
             $output['item_common'] = $item_common;
 
@@ -170,17 +171,17 @@ class ItemCommon extends BaseController {
             $new_image_name = $_SESSION["picture_prefix"].$this->config->image_picture_suffix.$this->config->image_extension;
 
             // Check if the user cancelled the form
-            if(isset($_POST['submitCancel'])) {
+            if (isset($_POST['submitCancel'])) {
                 $files = glob($this->config->images_upload_path.$temp_image_name);
                 if (count($files)) $tmp_image_file = glob($this->config->images_upload_path.$temp_image_name)[0];
                 else $tmp_image_file = false;
 
                 // Check if there is a temporary image file, if yes then delete it
-                if($tmp_image_file != null || $tmp_image_file != false){
+                if ($tmp_image_file != null || $tmp_image_file != false) {
                     unlink($tmp_image_file);
                 }
 
-                return redirect()->to(base_url("item_common/view/".$id)); //false id
+                return redirect()->to(base_url("item_common/view/".$id));
             }
 
             if (isset($_FILES['linked_file']) && $_FILES['linked_file']['name'] != '') {

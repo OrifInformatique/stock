@@ -3,7 +3,7 @@ $config = config('\Stock\Config\StockConfig');
 ?>
 
 <div class="container">
-    <?= form_open(base_url(""), [
+    <?= form_open("", [
             'enctype' => 'multipart/form-data'
         ]); 
     ?>
@@ -22,7 +22,7 @@ $config = config('\Stock\Config\StockConfig');
         <div class="row">
             <div class="col-12 mb-3">
                 <input type="submit" class="btn btn-success" id="btn_submit" name="btn_submit" value="<?= lang('MY_application.btn_save'); ?>" />
-                <a href="<?= base_url(""); ?>" class="btn btn-danger"><?= lang('MY_application.btn_cancel'); ?></a>
+                <a href="<?= base_url(); ?>" class="btn btn-danger"><?= lang('MY_application.btn_cancel'); ?></a>
             </div>
         </div>
 
@@ -67,9 +67,9 @@ $config = config('\Stock\Config\StockConfig');
 
                 <!-- Item Group -->
                 <div class="mb-3">
-                    <?= form_label(lang('MY_application.field_group'), 'item_common_group').form_dropdown('item_common_group', $item_groups, isset($item_common_group) ? $item_common_group : (isset($item_common['item_group_id']) ? $item_common['item_group_id'] : ''), [
+                    <?= form_label(lang('MY_application.field_group'), 'item_common_group_id').form_dropdown('item_common_item_group_id', $item_groups, isset($item_common_item_group) ? $item_common_item_group : (isset($item_common['item_group_id']) ? $item_common['item_group_id'] : ''), [
                             'class' => 'form-control',
-                            'id' => 'item_common_group'
+                            'id' => 'item_common_group_id'
                         ]);
                     ?>
                     <span class="text-danger"><?= isset($errors['item_group_id']) ? $errors['item_group_id']: ''; ?></span>
@@ -82,7 +82,7 @@ $config = config('\Stock\Config\StockConfig');
 
                 <!-- Linked File -->
                 <div class="mb-3">
-                    <?= form_label(lang('stock_lang.field_linked_file'), 'item_common_linked_file').form_input('linked_file', '', [
+                    <?= form_label(lang('stock_lang.field_linked_file'), 'item_common_linked_file').form_input('item_common_linked_file', '', [
                         'class' => 'form-control-file',
                         'accept' => '.pdf, .doc, .docx',
                         'id' => 'item_common_linked_file'
@@ -110,7 +110,7 @@ $config = config('\Stock\Config\StockConfig');
                     width="100%"
                     alt="<?= lang('MY_application.field_image'); ?>"/>
                 <div class="form-group">
-                    <input type="hidden" id="image" name="image" value="<? isset($imagePath) ? $imagePath : ''; ?>"/>
+                    <input type="hidden" id="imageitem_common_" name="item_common_image" value="<?= isset($imagePath) ? $imagePath : ''; ?>"/>
                 </div>
             </div>
         </div>
@@ -187,7 +187,7 @@ $config = config('\Stock\Config\StockConfig');
             </div>
             <div class="form-group col-md-6">
                 <label for="stocking_place_id"><?= lang('MY_application.field_stocking_place'); ?></label>
-                <?= form_dropdown('', $stocking_places, [], [
+                <?= form_dropdown('stocking_place_id', $stocking_places, isset($stocking_place_id) ? $stocking_place_id : [], [
                     'class' => 'form-control'
                 ]); ?>
             </div>
@@ -246,137 +246,145 @@ $config = config('\Stock\Config\StockConfig');
 
 <!-- SCRIPT -->
 <script>
-$(document).ready(function() {
-    // Set bootstrap class for the multiselect dropdown list
-    let no_filter = "<?= esc(lang('MY_application.field_no_filter')); ?>";
-    $('#item_tags-multiselect').multiselect({
-        nonSelectedText: no_filter,
-        buttonWidth: '100%',
-        buttonClass: 'text-left form-control',
-        numberDisplayed: 10
-    });
-    $('#entities_list').multiselect({
-        nonSelectedText: no_filter,
-        buttonWidth: '100%',
-        buttonClass: 'form-control',
-        numberDisplayed: 5
+    $(document).ready(function() {
+        // Set bootstrap class for the multiselect dropdown list
+        let no_filter = "<?= esc(lang('MY_application.field_no_filter')); ?>";
+        $('#item_tags-multiselect').multiselect({
+            nonSelectedText: no_filter,
+            buttonWidth: '100%',
+            buttonClass: 'text-left form-control',
+            numberDisplayed: 10
+        });
+        $('#entities_list').multiselect({
+            nonSelectedText: no_filter,
+            buttonWidth: '100%',
+            buttonClass: 'form-control',
+            numberDisplayed: 5
+        });
+
+        <?php if (isset($item_common)): ?>
+            $('.multiselect').prop('disabled', true);
+            $('#btn_submit_photo').prop('disabled', true);
+            $('#item_common_name').prop('disabled', true);
+            $('#item_common_description').prop('disabled', true);
+            $('#item_common_group_id').prop('disabled', true);
+            $('#item_common_linked_file').prop('disabled', true);
+        <?php endif; ?>
+
+        // Reload the page entirely if entity has been changed
+        $('#e ul.multiselect-container input[type=radio]').change(() => {
+            let url = location.href;
+            let eItems = $("#e .multiselect-container .active input");
+            if (eItems.length > 0) {
+                url = url.replace(/\/\d+/, `/${eItems[0].value}`);
+                location.href = url;
+            }
+        });
+
+        // Refresh the image to prevent display of an old cach image.
+        // Changing the src attribute forces browser to update.
+        d = new Date();
+        $("#picture").attr("src", "<?= base_url($config->images_upload_path.$imagePath); ?>?"+d.getTime()); 
     });
 
-    // Reload the page entirely if entity has been changed
-    $('#e ul.multiselect-container input[type=radio]').change(() => {
-        let url = location.href;
+    function get(objectName) {
+        switch (objectName) {
+            case "item_groups":
+                return <?php $array = ""; foreach($item_groups_list as $item_group) $array .= "'".$item_group['short_name']."',"; echo "[$array]"; ?>;
+
+            case "item_tags":
+                return <?php $array = ""; foreach($item_tags_list as $item_tag) $array .= "'".$item_tag['short_name']."',"; echo "[$array]"; ?>;
+
+            case "INVENTORY_PREFIX":
+                return "<?=$config->inventory_prefix; ?>" ;
+
+            case "INVENTORY_NUMBER_CHARS":
+                return "<?=$config->inventory_number_chars; ?>" ;
+
+            case "item_id":
+                return "<?= $item_id; ?>" ;
+
+        }
+    }
+
+    function change_warranty() {
+        var buying_date = new Date(document.getElementById('buying_date').value);
+        var duration = +document.getElementById('warranty_duration').value;
+        var span_garantie = document.getElementById('garantie');
+
+        //Get remaining months (ceil)
+        var current_date = new Date();
+
+        var remaining_months = (buying_date.getFullYear() * 12 + buying_date.getMonth()) + duration - (current_date.getFullYear() * 12 + current_date.getMonth());
+
+        if (buying_date.getDate() >= current_date.getDate()) remaining_months++;
+
+        if (remaining_months > 3) {
+            // Under warranty
+            span_garantie.innerHTML = "<?= lang('MY_application.text_warranty_status')[1]; ?>";
+            span_garantie.class = "label label-success";
+        } else if (remaining_months > 0) {
+            // Warranty expires soon
+            span_garantie.innerHTML = "<?= lang('MY_application.text_warranty_status')[2]; ?>";
+            span_garantie.class = "label label-warning";
+        } else {
+            // Warranty expired
+            span_garantie.innerHTML = "<?= lang('MY_application.text_warranty_status')[3]; ?>";
+            span_garantie.class = "label label-danger";
+        }
+    }
+
+    function createInventoryNo() {
+        let entities = JSON.parse('<?= json_encode($entities_list); ?>');
         let eItems = $("#e .multiselect-container .active input");
-        if (eItems.length > 0) {
-            url = url.replace(/\/\d+/, `/${eItems[0].value}`);
-            location.href = url;
+        var objectGroupField = $('#item_common_group_id').val();
+
+        var objectGroups = get("item_groups");
+
+        var tagShortName = getFirstTagShortName();
+        var buyingDateField = document.getElementById('buying_date');
+        var date = new Date(buyingDateField.value).getFullYear();
+        var inventoryNumberField = document.getElementById('inventory_prefix');
+        var inventoryNumber = "";
+        var inventoryIdField = document.getElementById('inventory_id');
+        var entityTag = '';
+        $(entities).each((entity) => {
+            if (entities[entity].entity_id == eItems[0].value) entityTag = entities[entity].shortname;
+        });
+        date = date.toString().slice(2,4);
+        if(date == "N"){
+            date = "00";
         }
-    });
+        inventoryNumber = entityTag + "." + objectGroups[objectGroupField-1] + tagShortName + date;
+        inventoryNumberField.value = inventoryNumber;
 
-    // Refresh the image to prevent display of an old cach image.
-    // Changing the src attribute forces browser to update.
-    d = new Date();
-    $("#picture").attr("src", "<?= base_url($config->images_upload_path.$imagePath); ?>?"+d.getTime()); 
-});
+        // If inventory_id field is empty, complete it
+        if (inventoryIdField.value == "") {
+            id = get("item_id");
+            inventoryNumberChars = get("INVENTORY_NUMBER_CHARS");
+            for(var i = id.length;i < inventoryNumberChars; i++){
+                id = "0" + id;
+            }
+            id = "." + id;
 
-function get(objectName) {
-    switch (objectName) {
-        case "item_groups":
-            return <?php $array = ""; foreach($item_groups_list as $item_group) $array .= "'".$item_group['short_name']."',"; echo "[$array]"; ?>;
-
-        case "item_tags":
-            return <?php $array = ""; foreach($item_tags_list as $item_tag) $array .= "'".$item_tag['short_name']."',"; echo "[$array]"; ?>;
-
-        case "INVENTORY_PREFIX":
-            return "<?=$config->inventory_prefix; ?>" ;
-
-        case "INVENTORY_NUMBER_CHARS":
-            return "<?=$config->inventory_number_chars; ?>" ;
-
-        case "item_id":
-            return "<?= $item_id; ?>" ;
-
-    }
-}
-
-function change_warranty() {
-	var buying_date = new Date(document.getElementById('buying_date').value);
-	var duration = +document.getElementById('warranty_duration').value;
-	var span_garantie = document.getElementById('garantie');
-
-	//Get remaining months (ceil)
-	var current_date = new Date();
-
-	var remaining_months = (buying_date.getFullYear() * 12 + buying_date.getMonth()) + duration - (current_date.getFullYear() * 12 + current_date.getMonth());
-
-	if (buying_date.getDate() >= current_date.getDate()) remaining_months++;
-
-	if (remaining_months > 3) {
-		// Under warranty
-		span_garantie.innerHTML = "<?= lang('MY_application.text_warranty_status')[1]; ?>";
-		span_garantie.class = "label label-success";
-	} else if (remaining_months > 0) {
-		// Warranty expires soon
-		span_garantie.innerHTML = "<?= lang('MY_application.text_warranty_status')[2]; ?>";
-		span_garantie.class = "label label-warning";
-	} else {
-		// Warranty expired
-		span_garantie.innerHTML = "<?= lang('MY_application.text_warranty_status')[3]; ?>";
-		span_garantie.class = "label label-danger";
-	}
-}
-
-function createInventoryNo() {
-    let entities = JSON.parse('<?= json_encode($entities_list); ?>');
-    let eItems = $("#e .multiselect-container .active input");
-    var objectGroupField = $('#item_common_group').val();
-
-    var objectGroups = get("item_groups");
-
-    var tagShortName = getFirstTagShortName();
-    var buyingDateField = document.getElementById('buying_date');
-    var date = new Date(buyingDateField.value).getFullYear();
-    var inventoryNumberField = document.getElementById('inventory_prefix');
-    var inventoryNumber = "";
-    var inventoryIdField = document.getElementById('inventory_id');
-    var entityTag = '';
-    $(entities).each((entity) => {
-        if (entities[entity].entity_id == eItems[0].value) entityTag = entities[entity].shortname;
-    });
-    date = date.toString().slice(2,4);
-    if(date == "N"){
-        date = "00";
-    }
-    inventoryNumber = entityTag + "." + objectGroups[objectGroupField-1] + tagShortName + date;
-    inventoryNumberField.value = inventoryNumber;
-
-    // If inventory_id field is empty, complete it
-    if (inventoryIdField.value == "") {
-        id = get("item_id");
-        inventoryNumberChars = get("INVENTORY_NUMBER_CHARS");
-        for(var i = id.length;i < inventoryNumberChars; i++){
-            id = "0" + id;
-        }
-        id = "." + id;
-
-        inventoryIdField.value = id;
-    }
-}
-
-function getFirstTagShortName(){
-    var tags = document.getElementsByClassName('tag-checkbox');
-    var firstTagShortName = "";
-
-    // Get an array with every tags shortnames
-    var tagsShortNames = get("item_tags");
-    for(var i = 0;i < tags.length;i++){
-        if(tags[i].checked === true){
-            firstTagShortName = tagsShortNames[i];
-            break;
+            inventoryIdField.value = id;
         }
     }
-    return firstTagShortName;
-}
 
-change_warranty();
+    function getFirstTagShortName(){
+        var tags = document.getElementsByClassName('tag-checkbox');
+        var firstTagShortName = "";
 
+        // Get an array with every tags shortnames
+        var tagsShortNames = get("item_tags");
+        for(var i = 0;i < tags.length;i++){
+            if(tags[i].checked === true){
+                firstTagShortName = tagsShortNames[i];
+                break;
+            }
+        }
+        return firstTagShortName;
+    }
+
+    change_warranty();
 </script>
