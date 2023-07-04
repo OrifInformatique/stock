@@ -163,6 +163,12 @@ class Item extends BaseController {
         
         $filters['e'] = $this->getEFilter($filters);
 
+        $item_groups = $this->dropdown($this->item_group_model->where('fk_entity_id', $filters['e'] != 0 ? $filters['e'] : null)->findAll(), 'item_group_id');
+        $stocking_places = $this->dropdown($this->stocking_place_model->where('fk_entity_id', $filters['e'] != 0 ? $filters['e'] : null)->findAll(), 'stocking_place_id');
+
+        $output['div_item_groups'] = form_label(lang('MY_application.field_group'),'item_groups-multiselect').form_dropdown('g[]', $item_groups, [], 'id="item_groups-multiselect" multiple="multiple"');
+        $output['div_stocking_places'] = form_label(lang('MY_application.field_stocking_place'),'stocking_places-multiselect').form_dropdown('s[]', $stocking_places, [], 'id="stocking_places-multiselect" multiple="multiple"');
+
         // Sanitize $page parameter
         if (empty($page) || !is_numeric($page) || $page<1) {
             $page = 1;

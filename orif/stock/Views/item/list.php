@@ -145,19 +145,7 @@ $(document).ready(function() {
     // ******************************************
     // Initialize the Bootstrap Multiselect plugin
     // ******************************************
-    var no_filter = "<?= htmlspecialchars(lang('MY_application.field_no_filter')); ?>";
-    $('#item_tags-multiselect').multiselect({
-        nonSelectedText: no_filter,
-        buttonWidth: '100%',
-        buttonClass: 'btn btn-outline-primary',
-        numberDisplayed: 10
-    });
-    $('#item_conditions-multiselect, #item_groups-multiselect, #stocking_places-multiselect, #sort_order, #sort_asc_desc, #entities_list').multiselect({
-        nonSelectedText: no_filter,
-        buttonWidth: '100%',
-        buttonClass: 'btn btn-outline-primary',
-        numberDisplayed: 5
-    });
+    initializeMultiSelect();
 
 
     // ******************************************
@@ -168,16 +156,8 @@ $(document).ready(function() {
     filters = location.search;
     load_items(page, filters);
 
-    // Reload the page entirely if entity has been changed
-    $('#e ul.multiselect-container input[type=radio]').change(() => {
-        // Load page 1 with new filters
-        filters = getFilters();
-        history.pushState(null, "", "<?= base_url("item/index")?>"+ "/" +page+filters);
-        location.reload();
-    });
-
     // Reload items list on filter update
-    $("input[type=checkbox], input[type=radio]").change(function() {
+    $("input[type=checkbox], input[type=radio]").on('change', function() {
         // Load page 1 with new filters
         load_items(1, getFilters());
     });
@@ -250,6 +230,11 @@ async function load_items(page, filters) {
                     $("#btn_add").toggle(false);
                 }
             }
+
+            $('#g').html(result.div_item_groups);
+            $('#s').html(result.div_stocking_places);
+
+            initializeMultiSelect();
 
             $("#pagination_top, #pagination_bottom").html(result.pagination);
 
@@ -357,5 +342,21 @@ function display_item(item){
     );
     card.append(card_div);
     return card;
+}
+
+function initializeMultiSelect() {
+    var no_filter = "<?= htmlspecialchars(lang('MY_application.field_no_filter')); ?>";
+    $('#item_tags-multiselect').multiselect({
+        nonSelectedText: no_filter,
+        buttonWidth: '100%',
+        buttonClass: 'btn btn-outline-primary',
+        numberDisplayed: 10
+    });
+    $('#item_conditions-multiselect, #item_groups-multiselect, #stocking_places-multiselect, #sort_order, #sort_asc_desc, #entities_list').multiselect({
+        nonSelectedText: no_filter,
+        buttonWidth: '100%',
+        buttonClass: 'btn btn-outline-primary',
+        numberDisplayed: 5
+    });
 }
 </script>
