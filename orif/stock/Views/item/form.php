@@ -131,6 +131,7 @@ $config = config('\Stock\Config\StockConfig');
                             id="inventory_prefix"
                             placeholder="<?= lang('MY_application.field_inventory_number') ?>"
                             value="<?= isset($item) ? $item['inventory_prefix'] : set_value('inventory_prefix') ?>" />
+                        <span class="text-danger"><?= isset($errors['inventory_prefix']) ? $errors['inventory_prefix']: ''; ?></span>
                     </div>
                     <div class="form-group col-12">
                         <input type="text" class="form-control" name="inventory_id"
@@ -149,18 +150,17 @@ $config = config('\Stock\Config\StockConfig');
             <div class="col-md-8">
                 <div class="row">
                     <div class="form-group col-md-12">
-                        <label for="serial_number"><?= lang('MY_application.field_serial_number'); ?>&nbsp;</label>
-                        <input type="text" id="serial_number" name="serial_number" class="form-control"
-                                value="<?php if(isset($serial_number)) {echo set_value('serial_number',$serial_number);} else {echo set_value('serial_number');} ?>" />
+                        <?= form_label(lang('MY_application.field_serial_number'), 'serial_number').form_input('serial_number', isset($serial_number) ? $serial_number : (isset($item['serial_number']) ? $item['serial_number'] : ''), [
+                            'class' => 'form-control'
+                        ]) ?>
                     </div>
                 </div>
                 <div class="row">
                     <div class="form-group col-md-12">
-                        <label for="remarks"><?= lang('MY_application.field_remarks'); ?></label>
-                        <textarea id="remarks" name="remarks" class="form-control"><?php
-                            // Don't move the <php> markups or they will be white spaces in textarea
-                            if(isset($remarks)) {echo set_value('remarks',$remarks);} else {echo set_value('remarks');}
-                        ?></textarea>
+                        <?= form_label(lang('MY_application.field_remarks'), 'remarks').form_textarea('remarks', isset($supplier_ref) ? $supplier_ref : (isset($item['remarks']) ? $item['remarks'] : ''), [
+                            'class' => 'form-control',
+                            'rows' => '2'
+                        ]) ?>
                     </div>
                 </div>
             </div>
@@ -174,22 +174,17 @@ $config = config('\Stock\Config\StockConfig');
         </div>
         <div class="row">
             <div class="form-group col-md-6">
-                <label for="item_condition_id"><?= lang('MY_application.text_item_condition'); ?></label>
-                <select id="item_condition_id" name="item_condition_id" class="form-control"><?php
-                    foreach ($condishes as $item_condition) {
-                        ?><option value="<?= $item_condition['item_condition_id']; ?>" <?php
-                            if (isset($item_condition_id) && $item_condition_id == $item_condition['item_condition_id']) {
-                                echo "selected";
-                            }
-                        ?> ><?= $item_condition['name']; ?></option><?php
-                    } ?>
-                </select>
+                <?= form_label(lang('MY_application.text_item_condition'), 'item_condition_id').form_dropdown('item_condition_id', $conditions, isset($item_condition_id) ? $item_condition_id : (isset($item['item_condition_id']) ? $item['item_condition_id'] : []), [
+                        'class' => 'form-control'
+                    ]);
+                ?>
             </div>
             <div class="form-group col-md-6">
-                <label for="stocking_place_id"><?= lang('MY_application.field_stocking_place'); ?></label>
-                <?= form_dropdown('stocking_place_id', $stocking_places, isset($stocking_place_id) ? $stocking_place_id : [], [
-                    'class' => 'form-control'
-                ]); ?>
+                <?= form_label(lang('MY_application.field_stocking_place'), 'stocking_place_id').form_dropdown('stocking_place_id', $stocking_places, isset($stocking_place_id) ? $stocking_place_id : (isset($item['stocking_place_id']) ? $item['stocking_place_id'] : []), [
+                        'class' => 'form-control'
+                    ]);
+                ?>
+                <span class="text-danger"><?= isset($errors['stocking_place_id']) ? $errors['stocking_place_id']: ''; ?></span>
             </div>
 
         </div>
@@ -203,40 +198,36 @@ $config = config('\Stock\Config\StockConfig');
         <div class="row">
             <div class ="col-md-4">
                 <div class="form-group">
-                    <label for="supplier_id"><?= lang('MY_application.field_supplier'); ?></label>
-                    <select id="supplier_id" name="supplier_id" class="form-control"><?php
-                        foreach ($suppliers as $supplier) {
-                        ?><option value="<?= $supplier['supplier_id']; ?>" <?php
-                            if (isset($supplier_id) && $supplier_id == $supplier['supplier_id']) {
-                                echo "selected";
-                            }
-                        ?> ><?= $supplier['name']; ?></option><?php
-                        } ?>
-                    </select>
+                    <?= form_label(lang('MY_application.field_supplier'), 'supplier_id').form_dropdown('supplier_id', $suppliers, isset($supplier_id) ? $supplier_id : (isset($item['supplier_id']) ? $item['supplier_id'] : []), [
+                        'class' => 'form-control'
+                    ]); ?>
                 </div>
                 <div class="form-group">
-                    <label for="supplier_ref"><?= lang('MY_application.field_supplier_ref'); ?></label>
-                    <input type="text" id="supplier_ref" name="supplier_ref" class="form-control"
-                        value="<?php if(isset($supplier_ref)) {echo set_value('supplier_ref',$supplier_ref);} else {echo set_value('supplier_ref');} ?>" />
+                    <?= form_label(lang('MY_application.field_supplier_ref'), 'supplier_ref').form_input('supplier_ref', isset($supplier_ref) ? $supplier_ref : (isset($item['supplier_ref']) ? $item['supplier_ref'] : ''), [
+                        'class' => 'form-control'
+                    ]) ?>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-group">
-                    <label for="buying_price"><?= lang('MY_application.field_buying_price'); ?></label>
-                    <input type="number" id="buying_price" name="buying_price" class="form-control" min="0" step="0.05"
-                        value="<?php if(isset($buying_price)) {echo set_value('buying_price',$buying_price);} else {echo set_value('buying_price');} ?><?= set_value('buying_price'); ?>" />
+                    <?= form_label(lang('MY_application.field_buying_price'), 'buying_price').form_input('buying_price', isset($buying_price) ? $buying_price : (isset($item['buying_price']) ? $item['buying_price'] : ''), [
+                        'class' => 'form-control'
+                    ], 'number') ?>
                 </div>
                 <div class="form-group">
-                    <label for="buying_date"><?= lang('MY_application.field_buying_date'); ?></label>
-                    <input type="date" id="buying_date" name="buying_date" class="form-control"
-                        value="<?php if(isset($buying_date)) {echo set_value('buying_date',$buying_date);} else {echo set_value('buying_date', date(config('\Stock\Config\StockConfig')->database_date_format));} ?>" onblur="change_warranty()" />
+                    <?= form_label(lang('MY_application.field_buying_date'), 'buying_date').form_input('buying_date', isset($buying_date) ? $buying_date : (isset($item['buying_date']) ? $item['buying_date'] : ''), [
+                        'class' => 'form-control',
+                        'id' => 'buying_date',
+                        'onblur' => 'change_warranty()'
+                    ], 'date') ?>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-group">
-                    <label for="warranty_duration"><?= lang('MY_application.field_warranty_duration'); ?></label>
-                    <input type="number" id="warranty_duration" name="warranty_duration" class="form-control" min="0" max="1000"
-                        value="<?php if(isset($warranty_duration)) {echo set_value('warranty_duration',$warranty_duration);} else {echo set_value('warranty_duration');} ?>" onblur="change_warranty()" />
+                    <?= form_label(lang('MY_application.field_warranty_duration'), 'warranty_duration').form_input('warranty_duration', isset($warranty_duration) ? $warranty_duration : (isset($item['warranty_duration']) ? $item['warranty_duration'] : ''), [
+                        'class' => 'form-control',
+                        'id' => 'warranty_duration'
+                    ], 'number') ?>
                 </div>
                 <span class="label label-success" id="garantie">Sous garantie</span>
             </div>

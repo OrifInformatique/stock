@@ -302,7 +302,7 @@ class Item extends BaseController {
                 return redirect()->to(base_url());
             }
 
-            $validation = $this->set_validation_rules(isset($_POST['item_common_name']) && !empty($_POST['item_common_name']));
+            $validation = $this->set_validation_rules();
 
             $data['upload_errors'] = "";
 
@@ -334,7 +334,7 @@ class Item extends BaseController {
                 }
             }
 
-            if (!is_null($this->request->getVar('btn_submit')) && $upload_failed != TRUE) {
+            if (!is_null($this->request->getVar('btn_submit')) && !empty($_POST) && $validation->run($_POST) && $upload_failed != TRUE) {
                 $linkArray = array();
 
                 foreach ($_POST as $key => $value) {
@@ -363,64 +363,149 @@ class Item extends BaseController {
                         foreach ($linkArray as $tag) {
                             $this->item_tag_link_model->insert(array("item_tag_id" => $tag, "item_common_id" => $item_common_id));
                         }
+
+                        $itemArray['item_common_id'] = $item_common_id;
+                        $itemArray["created_by_user_id"] = $_SESSION['user_id'];
+
+                        $item_id = $this->item_model->insert($itemArray);
+
+                        return redirect()->to(base_url("/item_common/view/" . $item_common_id));
                     } else {
                         $data['errors'] = $this->item_common_model->errors();
                     }
+                } else {
+                    $itemArray['item_common_id'] = $item_common_id;
+                    $itemArray["created_by_user_id"] = $_SESSION['user_id'];
+
+                    $item_id = $this->item_model->insert($itemArray);
+
+                    return redirect()->to(base_url("/item_common/view/" . $item_common_id));
                 }
-
-                $itemArray['item_common_id'] = $item_common_id;
-                $itemArray["created_by_user_id"] = $_SESSION['user_id'];
-
-                $item_id = $this->item_model->insert($itemArray);
-
-                return redirect()->to(base_url("/item_common/view/" . $item_common_id));
             } else if (!is_null($this->request->getVar('btn_submit_photo'))) {
                 // If the user want to display the image form, we first save fields
                 // values in the session, then redirect him to the image form
                 $_SESSION['POST'] = $_POST;
 
                 return redirect()->to(base_url("picture/select_picture"));
-            } else {
-                // Load entities
-                if (isset($_SESSION['user_access']) && isset($_SESSION['user_id']) && $_SESSION['user_access'] < config('\User\Config\UserConfig')->access_lvl_admin) {
-                    $entity_ids = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->findColumn('fk_entity_id');
-                    $data['entities_list'] = $this->entity_model->find($entity_ids);
-                } else {
-                    $data['entities_list'] = $this->entity_model->findAll();
-                }
-                
-                $data['entities'] = $this->dropdown($data['entities_list'], 'entity_id');
-
-                $data['stocking_places'] = $this->dropdown($this->stocking_place_model->where('fk_entity_id', $entity_id)->findAll(), 'stocking_place_id');
-
-                $data['suppliers'] = $this->supplier_model->findAll();
-
-                // Load item groups
-                $data['item_groups_list'] = $this->item_group_model->where('fk_entity_id', $entity_id)->findAll();
-                $data['item_groups'] = $this->dropdown($data['item_groups_list'], 'item_group_id');
-
-                $data['condishes'] = $this->item_condition_model->findAll();
-
-                // Load the tags
-                $data['item_tags_list'] = $this->item_tag_model->findAll();
-                $data['item_tags'] = $this->dropdown($data['item_tags_list'], 'item_tag_id');
-
-                // Load entity id
-                $data['selected_entity_id'] = $entity_id;
-
-                $data['item_id'] = $this->item_model->getFutureId();
-                $data['errors'] = $validation->getErrors();
-
-                // Remember fields in case 
-                if (isset($_SESSION['POST'])) {
-                    foreach ($_SESSION['POST'] as $key => $value) {
-                        $data[$key] = $value;
-                    }
-                    unset($_SESSION['POST']);
-                }
-
-                $this->display_view('Stock\Views\item\form', $data);
             }
+            // Load entities
+            if (isset($_SESSION['user_access']) && isset($_SESSION['user_id']) && $_SESSION['user_access'] < config('\User\Config\UserConfig')->access_lvl_admin) {
+                $entity_ids = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->findColumn('fk_entity_id');
+                $data['entities_list'] = $this->entity_model->find($entity_ids);
+            } else {
+                $data['entities_list'] = $this->entity_model->findAll();
+            }
+            
+            $data['entities'] = $this->dropdown($data['entities_list'], 'entity_id');
+
+            $data['stocking_places'] = $this->dropdown($this->stocking_place_model->where('fk_entity_id', $entity_id)->findAll(), 'stocking_place_id');
+
+            $data['suppliers'] = $this->dropdown($this->supplier_model->findAll(), 'supplier_id');
+
+            // Load item groups
+            $data['item_groups_list'] = $this->item_group_model->where('fk_entity_id', $entity_id)->findAll();
+            $data['item_groups'] = $this->dropdown($data['item_groups_list'], 'item_group_id');
+
+            $data['conditions'] = $this->dropdown($this->item_condition_model->findAll(), 'item_condition_id');
+
+            // Load the tags
+            $data['item_tags_list'] = $this->item_tag_model->findAll();
+            $data['item_tags'] = $this->dropdown($data['item_tags_list'], 'item_tag_id');
+
+            // Load entity id
+            $data['selected_entity_id'] = $entity_id;
+
+            $data['item_id'] = $this->item_model->getFutureId();
+
+            if (!isset($data['errors'])) {
+                $data['errors'] = $validation->getErrors();
+            }
+
+            // Remember fields in case 
+            if (isset($_SESSION['POST'])) {
+                foreach ($_SESSION['POST'] as $key => $value) {
+                    $data[$key] = $value;
+                }
+                unset($_SESSION['POST']);
+            }
+
+            $this->display_view('Stock\Views\item\form', $data);
+        } else {
+            // Access is not allowed
+            return redirect()->to(base_url());
+        }
+    }
+    
+    /**
+     * Modifz a new item
+     *
+     * @return void
+     */
+    public function modify($item_id) {
+        // Check if this is allowed
+        if (isset($_SESSION['logged_in']) &&
+            $_SESSION['logged_in'] == true &&
+            isset($_SESSION['user_id']) &&
+            $this->user_entity_model->check_user_item_entity($_SESSION['user_id'], $item_id) &&
+            $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) 
+        {
+            $item = $this->item_model->find($item_id);
+            $item_common = $this->item_common_model->find($item['item_common_id']);
+
+            $validation = $this->set_validation_rules();
+
+            $upload_failed = false;
+
+            if (!is_null($this->request->getVar('btn_submit')) && !empty($_POST) && $validation->run($_POST) && $upload_failed != TRUE) {
+                foreach ($_POST as $key => $value) {
+                    if (substr($key, 0, 11) != 'item_common') {
+                        $itemArray[$key] = $value;
+                    }
+                }
+
+                $itemArray["modified_by_user_id"] = $_SESSION['user_id'];
+
+                $this->item_model->update($item_id, $itemArray);
+
+                return redirect()->to(base_url("/item_common/view/" . $item['item_common_id']));
+            } else {
+                $data['errors'] = $validation->getErrors();
+            }
+
+            // Load entities
+            if (isset($_SESSION['user_access']) && isset($_SESSION['user_id']) && $_SESSION['user_access'] < config('\User\Config\UserConfig')->access_lvl_admin) {
+                $entity_ids = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->findColumn('fk_entity_id');
+                $data['entities_list'] = $this->entity_model->find($entity_ids);
+            } else {
+                $data['entities_list'] = $this->entity_model->findAll();
+            }
+
+            $entity_id = $this->stocking_place_model->find($item['stocking_place_id'])['fk_entity_id'];
+            
+            $data['entities'] = $this->dropdown($data['entities_list'], 'entity_id');
+
+            $data['stocking_places'] = $this->dropdown($this->stocking_place_model->where('fk_entity_id', $entity_id)->findAll(), 'stocking_place_id');
+
+            $data['suppliers'] = $this->dropdown($this->supplier_model->findAll(), 'supplier_id');
+
+            // Load item groups
+            $data['item_groups_list'] = $this->item_group_model->where('fk_entity_id', $entity_id)->findAll();
+            $data['item_groups'] = $this->dropdown($data['item_groups_list'], 'item_group_id');
+
+            $data['conditions'] = $this->dropdown($this->item_condition_model->findAll(), 'item_condition_id');
+
+            // Load the tags
+            $data['item_tags_list'] = $this->item_tag_model->findAll();
+            $data['item_tags'] = $this->dropdown($data['item_tags_list'], 'item_tag_id');
+
+            // Load entity id
+            $data['selected_entity_id'] = $entity_id;
+
+            $data['item_common'] = $item_common;
+            $data['item'] = $item;
+            $data['item_id'] = $item_id;
+
+            $this->display_view('Stock\Views\item\form', $data);
         } else {
             // Access is not allowed
             return redirect()->to(base_url());
@@ -935,11 +1020,9 @@ class Item extends BaseController {
      * @param integer $id
      * @return mixed
      */
-    private function set_validation_rules($limitedFields = false) {
+    private function set_validation_rules() {
         $validation = \Config\Services::validation();
 
-        !$limitedFields ? $validation->setRule("name", lang('MY_application.field_item_name'), 'required') : null;
-        !$limitedFields ? $validation->setRule("item_group_id", lang('MY_application.field_group'), 'required') : null;
         $validation->setRule("inventory_prefix", lang('MY_application.field_inventory_number'), 'required');
         $validation->setRule("stocking_place_id", lang('MY_application.field_stocking_place'), 'required');
 
