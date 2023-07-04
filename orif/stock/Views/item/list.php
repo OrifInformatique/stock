@@ -157,7 +157,7 @@ $(document).ready(function() {
     load_items(page, filters);
 
     // Reload items list on filter update
-    $("input[type=checkbox], input[type=radio]").on('change', function() {
+    $(document).on('change', "input[type=checkbox], input[type=radio]", function() {
         // Load page 1 with new filters
         load_items(1, getFilters());
     });
