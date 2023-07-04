@@ -680,7 +680,7 @@ class Item extends BaseController {
                     'required' => lang('MY_application.msg_err_no_loan_email'),
                     'valid_email' => lang('MY_application.msg_err_email'),
                 ]);
-                $validation->setRule("loan_to_user_id", lang('MY_application.field_loan_to_user'), "if_exist|in_list[${user_ids}]", [
+                $validation->setRule("loan_to_user_id", lang('MY_application.field_loan_to_user'), "if_exist|in_list[{$user_ids}]", [
                     'in_list' => lang('MY_application.msg_err_invalid_loan_to'),
                 ]);
 
@@ -696,7 +696,7 @@ class Item extends BaseController {
 
                     $loanArray["item_id"] = $id;
 
-                    $loanArray["loan_by_user_id"] = $this->session->user_id;
+                    $loanArray["loan_by_user_id"] = $_SESSION['user_id'];
 
                     $this->loan_model->insert($loanArray);
 
@@ -766,7 +766,7 @@ class Item extends BaseController {
                     'required' => lang('MY_application.msg_err_no_loan_email'),
                     'valid_email' => lang('MY_application.msg_err_email'),
                 ]);
-                $validation->setRule("loan_to_user_id", lang('MY_application.field_loan_to_user'), "if_exist|in_list[${user_ids}]", [
+                $validation->setRule("loan_to_user_id", lang('MY_application.field_loan_to_user'), "if_exist|in_list[{$user_ids}]", [
                     'in_list' => lang('MY_application.msg_err_invalid_loan_to'),
                 ]);
 
