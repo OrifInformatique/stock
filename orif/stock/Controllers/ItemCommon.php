@@ -138,10 +138,10 @@ class ItemCommon extends BaseController {
 
                 $output['items'] = $items;
 
-                $this->display_view('Stock\Views\item_common\item_common_details', $output);
+                $this->display_view('Stock\Views\item_common\details', $output);
             } else {
                 // No items so we display the page with a concise message
-                $this->display_view('Stock\Views\item_common\item_common_details', $output);
+                $this->display_view('Stock\Views\item_common\details', $output);
             }
         } else {
             // $id is not valid, display an error message

@@ -458,6 +458,8 @@ class Item extends BaseController {
             $item = $this->item_model->find($item_id);
             $item_common = $this->item_common_model->find($item['item_common_id']);
 
+            $_SESSION['picture_prefix'] = str_pad($item_id, $this->config->inventory_number_chars, "0", STR_PAD_LEFT);
+
             $validation = $this->set_validation_rules();
 
             $upload_failed = false;

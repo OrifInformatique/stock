@@ -1,13 +1,25 @@
-<div class="container">
+<div class="container mb-3">
     <!-- Item common -->
     <div class="row">
         <div class="row col-6">
-            <div class="col-12"><h3><?= esc($item_common['name']); ?></h3></div>
-            <div class="col-4"><?= lang('stock_lang.field_description') . ':'; ?></div>
-            <div class="col-8"><?= esc($item_common['description']); ?></div>
-            <div class="col-4"><?= lang('MY_application.field_group') . ':'; ?></div>
-            <div class="col-8"><?= !is_null($item_common['item_group']) ? esc($item_common['item_group']['name']) : '' ?></div>
-            <div class="col-4"><?= lang('MY_application.field_tags') . ':'; ?></div>
+            <div class="col-12">
+                <h3><?= esc($item_common['name']); ?></h3>
+            </div>
+            <div class="col-4">
+                <?= lang('stock_lang.field_description') . ':'; ?>
+            </div>
+            <div class="col-8">
+                <?= esc($item_common['description']); ?>
+            </div>
+            <div class="col-4">
+                <?= lang('MY_application.field_group') . ':'; ?>
+            </div>
+            <div class="col-8">
+                <?= !is_null($item_common['item_group']) ? esc($item_common['item_group']['name']) : '' ?>
+            </div>
+            <div class="col-4">
+                <?= lang('MY_application.field_tags') . ':'; ?>
+            </div>
             <div class="col-8">
                 <?php if (!empty($item_common['tags'])): ?>
                     <?php foreach ($item_common['tags'] as $tag): ?>
@@ -72,7 +84,7 @@
                             <label><?= lang('MY_application.field_item_condition'); ?> :</label>
                         </div>
                         <div class="col-12">
-                            <?= !is_null($item['condition']) ? $item['condition']['bootstrap_label'] : '-'; ?>
+                            <?= !is_null($item['condition']) ? $item['condition']['bootstrap_label'] : config('\Stock\Config\StockConfig')->item_no_data; ?>
                         </div>
 
                         <!-- Loan status -->
@@ -91,7 +103,7 @@
                             <label><?= lang('MY_application.field_stocking_place'); ?> :</label>
                         </div>
                         <div class="col-12">
-                            <?= !is_null($item['stocking_place']) ? esc($item['stocking_place']['name']) : '-'; ?>
+                            <?= !is_null($item['stocking_place']) ? esc($item['stocking_place']['name']) : config('\Stock\Config\StockConfig')->item_no_data; ?>
                         </div>
 
                         <!-- Remarks -->
@@ -99,13 +111,13 @@
                             <label><?= lang('MY_application.field_remarks'); ?> :</label>
                         </div>
                         <div class="col-12">
-                            <?= !empty($item['remarks']) ? $item['remarks'] : '-'; ?>
+                            <?= !empty($item['remarks']) ? $item['remarks'] : config('\Stock\Config\StockConfig')->item_no_data; ?>
                         </div>
                         <div class="col-12 pt-3">
                             <label><?= lang('MY_application.field_serial_number'); ?> :</label>
                         </div>
                         <div class="col-12">
-                            <?= !empty($item['serial_number']) ? esc($item['serial_number']) : '-'; ?>
+                            <?= !empty($item['serial_number']) ? esc($item['serial_number']) : config('\Stock\Config\StockConfig')->item_no_data; ?>
                         </div>
                     </div>
                 </div>
@@ -116,7 +128,7 @@
                             <label><?= lang('MY_application.field_supplier'); ?> :</label>
                         </div>
                         <div class="col-12">
-                            <?= !is_null($item['supplier']) ? $item['supplier']['name'] : '-'; ?>
+                            <?= !is_null($item['supplier']) ? $item['supplier']['name'] : config('\Stock\Config\StockConfig')->item_no_data; ?>
                         </div>
 
                         <!-- Buying Price -->
@@ -130,7 +142,7 @@
                             <label><?= lang('MY_application.field_warranty_duration'); ?> :</label>
                         </div>
                         <div class="col-12">
-                            <?= !empty($item['warranty_duration']) ? $item['warranty_duration'].' '.lang('MY_application.text_months') : '-' ?>
+                            <?= !empty($item['warranty_duration']) ? $item['warranty_duration'].' '.lang('MY_application.text_months') : config('\Stock\Config\StockConfig')->item_no_data; ?>
                         </div>
                     </div>
                 </div>
@@ -141,7 +153,7 @@
                             <label><?= lang('MY_application.field_supplier_ref'); ?> :</label>
                         </div>
                         <div class="col-12">
-                            <?= !empty($item['supplier_ref']) ? esc($item['supplier_ref']) : '-'; ?>
+                            <?= !empty($item['supplier_ref']) ? esc($item['supplier_ref']) : config('\Stock\Config\StockConfig')->item_no_data; ?>
                         </div>
 
                         <!-- Buying Date -->
@@ -149,31 +161,26 @@
                             <label><?= lang('MY_application.field_buying_date'); ?> :</label>
                         </div>
                         <div class="col-12">
-                            <?= !empty($item['buying_date']) ? databaseToShortDate($item['buying_date']) : '-'; ?>
+                            <?= !empty($item['buying_date']) ? databaseToShortDate($item['buying_date']) : config('\Stock\Config\StockConfig')->item_no_data; ?>
                         </div>
                         <div class="col-12 pt-3">
                         <label><?= lang('MY_application.field_item_warranty') ?> :</label>
                         </div>
                         <div class="col-12">
-                            <?php 
-                                if ($item['warranty_status'] == 1):
-                                    echo '<span class="badge badge-success" >'; // UNDER WARRANTY
-                                elseif ($item['warranty_status'] == 2):
-                                    echo '<span class="badge badge-warning" >'; // WARRANTY EXPIRES SOON
-                                elseif ($item['warranty_status'] == 3):
-                                    echo '<span class="badge badge-danger" >';  // WARRANTY EXPIRED
-                                else: 
-                                    echo '<span>' . lang('MY_application.text_warranty_status.' . $item['warranty_status']); 
-                                endif;
-                            ?>
+                            <?php if ($item['warranty_status'] == 1): ?>
+                                <span class="badge badge-success">
+                            <?php elseif ($item['warranty_status'] == 2): ?>
+                                <span class="badge badge-warning" >
+                            <?php elseif ($item['warranty_status'] == 3): ?>
+                                <span class="badge badge-danger" >
+                            <?php else: ?>
+                                <span> 
+                            <?php endif; ?>
+                            <?= lang('MY_application.text_warranty_status.' . $item['warranty_status']); ?>
                             </span>
                         </div>
                     </div>
                 </div>
-
-                <?php if ($item): ?>
-                <?php else: ?>
-                <?php endif ?>
 
                 <!-- Loans and controls -->
                 <div class="row col-12 pt-3">
