@@ -49,4 +49,7 @@ class StockConfig extends BaseConfig
 
     public $access_lvl_manager          =   2;
     public $access_lvl_admin            =   4;
+
+    public $group_by_item_common        =   0;
+    public $group_by_item               =   1;
 }

@@ -82,6 +82,7 @@ return[
 'no_item_common_found'                  => 'Aucun objet commun n\'a été trouvé',
 'add_item_common_info'                  => 'Un objet commun va être créé',
 'add_item_info'                         => 'Un objet sera créé et lié à l\'objet commun:',
+'all_item_groups'                       => 'Tous les groupes',
 
 'tag_deletion_explanation'              => 'La désactivation d\'un tag permet de le rendre inutilisable tout en conservant ses informations dans les archives. ' 
                                                 . 'Cela permet notamment de garder l\'historique de ses actions. <br> <br>' 
@@ -139,6 +140,7 @@ return[
 'delete_entity_what_to_do'              => 'La désactivation d\'un site permet de le rendre inutilisable tout en conservant ses informations dans les archives.
                                             Cela permet notamment de conserver l\'historique de ses actions.<br><br>
                                             En cas de suppression, toutes les information associées à ce site seront suprimées.',
+'group_by'                              => 'Grouper par',
 
 /** ERRORS */
 'unauthorized_entity_list'              => 'Vous n\'êtes pas autorisé à consulter le(s) sites demandés',
