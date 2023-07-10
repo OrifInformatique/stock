@@ -44,7 +44,7 @@ class Entity_model extends MyModel
         parent::__construct($db, $validation);
         $this->validationRules=[
             'name'=>['label'=>lang('stock_lang.name'),'rules'=>'required|max_length[50]'],
-            'address'=>['label'=>lang('stock_lang.address'),'rules'=>'required|max_length[100]'],
+            'address'=>['label'=>lang('stock_lang.field_address'),'rules'=>'required|max_length[100]'],
             'zip'=>['label'=>lang('stock_lang.zip_code'),'rules'=>'required|max_length[10]'],
             'locality'=>['label'=>lang('stock_lang.locality'),'rules'=>'required|max_length[100]'],
             'shortname'=>['label'=>lang('stock_lang.tagname'),'rules'=>'max_length[3]']

@@ -18,8 +18,8 @@
                 <input type="text" id="name" placeholder="<?=lang('stock_lang.name')?>" class="form-control form-text" name="name" value="<?=isset($data) && isset($data['name']) ? $data['name'] : set_value('name')?>">
             </div>
             <div class="col-sm-6" style="max-width: calc(50% - .4rem);">
-                <label for="address"><?=lang('stock_lang.address')?></label>
-                <input type="text" id="address" placeholder="<?=lang('stock_lang.address')?>" class="form-control form-text" name="address" value="<?=isset($data) && isset($data['address']) ? $data['address'] : set_value('address')?>">
+                <label for="address"><?=lang('stock_lang.field_address')?></label>
+                <input type="text" id="address" placeholder="<?=lang('stock_lang.field_address')?>" class="form-control form-text" name="address" value="<?=isset($data) && isset($data['address']) ? $data['address'] : set_value('address')?>">
             </div>
         </span>
         <span class="row row-responsive-2">

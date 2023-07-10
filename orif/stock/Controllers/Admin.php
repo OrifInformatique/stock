@@ -824,7 +824,7 @@ class Admin extends BaseController
 
     public function view_entity_list($with_deleted = 0)
     {
-        $data['columns'] = ['name' => lang('stock_lang.name'), 'address' => lang('stock_lang.address'), 'zip' => lang('stock_lang.zip_code'), 'locality' => lang('stock_lang.locality'), 'shortname' => lang('stock_lang.tagname')];
+        $data['columns'] = ['name' => lang('stock_lang.name'), 'address' => lang('stock_lang.field_address'), 'zip' => lang('stock_lang.zip_code'), 'locality' => lang('stock_lang.locality'), 'shortname' => lang('stock_lang.tagname')];
         $data['items'] = [];
         foreach ($this->entity_model->withDeleted($with_deleted)->findAll() as $entity) {
             $data['items'][] = ['id' => $entity['entity_id'], 'name' => $entity['name'], 'address' => $entity['address'], 'zip' => $entity['zip'], 'locality' => $entity['locality'], 'shortname' => $entity['shortname'], 'enabled' => $entity['archive'] == null ? lang('common_lang.yes') : lang('common_lang.no')];

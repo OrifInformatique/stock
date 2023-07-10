@@ -79,31 +79,30 @@
         loaderContainer.classList.remove('d-none');
         let entity_id = $('#entity_id').val();
         let group_id = $('#item_group_id').val();
+        let group_by = $("input[name='by_item_common']:checked").val();
         let formData = new FormData;
         
-        formData.append('group_id', group_id);
         formData.append('entity_id', entity_id);
+        formData.append('group_id', group_id);
+        formData.append('group_by', group_by);
 
         let rep = await fetch('<?=base_url("stock/export_excel")?>', {
             method: 'POST',
             body: formData,
         });
 
-        console.log(await rep);
-
         let datas = await rep.json();
         datas = datas.excel_datas;
         let link = document.createElement('a');
         let filename = $('#entity_id option:selected').text().trim().toLocaleLowerCase();
-        console.log(filename);
 
-        filename=filename.replace(' ','');
-        filename+=(new Date()).toLocaleDateString();
-        link.setAttribute('download',filename+'.xlsx');
-        link.setAttribute('href','data: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,'+datas);
+        filename = filename.replace('', '');
+        filename += (new Date()).toLocaleDateString();
+        link.setAttribute('download', filename+'.xlsx');
+        link.setAttribute('href', 'data: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,'+datas);
         link.click();
         loaderContainer.classList.add('d-none');
-        loaderContainer.querySelector('#loader').style.animation='';
+        loaderContainer.querySelector('#loader').style.animation = '';
     }
 
     async function checkEntityItems() {
