@@ -120,7 +120,7 @@ class Admin extends BaseController
         $data['url_getView'] = "stock/admin/view_tags";
         $data['with_deleted'] = $with_deleted;
 
-        return $this->display_view('Common\Views\items_list', $data);
+        return $this->display_view(['Stock\admin\common\entity_message', 'Common\Views\items_list'], $data);
     }
 
     /**
@@ -511,7 +511,7 @@ class Admin extends BaseController
       $data['url_getView'] = "stock/admin/view_suppliers";
       $data['with_deleted'] = $with_deleted;
 
-      return $this->display_view('Common\Views\items_list', $data);
+      return $this->display_view(['Stock\admin\common\entity_message', 'Common\Views\items_list'], $data);
     }
 
     /**

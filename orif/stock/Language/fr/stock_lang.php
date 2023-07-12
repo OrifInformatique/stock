@@ -137,5 +137,6 @@ return[
 'msg_no_entities_exist'                 => 'Aucun site n\'a été créé, par défaut tous les objets sont affichés',
 'msg_user_has_no_entities'              => 'Vous n\'êtes lié à aucun site, veuillez contacter votre administrateur',
 'msg_entities_has_no_items'             => 'Aucun site n\'est lié à un objet',
+'element_is_shared_between_entity'      => 'Attention ces éléments sont partagés entre tous les sites.',
 
 ];
