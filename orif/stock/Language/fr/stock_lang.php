@@ -117,6 +117,7 @@ return[
 'delete_entity_what_to_do'              => 'La désactivation d\'un site permet de le rendre inutilisable tout en conservant ses informations dans les archives.
                                             Cela permet notamment de conserver l\'historique de ses actions.<br><br>
                                             En cas de suppression, toutes les information associées à ce site seront suprimées.',
+'entity_has_no_user'                    => 'Cette entité ne possède aucun utilisateur activé',
 
 /** ERRORS */
 'unauthorized_entity_list'              => 'Vous n\'êtes pas autorisé à consulter le(s) sites demandés',

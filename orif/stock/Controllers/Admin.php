@@ -960,15 +960,19 @@ class Admin extends BaseController
     public function list_user($entity_id = null, $with_deleted = FALSE) {
         if (is_null($entity_id)) {
             $entity_id = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->where('default', true)->findColumn('fk_entity_id');
-            $entity_id = reset($entity_id);
+            $entity_id = !empty($entity_id) ? reset($entity_id) : null;
         }
 
         $fk_user_ids = $this->user_entity_model->where('fk_entity_id', $entity_id)->findColumn('fk_user_id');
 
-        if ($with_deleted) {
-            $users = $this->user_model->withDeleted()->find($fk_user_ids);
+        if (!empty($fk_user_ids)) {
+            if ($with_deleted) {
+                $users = $this->user_model->withDeleted()->find($fk_user_ids);
+            } else {
+                $users = $this->user_model->find($fk_user_ids);
+            }
         } else {
-            $users = $this->user_model->find($fk_user_ids);
+            $users = [];
         }
 
         //usertiarray is an array contained all usertype name and id

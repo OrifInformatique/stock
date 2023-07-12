@@ -35,28 +35,30 @@ helper("form");
         </div>
     </div>
     <div class="row mt-2">
-        <table class="table table-hover">
-        <thead>
-            <tr>
-                <th><?= lang('user_lang.field_username'); ?></th>
-                <th><?= lang('user_lang.field_email'); ?></th>
-                <th><?= lang('user_lang.field_usertype'); ?></th>
-                <th><?= lang('user_lang.field_user_active'); ?></th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody id="userslist">
-            <?php foreach($users as $user) { ?>
-                <tr>
-                    <td><a href="<?= base_url('user/admin/save_user/'.$user['id']); ?>"><?= esc($user['username']); ?></td>
-                    <td><?= esc($user['email']); ?></td>
-                    <td><?= $user_types[$user['fk_user_type']]; ?></td>
-                    <td><?= lang($user['archive'] ? 'common_lang.no' : 'common_lang.yes'); ?></td>
-                    <td><a href="<?= base_url('user/admin/delete_user/'.$user['id']); ?>" class="close">×</td>
-                </tr>
-            <?php } ?>
-        </tbody>
-        </table>
+        <div class="col-12">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th><?= lang('user_lang.field_username'); ?></th>
+                        <th><?= lang('user_lang.field_email'); ?></th>
+                        <th><?= lang('user_lang.field_usertype'); ?></th>
+                        <th><?= lang('user_lang.field_user_active'); ?></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="userslist">
+                    <?php foreach($users as $user): ?>
+                        <tr>
+                            <td><a href="<?= base_url('user/admin/save_user/'.$user['id']); ?>"><?= esc($user['username']); ?></td>
+                            <td><?= esc($user['email']); ?></td>
+                            <td><?= $user_types[$user['fk_user_type']]; ?></td>
+                            <td><?= lang($user['archive'] ? 'common_lang.no' : 'common_lang.yes'); ?></td>
+                            <td><a href="<?= base_url('user/admin/delete_user/'.$user['id']); ?>" class="close">×</td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
@@ -73,14 +75,15 @@ $(document).ready(() => {
     let eFilter = getEFilter();
     let isChecked = $('#toggle_deleted').prop('checked');
     history.pushState(null, "", "<?= base_url("stock/admin/list_user")?>"+ "/"+eFilter+"/"+(+isChecked));
+    updateUserList(eFilter, isChecked);
 
-    $('#e ul.multiselect-container input[type=radio]').change(() => {
+    $('#e ul.multiselect-container input[type=radio]').on('change', () => {
         eFilter = getEFilter();
         isChecked = $('#toggle_deleted').prop('checked');
         updateUserList(eFilter, isChecked);
     });
 
-    $('#toggle_deleted').change(e => {
+    $('#toggle_deleted').on('change', (e) => {
         eFilter = getEFilter();
         isChecked = e.currentTarget.checked;
         updateUserList(eFilter, isChecked);
@@ -91,7 +94,13 @@ function updateUserList(eFilter, isChecked) {
     history.pushState(null, "", "<?= base_url("stock/admin/list_user")?>"+ "/"+eFilter+"/"+(+isChecked));
     $.post('<?=base_url();?>/stock/admin/list_user/'+eFilter+"/"+(+isChecked), {}, data => {
         $('#userslist').empty();
-        $('#userslist')[0].innerHTML = $(data).find('#userslist')[0].innerHTML;
+
+        // When length value is at 37, the result contains 37 spaces in a string (it counts tabs from the tbody even if it's empty)
+        if ($(data).find('#userslist')[0].innerHTML.length === 37) {
+            $('#userslist')[0].innerHTML = '<td colspan="5" class="col-12 alert alert-info text-center"><?= lang('stock_lang.entity_has_no_user'); ?></td>';
+        } else {
+            $('#userslist')[0].innerHTML = $(data).find('#userslist')[0].innerHTML;
+        }
     });
 }
 
