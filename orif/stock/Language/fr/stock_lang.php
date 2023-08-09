@@ -53,6 +53,7 @@ return[
 'field_deleted_stocking_places'         => 'Afficher les lieux de stockage désactivés',
 'field_deleted_suppliers'               => 'Afficher les fournisseurs désactivés',
 'field_deleted_item_groups'             => 'Afficher les groupes d\'objets désactivés',
+'field_deleted_entities'                => 'Afficher les sites désactivés',
 'field_user_entities'                   => 'Sites attribués',
 'field_user_default_entity'             => 'Site principal',
 

@@ -112,7 +112,7 @@ class Admin extends BaseController
 
         $data['primary_key_field'] = 'item_tag_id';
         $data['btn_create_label'] = lang('stock_lang.btn_add_tag');
-        $data['field_display_deleted'] = lang("stock_lang.field_deleted_tags");
+        $data['display_deleted_label'] = lang("stock_lang.field_deleted_tags");
         $data['url_update'] = "stock/admin/modify_tag/";
         $data['url_delete'] = "stock/admin/delete_tag/";
         $data['url_create'] = "stock/admin/new_tag";
@@ -246,7 +246,7 @@ class Admin extends BaseController
             $entity_id = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->where('default', true)->findColumn('fk_entity_id');
             $entity_id = !empty($entity_id) ? reset($entity_id) : null;
         }
-        
+
         if ($with_deleted) {
             $data['items'] = $this->stocking_place_model->withDeleted()->where('fk_entity_id', $entity_id)->findAll();
 
@@ -281,7 +281,7 @@ class Admin extends BaseController
 
         $data['primary_key_field'] = 'stocking_place_id';
         $data['btn_create_label'] = lang('stock_lang.btn_add_stocking_place');
-        $data['field_display_deleted'] = lang("stock_lang.field_deleted_stocking_places");
+        $data['display_deleted_label'] = lang("stock_lang.field_deleted_stocking_places");
         $data['url_update'] = "stock/admin/modify_stocking_place/";
         $data['url_delete'] = "stock/admin/delete_stocking_place/";
         $data['url_create'] = "stock/admin/new_stocking_place";
@@ -482,7 +482,7 @@ class Admin extends BaseController
 
         $data['primary_key_field']  = 'supplier_id';
         $data['btn_create_label']   = lang('stock_lang.btn_add_supplier');
-        $data['field_display_deleted'] = lang("stock_lang.field_deleted_suppliers");
+        $data['display_deleted_label'] = lang("stock_lang.field_deleted_suppliers");
         $data['url_update'] = "stock/admin/modify_supplier/";
         $data['url_delete'] = "stock/admin/delete_supplier/";
         $data['url_create'] = "stock/admin/new_supplier";
@@ -677,7 +677,7 @@ class Admin extends BaseController
 
         $data['primary_key_field']  = 'item_group_id';
         $data['btn_create_label']   = lang('stock_lang.btn_add_item_group');
-        $data['field_display_deleted'] = lang("stock_lang.field_deleted_item_groups");
+        $data['display_deleted_label'] = lang("stock_lang.field_deleted_item_groups");
         $data['url_update'] = "stock/admin/modify_item_group/";
         $data['url_delete'] = "stock/admin/delete_item_group/";
         $data['url_create'] = "stock/admin/new_item_group";
@@ -848,6 +848,7 @@ class Admin extends BaseController
 
         $data['list_title'] = lang('stock_lang.title_entity_list');
         $data['primary_key_field']  = 'id';
+        $data['display_deleted_label'] = lang('stock_lang.field_deleted_entities');
         $data['btn_create_label']   = lang('stock_lang.add_entity');
         $data['with_deleted']       = $with_deleted;
         $data['url_update'] = "stock/admin/save_entity/1/";
@@ -956,7 +957,7 @@ class Admin extends BaseController
         $output['items'] = $users;
         $output['primary_key_field']  = 'id';
         $output['btn_create_label']   = lang('common_lang.btn_new_m');
-        $output['field_display_deleted'] = lang("user_lang.field_deleted_users_display");
+        $output['display_deleted_label'] = lang("user_lang.field_deleted_users_display");
         $output['url_update'] = "user/admin/save_user/";
         $output['url_delete'] = "user/admin/delete_user/";
         $output['url_create'] = "user/admin/save_user";
