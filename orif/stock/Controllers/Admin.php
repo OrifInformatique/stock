@@ -834,6 +834,7 @@ class Admin extends BaseController
             return redirect()->to('/stock/admin/modify_item_group/' . $id);
         }
     }
+
     public function view_entity_list($with_deleted = 0)
     {
         $data['columns'] = ['name' => lang('stock_lang.name'), 'address' => lang('stock_lang.address'), 'zip' => lang('stock_lang.zip_code'), 'locality' => lang('stock_lang.locality'), 'shortname' => lang('stock_lang.tagname')];
@@ -845,6 +846,7 @@ class Admin extends BaseController
             $data['columns']['enabled'] = lang('stock_lang.field_active');
         }
 
+        $data['list_title'] = lang('stock_lang.title_entity_list');
         $data['primary_key_field']  = 'id';
         $data['btn_create_label']   = lang('stock_lang.add_entity');
         $data['with_deleted']       = $with_deleted;
@@ -852,8 +854,9 @@ class Admin extends BaseController
         $data['url_delete'] = "stock/admin/delete_entity/0/";
         $data['url_create'] = "stock/admin/save_entity/0/";
         $data['url_getView'] = "stock/admin/view_entity_list";
-        return $this->display_view('\Stock\admin\entity\list_entity', ['data' => $data]);
+        return $this->display_view('Common\Views\items_list', $data);
     }
+
     public function save_entity($action = 0, $entity_id = 0)
     {
         if (count($this->request->getPost()) == 0) {
@@ -885,11 +888,13 @@ class Admin extends BaseController
             }
         }
     }
+
     public function reactivate_entity($entity_id)
     {
         $this->entity_model->update($entity_id, ['archive' => null]);
         return redirect()->to(base_url('stock/admin/view_entity_list'));
     }
+
     public function delete_entity($action = 0, $entity_id = 0)
     {
         if ($action == 0) {
@@ -929,22 +934,40 @@ class Admin extends BaseController
         }
 
         //usertiarray is an array contained all usertype name and id
-        $usertiarray = $this->db->table('user_type')->select(['id', 'name'],)->get()->getResultArray();
-        $usertypes = [];
-        foreach ($usertiarray as $row) {
-            $usertypes[$row['id']] = $row['name'];
+        $userTypes = $this->db->table('user_type')->select(['id', 'name'],)->get()->getResultArray();
+        foreach ($users as $index => $row) {
+            $key = array_search($row['fk_user_type'], array_column($userTypes, 'id'));
+
+            $users[$index]['user_type'] = $userTypes[$key]['name'];
+            $users[$index]['archive'] = is_null($row['archive']) ? lang('MY_application.text_yes') : lang('MY_application.text_no');
         }
 
-        $output = array(
-            'title' => lang('user_lang.title_administration'),
-            'users' => $users,
-            'user_types' => $usertypes,
-            'with_deleted' => $with_deleted,
-            'entities' => $this->entity_model->dropdown('name'),
-            'default_entity' => $entity_id
-        );
+        // Describe columns to display for common module generic items_list view
+        $output['columns'] = [
+            'username' => lang('user_lang.field_username'),
+            'email' => lang('user_lang.field_email'),
+            'archive' => lang('user_lang.field_user_active'),
+            'user_type' => lang('user_lang.field_usertype'),
+        ];
 
-        $this->display_view('\Stock\admin\users\list_user', $output);
+        // Complete datas for common module generic items_list view
+        $output['list_title'] = lang('user_lang.title_user_list');
+
+        $output['items'] = $users;
+        $output['primary_key_field']  = 'id';
+        $output['btn_create_label']   = lang('common_lang.btn_new_m');
+        $output['field_display_deleted'] = lang("user_lang.field_deleted_users_display");
+        $output['url_update'] = "user/admin/save_user/";
+        $output['url_delete'] = "user/admin/delete_user/";
+        $output['url_create'] = "user/admin/save_user";
+        $output['url_getView'] = "stock/admin/list_user/{$entity_id}";
+        $output['with_deleted'] = $with_deleted;
+        $output['entities'] = $this->entity_model->dropdown('name');
+        $output['default_entity'] = $entity_id;
+
+        //dd($output);
+
+        $this->display_view(['\Stock\Views\admin\common\entity_selector', '\Common\Views\items_list'], $output);
     }
 
     public function save_user($user_id = 0)
