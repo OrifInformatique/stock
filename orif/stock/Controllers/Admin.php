@@ -965,8 +965,6 @@ class Admin extends BaseController
         $output['entities'] = $this->entity_model->dropdown('name');
         $output['default_entity'] = $entity_id;
 
-        //dd($output);
-
         $this->display_view(['\Stock\Views\admin\common\entity_selector', '\Common\Views\items_list'], $output);
     }
 
