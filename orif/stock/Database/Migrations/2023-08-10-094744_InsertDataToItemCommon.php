@@ -56,7 +56,7 @@ class InsertDataToItemCommon extends Migration
                 'null'              => false
             ]
         ]);
-        $this->forge->addForeignKey('item_common_id', 'item', '', '', 'fk_item_item_common_id');
+        $this->forge->addColumn('item', 'CONSTRAINT fk_item_item_common_id FOREIGN KEY (item_common_id) REFERENCES item_common (item_common_id)');
     }
 
     public function down()
