@@ -19,6 +19,24 @@ class InsertDataToItemCommon extends Migration
             SET i.item_common_id = ic.item_common_id'
         );
 
+        $query = $this->db->query('SELECT i.image FROM item_common ic
+            RIGHT JOIN item i ON i.image = ic.image
+            WHERE ic.image IS NULL'
+        );
+
+        $result = $query->getResultArray();
+
+        if (count($result) > 0) {
+            foreach ($result as $item) {
+                $pathToFile = 'uploads' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . "{$item['image']}";
+                if (file_exists($pathToFile) && !is_null($item['image'])) {
+                    unlink($pathToFile);
+                }
+            }
+
+            clearstatcache();
+        }
+
         $this->forge->dropForeignKey('item', 'fk_item_group_id');
 
         $this->forge->dropColumn('item', [
@@ -28,6 +46,17 @@ class InsertDataToItemCommon extends Migration
             'linked_file',
             'item_group_id'
         ]);
+
+        // Remove the fk to make it NULLABLE after items have been linked to item_commons
+        // Then recreate the foreign key on item_common_id
+        $this->forge->modifyColumn('item', [
+            'item_common_id' => [
+				'type'				=> 'INT',
+                'constraint'        => '11',
+                'null'              => false
+            ]
+        ]);
+        $this->forge->addForeignKey('item_common_id', 'item', '', '', 'fk_item_item_common_id');
     }
 
     public function down()
