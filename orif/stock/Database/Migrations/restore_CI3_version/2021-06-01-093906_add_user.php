@@ -68,9 +68,7 @@ class Add_user extends \CodeIgniter\Database\Migration
         $this->forge->addKey('user_id', TRUE);
         $this->forge->createTable('user', TRUE);
 
-        $this->forge->addColumn('user', [
-			'CONSTRAINT fk_user_type_id FOREIGN KEY (user_type_id) REFERENCES user_type (user_type_id)'
-		]);
+        $this->forge->addColumn('user', 'CONSTRAINT fk_user_type_id FOREIGN KEY (user_type_id) REFERENCES user_type (user_type_id)');
 
 
     }

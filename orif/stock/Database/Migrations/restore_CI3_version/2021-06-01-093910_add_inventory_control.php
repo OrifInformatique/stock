@@ -47,10 +47,8 @@ class Add_InventoryControl extends \CodeIgniter\Database\Migration
 
         $this->forge->createTable('inventory_control', TRUE);
 
-        $this->forge->addColumn('inventory_control', [
-            'CONSTRAINT fk_inventory_control_controller_id FOREIGN KEY (controller_id) REFERENCES user (user_id)',
-            'CONSTRAINT fk_inventory_control_item_id FOREIGN KEY (item_id) REFERENCES item (item_id)'
-        ]);
+        $this->forge->addColumn('inventory_control', 'CONSTRAINT fk_inventory_control_controller_id FOREIGN KEY (controller_id) REFERENCES user (user_id)');
+        $this->forge->addColumn('inventory_control', 'CONSTRAINT fk_inventory_control_item_id FOREIGN KEY (item_id) REFERENCES item (item_id)');
     }
 
     /**
