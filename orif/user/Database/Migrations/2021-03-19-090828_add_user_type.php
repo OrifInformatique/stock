@@ -5,6 +5,7 @@ namespace User\Database\Migrations;
 
 
 use CodeIgniter\Database\Migration;
+use User\Models\User_type_model;
 
 class AddUserType extends Migration
 {
@@ -33,8 +34,13 @@ class AddUserType extends Migration
         ]);
         $this->forge->addKey('id',true);
         $this->forge->createTable('user_type',true);
-        $seeder=\Config\Database::seeder();
-        $seeder->call('\User\Database\Seeds\AddUserTypeDatas');
+
+        // In case user_types have been set before, do not add them again
+        $userTypeModel = new User_type_model();
+        if (count($userTypeModel->findAll()) == 0) {
+            $seeder=\Config\Database::seeder();
+            $seeder->call('\User\Database\Seeds\AddUserTypeDatas');
+        }
     }
 
     /**
