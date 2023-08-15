@@ -934,7 +934,6 @@ class Item extends BaseController {
             $loans = $this->db->table('entity')
                               ->where('entity_id', $filters['e'])
                               ->where('real_return_date', null)
-                              ->join('item_group', 'item_group.fk_entity_id = entity.entity_id', 'inner')
                               ->join('stocking_place', 'stocking_place.fk_entity_id = entity.entity_id', 'inner')
                               ->join('item', 'item.stocking_place_id = stocking_place.stocking_place_id', 'inner')
                               ->join('loan', 'loan.item_id = item.item_id', 'inner')
@@ -954,8 +953,9 @@ class Item extends BaseController {
                 $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
                 $item['condition'] = $this->item_model->getItemCondition($item);
                 $item['current_loan'] = $this->item_model->getCurrentLoan($item);
-                $item['image'] = $this->item_model->getImage($item);
-                $item['image_path'] = $this->item_model->getImagePath($item);
+                $item['image'] = $this->item_common_model->getImage($item);
+                $item['image_path'] = $this->item_common_model->getImagePath($item);
+                $item['name'] = $this->item_common_model->getName($item);
                 $items[] = $item;
             }
     

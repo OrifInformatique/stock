@@ -74,9 +74,11 @@ class Item_common_model extends MyModel
         return $tags;
     }
 
-    public function getImage($item_common)
+    public function getImage($item)
     {
-        if (!is_null($item_common) && is_null($item_common['image'])) {
+        $item_common = $this->where('item_common_id', $item['item_common_id'])->first();
+
+        if (is_null($item_common) && !isset($item_common['image'])) {
             $item_common['image'] = config('\Stock\Config\StockConfig')->item_no_image;
         }
 
@@ -90,5 +92,13 @@ class Item_common_model extends MyModel
         } else {
             return config('\Stock\Config\StockConfig')->images_upload_path . $item_common['image'];
         }
+    }
+    
+    public function getName($item)
+    {
+        $item_common = $this->where('item_common_id', $item['item_common_id'])->first();
+
+        if (!is_null($item_common)) 
+            return $item_common['name'];
     }
 }

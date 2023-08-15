@@ -57,7 +57,7 @@ class Loan_model extends MyModel
                                ->join('stocking_place', 'stocking_place.fk_entity_id = entity.entity_id', 'inner')
                                ->join('item', 'item.stocking_place_id = stocking_place.stocking_place_id', 'inner')
                                ->join('loan', 'loan.item_id = item.item_id', 'inner')
-                               ->select(['loan.loan_id', 'loan.date', 'loan.item_localisation', 'loan.remarks', 'loan.planned_return_date', 'loan.real_return_date', 'loan.item_id', 'loan.loan_by_user_id', 'loan.loan_to_user_id', 'loan.borrower_email'])
+                               ->select('loan.loan_id')
                                ->countAllResults();
 
         return $late_loans;
