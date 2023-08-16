@@ -52,10 +52,10 @@ class ExcelExport extends \App\Controllers\BaseController
     }
 
     public function index() {
-        //make exportation
+        // make exportation
         if (count($_POST) > 0) {
             $items=[];
-            //filter by entity
+            // filter by entity
             if (!is_null($this->request->getPost('entity_id')) && !is_null($this->request->getPost('group_id')) && !is_null($this->request->getPost('group_by'))) {
                 $entity_id = $this->request->getPost('entity_id');
                 $group_id = $this->request->getPost('group_id');
@@ -64,28 +64,29 @@ class ExcelExport extends \App\Controllers\BaseController
                 if ($group_by == config('\Stock\config\StockConfig')->group_by_item_common) {
                     // Group by item_common
                     $builder = $this->db->table('item_common');
-                    $subquery = $this->db->table('item')
+                    $totalPriceQuery = $this->db->table('item')
                         ->select('item_common_id, COUNT(item_id) as item_count, SUM(buying_price) as total_price')
                         ->groupBy('item_common_id')
                         ->getCompiledSelect();
 
-                    $firstItemSubquery = $this->db->table('item')
-                        ->select('item_common_id, MAX(created_date) as last_created_date')
+                    $lastCreatedDateQuery = $this->db->table('item')
+                        ->select('item_common_id, group_concat(buying_price) as unit_price, MAX(created_date) as last_created_date')
                         ->groupBy('item_common_id')
                         ->getCompiledSelect();
 
                     $builder->select('item_common.*, item_group.name AS "item_group_name", items.item_count, items.total_price, last_item.*')
-                        ->join('(' . $subquery . ') items', 'item_common.item_common_id = items.item_common_id', 'inner')
-                        ->join('(' . $firstItemSubquery . ') last_item', 'item_common.item_common_id = last_item.item_common_id', 'inner')
+                        ->join('(' . $totalPriceQuery . ') items', 'item_common.item_common_id = items.item_common_id', 'inner')
+                        ->join('(' . $lastCreatedDateQuery . ') last_item', 'item_common.item_common_id = last_item.item_common_id', 'inner')
                         ->join('item_group', 'item_group.item_group_id = item_common.item_group_id', 'inner');
 
                     !is_null($entity_id) ? $builder->where('fk_entity_id', $entity_id) : $builder;
                 } else {
                     // Group by item
                     $builder = $this->db->table('item')
-                                        ->join('item_common', 'item_common.item_common_id = item.item_common_id', 'inner')
-                                        ->join('item_group', 'item_group.item_group_id = item_common.item_group_id', 'inner')
-                                        ->where('item_group.fk_entity_id', $entity_id);
+                        ->join('item_common', 'item_common.item_common_id = item.item_common_id', 'inner')
+                        ->join('item_group', 'item_group.item_group_id = item_common.item_group_id', 'inner')
+                        ->where('item_group.fk_entity_id', $entity_id)
+                        ->select('item.*, item_common.*');
                 }
 
                 if ($group_id != 0) {
@@ -95,29 +96,63 @@ class ExcelExport extends \App\Controllers\BaseController
 
                 $items = $builder->get()->getResultArray();
 
-                /* $this->response->setContentType('Content-Type: application/json');
-                return json_encode([
-                    'items' => $items
-                ]);
-
-                $items = []; */
-
                 //prepare items to add in excel sheet
                 foreach ($items as $idx => $item) {
                     if ($group_by == config('\Stock\config\StockConfig')->group_by_item) {
-                        (($this->stocking_place_model->find($item['stocking_place_id']))['fk_entity_id']) == null ? $item['entity_name'] = '' : ($item['entity_name'] = $this->entity_model->find($this->stocking_place_model->find($item['stocking_place_id'])['fk_entity_id']) != null ? $this->entity_model->find($this->stocking_place_model->find($item['stocking_place_id'])['fk_entity_id'])['name'] : '');
-                        $item['stock_place'] = $this->stocking_place_model->find($item['stocking_place_id'])['name'];
+                        $stockingPlace = $this->stocking_place_model->withDeleted()->find($item['stocking_place_id']);
+                        $item['entity_name'] = '';
+
+                        if ($stockingPlace !== null) {
+                            $entityId = $stockingPlace['fk_entity_id'];
+
+                            if ($entityId !== null) {
+                                $entity = $this->entity_model->find($entityId);
+
+                                if ($entity !== null) {
+                                    $item['entity_name'] = $entity['name'];
+                                }
+                            }
+                        }
+                        $item['stock_place'] = $this->stocking_place_model->withDeleted()->find($item['stocking_place_id'])['name'];
                     } else {
-                        (($this->item_group_model->find($item['item_group_id']))['fk_entity_id']) == null ? $item['entity_name'] = '' : ($item['entity_name'] = $this->entity_model->find($this->item_group_model->find($item['item_group_id'])['fk_entity_id']) != null ? $this->entity_model->find($this->item_group_model->find($item['item_group_id'])['fk_entity_id'])['name'] : '');
+                        $entityId = null;
+                        $itemGroup = $this->item_group_model->withDeleted()->find($item['item_group_id']);
+                        $item['entity_name'] = '';
+
+                        if ($itemGroup !== null) {
+                            $entityId = $itemGroup['fk_entity_id'];
+
+                            if ($entityId !== null) {
+                                $entity = $this->entity_model->find($entityId);
+
+                                if ($entity !== null) {
+                                    $item['entity_name'] = $entity['name'];
+                                }
+                            }
+                        }
+
                         $item_entity = $this->entity_model->where('name', $item['entity_name'])->first();
                         $item['entity_address'] = !is_null($item_entity) ? "{$item_entity['address']} {$item_entity['zip']}, {$item_entity['locality']}" : '';
-                        $item['unit_price'] = $item['total_price'] != 0 ? round($item['total_price'] / $item['item_count'], 2) : '0';
+                        $item['total_price'] = $item['total_price'] != 0 ? round($item['total_price'], 2) : '0';
+                        $unitPrices = explode(',', $item['unit_price']);
+                        $item['unit_price'] = 0;
+
+                        // Get last value above zero
+                        if (is_array($unitPrices)) {
+                            $unitPrices = array_reverse($unitPrices);
+                            foreach ($unitPrices as $unitPrice) {
+                                if ($unitPrice > 0) {
+                                    $item['unit_price'] = $unitPrice;
+                                    break;
+                                }
+                            }
+                        }
                     }
                     
                     $tag_ids = $this->item_tag_link_model->where('item_common_id', $item['item_common_id'])->findColumn('item_tag_id');
                     is_array($tag_ids) ? $item['tags'] = $this->item_tag_model->whereIn('item_tag_id', $tag_ids)->findColumn('name') : $item['tags'] = [];
                     $item['tags'] = (is_array($item['tags']) ? implode(';', $item['tags']) : '');
-                    isset($item['item_group_id']) ? $item['group_name'] = $this->item_group_model->find($item['item_group_id'])['name'] : $item['group_name'] = '';
+                    isset($item['item_group_id']) ? $item['group_name'] = $this->item_group_model->withDeleted()->find($item['item_group_id'])['name'] : $item['group_name'] = '';
                     
                     $supplier = null;
                     !isset($item['supplier_id']) ?: $supplier = $this->supplier_model->find($item['supplier_id']);
@@ -176,7 +211,7 @@ class ExcelExport extends \App\Controllers\BaseController
                         $sheet->setCellValue('F'.strval($idx+2), $item['tags']);
                         $sheet->setCellValue('G'.strval($idx+2), $item['item_count']);
                         $sheet->setCellValue('H'.strval($idx+2), $item['name']);
-                        $sheet->setCellValue('I'.strval($idx+2), date(config('\Stock\config\StockConfig')->database_date_format, strtotime($item['last_created_date'])));
+                        $sheet->setCellValue('I'.strval($idx+2), !is_null($item['last_created_date']) ? date(config('\Stock\config\StockConfig')->database_date_format, strtotime($item['last_created_date'])) : '');
                         $sheet->setCellValue('J'.strval($idx+2), $item['unit_price']);
                         $sheet->setCellValue('K'.strval($idx+2), $item['total_price']);
                         $sheet->setCellValue('L'.strval($idx+2), $item['supplier']);
