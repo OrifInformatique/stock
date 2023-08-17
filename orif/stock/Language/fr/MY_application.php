@@ -169,7 +169,7 @@ return[
 'btn_back_to_main'               => 'Retour à l\'accueil',
 'btn_back_to_list'               => 'Retour à la liste',
 'btn_back_to_object'             => 'Retour à l\'objet',
-'btn_linked_doc'                 => 'Voir document',
+'btn_linked_doc'                 => 'Voir le fichier joint',
 'btn_create_inventory_control'   => 'Nouveau contrôle',
 'btn_inventory_control_history'  => 'Historique des contrôles',
 'btn_to_loans'                   => 'Liste des prêts',

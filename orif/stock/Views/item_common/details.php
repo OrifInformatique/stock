@@ -1,45 +1,50 @@
 <div class="container mb-3">
     <!-- Item common -->
     <div class="row">
-        <div class="row col-6">
-            <div class="col-12">
-                <h3><?= esc($item_common['name']); ?></h3>
-            </div>
-            <div class="col-4">
-                <?= lang('stock_lang.field_description') . ':'; ?>
-            </div>
-            <div class="col-8">
-                <?= esc($item_common['description']); ?>
-            </div>
-            <div class="col-4">
-                <?= lang('MY_application.field_group') . ':'; ?>
-            </div>
-            <div class="col-8">
-                <?= !is_null($item_common['item_group']) ? esc($item_common['item_group']['name']) : '' ?>
-            </div>
-            <div class="col-4">
-                <?= lang('MY_application.field_tags') . ':'; ?>
-            </div>
-            <div class="col-8">
-                <?php if (!empty($item_common['tags'])): ?>
-                    <?php foreach ($item_common['tags'] as $tag): ?>
-                        <span class="badge badge-dark"><?= esc($tag[0]['name']) ?></span>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </div>
-            <div class="col-4"><?= lang('stock_lang.field_linked_file') . ':'; ?></div>
-            <div class="col-8">
-                <!-- Button to display linked file -->
-                <a href="<?= !empty($item['linked_file']) ? base_url('uploads/files/'.$item['linked_file']) : ''?>" class="btn btn-default pt-0 pl-0 <?= !empty($item['linked_file']) ? '' : 'disabled' ?>"  role="button" >
-                    <?= lang('MY_application.btn_linked_doc'); ?>
-                </a>
-            </div>
+        <div class="col-12">
+            <h3><?= esc($item_common['name']); ?></h3>
         </div>
-        <div class="col-4">
+        <div class="col-12">
+            <?= esc($item_common['description']); ?>
+        </div>
+    </div>
+    <div class="row">
+        <div class="mt-2 col-lg-3 col-md-4 col-sm-6">
             <img id="picture"
                  src="<?= base_url($item_common['image']); ?>"
                  width="100%"
                  alt="<?= lang('MY_application.field_image'); ?>"/>
+        </div>
+        <div class="mt-2 col">
+            <div class="row">
+                <div class="col-12">
+                    <h4><span class="badge badge-info"><?= esc($item_common['entity']['name']) ?></span></h4>
+                </div>
+                <div class="col-6 col-md-4">
+                    <?= lang('MY_application.field_group') . '&nbsp;:'; ?>
+                </div>
+                <div class="col-6">
+                    <?= !is_null($item_common['item_group']) ? esc($item_common['item_group']['name']) : '' ?>
+                </div>
+                <div class="col-6 col-md-4">
+                    <?= lang('MY_application.field_tags') . '&nbsp;:'; ?>
+                </div>
+                <div class="col-6">
+                    <?php if (!empty($item_common['tags'])): ?>
+                        <?php foreach ($item_common['tags'] as $tag): ?>
+                            <span class="badge badge-dark"><?= esc($tag[0]['name']) ?></span>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+                <div class="col-12">
+                    <!-- Button to display linked file -->
+                    <?php if (!empty($item_common['linked_file'])): ?>
+                        <a href="<?= base_url('uploads/files/'.$item_common['linked_file']) ?>" class="btn btn-secondary"  role="button" >
+                            <?= lang('MY_application.btn_linked_doc'); ?>
+                        </a>
+                    <?php endif; ?>
+                </div>
+            </div>
         </div>
         <div class="col-2">
             <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && isset($can_modify) && $can_modify && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered): ?>

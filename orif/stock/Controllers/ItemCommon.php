@@ -109,9 +109,10 @@ class ItemCommon extends BaseController {
             $item_common['tags'] = $this->item_common_model->getTags($item_common);
             $item_common['image'] = $this->item_common_model->getImagePath($item_common);
             $item_common['item_group'] = $this->item_common_model->getItemGroup($item_common);
-            $output['entity_id'] = $item_common['item_group']['fk_entity_id'];
+            $item_common['entity'] = $this->entity_model->where('entity_id', $item_common['item_group']['fk_entity_id'])->first();
             
             $output['item_common'] = $item_common;
+            $output['entity_id'] = $item_common['entity']['entity_id'];
 
             if (isset($_SESSION['user_id'])) {
                 $output['can_modify'] = $this->user_entity_model->check_user_item_common_entity($_SESSION['user_id'], $item_common['item_common_id']);
