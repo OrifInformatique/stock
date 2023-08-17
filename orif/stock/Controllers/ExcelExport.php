@@ -135,7 +135,7 @@ class ExcelExport extends \App\Controllers\BaseController
                         $item['entity_address'] = !is_null($item_entity) ? "{$item_entity['address']} {$item_entity['zip']}, {$item_entity['locality']}" : '';
                         $item['total_price'] = $item['total_price'] != 0 ? round($item['total_price'], 2) : '0';
                         $unitPrices = explode(',', $item['unit_price']);
-                        $item['unit_price'] = 0;
+                        $item['unit_price'] = $unitPrices ? 0 : $item['unit_price'];
 
                         // Get last value above zero
                         if (is_array($unitPrices)) {
