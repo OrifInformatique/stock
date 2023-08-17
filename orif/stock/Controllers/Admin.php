@@ -332,7 +332,7 @@ class Admin extends BaseController
             return redirect()->to('/stock/admin/view_stocking_places');
         }
 
-        $output['entities'] = $this->entity_model->withDeleted()->findAll();
+        $output['entities'] = $this->entity_model->findAll();
 
         $this->display_view('Stock\admin\stocking_places\form', $output);
     }
@@ -369,7 +369,7 @@ class Admin extends BaseController
             }
         }
 
-        $output['entities'] = $this->entity_model->withDeleted()->findAll();
+        $output['entities'] = $this->entity_model->findAll();
 
         $this->display_view('Stock\admin\stocking_places\form', $output);
     }
@@ -720,7 +720,7 @@ class Admin extends BaseController
             return redirect()->to('/stock/admin/view_item_groups');
         }
 
-        $output['entities'] = $this->entity_model->withDeleted(false)->findAll();
+        $output['entities'] = $this->entity_model->findAll();
 
         $this->display_view('Stock\admin\item_groups\form', $output);
     }
@@ -759,7 +759,7 @@ class Admin extends BaseController
             }
         }
 
-        $output['entities'] = $this->entity_model->withDeleted(false)->findAll();
+        $output['entities'] = $this->entity_model->findAll();
         $output['errors'] = $validation->getErrors();
 
         $this->display_view('Stock\admin\item_groups\form', $output);
@@ -1053,7 +1053,7 @@ class Admin extends BaseController
             return $this->display_view('\Stock\admin\users\form_user', [
                 'user' => $user,
                 'user_types' => $userTypes,
-                'entities' => $this->entity_model->dropdown('name'),
+                'entities' => $this->dropdown($this->entity_model->findAll(), 'entity_id'),
                 'default_entities' => $this->entity_model->findAll()
             ]);
         }

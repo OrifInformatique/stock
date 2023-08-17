@@ -119,7 +119,7 @@ class Item extends BaseController {
         if (!isset($output["ad"])) $output["ad"] = '';
         if (!isset($output["e"])) $output["e"] = '';
 
-        $output['entities'] = $this->entity_model->dropdown('name');
+        $output['entities'] = $this->dropdown($this->entity_model->findAll(), 'entity_id');
         $output['has_entities'] = true;
 
         if (isset($_SESSION['user_id'])) {
