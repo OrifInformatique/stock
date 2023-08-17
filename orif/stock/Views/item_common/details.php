@@ -1,13 +1,28 @@
 <div class="container mb-3">
-    <!-- Item common -->
+    <!-- Button to return to the items list -->
+    <a href="<?php if (isset($_SESSION['items_list_url'])) {echo $_SESSION['items_list_url'];} else {echo base_url('/item/index');} ?>"
+       class="btn btn-primary mb-2" role="button"><i class="bi bi-arrow-left-circle"></i>&nbsp;<?= lang('MY_application.btn_back_to_list'); ?></a>
+
+    <!-- Administration buttons for authorized users only -->
     <div class="row">
-        <div class="col-12">
-            <h3><?= esc($item_common['name']); ?></h3>
-        </div>
-        <div class="col-12">
-            <?= esc($item_common['description']); ?>
-        </div>
+        <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && isset($can_modify) && $can_modify && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered): ?>
+            <div class="col-12">
+                <a href="<?= base_url("item/create/{$entity_id}/{$item_common['item_common_id']}"); ?>" class="btn btn-outline-success mb-2" role="button">
+                    <?= lang('My_application.btn_add_subitem'); ?>
+                </a>
+                <a href="<?= base_url('item_common/modify/' . $item_common['item_common_id']); ?>" class="btn btn-outline-warning mb-2" role="button">
+                    <?= lang('MY_application.btn_modify'); ?>
+                </a>
+                <?php if ($_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_admin): ?>
+                    <a href="<?= base_url('item_common/delete/' . $item_common['item_common_id']); ?>" class="btn btn-outline-danger mb-2" role="button">
+                        <?= lang('MY_application.btn_delete_all'); ?>
+                    </a>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
     </div>
+    <!-- End of administration buttons -->
+
     <div class="row">
         <div class="mt-2 col-lg-3 col-md-4 col-sm-6">
             <img id="picture"
@@ -18,25 +33,22 @@
         <div class="mt-2 col">
             <div class="row">
                 <div class="col-12">
-                    <h4><span class="badge badge-info"><?= esc($item_common['entity']['name']) ?></span></h4>
+                    <h3><span class="badge badge-info"><?= esc($item_common['entity']['name']) ?></span><?= ' '.esc($item_common['name']); ?></h3>
+                    <p><?= esc($item_common['description']); ?></p>
                 </div>
-                <div class="col-6 col-md-4">
-                    <?= lang('MY_application.field_group') . '&nbsp;:'; ?>
-                </div>
-                <div class="col-6">
+                <div class="col-md-6 col-md-4">
+                    <?= lang('MY_application.field_group') . '&nbsp;:<br>'; ?>
                     <?= !is_null($item_common['item_group']) ? esc($item_common['item_group']['name']) : '' ?>
                 </div>
-                <div class="col-6 col-md-4">
-                    <?= lang('MY_application.field_tags') . '&nbsp;:'; ?>
-                </div>
-                <div class="col-6">
+                <div class="col-md-6 col-lg-4">
+                    <?= lang('MY_application.field_tags') . '&nbsp;:<br>'; ?>
                     <?php if (!empty($item_common['tags'])): ?>
                         <?php foreach ($item_common['tags'] as $tag): ?>
                             <span class="badge badge-dark"><?= esc($tag[0]['name']) ?></span>
                         <?php endforeach; ?>
                     <?php endif; ?>
                 </div>
-                <div class="col-12">
+                <div class="col-12 mt-2">
                     <!-- Button to display linked file -->
                     <?php if (!empty($item_common['linked_file'])): ?>
                         <a href="<?= base_url('uploads/files/'.$item_common['linked_file']) ?>" class="btn btn-secondary"  role="button" >
@@ -46,22 +58,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-2">
-            <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && isset($can_modify) && $can_modify && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered): ?>
-                <a href="<?= base_url("item/create/{$entity_id}/{$item_common['item_common_id']}"); ?>" class="btn btn-success mb-1 w-100" role="button">
-                    <?= lang('common_lang.btn_add'); ?>
-                </a>
-                <a href="<?= base_url('item_common/modify/' . $item_common['item_common_id']); ?>" class="btn btn-warning mb-1 w-100" role="button">
-                    <?= lang('MY_application.btn_modify'); ?>
-                </a>
-                <?php if ($_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_admin): ?>
-                    <a href="<?= base_url('item_common/delete/' . $item_common['item_common_id']); ?>" class="btn btn-danger w-100" role="button">
-                        <?= lang('MY_application.btn_delete'); ?>
-                    </a>
-                <?php endif; ?>
-            <?php endif; ?>
-        </div>
     </div>
+
     <!-- Item details list -->
     <?php if (isset($items)): ?>
         <?php foreach ($items as $item): ?>
