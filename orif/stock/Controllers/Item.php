@@ -1134,6 +1134,6 @@ class Item extends BaseController {
             $this->loan_model->update($id, $data);
         }
 
-        return redirect()->to("/item");
+        return redirect()->to(base_url());
     }
 }

@@ -103,7 +103,7 @@ function load_items(page, filters){
             var result = JSON.parse(response);
             page = result.number_page;
             filters=getFilters();
-            history.pushState(null, "", "<?= base_url("item/list_loans/")?>"+ "/"+page+filters);
+            history.pushState(null, "", "<?= base_url("item/list_loans/")?>"+page+filters);
 
             // Empty list before filling it
             if (result.items !== null && result.items.length > 0){
@@ -132,7 +132,7 @@ function load_items(page, filters){
                 load_items(pageLinkNumber, getFilters());
             });
 
-            history.pushState(null, "", "<?= base_url("item/list_loans/")?>"+ "/" +page+filters);
+            history.pushState(null, "", "<?= base_url("item/list_loans/")?>"+page+filters);
             populating = false;
         },
         error : function(resultat, statut, erreur){
@@ -148,7 +148,7 @@ function load_items(page, filters){
 
 function display_item(item){
     // Item's parameters
-    let href = '<?= base_url("/item_common/view/"); ?>/'+item["item_common_id"];
+    let href = '<?= base_url("/item_common/view/"); ?>'+item["item_common_id"];
     let src_image = '<?= base_url(); ?>/'+item["image_path"];
     let alt_image = '<?php htmlspecialchars(lang("MY_application.field_image")); ?>';
     let item_condition = item["condition"]["bootstrap_label"];
