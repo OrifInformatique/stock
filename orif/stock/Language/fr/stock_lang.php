@@ -166,6 +166,8 @@ return[
 'unauthorized_entity_list'              => 'Vous n\'êtes pas autorisé à consulter le(s) sites demandés',
 'msg_err_unique_name'                   => 'Ce nom est déjà utilisé dans ce site',
 'msg_err_unique_short_name'             => 'Ce nom court est déjà utilisé dans ce site',
+'msg_err_item_group_has_same_entity'    => 'Ce groupe d\'objets ne peut pas être transféré sur un autre site, car des objets lui sont liés.',
+'msg_err_stocking_place_has_same_entity'=> 'Ce lieu de stockage ne peut pas être transféré sur un autre site, car des objets lui sont liés.',
 
 /** BTN */
 'excel_export_btn'                      => 'Exporter',

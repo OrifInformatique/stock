@@ -1038,8 +1038,6 @@ class Item extends BaseController {
     }
 
     /**
-     * 
-     *
      * @param  mixed $entityId
      * @return void
      */
@@ -1067,11 +1065,6 @@ class Item extends BaseController {
         }
     }
 
-    public function return_loan() {
-        echo 'Retour du prêt';
-        
-    }
-
     /**
      * Get e filter or set the default one 
      *
@@ -1096,4 +1089,51 @@ class Item extends BaseController {
         return $this->entity_model->first()['entity_id'] ?? 0;        
     }
     
+    /**
+     * Display a form to register the return of a loan
+     * 
+     * @param $id : The id of the concerned loan
+     */
+    public function return_loan($id) {
+        $loan = $this->loan_model->find($id);
+
+        if (!is_null($loan)) {
+            $item = $this->item_model->find($loan['item_id']);
+            $item_common = $this->item_common_model->find($item['item_common_id']);
+            $item['inventory_item_nb'] = $this->item_model->getInventoryNumber($item);
+            $user_model = new User_model();
+            $loaner = $user_model->withDeleted()->find($loan['loan_by_user_id']);
+    
+            $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
+            $data['title'] = lang('MY_application.page_return_loan');
+            $data['loan'] = $loan;
+            $data['item'] = $item;
+            $data['item_common'] = $item_common;
+            $data['loaner'] = $loaner;
+    
+            return $this->display_view('Stock\Views\loan\return', $data);
+        } else {
+            return redirect()->to($_SESSION['_ci_previous_url']);
+        }
+    }
+
+    /**
+     * Save new return date
+     * 
+     * @param $id : The id of the concerned loan
+     */
+    public function save_loan_return_date($id) {
+        // Check if this is allowed
+        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
+
+            $data = [
+                'real_return_date' => $this->request->getVar('real_return_date'),
+            ];
+
+            //save updated loan data
+            $this->loan_model->update($id, $data);
+        }
+
+        return redirect()->to(base_url());
+    }
 }
