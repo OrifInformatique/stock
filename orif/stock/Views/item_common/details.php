@@ -78,11 +78,19 @@
                                 <?= lang('MY_application.btn_delete'); ?>
                             </a>
                         <?php endif; ?>
-                        <!-- Button to create new loan -->              
-                        <a href="<?=base_url('/item/create_loan/' . $item['item_id'])?>"
-                            class="btn btn-outline-success btn-sm mb-2"  role="button" >
-                            <?= lang('MY_application.btn_create_loan'); ?>
-                        </a>
+                        <?php if (isset($item['current_loan']['planned_return_date'])): ?>
+                            <!-- Button to return a loan -->              
+                            <a href="<?=base_url('/item/return_loan/' . $item['current_loan']['loan_id'])?>"
+                                class="btn btn-outline-success btn-sm mb-2"  role="button" >
+                                <?= lang('MY_application.btn_return_loan'); ?>
+                            </a>
+                        <?php else: ?>
+                            <!-- Button to create new loan -->              
+                            <a href="<?=base_url('/item/create_loan/' . $item['item_id'])?>"
+                                class="btn btn-outline-success btn-sm mb-2"  role="button" >
+                                <?= lang('MY_application.btn_create_loan'); ?>
+                            </a>
+                        <?php endif; ?>
                         <!-- Button to display loans history -->
                         <a href="<?=base_url('/item/loans/' . $item['item_id'])?>"
                             class="btn btn-outline-primary btn-sm mb-2"  role="button" >
@@ -149,7 +157,6 @@
                     <!-- Warranty -->
                     <p>
                         <?= lang('MY_application.field_warranty_duration').'&nbsp;:<br>'; ?>
-                        <?= !empty($item['warranty_duration']) ? $item['warranty_duration'].' '.lang('MY_application.text_months') : config('\Stock\Config\StockConfig')->item_no_data; ?>
                         
                         <!-- Warranty status -->
                         <?php if ($item['warranty_status'] == 1): ?>
