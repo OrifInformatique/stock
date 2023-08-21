@@ -84,6 +84,7 @@ class Item extends BaseController {
         $this->entity_model = new Entity_model();
         $this->user_entity_model = new User_entity_model();
         $this->item_common_model = new Item_common_model();
+        $this->user_model = new User_model();
         $this->config = config('\Stock\Config\StockConfig');
 
         // Initialize db for query builder
@@ -1101,8 +1102,7 @@ class Item extends BaseController {
             $item = $this->item_model->find($loan['item_id']);
             $item_common = $this->item_common_model->find($item['item_common_id']);
             $item['inventory_item_nb'] = $this->item_model->getInventoryNumber($item);
-            $user_model = new User_model();
-            $loaner = $user_model->withDeleted()->find($loan['loan_by_user_id']);
+            $loaner = $this->user_model->withDeleted()->find($loan['loan_by_user_id']);
     
             $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
             $data['title'] = lang('MY_application.page_return_loan');
