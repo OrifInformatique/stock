@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col">
             <?php foreach (config('\Common\Config\AdminPanelConfig')->tabs as $tab){?>
-                <a href="<?=base_url($tab['pageLink'])?>" class="btn btn-primary adminnav" ><?=lang($tab['label'])?></a>
+                <a href="<?=base_url($tab['pageLink'])?>" class="btn btn-primary adminnav mb-1" ><?=lang($tab['label'])?></a>
             <?php } ?>
         </div>
     </div>

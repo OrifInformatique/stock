@@ -21,6 +21,7 @@ use Stock\Models\Stocking_place_model;
 use Stock\Models\Supplier_model;
 use Stock\Models\Item_group_model;
 use Stock\Models\Item_model;
+use Stock\Models\Item_common_model;
 use Stock\Models\User_entity_model;
 use User\Models\User_model;
 use User\Models\User_type_model;
@@ -35,6 +36,7 @@ class Admin extends BaseController
     protected Supplier_model $supplier_model;
     protected Item_group_model $item_group_model;
     protected Item_model $item_model;
+    protected Item_common_model $item_common_model;
     protected Entity_model $entity_model;
     protected User_entity_model $user_entity_model;
     protected User_model $user_model;
@@ -67,6 +69,7 @@ class Admin extends BaseController
         $this->supplier_model         = new Supplier_model();
         $this->item_group_model       = new Item_group_model();
         $this->item_model             = new Item_model();
+        $this->item_common_model      = new Item_common_model();
         $this->entity_model           = new Entity_model();
         $this->user_entity_model      = new User_entity_model();
         $this->user_model             = new User_model();
@@ -112,14 +115,14 @@ class Admin extends BaseController
 
         $data['primary_key_field'] = 'item_tag_id';
         $data['btn_create_label'] = lang('stock_lang.btn_add_tag');
-        $data['field_display_deleted'] = lang("stock_lang.field_deleted_tags");
+        $data['display_deleted_label'] = lang("stock_lang.field_deleted_tags");
         $data['url_update'] = "stock/admin/modify_tag/";
         $data['url_delete'] = "stock/admin/delete_tag/";
         $data['url_create'] = "stock/admin/new_tag";
         $data['url_getView'] = "stock/admin/view_tags";
         $data['with_deleted'] = $with_deleted;
 
-        return $this->display_view('Common\Views\items_list', $data);
+        return $this->display_view(['Stock\admin\common\entity_message', 'Common\Views\items_list'], $data);
     }
 
     /**
@@ -240,10 +243,15 @@ class Admin extends BaseController
     /**
      * As the name says, view the stocking places.
      */
-    public function view_stocking_places($with_deleted = FALSE)
+    public function view_stocking_places($entity_id = null, $with_deleted = FALSE)
     {
+        if (is_null($entity_id)) {
+            $entity_id = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->where('default', true)->findColumn('fk_entity_id');
+            $entity_id = !empty($entity_id) ? reset($entity_id) : null;
+        }
+
         if ($with_deleted) {
-            $data['items'] = $this->stocking_place_model->withDeleted()->findAll();
+            $data['items'] = $this->stocking_place_model->withDeleted()->where('fk_entity_id', $entity_id)->findAll();
 
             // Add the "active" info for each stocking place
             foreach ($data['items'] as &$stocking_place) {
@@ -258,7 +266,7 @@ class Admin extends BaseController
                 'active' => lang('stock_lang.field_active'),
             ];
         } else {
-            $data['items'] = $this->stocking_place_model->findAll();
+            $data['items'] = $this->stocking_place_model->where('fk_entity_id', $entity_id)->findAll();
             foreach ($data['items'] as &$stocking_place) {
                 if ($stocking_place['fk_entity_id'] != null)
                     $stocking_place['fk_entity_id'] = $this->entity_model->withDeleted()->find($stocking_place['fk_entity_id'])['name'];
@@ -268,23 +276,24 @@ class Admin extends BaseController
                 'name'  => lang('stock_lang.field_name'),
                 'short' => lang('stock_lang.field_short_name'),
                 'fk_entity_id' => lang('stock_lang.entity_name'),
-
             ];
         }
 
         // Prepare datas for common module generic items_list view
         $data['list_title'] = lang('stock_lang.title_stocking_places');
 
-        $data['primary_key_field']  = 'stocking_place_id';
-        $data['btn_create_label']   = lang('stock_lang.btn_add_stocking_place');
-        $data['field_display_deleted'] = lang("stock_lang.field_deleted_stocking_places");
+        $data['primary_key_field'] = 'stocking_place_id';
+        $data['btn_create_label'] = lang('stock_lang.btn_add_stocking_place');
+        $data['display_deleted_label'] = lang("stock_lang.field_deleted_stocking_places");
         $data['url_update'] = "stock/admin/modify_stocking_place/";
         $data['url_delete'] = "stock/admin/delete_stocking_place/";
         $data['url_create'] = "stock/admin/new_stocking_place";
-        $data['url_getView'] = "stock/admin/view_stocking_places";
+        $data['url_getView'] = "stock/admin/view_stocking_places/{$entity_id}";
         $data['with_deleted'] = $with_deleted;
+        $data['entities'] = $this->dropdown($this->entity_model->findAll(), 'entity_id');
+        $data['default_entity'] = $entity_id;
 
-        return $this->display_view('Common\Views\items_list', $data);
+        return $this->display_view(['Stock\Views\admin\common\entity_selector', 'Common\Views\items_list'], $data);
     }
 
     /**
@@ -303,7 +312,7 @@ class Admin extends BaseController
             // VALIDATION
             $validationRules = [
                 'name' => 'required|min_length[3]|max_length[45]|is_unique_place_name_by_entity[' . $id . ',' . $_POST['fk_entity_id'] . ']',
-                'short' => 'required|max_length['.$short_max_length.']|is_unique_place_short_name_by_entity[' . $id . ',' . $_POST['fk_entity_id'] . ']',
+                'short' => 'required|max_length[' . $short_max_length . ']|is_unique_place_short_name_by_entity[' . $id . ',' . $_POST['fk_entity_id'] . ']',
                 'fk_entity_id' => 'required|stocking_place_has_same_entity[' . $id . ']'
             ];
 
@@ -336,7 +345,7 @@ class Admin extends BaseController
             return redirect()->to('/stock/admin/view_stocking_places');
         }
 
-        $output['entities'] = $this->entity_model->findAll();
+        $output['entities'] = $this->entity_model->withDeleted()->findAll();
 
         $this->display_view('Stock\admin\stocking_places\form', $output);
     }
@@ -373,7 +382,7 @@ class Admin extends BaseController
             }
         }
 
-        $output['entities'] = $this->entity_model->findAll();
+        $output['entities'] = $this->entity_model->withDeleted()->findAll();
 
         $this->display_view('Stock\admin\stocking_places\form', $output);
     }
@@ -480,14 +489,14 @@ class Admin extends BaseController
 
         $data['primary_key_field']  = 'supplier_id';
         $data['btn_create_label']   = lang('stock_lang.btn_add_supplier');
-        $data['field_display_deleted'] = lang("stock_lang.field_deleted_suppliers");
+        $data['display_deleted_label'] = lang("stock_lang.field_deleted_suppliers");
         $data['url_update'] = "stock/admin/modify_supplier/";
         $data['url_delete'] = "stock/admin/delete_supplier/";
         $data['url_create'] = "stock/admin/new_supplier";
         $data['url_getView'] = "stock/admin/view_suppliers";
         $data['with_deleted'] = $with_deleted;
 
-        return $this->display_view('Common\Views\items_list', $data);
+        return $this->display_view(['Stock\admin\common\entity_message', 'Common\Views\items_list'], $data);
     }
 
     /**
@@ -634,10 +643,15 @@ class Admin extends BaseController
     /**
      * As the name says, view the item groups.
      */
-    public function view_item_groups($with_deleted = FALSE)
+    public function view_item_groups($entity_id = null, $with_deleted = FALSE)
     {
+        if (is_null($entity_id)) {
+            $entity_id = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->where('default', true)->findColumn('fk_entity_id');
+            $entity_id = !empty($entity_id) ? reset($entity_id) : null;
+        }
+
         if ($with_deleted) {
-            $data['items'] = $this->item_group_model->withDeleted()->findAll();
+            $data['items'] = $this->item_group_model->withDeleted()->where('fk_entity_id', $entity_id)->findAll();
 
             // Add the "active" info for each item group
             foreach ($data['items'] as &$item_group) {
@@ -651,7 +665,7 @@ class Admin extends BaseController
                 'active' => lang('stock_lang.field_active'),
             ];
         } else {
-            $data['items'] = $this->item_group_model->findAll();
+            $data['items'] = $this->item_group_model->where('fk_entity_id', $entity_id)->findAll();
             foreach ($data['items'] as $itemidx => $item) {
                 if (isset($item['fk_entity_id']))
                     $item['fk_entity_id'] = $this->entity_model->withDeleted(true)->find($item['fk_entity_id'])['name'];
@@ -670,14 +684,16 @@ class Admin extends BaseController
 
         $data['primary_key_field']  = 'item_group_id';
         $data['btn_create_label']   = lang('stock_lang.btn_add_item_group');
-        $data['field_display_deleted'] = lang("stock_lang.field_deleted_item_groups");
+        $data['display_deleted_label'] = lang("stock_lang.field_deleted_item_groups");
         $data['url_update'] = "stock/admin/modify_item_group/";
         $data['url_delete'] = "stock/admin/delete_item_group/";
         $data['url_create'] = "stock/admin/new_item_group";
-        $data['url_getView'] = "stock/admin/view_item_groups";
+        $data['url_getView'] = "stock/admin/view_item_groups/{$entity_id}";
         $data['with_deleted'] = $with_deleted;
+        $data['entities'] = $this->dropdown($this->entity_model->findAll(), 'entity_id');
+        $data['default_entity'] = $entity_id;
 
-        return $this->display_view('Common\Views\items_list', $data);
+        return $this->display_view(['Stock\Views\admin\common\entity_selector', 'Common\Views\items_list'], $data);
     }
 
     /**
@@ -695,7 +711,7 @@ class Admin extends BaseController
             // VALIDATION
             $validationRules = [
                 'name' => 'required|min_length[2]|max_length[45]|is_unique_group_name_by_entity[' . $id . ',' . $_POST['fk_entity_id'] . ']',
-                'short_name' => 'required|max_length['.config('\Stock\Config\StockConfig')->stocking_short_max_length.']|is_unique_group_short_name_by_entity[' . $id . ',' . $_POST['fk_entity_id'] . ']',
+                'short_name' => 'required|max_length[' . config('\Stock\Config\StockConfig')->stocking_short_max_length . ']|is_unique_group_short_name_by_entity[' . $id . ',' . $_POST['fk_entity_id'] . ']',
                 'fk_entity_id' => 'required|item_group_has_same_entity[' . $id . ']'
             ];
 
@@ -795,16 +811,13 @@ class Admin extends BaseController
                 return redirect()->to('/stock/admin/view_item_groups');
                 break;
 
-            case 2: // Delete item_group and update every connected FK to NULL
-                $item_id = $this->item_model->where('item_group_id', $id)->findAll();
+            case 2: // Delete item_group and update (prevent deletion if linked to an item_common)
+                $item_commons = $this->item_common_model->where('item_group_id', $id)->findAll();
 
-                if (!is_null($item_id)) {
-                    for ($i = 0; $i <= count($item_id) - 1; $i++) {
-                        $this->item_model->update($item_id[$i]['item_id'], ['item_group_id' => NULL]);
-                    }
+                if (is_null($item_commons)) {
+                    $this->item_group_model->delete($id, TRUE);
                 }
 
-                $this->item_group_model->delete($id, TRUE);
                 return redirect()->to('/stock/admin/view_item_groups');
 
             default: // Do nothing
@@ -832,7 +845,7 @@ class Admin extends BaseController
 
     public function view_entity_list($with_deleted = 0)
     {
-        $data['columns'] = ['name' => lang('stock_lang.name'), 'address' => lang('stock_lang.field_address'), 'zip' => lang('stock_lang.zip_code'), 'locality' => lang('stock_lang.locality'), 'shortname' => lang('stock_lang.tagname')];
+        $data['columns'] = ['name' => lang('stock_lang.name'), 'address' => lang('stock_lang.address'), 'zip' => lang('stock_lang.zip_code'), 'locality' => lang('stock_lang.locality'), 'shortname' => lang('stock_lang.tagname')];
         $data['items'] = [];
         foreach ($this->entity_model->withDeleted($with_deleted)->findAll() as $entity) {
             $data['items'][] = ['id' => $entity['entity_id'], 'name' => $entity['name'], 'address' => $entity['address'], 'zip' => $entity['zip'], 'locality' => $entity['locality'], 'shortname' => $entity['shortname'], 'enabled' => $entity['archive'] == null ? lang('common_lang.yes') : lang('common_lang.no')];
@@ -841,15 +854,16 @@ class Admin extends BaseController
             $data['columns']['enabled'] = lang('stock_lang.field_active');
         }
 
+        $data['list_title'] = lang('stock_lang.title_entity_list');
         $data['primary_key_field']  = 'id';
+        $data['display_deleted_label'] = lang('stock_lang.field_deleted_entities');
         $data['btn_create_label']   = lang('stock_lang.add_entity');
-        $data['list_title']         = lang('stock_lang.title_entity_list');
         $data['with_deleted']       = $with_deleted;
-        $data['url_update']         = "stock/admin/save_entity/1/";
-        $data['url_delete']         = "stock/admin/delete_entity/0/";
-        $data['url_create']         = "stock/admin/save_entity/0/";
-        $data['url_getView']        = "stock/admin/view_entity_list";
-        return $this->display_view('\Common\items_list', $data);
+        $data['url_update'] = "stock/admin/save_entity/1/";
+        $data['url_delete'] = "stock/admin/delete_entity/0/";
+        $data['url_create'] = "stock/admin/save_entity/0/";
+        $data['url_getView'] = "stock/admin/view_entity_list";
+        return $this->display_view('Common\Views\items_list', $data);
     }
 
     public function save_entity($action = 0, $entity_id = 0)
@@ -901,6 +915,66 @@ class Admin extends BaseController
             $this->entity_model->delete($entity_id, true);
             return redirect()->to(base_url('stock/admin/view_entity_list'));
         }
+    }
+
+    /**
+     * Displays the list of users
+     *
+     * @param boolean $with_deleted : Display archived users or not
+     * @return void
+     */
+    public function list_user($entity_id = null, $with_deleted = FALSE)
+    {
+        if (is_null($entity_id)) {
+            $entity_id = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->where('default', true)->findColumn('fk_entity_id');
+            $entity_id = !empty($entity_id) ? reset($entity_id) : null;
+        }
+
+        $fk_user_ids = $this->user_entity_model->where('fk_entity_id', $entity_id)->findColumn('fk_user_id');
+
+        if (!empty($fk_user_ids)) {
+            if ($with_deleted) {
+                $users = $this->user_model->withDeleted()->find($fk_user_ids);
+            } else {
+                $users = $this->user_model->find($fk_user_ids);
+            }
+        } else {
+            $users = [];
+        }
+
+        //usertiarray is an array contained all usertype name and id
+        $userTypes = $this->db->table('user_type')->select(['id', 'name'],)->get()->getResultArray();
+        foreach ($users as $index => $row) {
+            $key = array_search($row['fk_user_type'], array_column($userTypes, 'id'));
+
+            $users[$index]['user_type'] = $userTypes[$key]['name'];
+            $users[$index]['archive'] = is_null($row['archive']) ? lang('MY_application.text_yes') : lang('MY_application.text_no');
+        }
+
+        // Describe columns to display for common module generic items_list view
+        $output['columns'] = [
+            'username' => lang('user_lang.field_username'),
+            'email' => lang('user_lang.field_email'),
+            'archive' => lang('user_lang.field_user_active'),
+            'user_type' => lang('user_lang.field_usertype'),
+        ];
+
+        // Complete datas for common module generic items_list view
+        $output['list_title'] = lang('user_lang.title_user_list');
+
+        $output['items'] = $users;
+        $output['primary_key_field']  = 'id';
+        $output['btn_create_label']   = lang('common_lang.btn_new_m');
+        $output['display_deleted_label'] = lang("user_lang.field_deleted_users_display");
+        $output['url_update'] = "user/admin/save_user/";
+        $output['url_delete'] = "user/admin/delete_user/";
+        $output['url_create'] = "user/admin/save_user";
+        $output['url_getView'] = "stock/admin/list_user/{$entity_id}";
+        $output['with_deleted'] = $with_deleted;
+        $output['entities'] = $this->dropdown($this->entity_model->findAll(), 'entity_id');
+        $output['default_entity'] = $entity_id;
+
+        $this->display_view(['\Stock\Views\admin\common\entity_selector', '\Common\Views\items_list'], $output);
     }
 
     public function save_user($user_id = 0)
@@ -1084,7 +1158,7 @@ class Admin extends BaseController
             return redirect()->to('/user/admin/list_user');
         }
 
-        switch($action) {
+        switch ($action) {
             case 0: // Display confirmation
                 $output = array(
                     'user' => $user,

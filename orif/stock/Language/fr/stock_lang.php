@@ -59,6 +59,7 @@ return[
 'field_deleted_stocking_places'         => 'Afficher les lieux de stockage désactivés',
 'field_deleted_suppliers'               => 'Afficher les fournisseurs désactivés',
 'field_deleted_item_groups'             => 'Afficher les groupes d\'objets désactivés',
+'field_deleted_entities'                => 'Afficher les sites désactivés',
 'field_user_entities'                   => 'Sites attribués',
 'field_user_default_entity'             => 'Site principal',
 'field_search_item_common'              => 'Rechercher un objet commun',
@@ -139,6 +140,8 @@ return[
 'delete_entity_what_to_do'              => 'La désactivation d\'un site permet de le rendre inutilisable tout en conservant ses informations dans les archives.
                                             Cela permet notamment de conserver l\'historique de ses actions.<br><br>
                                             En cas de suppression, toutes les information associées à ce site seront suprimées.',
+'entity_has_no_user'                    => 'Cette entité ne possède aucun utilisateur activé',
+'entity_has_no_elements'                => 'Cette entité ne possède aucun élément activé',
 'group_by'                              => 'Grouper par',
 'export_excel_default_service'          => 'Professionnel',
 'export_excel_default_section'          => 'Section Informatique',
@@ -182,5 +185,6 @@ return[
 'msg_no_entities_exist'                 => 'Aucun site n\'a été créé, par défaut tous les objets sont affichés',
 'msg_user_has_no_entities'              => 'Vous n\'êtes lié à aucun site, veuillez contacter votre administrateur',
 'msg_entities_has_no_items'             => 'Aucun site n\'est lié à un objet',
+'element_is_shared_between_entity'      => 'Attention ces éléments sont partagés entre tous les sites.',
 
 ];
