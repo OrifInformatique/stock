@@ -118,6 +118,15 @@
                     <?= !is_null($item['condition']) ? $item['condition']['bootstrap_label'] : config('\Stock\Config\StockConfig')->item_no_data; ?>
                     <!-- Loan status -->
                     <?= $item['current_loan']['bootstrap_label']; ?>
+                    <!-- Loan informations -->
+                    <?php if (isset($item['current_loan']['loan_id'])): ?>
+                        <p>
+                            <?= !empty($item['current_loan']['borrower_email']) ? $item['current_loan']['borrower_email'].'<br>' : ''; ?>
+                            <?= !empty($item['current_loan']['item_localisation']) ? $item['current_loan']['item_localisation'].'<br>' : ''; ?>
+                            <?= lang('MY_application.field_loan_planned_return'); ?>&nbsp;:
+                            <?= !empty($item['current_loan']['planned_return_date']) ? databaseToShortDate($item['current_loan']['planned_return_date']) : config('\Stock\Config\StockConfig')->item_no_data; ?>
+                        </p>
+                    <?php endif; ?>
                     <!-- Remarks -->
                     <?php if (isset($item['remarks']) && !empty($item['remarks'])): ?>
                         <p class="alert alert-info mt-2" role="alert"><?= $item['remarks']; ?></p>
