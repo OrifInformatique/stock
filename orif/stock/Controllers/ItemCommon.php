@@ -266,11 +266,13 @@ class ItemCommon extends BaseController {
 
             $item_common = $this->item_common_model->find($id);
             $entity_id = $this->item_group_model->where('item_group_id', $item_common['item_group_id'])->findColumn('fk_entity_id');
+            $entity = $this->entity_model->where('entity_id', $entity_id)->first();
             $item_groups = $this->item_group_model->where('fk_entity_id', reset($entity_id))->findAll();
             $item_tags = $this->item_tag_model->findAll();
             $item_tag_ids = $this->item_tag_link_model->where('item_common_id', $id)->findColumn('item_tag_id');
 
             $output['item_common'] = $item_common;
+            $output['entity'] = $entity;
             $output['item_groups'] = $this->dropdown($item_groups, 'item_group_id');
             $output['item_tags'] = $this->dropdown($item_tags, 'item_tag_id');
             $output['item_tag_ids'] = $item_tag_ids;

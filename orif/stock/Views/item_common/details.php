@@ -52,7 +52,7 @@
                 <div class="col-12 mt-2">
                     <!-- Button to display linked file -->
                     <?php if (!empty($item_common['linked_file'])): ?>
-                        <a href="<?= base_url('uploads/files/'.$item_common['linked_file']) ?>" class="btn btn-secondary"  role="button" >
+                        <a href="<?= base_url('uploads/files/'.$item_common['linked_file']) ?>" class="btn btn-outline-primary btn-sm"  role="button" target="_blank" >
                             <?= lang('MY_application.btn_linked_doc'); ?>
                         </a>
                     <?php endif; ?>

@@ -76,6 +76,7 @@ return[
 'field_tags'                     => 'Type d\'objet',
 'field_text_search'              => 'Nom, description, No inventaire, No série',
 'field_no_filter'                => 'Aucun filtre',
+'field_no_type'                  => 'Aucun type',
 'field_sort_order'               => 'Trier par',
 'field_sort_asc_desc'            => 'Ordre de tri',
 'field_take_photo'               => 'Prendre une photo',
