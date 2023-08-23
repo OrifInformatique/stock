@@ -156,7 +156,9 @@
                     </p>
                     <!-- Warranty -->
                     <p>
+                        <!-- Warranty duration -->
                         <?= lang('MY_application.field_warranty_duration').'&nbsp;:<br>'; ?>
+                        <?= !empty($item['warranty_duration']) ? $item['warranty_duration'].' '.lang('MY_application.text_months') : ''; ?>
                         
                         <!-- Warranty status -->
                         <?php if ($item['warranty_status'] == 1): ?>
