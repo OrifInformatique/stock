@@ -2,7 +2,6 @@
 
     <!-- *** ADMIN *** -->
     <?php
-
     if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered) { ?>
         <div class="row bottom-margin">
             <div class="col-12">
@@ -14,9 +13,10 @@
     <?php } ?>
     <!-- *** END OF ADMIN *** -->
 
+    <!-- Entity -->
     <div class="row pb-3">
-        <div id="e" class="col-sm-12">
-            <?= form_label(lang('stock_lang.entity_name'),'entities_list_label').form_dropdown('e', $entities, isset($_GET["e"]) ? $_GET["e"] : $default_entity,'id="entities_list"');?>
+        <div id="e" class="dropdown col-md-4">
+            <?= form_dropdown('e', $entities, isset($_GET["e"]) ? $_GET["e"] : $default_entity,'id="entities_list"');?>
         </div>
     </div>
 
@@ -31,6 +31,7 @@
     <div id="alert_user_has_no_entities" class="<?= $has_entities ? 'd-none' : '' ?> alert alert-warning text-center" role="alert">
        <?= lang('stock_lang.msg_user_has_no_entities') ?>
     </div>
+
     <!-- FILTERS AND SORT FORM -->
     <form id="filters" class="" style="overflow: visible;" method="get" action="<?=base_url("item/index/1") . "/"?>">
         <div class="row">
@@ -352,10 +353,16 @@ function initializeMultiSelect() {
         buttonClass: 'btn btn-outline-primary',
         numberDisplayed: 10
     });
-    $('#item_conditions-multiselect, #item_groups-multiselect, #stocking_places-multiselect, #sort_order, #sort_asc_desc, #entities_list').multiselect({
+    $('#item_conditions-multiselect, #item_groups-multiselect, #stocking_places-multiselect, #sort_order, #sort_asc_desc').multiselect({
         nonSelectedText: no_filter,
         buttonWidth: '100%',
         buttonClass: 'btn btn-outline-primary',
+        numberDisplayed: 5
+    });
+    $('#entities_list').multiselect({
+        nonSelectedText: no_filter,
+        buttonWidth: '100%',
+        buttonClass: 'btn btn-info',
         numberDisplayed: 5
     });
 }
