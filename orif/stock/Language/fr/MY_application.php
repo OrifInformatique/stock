@@ -159,7 +159,8 @@ return[
 'admin_new'                      => 'Nouveau…',
 'admin_cancel'                   => 'Annuler',
 // Buttons
-'btn_add_subitem'                => 'Ajouter un sous-objet',
+'btn_add_item'                   => "Ajouter un objet",
+'btn_add_subitem'                => 'Ajouter un exemplaire',
 'btn_admin'                      => 'Administration',
 'btn_cancel'                     => 'Annuler',
 'btn_change_password'            => 'Modifier le mot de passe',

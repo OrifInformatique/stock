@@ -1,24 +1,23 @@
 <div class="container">
-
-    <!-- *** ADMIN *** -->
-    <?php
-    if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered) { ?>
-        <div class="row bottom-margin">
-            <div class="col-12">
-                <!-- Button for new item -->
-                <a id="btn_add" href="<?php echo base_url("item/create/"); ?>"
-                        class="btn btn-success mb-3"><?php echo htmlspecialchars(lang('MY_application.btn_new')); ?></a>
-            </div>
-        </div>
-    <?php } ?>
-    <!-- *** END OF ADMIN *** -->
-
-    <!-- Entity -->
+    
     <div class="row pb-3">
+        <!-- Entity -->
         <div id="e" class="dropdown col-md-4">
             <?= form_dropdown('e', $entities, isset($_GET["e"]) ? $_GET["e"] : $default_entity,'id="entities_list"');?>
         </div>
+        <!-- *** ADMIN *** -->
+        <?php
+        if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered) { ?>
+            <div class="col-md-8 text-right">
+                <!-- Button for new item -->
+                <a id="btn_add" href="<?php echo base_url("item/create/"); ?>"
+                        class="btn btn-outline-success"><?php echo htmlspecialchars(lang('MY_application.btn_add_item')); ?></a>
+            </div>
+        <?php } ?>
+        <!-- *** END OF ADMIN *** -->
     </div>
+
+    
 
     <div id="alert_no_entities" class="d-none alert alert-warning text-center" role="alert">
        <?= lang('stock_lang.msg_no_entities_exist') ?>
