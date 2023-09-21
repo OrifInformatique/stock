@@ -150,49 +150,68 @@ $config = config('\Stock\Config\StockConfig');
             </div>
         </div>
 
+        <!-- Item specimen details -->
         <div class="row">
             <div class="col-12">
-                <p class="bg-primary">&nbsp;<?= lang('MY_application.header_item_name'); ?></p>
+                <p class="bg-primary">&nbsp;<?= lang('stock_lang.item_specimen_details'); ?></p>
             </div>
         </div>
 
-        <!-- INVENTORY PREFIX, INVENTORY NUMBER, SERIAL NUMBER AND REMARKS -->
         <div class="row">
+            <!-- Inventory number -->
             <div class="col-md-4">
-                <div class="row">
-                    <div class="form-group col-12">
-                        <?= form_label(lang('MY_application.field_inventory_number'), 'inventory_prefix'); ?>
-                        <input type="text" class="form-control input-bold" name="inventory_prefix"
+                <?= form_label(lang('MY_application.field_inventory_number')); ?>
+
+                <div class="row mb-2">
+                    <!-- Inventory prefix -->
+                    <div class="col-md-8">
+                        <?= form_label(lang('MY_application.field_inventory_prefix'), 'inventory_prefix'); ?>
+                        <input type="text" class="form-control" name="inventory_prefix"
                             id="inventory_prefix"
-                            placeholder="<?= lang('MY_application.field_inventory_number') ?>"
+                            placeholder="<?= lang('MY_application.field_inventory_prefix') ?>"
                             value="<?= isset($item) ? $item['inventory_prefix'] : set_value('inventory_prefix') ?>" />
                         <span class="text-danger"><?= isset($errors['inventory_prefix']) ? $errors['inventory_prefix']: ''; ?></span>
                     </div>
-                    <div class="form-group col-12">
+
+                    <!-- Inventory id -->
+                    <div class="col-md-4">
+                        <?= form_label(lang('MY_application.field_inventory_id'), 'inventory_id'); ?>
                         <input type="text" class="form-control" name="inventory_id"
                             id="inventory_id"
                             value="<?php if(isset($inventory_id)) {echo set_value('inventory_id',$inventory_id);} else {echo set_value('inventory_id');} ?>"
                                 disabled />
                     </div>
                 </div>
-                <div class="row">
-                    <div class="form-group col-12">
-                        <input type="button" class="form-control btn btn-primary" name="inventory_number_button"
+
+                <!-- Generate inventory number -->
+                <div class="row mb-2">
+                    <div class="col-12">
+                        <input type="button" class="form-control btn btn-sm btn-primary" name="inventory_number_button"
                             value="<?= lang('MY_application.btn_generate_inventory_nb') ?>" onclick="createInventoryNo()">
                     </div>
                 </div>
             </div>
+
             <div class="col-md-8">
-                <div class="row">
-                    <div class="form-group col-md-12">
-                        <?= form_label(lang('MY_application.field_serial_number'), 'serial_number').form_input('serial_number', isset($serial_number) ? $serial_number : (isset($item['serial_number']) ? $item['serial_number'] : ''), [
+                <!-- Serial number -->
+                <div class="row mb-2">
+                    <div class="col-md-4">
+                        <?= form_label(lang('MY_application.field_serial_number'), 'serial_number') ?>
+                    </div>
+                    <div class="col-md-8">
+                        <?= form_input('serial_number', isset($serial_number) ? $serial_number : (isset($item['serial_number']) ? $item['serial_number'] : ''), [
                             'class' => 'form-control'
                         ]) ?>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="form-group col-md-12">
-                        <?= form_label(lang('MY_application.field_remarks'), 'remarks').form_textarea('remarks', isset($supplier_ref) ? $supplier_ref : (isset($item['remarks']) ? $item['remarks'] : ''), [
+
+                <!-- Remarks -->
+                <div class="row mb-2">
+                    <div class="col-md-4">
+                        <?= form_label(lang('MY_application.field_remarks'), 'remarks') ?>
+                    </div>
+                    <div class="col-md-8">
+                        <?= form_textarea('remarks', isset($supplier_ref) ? $supplier_ref : (isset($item['remarks']) ? $item['remarks'] : ''), [
                             'class' => 'form-control',
                             'rows' => '2'
                         ]) ?>
@@ -201,19 +220,21 @@ $config = config('\Stock\Config\StockConfig');
             </div>
         </div>
 
-        <!-- ITEM STATUS, LOAN STATUS AND HISTORY -->
         <div class="row">
-            <div class="col-md-12">
-                <p class="bg-primary">&nbsp;<?= lang('MY_application.text_item_loan_status'); ?></p>
+            <!-- Separator -->
+            <div class="col-12">
+                <div class="border-top border-bottom border-primary mt-3 mb-3"></div>
             </div>
-        </div>
-        <div class="row">
+
+            <!-- Condition -->
             <div class="form-group col-md-6">
                 <?= form_label(lang('MY_application.text_item_condition'), 'item_condition_id').form_dropdown('item_condition_id', $conditions, isset($item_condition_id) ? $item_condition_id : (isset($item['item_condition_id']) ? $item['item_condition_id'] : []), [
                         'class' => 'form-control'
                     ]);
                 ?>
             </div>
+
+            <!-- Stocking place -->
             <div class="form-group col-md-6">
                 <?= form_label(lang('MY_application.field_stocking_place'), 'stocking_place_id').form_dropdown('stocking_place_id', $stocking_places, isset($stocking_place_id) ? $stocking_place_id : (isset($item['stocking_place_id']) ? $item['stocking_place_id'] : []), [
                         'class' => 'form-control'
@@ -221,16 +242,15 @@ $config = config('\Stock\Config\StockConfig');
                 ?>
                 <span class="text-danger"><?= isset($errors['stocking_place_id']) ? $errors['stocking_place_id']: ''; ?></span>
             </div>
-
         </div>
 
-        <!-- ITEM SUPPLIER, BUYING AND WARRANTY INFORMATIONS -->
         <div class="row">
-            <div class="col-md-12">
-                <p class="bg-primary">&nbsp;<?= lang('MY_application.text_item_buying_warranty'); ?></p>
+            <!-- Separator -->
+            <div class="col-12">
+                <div class="border-top border-bottom border-primary mt-3 mb-3"></div>
             </div>
-        </div>
-        <div class="row">
+
+            <!-- Supplier -->
             <div class ="col-md-4">
                 <div class="form-group">
                     <?= form_label(lang('MY_application.field_supplier'), 'supplier_id').form_dropdown('supplier_id', $suppliers, isset($supplier_id) ? $supplier_id : (isset($item['supplier_id']) ? $item['supplier_id'] : []), [
@@ -243,6 +263,8 @@ $config = config('\Stock\Config\StockConfig');
                     ]) ?>
                 </div>
             </div>
+
+            <!-- Buying price and buying date -->
             <div class="col-md-4">
                 <div class="form-group">
                     <?= form_label(lang('MY_application.field_buying_price'), 'buying_price').form_input('buying_price', isset($buying_price) ? $buying_price : (isset($item['buying_price']) ? $item['buying_price'] : ''), [
@@ -257,14 +279,17 @@ $config = config('\Stock\Config\StockConfig');
                     ], 'date') ?>
                 </div>
             </div>
+
+            <!-- Warranty -->
             <div class="col-md-4">
                 <div class="form-group">
                     <?= form_label(lang('MY_application.field_warranty_duration'), 'warranty_duration').form_input('warranty_duration', isset($warranty_duration) ? $warranty_duration : (isset($item['warranty_duration']) ? $item['warranty_duration'] : ''), [
                         'class' => 'form-control',
-                        'id' => 'warranty_duration'
+                        'id' => 'warranty_duration',
+                        'onblur' => 'change_warranty()'
                     ], 'number') ?>
                 </div>
-                <span class="label label-success" id="garantie">Sous garantie</span>
+                <span class="badge badge-success" id="garantie">Sous garantie</span>
             </div>
         </div>
     <?= form_close(); ?>
@@ -348,15 +373,21 @@ $config = config('\Stock\Config\StockConfig');
         if (remaining_months > 3) {
             // Under warranty
             span_garantie.innerHTML = "<?= lang('MY_application.text_warranty_status')[1]; ?>";
-            span_garantie.class = "label label-success";
+            span_garantie.className = "badge badge-success";
         } else if (remaining_months > 0) {
             // Warranty expires soon
             span_garantie.innerHTML = "<?= lang('MY_application.text_warranty_status')[2]; ?>";
-            span_garantie.class = "label label-warning";
+            span_garantie.className = "badge badge-warning";
         } else {
-            // Warranty expired
-            span_garantie.innerHTML = "<?= lang('MY_application.text_warranty_status')[3]; ?>";
-            span_garantie.class = "label label-danger";
+            if (!buying_date || !duration) {
+                // Undetermined warranty
+                span_garantie.innerHTML = "";
+                span_garantie.className = "";
+            } else {
+                // Warranty expired
+                span_garantie.innerHTML = "<?= lang('MY_application.text_warranty_status')[3]; ?>";
+                span_garantie.className = "badge badge-danger";
+            }
         }
     }
 

@@ -80,6 +80,8 @@ return[
 'supplier'                              => 'Fournisseur',
 'item_group'                            => 'Groupe d\'objets',
 'item_common'                           => 'Objet',
+'item_specimen'                         => 'Exemplaire d\'objet',
+'item_specimen_details'                 => 'Détails de cet exemplaire',
 'no_item_common_found'                  => 'Aucun objet n\'a été trouvé',
 'add_item_common_info'                  => 'Un objet va être créé',
 'add_item_info'                         => 'Un nouvel exemplaire de cet objet sera créé :',

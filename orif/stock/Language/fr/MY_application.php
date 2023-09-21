@@ -48,6 +48,8 @@ return[
 'field_serial_number'            => 'No de série',
 'field_inventory_number'         => 'Numéro d\'inventaire',
 'field_inventory_number_abr'     => 'No inventaire',
+'field_inventory_prefix'         => 'Préfixe',
+'field_inventory_id'             => 'Identifiant',
 'field_item_name'                => 'Nom de l\'objet',
 'field_item_description'         => 'Description de l\'objet',
 'field_item_condition'           => 'État de l\'objet',
@@ -186,7 +188,7 @@ return[
 'btn_remove_filters'             => 'Supprimer les filtres',
 'btn_all'                        => 'Tout',
 'btn_none'                       => 'Rien',
-'btn_generate_inventory_nb'      => 'Générer un No d\'inventaire',
+'btn_generate_inventory_nb'      => 'Générer no d\'inventaire',
 // Messages
 'msg_err_abbreviation'           => 'Une abréviation doit être fournie',
 'msg_err_invalid_password'       => 'L\'identifiant et le mot de passe ne sont pas valides',
