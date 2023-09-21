@@ -7,7 +7,7 @@ $config = config('\Stock\Config\StockConfig');
             'enctype' => 'multipart/form-data'
         ]); 
     ?>
-        <!-- ERROR MESSAGES -->
+        <!-- Error messages -->
         <?php if (isset($upload_errors) && !empty($upload_errors)): ?>
             <div class="row">
                 <div class="col-12">
@@ -22,16 +22,11 @@ $config = config('\Stock\Config\StockConfig');
         <div class="row">
             <div class="col-12 mb-3">
                 <input type="submit" class="btn btn-success" id="btn_submit" name="btn_submit" value="<?= lang('MY_application.btn_save'); ?>" />
-                <a href="<?= base_url(); ?>" class="btn btn-danger"><?= lang('MY_application.btn_cancel'); ?></a>
-            </div>
-        </div>
-
-        <!-- Entities -->
-        <div class="row">
-            <div id="e" class="col-12 mb-3">
-                <?= form_label(lang('stock_lang.entity_name'),'entities_list_label').form_dropdown('e', $entities, $selected_entity_id, [
-                    'id' => 'entities_list'
-                ]);?>
+                <?php if (isset($item_common) && !empty($item_common)): ?>
+                    <a href="<?= base_url("item_common/view/{$item_common['item_common_id']}"); ?>" class="btn btn-outline-primary"><?= lang('MY_application.btn_cancel'); ?></a>
+                <?php else: ?>
+                    <a href="<?= base_url(); ?>" class="btn btn-outline-primary"><?= lang('MY_application.btn_cancel'); ?></a>
+                <?php endif; ?>
             </div>
         </div>
 
@@ -41,60 +36,11 @@ $config = config('\Stock\Config\StockConfig');
                 <p class="bg-primary">&nbsp;<?= lang('stock_lang.item_common'); ?></p>
             </div>
         </div>
+
         <div class="row">
-            <div class="col-md-8">
-                <!-- Name -->
-                <div class="mb-3">
-                    <?= form_label(lang('stock_lang.field_name'), 'item_common_name').form_input('item_common_name', isset($item_common_name) ? $item_common_name : (isset($item_common['name']) ? $item_common['name'] : ''), [
-                            'placeholder' => lang('stock_lang.field_item_common_name'),
-                            'class' => 'form-control', 
-                            'id' => 'item_common_name'
-                        ]); 
-                    ?>
-                    <span class="text-danger"><?= isset($errors['name']) ? $errors['name']: ''; ?></span>
-                </div>
-                    
-                <!-- Description -->
-                <div class="mb-3">
-                    <?= form_label(lang('stock_lang.field_description'), 'item_common_description').form_input('item_common_description', isset($item_common_description) ? $item_common_description : (isset($item_common['description']) ? $item_common['description'] : ''), [
-                            'placeholder' => lang('stock_lang.field_item_common_description'),
-                            'class' => 'form-control', 
-                            'id' => 'item_common_description'
-                        ]); 
-                    ?>
-                    <span class="text-danger"><?= isset($errors['description']) ? $errors['description']: ''; ?></span>
-                </div>
-
-                <!-- Item Group -->
-                <div class="mb-3">
-                    <?= form_label(lang('MY_application.field_group'), 'item_common_group_id').form_dropdown('item_common_item_group_id', $item_groups, isset($item_common_item_group) ? $item_common_item_group : (isset($item_common['item_group_id']) ? $item_common['item_group_id'] : ''), [
-                            'class' => 'form-control',
-                            'id' => 'item_common_group_id'
-                        ]);
-                    ?>
-                    <span class="text-danger"><?= isset($errors['item_group_id']) ? $errors['item_group_id']: ''; ?></span>
-                </div>
-
-                <!-- Item Tags -->
-                <div class="mb-3">
-                    <?= form_label(lang('MY_application.field_tags'), 'item_tags-multiselect').form_multiselect('item_common_tags[]', $item_tags, isset($item_common_tags) ? $item_common_tags : (isset($item_tag_ids) ? $item_tag_ids : []),'id="item_tags-multiselect" multiple="multiple"'); ?>
-                </div>
-
-                <!-- Linked File -->
-                <div class="mb-3">
-                    <?= form_label(lang('stock_lang.field_linked_file'), 'item_common_linked_file').form_input('item_common_linked_file', '', [
-                        'class' => 'form-control-file',
-                        'accept' => '.pdf, .doc, .docx',
-                        'id' => 'item_common_linked_file'
-                        ], 'file');
-                    ?>
-                    <span class="text-danger"><?= isset($errors['linked_file']) ? $errors['linked_file']: ''; ?></span>
-                </div>
-            </div>
-
             <!-- Image -->
-            <div class="col-md-4 mb-3">
-                <input type="submit" class="btn btn-primary w-100 mb-1" name="btn_submit_photo" id="btn_submit_photo" value="<?= lang('MY_application.field_add_modify_photo') ?>"/>
+            <div class="col-12 col-md-4 mb-2">
+            <div>
                 <?php
                     $temp_path = $_SESSION['picture_prefix'].$config->image_picture_suffix.$config->image_tmp_suffix.$config->image_extension;
                     if (file_exists($config->images_upload_path.$temp_path)) {
@@ -109,8 +55,97 @@ $config = config('\Stock\Config\StockConfig');
                     src="<?= base_url($config->images_upload_path.$imagePath); ?>"
                     width="100%"
                     alt="<?= lang('MY_application.field_image'); ?>"/>
+                </div>
+                <div class="mt-2">
+                    <input type="submit" class="btn btn-primary btn-sm" name="btn_submit_photo" id="btn_submit_photo" value="<?= lang('MY_application.field_add_modify_photo') ?>"/>
+                </div>
                 <div class="form-group">
-                    <input type="hidden" id="imageitem_common_" name="item_common_image" value="<?= isset($imagePath) ? $imagePath : ''; ?>"/>
+                    <input type="hidden" id="image" name="image" value="<?= isset($imagePath) ? $imagePath : ''; ?>"/>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-8">
+                <!-- Entities -->
+                <div class="row mb-2">
+                    <div id="e" class="col-12">
+                        <?= form_dropdown('e', $entities, $selected_entity_id, [
+                            'id' => 'entities_list',
+                            'class' => 'btn-outline-info',
+                        ]);?>
+                    </div>
+                </div>
+
+                <!-- Name -->
+                <div class="row mb-2">
+                    <div class="col-4">
+                        <?= form_label(lang('stock_lang.field_name'), 'item_common_name'); ?>
+                    </div>
+                    <div class="col-8">
+                        <?= form_input('item_common_name', isset($item_common_name) ? $item_common_name : (isset($item_common['name']) ? $item_common['name'] : ''), [
+                                'placeholder' => lang('stock_lang.field_item_common_name'),
+                                'class' => 'form-control', 
+                                'id' => 'item_common_name'
+                            ]); 
+                        ?>
+                        <span class="text-danger"><?= isset($errors['name']) ? $errors['name']: ''; ?></span>
+                    </div>
+                </div>
+                    
+                <!-- Description -->
+                <div class="row mb-2">
+                    <div class="col-4">
+                        <?= form_label(lang('stock_lang.field_description'), 'item_common_description'); ?>
+                    </div>
+                    <div class="col-8">
+                        <?= form_input('item_common_description', isset($item_common_description) ? $item_common_description : (isset($item_common['description']) ? $item_common['description'] : ''), [
+                                'placeholder' => lang('stock_lang.field_item_common_description'),
+                                'class' => 'form-control', 
+                                'id' => 'item_common_description'
+                            ]); 
+                        ?>
+                        <span class="text-danger"><?= isset($errors['description']) ? $errors['description']: ''; ?></span>
+                    </div>
+                </div>
+
+                <!-- Item Group -->
+                <div class="row mb-2">
+                    <div class="col-4">
+                        <?= form_label(lang('MY_application.field_group'), 'item_common_group_id'); ?>
+                    </div>
+                    <div class="col-8">
+                        <?= form_dropdown('item_common_item_group_id', $item_groups, isset($item_common_item_group) ? $item_common_item_group : (isset($item_common['item_group_id']) ? $item_common['item_group_id'] : ''), [
+                                'class' => 'form-control',
+                                'id' => 'item_common_group_id'
+                            ]);
+                        ?>
+                        <span class="text-danger"><?= isset($errors['item_group_id']) ? $errors['item_group_id']: ''; ?></span>
+                    </div>
+                </div>
+
+                <!-- Item Tags -->
+                <div class="row mb-2">
+                    <div class="col-4">
+                        <?= form_label(lang('MY_application.field_tags'), 'item_tags-multiselect'); ?>
+                    </div>
+                    <div class="col-8">
+                        <?= form_multiselect('item_common_tags[]', $item_tags, isset($item_common_tags) ? $item_common_tags : (isset($item_tag_ids) ? $item_tag_ids : []),'id="item_tags-multiselect" multiple="multiple"'); ?>
+                    </div>
+                </div>
+
+                <!-- Linked File -->
+                <div class="row mb-2">
+                    <div class="col-4">
+                        <?= form_label(lang('stock_lang.field_linked_file'), 'item_common_linked_file'); ?>
+                    </div>
+                    <div class="col-8">
+                        <?= form_input('item_common_linked_file', '', [
+                            'class' => 'form-control-file',
+                            'accept' => '.pdf, .doc, .docx',
+                            'id' => 'item_common_linked_file'
+                            ], 'file');
+                        ?>
+                        <span class="text-danger"><?= isset($errors['linked_file']) ? $errors['linked_file']: ''; ?></span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -239,7 +274,7 @@ $config = config('\Stock\Config\StockConfig');
 <script>
     $(document).ready(function() {
         // Set bootstrap class for the multiselect dropdown list
-        let no_filter = "<?= esc(lang('MY_application.field_no_filter')); ?>";
+        let no_filter = "<?= esc(lang('MY_application.field_no_type')); ?>";
         $('#item_tags-multiselect').multiselect({
             nonSelectedText: no_filter,
             buttonWidth: '100%',
@@ -248,9 +283,9 @@ $config = config('\Stock\Config\StockConfig');
         });
         $('#entities_list').multiselect({
             nonSelectedText: no_filter,
-            buttonWidth: '100%',
-            buttonClass: 'form-control',
-            numberDisplayed: 5
+            buttonWidth: '',
+            buttonClass: 'form-control btn-info',
+            numberDisplayed: 10
         });
 
         <?php if (isset($item_common)): ?>
