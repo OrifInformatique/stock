@@ -507,6 +507,9 @@ class Item extends BaseController {
             // Load entity id
             $data['selected_entity_id'] = $entity_id;
 
+            // Load inventory ID
+            $data['inventory_id'] = $this->item_model->getInventoryID($item);
+
             $data['item_common'] = $item_common;
             $data['item'] = $item;
             $data['item_id'] = $item_id;
