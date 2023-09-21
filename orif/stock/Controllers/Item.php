@@ -396,12 +396,8 @@ class Item extends BaseController {
                 return redirect()->to(base_url("picture/select_picture"));
             }
             // Load entities
-            if (isset($_SESSION['user_access']) && isset($_SESSION['user_id']) && $_SESSION['user_access'] < config('\User\Config\UserConfig')->access_lvl_admin) {
-                $entity_ids = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->findColumn('fk_entity_id');
-                $data['entities_list'] = $this->entity_model->find($entity_ids);
-            } else {
-                $data['entities_list'] = $this->entity_model->findAll();
-            }
+            $entity_ids = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->findColumn('fk_entity_id');
+            $data['entities_list'] = $this->entity_model->find($entity_ids);
             
             $data['entities'] = $this->dropdown($data['entities_list'], 'entity_id');
 
