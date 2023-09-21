@@ -316,8 +316,8 @@ function display_item(item){
     let loan_bootstrap_label = item["current_loan"]["bootstrap_label"];
     let item_localisation = item["current_loan"]["loan_id"]!=null ?'<div class="small">'+item["current_loan"]["item_localisation"]+'</div>':"";
     let item_planned_return = item["current_loan"]["loan_id"]!=null ?'<div class="small">'+'<?= lang("MY_application.field_loan_planned_return"); ?> : '+item["current_loan"]["planned_return_date"]+'</div>':"";
-    let item_name = item["name"];
-    let item_description = item["description"];
+    let item_name = htmlspecialchars(item["name"]);
+    let item_description = htmlspecialchars(item["description"]);
     let stocking_place = "<span>"+item["stocking_place"]["name"]+"</span>";
     let inventory_number = item["inventory_number"];
     let serial_number = item["serial_number"];
@@ -364,5 +364,18 @@ function initializeMultiSelect() {
         buttonClass: 'btn btn-info',
         numberDisplayed: 5
     });
+}
+
+function htmlspecialchars(input) {
+  if (typeof input !== 'string') {
+    return input;
+  }
+
+  return input
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 </script>
