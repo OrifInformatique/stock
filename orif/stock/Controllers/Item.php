@@ -502,6 +502,7 @@ class Item extends BaseController {
             // Load the tags
             $data['item_tags_list'] = $this->item_tag_model->findAll();
             $data['item_tags'] = $this->dropdown($data['item_tags_list'], 'item_tag_id');
+            $data['item_tag_ids'] = $this->item_tag_link_model->where('item_common_id', $item_common['item_common_id'])->findColumn('item_tag_id');
 
             // Load entity id
             $data['selected_entity_id'] = $entity_id;
