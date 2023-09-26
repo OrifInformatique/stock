@@ -108,8 +108,6 @@
                         } else {
                             $imagePath = $config->item_no_image;
                         }
-
-                        d($imagePath, $temp_path);
                     ?>
                     <img id="picture"
                         src="<?= base_url($config->images_upload_path.$imagePath . '?t=' . time()); ?>"
