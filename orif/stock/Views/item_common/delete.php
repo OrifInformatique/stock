@@ -12,7 +12,7 @@
         <div class="row">
             <div class="col-12">
                 <div>
-                    <h1><?= lang('stock_lang.item_common').' "'.esc($item_common['name']).'"' ?></h1>
+                    <h3><?= lang('stock_lang.item_common').' "'.esc($item_common['name']).'"' ?></h3>
                     <h4><?= lang('user_lang.what_to_do')?></h4>
                     <div class = "alert alert-warning" ><?= lang('stock_lang.item_common_delete_explanation')?></div>
                 </div>

@@ -102,12 +102,12 @@ return[
 'stocking_place_deletion_explanation'   => 'La désactivation d\'un lieu de stockage permet de le rendre inutilisable tout en conservant ses informations dans les archives. ' 
                                                 . 'Cela permet notamment de garder l\'historique de ses actions. <br> <br>' 
                                                 . 'En cas de suppression définitive, toutes les informations concernant ce lieu de stockage seront supprimées.',
-'item_common_delete_explanation'        => 'La suppression d\'un objet est définitive et tous les exemplaires de cet objet seront supprimés.',
+'item_common_delete_explanation'        => 'La suppression d\'un objet est définitive et tous les exemplaires de cet objet seront supprimés.<br>Vous avez la possibilité de désactiver les exemplaires de cet objet sans les supprimer, en modifiant leur état à "plus disponible".',
 'really_want_to_delete_item_common'     => 'Voulez-vous vraiment supprimer cet objet ?',
 'hard_delete_item_common_explanation'   => 'Toutes ses données ainsi que tous les exemplaires de cet objet seront définitivement effacés.',
 'item_common_no_item'                   => 'Aucun exemplaire de cet objet n\'est répertorié.',
 
-'item_delete_explanation'               => 'La suppression d\'un exemplaire d\'objet est définitive et toutes les informations des contrôles d\'inventaire et des prêts seront supprimées.',
+'item_delete_explanation'               => 'La suppression d\'un exemplaire d\'objet est définitive et toutes les informations de contrôles d\'inventaire et de prêts seront supprimées.<br>Si vous souhaitez le désactiver sans le supprimer, vous pouvez modifier son état à "plus disponible".',
 'really_want_to_delete_item'            => 'Voulez-vous vraiment supprimer cet exemplaire d\'objet ?',
 'hard_delete_item_explanation'          => 'Toutes ses données ainsi que ses contrôles d\'inventaires et l\'historique des prêts seront définitivement effacés.',
 
