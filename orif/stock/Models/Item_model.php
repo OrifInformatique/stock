@@ -211,25 +211,20 @@ class Item_model extends MyModel
      * @return array array of corresponding items and items count
      */
     public function getFiltered($filters, $page) {
-        // Initialize a global WHERE clause for filtering
+        // Initialize a global query for filtering
         $queryBuilder = $this->db->table('entity')
-            //->select('item.*, item_common.*, item_group.*, stocking_place.*, item_tag_link.*, ')
             ->join('item_group', 'item_group.fk_entity_id = entity.entity_id', 'inner')
             ->join('stocking_place', 'stocking_place.fk_entity_id = entity.entity_id', 'inner')
             ->join('item_common', 'item_common.item_group_id = item_group.item_group_id', 'inner')
             ->join('item_tag_link', 'item_tag_link.item_common_id = item_common.item_common_id', 'inner')
             ->join('item', 'item.stocking_place_id = stocking_place.stocking_place_id AND item.item_common_id = item_common.item_common_id', 'inner');
 
-        /*********************
-         ** ENTITY FILTER
-         **********************/
+        // Entity filter
         if (isset($filters['e']) && $filters['e'] != 0) {
             $queryBuilder->where('entity_id', $filters['e']);
         }
 
-        /*********************
-         ** TEXT SEARCH FILTER
-         **********************/
+        // Text search filter
         if (isset($filters['ts']) && $filters['ts'] != '') {
             $textSearch = esc($filters['ts']);
             $parts = explode('.', $textSearch);
@@ -258,38 +253,27 @@ class Item_model extends MyModel
             $queryBuilder->where($whereCondition);
         }
 
-        /*********************
-         ** ITEM CONDITION FILTER
-         ** Default filtering for "functional" items
-         **********************/
+        // Item condition filter
         if (isset($filters['c'])) {
             $queryBuilder->whereIn('item_condition_id', $filters['c']);
         }
 
-        /*********************
-         ** ITEM GROUP FILTER
-         **********************/
+        // Item group filter
         if (isset($filters['g'])) {
             $queryBuilder->whereIn('item_common.item_group_id', $filters['g']);
         }
 
-        /*********************
-         ** STOCKING PLACE FILTER
-         **********************/
+        // Stocking place filter
         if (isset($filters['s'])) {
             $queryBuilder->whereIn('item.stocking_place_id', $filters['s']);
         }
 
-        /*********************
-         ** ITEM TAGS FILTER
-         **********************/
+        // Item tags filter
         if (isset($filters['t'])) {
             $queryBuilder->whereIn('item_tag_link.item_tag_id', $filters['t']);
         }
 
-        /*********************
-         ** ORDER BY FIELD FILTER
-         **********************/
+        // Order by field filter
         if (isset($filters['o'])) {
             switch ($filters['o']) {
                 case '1':
@@ -309,9 +293,7 @@ class Item_model extends MyModel
             $orderByField = 'item_common.name';
         }
 
-        /*********************
-         ** ORDER BY FILTER
-         **********************/
+        // Order by filter
         if (isset($filters['ad'])) {
             $orderBy = $filters['ad'] === '0' ? 'ASC' : 'DESC';
         } else {
@@ -320,13 +302,12 @@ class Item_model extends MyModel
 
         $queryBuilder->orderBy($orderByField, $orderBy);
 
-        /*********************
-         ** GET FILTERED ITEMS
-         **********************/
+        // Count and get paginated items
         $itemsPerPage = config('\Stock\Config\StockConfig')->items_per_page;
         $totalItemsCount = $queryBuilder->countAllResults(false);
         $queryBuilder->limit($itemsPerPage, ($page - 1) * $itemsPerPage);
         $items = $queryBuilder->get()->getResultArray();
+        
         foreach ($items as &$item) {
             $item['stocking_place'] = $this->getStockingPlace($item);
             $item['inventory_number'] = $this->getInventoryNumber($item);
