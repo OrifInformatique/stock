@@ -1134,6 +1134,9 @@ class Item extends BaseController {
             $this->loan_model->update($id, $data);
         }
 
-        return redirect()->to(base_url());
+        // Go back to the item_common corresponding to the updated loan
+        $loan = $this->loan_model->find($id);
+        $item = $this->item_model->where('item_id', $loan['item_id'])->first();
+        return redirect()->to(base_url('item_common/view/'.$item['item_common_id']));
     }
 }

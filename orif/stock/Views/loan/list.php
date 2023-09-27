@@ -11,23 +11,21 @@
     <!-- BUTTONS -->
 	<a href="<?= $item_page ?>" class="btn btn-primary" role="button"><?= lang('MY_application.btn_back_to_object'); ?></a>
 
-    <!-- ITEM NAME AND DESCRIPTION -->
-	<a style="color:inherit;" href="<?= $item_page; ?>">
+    <!-- TITLE -->
     <div class="row">
-        <div class="col-md-4"><h3><?= $item['inventory_number']; ?></h3></div>
-        <div class="col-md-7"><h3><?= $item_common['name']; ?></h3></div>
-        <div class="col-md-1"><h6 class="text-right">ID <?= $item['item_id']; ?></h6></div>
+        <div class="col-12"><h3><?= lang('MY_application.text_loans_history'); ?></h3></div>
+        <div class="col-12"><p><?= $item['inventory_number'].' - '.$item_common['name']; ?></p></div>
     </div>
-    <div class="row">
-        <div class="col-md-12"><p><?= $item_common['description']; ?></p></div>
-    </div>
-	</a>
 
     <!-- LOANS LIST -->
-	<?php if(empty($loans)) { ?>
-	<em style="font-size:1.5em;" class="text-warning"><?= lang('MY_application.msg_no_loan'); ?></em>
-	<?php } else { ?>
-        <div class="col-lg-12 col-sm-12 table-responsive">
+    <?php if(empty($loans)) { ?>
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-info"><?= lang('MY_application.msg_no_loan'); ?></div>
+            </div>
+        </div>
+    <?php } else { ?>
+        <div class="table-responsive">
             <table class="table table-striped table-hover">
                 <thead>
                     <tr>
@@ -36,12 +34,16 @@
                         <th><?= lang('MY_application.header_loan_real_return'); ?></th>
                         <th><?= lang('MY_application.header_loan_localisation'); ?></th>
                         <th><?= lang('MY_application.header_loan_by_user'); ?></th>
-                        <th colspan="2"><?= lang('MY_application.header_loan_to_user'); ?></th>
+                        <th><?= lang('MY_application.header_loan_to_user'); ?></th>
+                        <!-- ADMINISTRATORS COLUMN ONLY -->
+                        <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_admin) { ?>
+                            <th></th>
+                        <?php } ?>
                     </tr>
                 </thead>
                 <tbody>
                 <?php foreach ($loans as $loan) { ?>
-                    <tr><div style="width:100%;height:100%">
+                    <tr>
                         <td>
                             <?php if ($registered_access) { ?>
                             <a href="<?= base_url('/item/modify_loan/'.$loan['loan_id']) ?>">
@@ -55,21 +57,26 @@
                         <td><?= $loan['real_return_date']; ?></td>
                         <td><?= $loan['item_localisation']; ?></td>
                         <td><?= $loan['loan_by_user']['username']; ?></td>
-                        <td><?php if (isset($loan['loan_to_user'])) {echo $loan['loan_to_user']['username'];} ?>
-                        <td><?php if (isset($loan['borrower_email'])) { ?>
-                            <a href="mailto:<?= $loan['borrower_email']; ?>"><?= $loan['borrower_email']; ?></a>
-                        <?php } ?>
+                        <td>
+                            <?php if (isset($loan['loan_to_user'])) {echo $loan['loan_to_user']['username'];} ?>
+                            <?php if (isset($loan['borrower_email'])) { ?>
+                                <a href="mailto:<?= $loan['borrower_email']; ?>"><?= $loan['borrower_email']; ?></a>
+                            <?php } ?>
+                        </td>
 
                         <!-- DELETE ACCESS RESTRICTED FOR ADMINISTRATORS ONLY -->
-						<?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_admin) { ?>
-				        <a href="<?= base_url('/item/delete_loan/'.$loan['loan_id']); ?>" class="close" title="Supprimer le prêt">×</a><?php } ?></td>
-                    </div></a></tr>
+                        <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_admin) { ?>
+                            <td><a href="<?= base_url('/item/delete_loan/'.$loan['loan_id']); ?>" class="close" title="Supprimer le prêt">×</a></td>
+                        <?php } ?>
+                    </tr>
                 <?php } ?>
                 </tbody>
             </table>
         </div>
-	<?php } ?>
-<?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $registered_access) { ?>
-	<a href="<?= base_url('item/create_loan/'.$item['item_id']); ?>" class="btn btn-primary"><?= lang('MY_application.btn_new') ?></a>
-<?php } ?>
+    <?php } ?>
+
+    <!-- BUTTON TO CREATE NEW LOAN -->
+    <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $registered_access) { ?>
+        <a href="<?= base_url('item/create_loan/'.$item['item_id']); ?>" class="btn btn-primary"><?= lang('MY_application.btn_new') ?></a>
+    <?php } ?>
 </div>
