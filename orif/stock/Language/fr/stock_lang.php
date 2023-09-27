@@ -9,11 +9,11 @@
 
 return[
 // Page titles
-'title_tags'                            => 'Liste des tags',
-'title_stocking_places'                 => 'Liste des lieux de stockage',
-'title_suppliers'                       => 'Liste des fournisseurs',
-'title_item_groups'                     => 'Liste des groupes d\'objets',
-'title_entity_list'                     => 'Liste des sites',
+'title_tags'                            => 'Types d\'objets',
+'title_stocking_places'                 => 'Lieux de stockage',
+'title_suppliers'                       => 'Fournisseurs',
+'title_item_groups'                     => 'Groupes d\'objets',
+'title_entity_list'                     => 'Sites',
 'title_excel_export'                    => 'Exportation Excel',
 'title_delete_item_common'              => 'Supprimer un objet',
 'title_delete_item'                     => 'Supprimer un exemplaire d\'objet',
@@ -55,7 +55,7 @@ return[
 'field_country'                         => 'Pays',
 'field_tel'                             => 'Téléphone',
 'field_email'                           => 'E-mail',
-'field_deleted_tags'                    => 'Afficher les tags désactivés',
+'field_deleted_tags'                    => 'Afficher les types d\'objets désactivés',
 'field_deleted_stocking_places'         => 'Afficher les lieux de stockage désactivés',
 'field_deleted_suppliers'               => 'Afficher les fournisseurs désactivés',
 'field_deleted_item_groups'             => 'Afficher les groupes d\'objets désactivés',
