@@ -175,45 +175,14 @@ class Item extends BaseController {
             $page = 1;
         }
 
-        $output['items'] = $this->item_model->get_filtered($filters);
-
-        // Verify the existence of the sort order key in filters
-        if(array_key_exists("o", $filters)){
-            switch ($filters['o']) {
-                case 1:
-                $sortValue = "stocking_place_id";
-                break;
-                case 2:
-                $sortValue = "buying_date";
-                break;
-                case 3:
-                $sortValue = "inventory_number";
-                break;
-                //In case of problem, it automatically switches to name
-                default:
-                case 0:
-                $sortValue = "name";
-                break;
-            }
-        } else {
-            // default sort by name
-            $sortValue = "name";
-        }
-
-        // If not 1, order will be ascending
-        if(array_key_exists("ad", $filters)){
-            $asc = $filters['ad'] != 1;
-        } else {
-            // default sort order is asc
-            $asc = true;
-        }
-        $output['items'] = sortBySubValue($output['items'], $sortValue, $asc);
+        $paginatedItems = $this->item_model->getFiltered($filters, $page);
+        $output['items'] = $paginatedItems['items'];
 
         // Add page title
         $output['title'] = lang('My_application.page_item_list');
 
         // Pagination
-        $items_count = count($output["items"]);
+        $items_count = $paginatedItems['items_count'];
         //$output['pagination'] =  $this->load_pagination($items_count)->create_links();
         $output['pagination'] = $this->load_pagination($items_count, $page);
 
@@ -221,10 +190,8 @@ class Item extends BaseController {
         if($output['number_page']>ceil($items_count/$this->config->items_per_page)) $output['number_page']=ceil($items_count/$this->config->items_per_page);
 
         // Keep only the slice of items corresponding to the current page
-        $output["items"] = array_slice($output["items"], ($output['number_page']-1)*$this->config->items_per_page, $this->config->items_per_page);
-
         // Format dates
-        array_walk($output["items"], function(&$item) {
+        array_walk($paginatedItems['items'], function(array &$item) {
             $loan = $item['current_loan'];
             if (!isset($loan['planned_return_date'])) {
                 $loan['planned_return_date'] = lang('MY_application.text_none');
