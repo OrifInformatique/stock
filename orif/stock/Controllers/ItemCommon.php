@@ -168,7 +168,7 @@ class ItemCommon extends BaseController {
             $upload_failed = false;
             $item_common = $this->item_common_model->find($id);
 
-            
+            // If image allready exist, get its id
             if (isset($item_common['image']) && $item_common['image'] !== '') {
                 $imageId = explode('_', $item_common['image'])[0];
             }
