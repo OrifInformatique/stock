@@ -33,13 +33,14 @@ $config = config('\Stock\Config\StockConfig');
         <!-- ITEM COMMON -->
         <div class="row">
             <div class="col-12">
-                <p class="bg-primary">&nbsp;<?= lang('stock_lang.item_common'); ?></p>
+                <p class="bg-primary mb-0">&nbsp;<?= lang('stock_lang.item_common'); ?></p>
             </div>
         </div>
 
-        <div class="row">
+        <div id="item_common" class="row pt-3 pb-3">
+
             <!-- Image -->
-            <div class="col-12 col-md-4 mb-2">
+            <div class="col-12 col-md-4">
             <div>
                 <?php
                     $temp_path = $_SESSION['picture_prefix'].$config->image_picture_suffix.$config->image_tmp_suffix.$config->image_extension;
@@ -314,6 +315,7 @@ $config = config('\Stock\Config\StockConfig');
         });
 
         <?php if (isset($item_common)): ?>
+            $('#item_common').addClass('border rounded disabled-bg');
             $('.multiselect').prop('disabled', true);
             $('#btn_submit_photo').prop('disabled', true);
             $('#item_common_name').prop('disabled', true);
