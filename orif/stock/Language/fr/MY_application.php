@@ -237,7 +237,7 @@ return[
                                     2 => 'Échéance proche',
                                     3 => 'Garantie expirée'],
 'text_item_detail'               => 'Photo et détail',
-'text_item_condition'            => 'Condition',
+'text_item_condition'            => 'État',
 'text_item_loan_status'          => 'Disponibilité et prêts',
 'text_item_buying_warranty'      => 'Achat et garantie',
 'text_item_tags'                 => 'Type d\'objet',

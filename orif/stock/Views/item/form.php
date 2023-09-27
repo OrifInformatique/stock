@@ -269,7 +269,8 @@ $config = config('\Stock\Config\StockConfig');
             <div class="col-md-4">
                 <div class="form-group">
                     <?= form_label(lang('MY_application.field_buying_price'), 'buying_price').form_input('buying_price', isset($buying_price) ? $buying_price : (isset($item['buying_price']) ? $item['buying_price'] : ''), [
-                        'class' => 'form-control'
+                        'class' => 'form-control',
+                        'step' => '0.01'
                     ], 'number') ?>
                 </div>
                 <div class="form-group">
@@ -284,7 +285,7 @@ $config = config('\Stock\Config\StockConfig');
             <!-- Warranty -->
             <div class="col-md-4">
                 <div class="form-group">
-                    <?= form_label(lang('MY_application.field_warranty_duration'), 'warranty_duration').form_input('warranty_duration', isset($warranty_duration) ? $warranty_duration : (isset($item['warranty_duration']) ? $item['warranty_duration'] : ''), [
+                    <?= form_label(lang('MY_application.field_warranty_duration').' ('.lang('MY_application.text_months').')', 'warranty_duration').form_input('warranty_duration', isset($warranty_duration) ? $warranty_duration : (isset($item['warranty_duration']) ? $item['warranty_duration'] : ''), [
                         'class' => 'form-control',
                         'id' => 'warranty_duration',
                         'onblur' => 'change_warranty()'
