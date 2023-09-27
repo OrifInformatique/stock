@@ -76,7 +76,7 @@ $config = config('\Stock\Config\StockConfig');
                 </div>
 
                 <!-- Item Tags -->
-                <div class="mb-3">
+                <div id="item_tags" class="mb-3">
                     <?= form_label(lang('MY_application.field_tags'), 'item_tags-multiselect').form_multiselect('item_common_tags[]', $item_tags, isset($item_common_tags) ? $item_common_tags : (isset($item_tag_ids) ? $item_tag_ids : []),'id="item_tags-multiselect" multiple="multiple"'); ?>
                 </div>
 
@@ -362,18 +362,20 @@ $config = config('\Stock\Config\StockConfig');
         }
     }
 
-    function getFirstTagShortName(){
-        var tags = document.getElementsByClassName('tag-checkbox');
-        var firstTagShortName = "";
+    function getFirstTagShortName() {
+        let checkboxes = $('#item_tags .multiselect-container input');
+        let firstTagShortName = "";
 
         // Get an array with every tags shortnames
-        var tagsShortNames = get("item_tags");
-        for(var i = 0;i < tags.length;i++){
-            if(tags[i].checked === true){
+        let tagsShortNames = get("item_tags");
+
+        $.each(checkboxes, (i, value) => {
+            if (checkboxes[i].checked) {
                 firstTagShortName = tagsShortNames[i];
-                break;
+                return false; // Gets out of "each" but stays in getFirstTagShortName
             }
-        }
+        });
+
         return firstTagShortName;
     }
 
