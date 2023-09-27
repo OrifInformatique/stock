@@ -240,6 +240,7 @@ return[
 'text_item_condition'            => 'État',
 'text_item_loan_status'          => 'Disponibilité et prêts',
 'text_loans_history'             => 'Historique des prêts',
+'text_inventory_controls'        => 'Contrôles d\'inventaire',
 'text_item_buying_warranty'      => 'Achat et garantie',
 'text_item_tags'                 => 'Type d\'objet',
 'text_search_filters'            => 'Filtres de recherche',

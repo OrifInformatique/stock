@@ -632,7 +632,7 @@ class Item extends BaseController {
             // Get item object with related inventory controls
             $output['item'] = $this->item_model->find($id);
             $output['item_common'] = $this->item_common_model->find($output['item']['item_common_id']);
-            $output['inventory_controls'] = $this->inventory_control_model->where('item_id='.$id)->findAll();
+            $output['inventory_controls'] = $this->inventory_control_model->where('item_id='.$id)->orderBy('date', 'desc')->findAll();
             $output['item']['inventory_number'] = $this->item_model->getInventoryNumber($output['item']);
             array_walk($output['inventory_controls'], function(&$control) {
                 $control['controller'] = $this->inventory_control_model->getUser($control['controller_id']);
@@ -831,7 +831,7 @@ class Item extends BaseController {
             $item = $this->item_model->find($id);
             $item_common = $this->item_common_model->find($item['item_common_id']);
             $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
-            $loans = $this->loan_model->where('item_id', $item['item_id'])->findAll();
+            $loans = $this->loan_model->where('item_id', $item['item_id'])->orderBy('date', 'desc')->findAll();
             array_walk($loans, function(&$loan) {
                 $loan['loan_by_user'] = $this->loan_model->get_loaner($loan);
                 $loan['date'] = databaseToShortDate($loan['date']);
