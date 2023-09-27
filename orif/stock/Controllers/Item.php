@@ -147,8 +147,7 @@ class Item extends BaseController {
         return $this->display_view('Stock\Views\item\list', $output);
     }
 
-    private function load_list($page = 1)
-    {
+    private function load_list($page = 1) {
         // Store URL to make possible to come back later (from item detail for example)
         $_SESSION['items_list_url'] = base_url('item/index/'.$page);
         if (isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING'])) {
@@ -191,7 +190,7 @@ class Item extends BaseController {
 
         // Keep only the slice of items corresponding to the current page
         // Format dates
-        array_walk($paginatedItems['items'], function(array &$item) {
+        array_walk($output['items'], function(array &$item) {
             $loan = $item['current_loan'];
             if (!isset($loan['planned_return_date'])) {
                 $loan['planned_return_date'] = lang('MY_application.text_none');
