@@ -372,7 +372,7 @@ $config = config('\Stock\Config\StockConfig');
         $.each(checkboxes, (i, value) => {
             if (checkboxes[i].checked) {
                 firstTagShortName = tagsShortNames[i];
-                return false;
+                return false; // Gets out of "each" but stays in getFirstTagShortName
             }
         });
 
