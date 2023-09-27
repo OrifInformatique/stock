@@ -310,7 +310,7 @@ function getFilters() {
 function display_item(item){
     // Item's parameters
     let href = '<?= base_url("/item_common/view/"); ?>'+item["item_common_id"];
-    let src_image = '<?= base_url(); ?>'+item["image_path"];
+    let src_image = '<?= base_url(); ?>'+item["image_path"]+'<?= '?t=' . time() ?>';
     let alt_image = '<?php htmlspecialchars(lang("MY_application.field_image")); ?>';
     let item_condition = item["condition"]["bootstrap_label"];
     let loan_bootstrap_label = item["current_loan"]["bootstrap_label"];

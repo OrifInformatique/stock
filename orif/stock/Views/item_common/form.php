@@ -33,7 +33,7 @@
                         }
                     ?>
                     <img id="picture"
-                        src="<?= base_url($config->images_upload_path.$imagePath); ?>"
+                        src="<?= base_url($config->images_upload_path.$imagePath . '?t=' . time()); ?>"
                         width="100%"
                         alt="<?= lang('MY_application.field_image'); ?>"/>
                 </div>

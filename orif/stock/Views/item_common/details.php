@@ -27,7 +27,7 @@
     <div class="row">
         <div class="mt-2 col-lg-3 col-md-4 col-sm-6">
             <img id="picture"
-                 src="<?= base_url($item_common['image']); ?>"
+                 src="<?= base_url($item_common['image'] . '?t=' . time()); ?>"
                  width="100%"
                  alt="<?= lang('MY_application.field_image'); ?>"/>
         </div>
