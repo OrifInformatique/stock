@@ -16,7 +16,7 @@
             <!-- Buttons -->
             <div class="col-12 mb-3">
                 <input type="submit" class="btn btn-success" id="btn_submit" name="btn_submit" value="<?= lang('MY_application.btn_save'); ?>" />
-                <a href="<?= base_url("item_common/view/{$item_common['item_common_id']}"); ?>" class="btn btn-danger"><?= lang('MY_application.btn_cancel'); ?></a>
+                <input type="submit" class="btn btn-danger" id="submitCancel" name="submitCancel" value="<?= lang('MY_application.btn_cancel'); ?>">
             </div>
             <div class="row col-12 col-md-8">
                 <!-- Name -->
@@ -110,7 +110,7 @@
                         }
                     ?>
                     <img id="picture"
-                        src="<?= base_url($config->images_upload_path.$imagePath); ?>"
+                        src="<?= base_url($config->images_upload_path.$imagePath . '?t=' . time()); ?>"
                         width="100%"
                         alt="<?= lang('MY_application.field_image'); ?>"/>
                 </div>

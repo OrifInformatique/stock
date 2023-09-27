@@ -164,10 +164,17 @@ class ItemCommon extends BaseController {
             $this->user_entity_model->check_user_item_common_entity($_SESSION['user_id'], $id) &&
             $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) 
         {
+            $imageId = $id;
             $upload_failed = false;
+            $item_common = $this->item_common_model->find($id);
+
+            // If image allready exist, get its id
+            if (isset($item_common['image']) && $item_common['image'] !== '') {
+                $imageId = explode('_', $item_common['image'])[0];
+            }
 
             // Define image path variables
-            $_SESSION['picture_prefix'] = str_pad($id, $this->config->inventory_number_chars, "0", STR_PAD_LEFT);
+            $_SESSION['picture_prefix'] = str_pad($imageId, $this->config->inventory_number_chars, "0", STR_PAD_LEFT);
             $temp_image_name = $_SESSION["picture_prefix"].$this->config->image_picture_suffix.$this->config->image_tmp_suffix.$this->config->image_extension;
             $new_image_name = $_SESSION["picture_prefix"].$this->config->image_picture_suffix.$this->config->image_extension;
 
@@ -214,8 +221,11 @@ class ItemCommon extends BaseController {
             if (!is_null($this->request->getVar('btn_submit')) && !$upload_failed) {
                 // Turn Temporaty Image into a final one if there is one
                 if (file_exists($this->config->images_upload_path.$temp_image_name)) {
+                    if (file_exists($this->config->images_upload_path.$new_image_name)) {
+                        // If new image name already exists, delete it
+                        unlink(ROOTPATH.'public/' . $this->config->images_upload_path . $item_common['image']);
+                    }
                     rename($this->config->images_upload_path.$temp_image_name, $this->config->images_upload_path.$new_image_name);
-                    $itemArray['image'] = $new_image_name;
                 }
 
                 $itemCommonUpdate = array(
@@ -264,7 +274,6 @@ class ItemCommon extends BaseController {
                 return redirect()->to(base_url("picture/select_picture"));
             }
 
-            $item_common = $this->item_common_model->find($id);
             $entity_id = $this->item_group_model->where('item_group_id', $item_common['item_group_id'])->findColumn('fk_entity_id');
             $item_groups = $this->item_group_model->where('fk_entity_id', reset($entity_id))->findAll();
             $item_tags = $this->item_tag_model->findAll();
@@ -275,7 +284,6 @@ class ItemCommon extends BaseController {
             $output['item_tags'] = $this->dropdown($item_tags, 'item_tag_id');
             $output['item_tag_ids'] = $item_tag_ids;
             $output['config'] = config('\Stock\Config\StockConfig');
-            $output['title'] = 'Test';
 
             if (isset($_SESSION['POST'])) {
                 foreach ($_SESSION['POST'] as $key => $value) {
