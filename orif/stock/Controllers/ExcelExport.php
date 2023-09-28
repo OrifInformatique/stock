@@ -157,20 +157,10 @@ class ExcelExport extends \App\Controllers\BaseController
                     $supplier = null;
                     !isset($item['supplier_id']) ?: $supplier = $this->supplier_model->find($item['supplier_id']);
                     if ($supplier != null) {
-                        $supplier = [
-                            $supplier['name'],
-                            $supplier['address_line1'],
-                            $supplier['address_line2'],
-                            $supplier['zip'],
-                            $supplier['city'],
-                            $supplier['country'],
-                            $supplier['tel'],
-                            $supplier['email']
-                        ];
-                        $supplier = array_filter($supplier);
+                        $supplier = $supplier['name'];
                     }
 
-                    $item['supplier'] = $supplier == null ? '' : implode("\n", $supplier);
+                    $item['supplier'] = $supplier == null ? '' : $supplier;
                     $items[$idx] = $item;
                 }
     
