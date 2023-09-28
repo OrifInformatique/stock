@@ -12,10 +12,10 @@
     ?>
     </div>
 
-    <label for="date"><?= lang('MY_application.header_loan_date'); ?> :&nbsp;</label>
+    <label for="date"><?= '* '.lang('MY_application.header_loan_date'); ?> :&nbsp;</label>
     <input class="form-control" name="date" type="date" value="<?php if(isset($date)) {echo $date;} else {echo set_value('date', date(config('\Stock\Config\StockConfig')->database_date_format));} ?>" /><br />
 
-    <label for="planned_return_date"><?= lang('MY_application.header_loan_planned_return'); ?> :&nbsp;</label>
+    <label for="planned_return_date"><?= '* '.lang('MY_application.header_loan_planned_return'); ?> :&nbsp;</label>
     <input class="form-control" name="planned_return_date" type="date" value="<?php if(isset($planned_return_date)) {echo $planned_return_date;} ?>" /><br />
 
     <label for="real_return_date"><?= lang('MY_application.header_loan_real_return'); ?> :&nbsp;</label>
@@ -29,7 +29,7 @@
         <?php } ?>
     </select><br />
 
-    <label for="borrower_email"><?= lang('MY_application.field_borrower_email'); ?> :&nbsp;</label>
+    <label for="borrower_email"><?= '* '.lang('MY_application.field_borrower_email'); ?> :&nbsp;</label>
     <input class="form-control" name="borrower_email" value="<?php if(isset($borrower_email)) {echo $borrower_email;} ?>" /><br />
 
     <label for="item_localisation"><?= lang('MY_application.header_loan_localisation'); ?> :&nbsp;</label>

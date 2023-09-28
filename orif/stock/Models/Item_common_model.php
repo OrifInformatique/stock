@@ -28,7 +28,7 @@ class Item_common_model extends MyModel
         $this->validationRules = [
             'name' => [
                 'label' => strtolower(lang('stock_lang.field_name')),
-                'rules' => 'trim|required|alpha_numeric_accent_space|'
+                'rules' => 'trim|required|'
                     . 'min_length['.config("\Stock\Config\StockConfig")->name_min_length.']|'
                     . 'max_length['.config("\Stock\Config\StockConfig")->name_max_length.']'
             ],

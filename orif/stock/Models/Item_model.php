@@ -326,8 +326,19 @@ class Item_model extends MyModel
 
     public function getInventoryNumber($item)
     {
-        $inventory_id = "";
         $inventory_number = "";
+
+        if (!is_null($item)) {
+            $inventory_id = $this->getInventoryID($item);
+            $inventory_number = $item['inventory_prefix'] . "." . $inventory_id;
+        }
+
+        return $inventory_number;
+    }
+
+    public function getInventoryID($item)
+    {
+        $inventory_id = "";
 
         if (!is_null($item)) {
             $inventory_id = $item['item_id'];
@@ -336,12 +347,9 @@ class Item_model extends MyModel
             for ($i = strlen($inventory_id); $i < config('\Stock\Config\StockConfig')->inventory_number_chars; $i++) {
                 $inventory_id = "0" . $inventory_id;
             }
-            $item['inventory_id'] = $inventory_id;
-
-            $inventory_number = $item['inventory_prefix'] . "." . $item['inventory_id'];
         }
 
-        return $inventory_number;
+        return $inventory_id;
     }
 
     public function getStockingPlace($item)

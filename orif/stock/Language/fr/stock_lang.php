@@ -9,14 +9,15 @@
 
 return[
 // Page titles
-'title_tags'                            => 'Liste des tags',
-'title_stocking_places'                 => 'Liste des lieux de stockage',
-'title_suppliers'                       => 'Liste des fournisseurs',
-'title_item_groups'                     => 'Liste des groupes d\'objets',
-'title_entity_list'                     => 'Liste des sites',
+'title_tags'                            => 'Types d\'objets',
+'title_stocking_places'                 => 'Lieux de stockage',
+'title_suppliers'                       => 'Fournisseurs',
+'title_item_groups'                     => 'Groupes d\'objets',
+'title_entity_list'                     => 'Sites',
 'title_excel_export'                    => 'Exportation Excel',
-'title_delete_item_common'              => 'Supprimer un objet commun',
-'title_delete_item'                     => 'Supprimer un objet',
+'title_delete_item_common'              => 'Supprimer un objet',
+'title_delete_item'                     => 'Supprimer un exemplaire d\'objet',
+'title_delete_loan'                     => 'Supprimer un prêt',
 
 
 // Buttons
@@ -36,8 +37,9 @@ return[
 'btn_soft_delete_supplier'              => 'Désactiver ce fournisseur',
 'btn_soft_delete_item_group'            => 'Désactiver ce groupe d\'objets',
 'btn_delete_item_group'                 => 'Supprimer ce groupe d\'objets',
-'btn_delete_item_common'                => 'Supprimer cet objet commun',
-'btn_delete_item'                       => 'Supprimer cet objet',
+'btn_delete_item_common'                => 'Supprimer cet objet',
+'btn_delete_item'                       => 'Supprimer cet exemplaire d\'objet',
+'btn_delete_loan'                       => 'Supprimer ce prêt',
 'btn_export'                            => 'Exporter',
 
 
@@ -55,16 +57,16 @@ return[
 'field_country'                         => 'Pays',
 'field_tel'                             => 'Téléphone',
 'field_email'                           => 'E-mail',
-'field_deleted_tags'                    => 'Afficher les tags désactivés',
+'field_deleted_tags'                    => 'Afficher les types d\'objets désactivés',
 'field_deleted_stocking_places'         => 'Afficher les lieux de stockage désactivés',
 'field_deleted_suppliers'               => 'Afficher les fournisseurs désactivés',
 'field_deleted_item_groups'             => 'Afficher les groupes d\'objets désactivés',
 'field_deleted_entities'                => 'Afficher les sites désactivés',
 'field_user_entities'                   => 'Sites attribués',
 'field_user_default_entity'             => 'Site principal',
-'field_search_item_common'              => 'Rechercher un objet commun',
-'field_item_common_name'                => 'Nom de l\'objet commun',
-'field_item_common_description'         => 'Description de l\'objet commun',
+'field_search_item_common'              => 'Rechercher un objet',
+'field_item_common_name'                => 'Nom de l\'objet',
+'field_item_common_description'         => 'Description de l\'objet',
 
 // Admin other labels   
 'admin_modify'                          => 'Modification',
@@ -79,10 +81,12 @@ return[
 'stocking_place'                        => 'Lieu de stockage',
 'supplier'                              => 'Fournisseur',
 'item_group'                            => 'Groupe d\'objets',
-'item_common'                           => 'Objet commun',
-'no_item_common_found'                  => 'Aucun objet commun n\'a été trouvé',
-'add_item_common_info'                  => 'Un objet commun va être créé',
-'add_item_info'                         => 'Un objet sera créé et lié à l\'objet commun:',
+'item_common'                           => 'Objet',
+'item_specimen'                         => 'Exemplaire d\'objet',
+'item_specimen_details'                 => 'Détails de cet exemplaire',
+'no_item_common_found'                  => 'Aucun objet n\'a été trouvé',
+'add_item_common_info'                  => 'Un objet va être créé',
+'add_item_info'                         => 'Un nouvel exemplaire de cet objet sera créé :',
 'all_item_groups'                       => 'Tous les groupes',
 
 'tag_deletion_explanation'              => 'La désactivation d\'un tag permet de le rendre inutilisable tout en conservant ses informations dans les archives. ' 
@@ -100,14 +104,16 @@ return[
 'stocking_place_deletion_explanation'   => 'La désactivation d\'un lieu de stockage permet de le rendre inutilisable tout en conservant ses informations dans les archives. ' 
                                                 . 'Cela permet notamment de garder l\'historique de ses actions. <br> <br>' 
                                                 . 'En cas de suppression définitive, toutes les informations concernant ce lieu de stockage seront supprimées.',
-'item_common_delete_explanation'        => 'La suppression d\'un objet commun est définitive et toutes les informations des objets liés, ainsi que de l\'objet commun seront supprimées.',
-'really_want_to_delete_item_common'     => 'Voulez-vous vraiment supprimer cet objet commun?',
-'hard_delete_item_common_explanation'   => 'Toutes ses données ainsi que ses objets liés seront définitivement effacés.',
-'item_common_no_item'                   => 'Aucun objet n\'est lié à cet objet commun.',
+'item_common_delete_explanation'        => 'La suppression d\'un objet est définitive et tous les exemplaires de cet objet seront supprimés.<br>Vous avez la possibilité de désactiver les exemplaires de cet objet sans les supprimer, en modifiant leur état à "plus disponible".',
+'really_want_to_delete_item_common'     => 'Voulez-vous vraiment supprimer cet objet ?',
+'hard_delete_item_common_explanation'   => 'Toutes ses données ainsi que tous les exemplaires de cet objet seront définitivement effacés.',
+'item_common_no_item'                   => 'Aucun exemplaire de cet objet n\'est répertorié.',
 
-'item_delete_explanation'               => 'La suppression d\'un objet est définitive et toutes les informations des contrôles d\'inventaire et des prêts seront supprimées.',
-'really_want_to_delete_item'            => 'Voulez-vous vraiment supprimer cet objet commun?',
-'hard_delete_item_explanation'          => 'Toutes ses données ainsi que ses contrôles d\'inventaires et ses prêts liés seront définitivement effacés.',
+'loan_delete_explanation'               => 'La suppression du prêt est définitive.',
+
+'item_delete_explanation'               => 'La suppression d\'un exemplaire d\'objet est définitive et toutes les informations de contrôles d\'inventaire et de prêts seront supprimées.<br>Si vous souhaitez le désactiver sans le supprimer, vous pouvez modifier son état à "plus disponible".',
+'really_want_to_delete_item'            => 'Voulez-vous vraiment supprimer cet exemplaire d\'objet ?',
+'hard_delete_item_explanation'          => 'Toutes ses données ainsi que ses contrôles d\'inventaires et l\'historique des prêts seront définitivement effacés.',
 
 'supplier_already_disabled'             => 'Ce fournisseur est déjà désactivé. Voulez-vous le supprimer définitivement ?',
 'delete_supplier'                       => 'Désactiver ou supprimer ce fournisseur',

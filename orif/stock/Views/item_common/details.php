@@ -27,7 +27,7 @@
     <div class="row">
         <div class="mt-2 col-lg-3 col-md-4 col-sm-6">
             <img id="picture"
-                 src="<?= base_url($item_common['image']); ?>"
+                 src="<?= base_url($item_common['image'] . '?t=' . time()); ?>"
                  width="100%"
                  alt="<?= lang('MY_application.field_image'); ?>"/>
         </div>
@@ -52,7 +52,7 @@
                 <div class="col-12 mt-2">
                     <!-- Button to display linked file -->
                     <?php if (!empty($item_common['linked_file'])): ?>
-                        <a href="<?= base_url('uploads/files/'.$item_common['linked_file']) ?>" class="btn btn-secondary"  role="button" >
+                        <a href="<?= base_url('uploads/files/'.$item_common['linked_file']) ?>" class="btn btn-outline-primary btn-sm"  role="button" target="_blank" >
                             <?= lang('MY_application.btn_linked_doc'); ?>
                         </a>
                     <?php endif; ?>
@@ -78,57 +78,93 @@
                                 <?= lang('MY_application.btn_delete'); ?>
                             </a>
                         <?php endif; ?>
-                        <?php if (isset($item['current_loan']['planned_return_date'])): ?>
-                            <!-- Button to return a loan -->              
-                            <a href="<?=base_url('/item/return_loan/' . $item['current_loan']['loan_id'])?>"
-                                class="btn btn-outline-success btn-sm mb-2"  role="button" >
-                                <?= lang('MY_application.btn_return_loan'); ?>
-                            </a>
-                        <?php else: ?>
-                            <!-- Button to create new loan -->              
-                            <a href="<?=base_url('/item/create_loan/' . $item['item_id'])?>"
-                                class="btn btn-outline-success btn-sm mb-2"  role="button" >
-                                <?= lang('MY_application.btn_create_loan'); ?>
-                            </a>
-                        <?php endif; ?>
-                        <!-- Button to display loans history -->
-                        <a href="<?=base_url('/item/loans/' . $item['item_id'])?>"
-                            class="btn btn-outline-primary btn-sm mb-2"  role="button" >
-                            <?= lang('MY_application.btn_loans_history'); ?>
-                        </a>
-                        <!-- Button to create new inventory control -->              
-                        <a href="<?= base_url('/item/create_inventory_control/'.$item['item_id']); ?>"
-                            class="btn btn-outline-success btn-sm mb-2"  role="button">
-                            <?= lang('MY_application.btn_create_inventory_control'); ?>
-                        </a>
-                        <!-- Button to display inventory controls history -->
-                        <a href="<?= base_url('/item/inventory_controls/'.$item['item_id']); ?>"
-                            class="btn btn-outline-primary btn-sm mb-2"  role="button" >
-                            <?= lang('MY_application.btn_inventory_control_history'); ?>
-                        </a>
                     </div>
                 <?php endif; ?>
                 <!-- End of administration buttons -->
 
                 <!-- Item details -->
-                <div class="col-lg-6">
+                <div class="col-lg-4 col-sm-6">
                     <h4><?= $item['inventory_number']; ?></h4>
                     
                     <!-- Item condition -->
                     <?= !is_null($item['condition']) ? $item['condition']['bootstrap_label'] : config('\Stock\Config\StockConfig')->item_no_data; ?>
                     <!-- Loan status -->
                     <?= $item['current_loan']['bootstrap_label']; ?>
+                    <!-- Loan informations -->
+                    <?php if (isset($item['current_loan']['loan_id'])): ?>
+                        <p>
+                            <?= !empty($item['current_loan']['borrower_email']) ? $item['current_loan']['borrower_email'].'<br>' : ''; ?>
+                            <?= !empty($item['current_loan']['item_localisation']) ? $item['current_loan']['item_localisation'].'<br>' : ''; ?>
+                            <?= lang('MY_application.field_loan_planned_return'); ?>&nbsp;:
+                            <?= !empty($item['current_loan']['planned_return_date']) ? databaseToShortDate($item['current_loan']['planned_return_date']) : config('\Stock\Config\StockConfig')->item_no_data; ?>
+                        </p>
+                    <?php endif; ?>
+                    <!-- Loan management buttons for authorized users only -->
+                    <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && isset($can_modify) && $can_modify && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered): ?>
+                        <div class="mt-2">
+                            <?php if (isset($item['current_loan']['planned_return_date'])): ?>
+                                <!-- Button to return a loan -->              
+                                <a href="<?=base_url('/item/return_loan/' . $item['current_loan']['loan_id'])?>"
+                                    class="btn btn-outline-success btn-sm mb-2"  role="button" >
+                                    <?= lang('MY_application.btn_return_loan'); ?>
+                                </a>
+                            <?php else: ?>
+                                <!-- Button to create new loan -->              
+                                <a href="<?=base_url('/item/create_loan/' . $item['item_id'])?>"
+                                    class="btn btn-outline-success btn-sm mb-2"  role="button" >
+                                    <?= lang('MY_application.btn_create_loan'); ?>
+                                </a>
+                            <?php endif; ?>
+                            <!-- Button to display loans history -->
+                            <a href="<?=base_url('/item/loans/' . $item['item_id'])?>"
+                                class="btn btn-outline-primary btn-sm mb-2"  role="button" >
+                                <?= lang('MY_application.btn_loans_history'); ?>
+                            </a>
+                        </div>
+                    <?php endif; ?>
                     <!-- Remarks -->
                     <?php if (isset($item['remarks']) && !empty($item['remarks'])): ?>
                         <p class="alert alert-info mt-2" role="alert"><?= $item['remarks']; ?></p>
                     <?php endif; ?>
                 </div>
-                <div class="col-lg-3 col-sm-6">
+                <div class="col-lg-4 col-sm-6">
                     <!-- Stocking place -->
                     <p>
-                        <?= lang('MY_application.field_stocking_place').'&nbsp;:<br>'; ?>
+                        <?= lang('MY_application.field_stocking_place').'&nbsp;:&nbsp;'; ?>
                         <?= !empty($item['stocking_place']) ? esc($item['stocking_place']['name']) : config('\Stock\Config\StockConfig')->item_no_data; ?>
                     </p>
+                    <!-- Last control -->
+                    <p>
+                        <?= lang('MY_application.field_last_inventory_control').'&nbsp;:&nbsp;'; ?>
+                        <?php if(!is_null($item['last_inventory_control'])) {
+                            echo databaseToShortDate($item['last_inventory_control']['date']);
+                            echo ', ';
+                            if (!is_null($item['last_inventory_control']['controller'])) {
+                                echo htmlspecialchars($item['last_inventory_control']['controller']['username']);
+                            }
+                            if(!is_null($item['last_inventory_control']['remarks'])) {
+                                echo '</br >'.htmlspecialchars($item['last_inventory_control']['remarks']);
+                            }
+                        } else {
+                            echo htmlspecialchars(lang('MY_application.text_none'));
+                        } ?>
+                    </p>
+                    <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && isset($can_modify) && $can_modify && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered): ?>
+                        <div class="mt-2">
+                            <!-- Button to create new inventory control -->              
+                            <a href="<?= base_url('/item/create_inventory_control/'.$item['item_id']); ?>"
+                                class="btn btn-outline-success btn-sm mb-2"  role="button">
+                                <?= lang('MY_application.btn_create_inventory_control'); ?>
+                            </a>
+                            <!-- Button to display inventory controls history -->
+                            <a href="<?= base_url('/item/inventory_controls/'.$item['item_id']); ?>"
+                                class="btn btn-outline-primary btn-sm mb-2"  role="button" >
+                                <?= lang('MY_application.btn_inventory_control_history'); ?>
+                            </a>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                <div class="col-lg-2 col-sm-6">
                     <!-- Serial number -->
                     <p>
                         <?= lang('MY_application.field_serial_number').'&nbsp;:<br>'; ?>
@@ -143,7 +179,7 @@
                         <?php endif ?>
                     </p>
                 </div>
-                <div class="col-lg-3 col-sm-6">
+                <div class="col-lg-2 col-sm-6">
                     <!-- Buying Price -->
                     <p>
                         <?= lang('MY_application.field_buying_price').'&nbsp;:<br>'; ?>
@@ -156,7 +192,9 @@
                     </p>
                     <!-- Warranty -->
                     <p>
+                        <!-- Warranty duration -->
                         <?= lang('MY_application.field_warranty_duration').'&nbsp;:<br>'; ?>
+                        <?= !empty($item['warranty_duration']) ? $item['warranty_duration'].' '.lang('MY_application.text_months') : ''; ?>
                         
                         <!-- Warranty status -->
                         <?php if ($item['warranty_status'] == 1): ?>

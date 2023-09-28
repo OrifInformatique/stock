@@ -1,24 +1,23 @@
 <div class="container">
-
-    <!-- *** ADMIN *** -->
-    <?php
-
-    if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered) { ?>
-        <div class="row bottom-margin">
-            <div class="col-12">
+    
+    <div class="row pb-3">
+        <!-- Entity -->
+        <div id="e" class="dropdown col-md-4">
+            <?= form_dropdown('e', $entities, isset($_GET["e"]) ? $_GET["e"] : $default_entity,'id="entities_list"');?>
+        </div>
+        <!-- *** ADMIN *** -->
+        <?php
+        if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered) { ?>
+            <div class="col-md-8 text-right">
                 <!-- Button for new item -->
                 <a id="btn_add" href="<?php echo base_url("item/create/"); ?>"
-                        class="btn btn-success mb-3"><?php echo htmlspecialchars(lang('MY_application.btn_new')); ?></a>
+                        class="btn btn-outline-success"><?php echo htmlspecialchars(lang('MY_application.btn_add_item')); ?></a>
             </div>
-        </div>
-    <?php } ?>
-    <!-- *** END OF ADMIN *** -->
-
-    <div class="row pb-3">
-        <div id="e" class="col-sm-12">
-            <?= form_label(lang('stock_lang.entity_name'),'entities_list_label').form_dropdown('e', $entities, isset($_GET["e"]) ? $_GET["e"] : $default_entity,'id="entities_list"');?>
-        </div>
+        <?php } ?>
+        <!-- *** END OF ADMIN *** -->
     </div>
+
+    
 
     <div id="alert_no_entities" class="d-none alert alert-warning text-center" role="alert">
        <?= lang('stock_lang.msg_no_entities_exist') ?>
@@ -31,6 +30,7 @@
     <div id="alert_user_has_no_entities" class="<?= $has_entities ? 'd-none' : '' ?> alert alert-warning text-center" role="alert">
        <?= lang('stock_lang.msg_user_has_no_entities') ?>
     </div>
+
     <!-- FILTERS AND SORT FORM -->
     <form id="filters" class="" style="overflow: visible;" method="get" action="<?=base_url("item/index/1") . "/"?>">
         <div class="row">
@@ -310,14 +310,14 @@ function getFilters() {
 function display_item(item){
     // Item's parameters
     let href = '<?= base_url("/item_common/view/"); ?>'+item["item_common_id"];
-    let src_image = '<?= base_url(); ?>'+item["image_path"];
+    let src_image = '<?= base_url(); ?>'+item["image_path"]+'<?= '?t=' . time() ?>';
     let alt_image = '<?php htmlspecialchars(lang("MY_application.field_image")); ?>';
     let item_condition = item["condition"]["bootstrap_label"];
     let loan_bootstrap_label = item["current_loan"]["bootstrap_label"];
     let item_localisation = item["current_loan"]["loan_id"]!=null ?'<div class="small">'+item["current_loan"]["item_localisation"]+'</div>':"";
     let item_planned_return = item["current_loan"]["loan_id"]!=null ?'<div class="small">'+'<?= lang("MY_application.field_loan_planned_return"); ?> : '+item["current_loan"]["planned_return_date"]+'</div>':"";
-    let item_name = item["name"];
-    let item_description = item["description"];
+    let item_name = htmlspecialchars(item["name"]);
+    let item_description = htmlspecialchars(item["description"]);
     let stocking_place = "<span>"+item["stocking_place"]["name"]+"</span>";
     let inventory_number = item["inventory_number"];
     let serial_number = item["serial_number"];
@@ -352,11 +352,30 @@ function initializeMultiSelect() {
         buttonClass: 'btn btn-outline-primary',
         numberDisplayed: 10
     });
-    $('#item_conditions-multiselect, #item_groups-multiselect, #stocking_places-multiselect, #sort_order, #sort_asc_desc, #entities_list').multiselect({
+    $('#item_conditions-multiselect, #item_groups-multiselect, #stocking_places-multiselect, #sort_order, #sort_asc_desc').multiselect({
         nonSelectedText: no_filter,
         buttonWidth: '100%',
         buttonClass: 'btn btn-outline-primary',
         numberDisplayed: 5
     });
+    $('#entities_list').multiselect({
+        nonSelectedText: no_filter,
+        buttonWidth: '100%',
+        buttonClass: 'btn btn-info',
+        numberDisplayed: 5
+    });
+}
+
+function htmlspecialchars(input) {
+  if (typeof input !== 'string') {
+    return input;
+  }
+
+  return input
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 </script>
