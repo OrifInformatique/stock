@@ -876,10 +876,13 @@ class Item extends BaseController {
             $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_admin) {
 
             if (empty($command)) {
-                $data['db'] = 'loan';
-                $data['id'] = $id;
+                $data['loan'] = $this->loan_model->find($id);
+                $item = $this->item_model->find($data['loan']['item_id']);
+                $data['inventory_number'] = $this->item_model->getInventoryNumber($item);
+                $data['item_common'] = $this->item_common_model->find($item['item_common_id']);
+                $data['title'] = lang('stock_lang.title_delete_loan');
 
-                $this->display_view('Stock\Views\item\confirm_delete', $data);
+                $this->display_view('Stock\Views\loan\confirm_delete', $data);
             } else {
                 // get the data from the loan with this id (to fill the form or to get the concerned item)
                 $data = $this->loan_model->find($id);
