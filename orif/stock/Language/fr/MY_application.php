@@ -99,7 +99,7 @@ return[
 'header_status'                  => 'Disponibilité',
 'header_serial_nb'               => 'No de série',
 'header_inventory_nb'            => 'No d\'inventaire',
-'header_item_name'               => 'Objet',
+'header_item_name'               => 'Exemplaire d\'objet',
 'header_item_created_by'         => 'Créé par',
 'header_loan_date'               => 'Prêté le',
 'header_loan_planned_return'     => 'Retour prévu',
