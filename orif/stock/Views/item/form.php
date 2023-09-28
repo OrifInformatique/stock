@@ -82,7 +82,7 @@ $config = config('\Stock\Config\StockConfig');
                         <?= form_label(lang('stock_lang.field_name'), 'item_common_name'); ?>
                     </div>
                     <div class="col-8">
-                        <?= form_input('item_common_name', isset($item_common_name) ? $item_common_name : (isset($item_common['name']) ? $item_common['name'] : ''), [
+                        <?= form_input('item_common_name', isset($item_common_name) ? $item_common_name : (isset($item_common['name']) ? $item_common['name'] : set_value('item_common_name')), [
                                 'placeholder' => lang('stock_lang.field_item_common_name'),
                                 'class' => 'form-control', 
                                 'id' => 'item_common_name'
@@ -98,7 +98,7 @@ $config = config('\Stock\Config\StockConfig');
                         <?= form_label(lang('stock_lang.field_description'), 'item_common_description'); ?>
                     </div>
                     <div class="col-8">
-                        <?= form_input('item_common_description', isset($item_common_description) ? $item_common_description : (isset($item_common['description']) ? $item_common['description'] : ''), [
+                        <?= form_input('item_common_description', isset($item_common_description) ? $item_common_description : (isset($item_common['description']) ? $item_common['description'] : set_value('item_common_description')), [
                                 'placeholder' => lang('stock_lang.field_item_common_description'),
                                 'class' => 'form-control', 
                                 'id' => 'item_common_description'
@@ -114,7 +114,7 @@ $config = config('\Stock\Config\StockConfig');
                         <?= form_label(lang('MY_application.field_group'), 'item_common_group_id'); ?>
                     </div>
                     <div class="col-8">
-                        <?= form_dropdown('item_common_item_group_id', $item_groups, isset($item_common_item_group) ? $item_common_item_group : (isset($item_common['item_group_id']) ? $item_common['item_group_id'] : ''), [
+                        <?= form_dropdown('item_common_item_group_id', $item_groups, isset($item_common_item_group) ? $item_common_item_group : (isset($item_common['item_group_id']) ? $item_common['item_group_id'] : set_value('item_common_item_group_id')), [
                                 'class' => 'form-control',
                                 'id' => 'item_common_group_id'
                             ]);
@@ -129,7 +129,7 @@ $config = config('\Stock\Config\StockConfig');
                         <?= form_label(lang('MY_application.field_tags'), 'item_tags-multiselect'); ?>
                     </div>
                     <div class="col-8">
-                        <?= form_multiselect('item_common_tags[]', $item_tags, isset($item_common_tags) ? $item_common_tags : (isset($item_tag_ids) ? $item_tag_ids : []),'id="item_tags-multiselect" multiple="multiple"'); ?>
+                        <?= form_multiselect('item_common_tags[]', $item_tags, isset($item_common_tags) ? $item_common_tags : (isset($item_tag_ids) ? $item_tag_ids : (gettype(set_value('item_common_tags[]')) == 'array' ? set_value('item_common_tags[]') : [])),'id="item_tags-multiselect" multiple="multiple"'); ?>
                     </div>
                 </div>
 
@@ -200,7 +200,7 @@ $config = config('\Stock\Config\StockConfig');
                         <?= form_label(lang('MY_application.field_serial_number'), 'serial_number') ?>
                     </div>
                     <div class="col-md-8">
-                        <?= form_input('serial_number', isset($serial_number) ? $serial_number : (isset($item['serial_number']) ? $item['serial_number'] : ''), [
+                        <?= form_input('serial_number', isset($serial_number) ? $serial_number : (isset($item['serial_number']) ? $item['serial_number'] : set_value('serial_number')), [
                             'class' => 'form-control'
                         ]) ?>
                     </div>
@@ -212,7 +212,7 @@ $config = config('\Stock\Config\StockConfig');
                         <?= form_label(lang('MY_application.field_remarks'), 'remarks') ?>
                     </div>
                     <div class="col-md-8">
-                        <?= form_textarea('remarks', isset($supplier_ref) ? $supplier_ref : (isset($item['remarks']) ? $item['remarks'] : ''), [
+                        <?= form_textarea('remarks', isset($supplier_ref) ? $supplier_ref : (isset($item['remarks']) ? $item['remarks'] : set_value('remarks')), [
                             'class' => 'form-control',
                             'rows' => '2'
                         ]) ?>
@@ -229,7 +229,7 @@ $config = config('\Stock\Config\StockConfig');
 
             <!-- Condition -->
             <div class="form-group col-md-6">
-                <?= form_label(lang('MY_application.text_item_condition'), 'item_condition_id').form_dropdown('item_condition_id', $conditions, isset($item_condition_id) ? $item_condition_id : (isset($item['item_condition_id']) ? $item['item_condition_id'] : []), [
+                <?= form_label(lang('MY_application.text_item_condition'), 'item_condition_id').form_dropdown('item_condition_id', $conditions, isset($item_condition_id) ? $item_condition_id : (isset($item['item_condition_id']) ? $item['item_condition_id'] : set_value('item_condition_id')), [
                         'class' => 'form-control'
                     ]);
                 ?>
@@ -237,7 +237,7 @@ $config = config('\Stock\Config\StockConfig');
 
             <!-- Stocking place -->
             <div class="form-group col-md-6">
-                <?= form_label(lang('MY_application.field_stocking_place'), 'stocking_place_id').form_dropdown('stocking_place_id', $stocking_places, isset($stocking_place_id) ? $stocking_place_id : (isset($item['stocking_place_id']) ? $item['stocking_place_id'] : []), [
+                <?= form_label(lang('MY_application.field_stocking_place'), 'stocking_place_id').form_dropdown('stocking_place_id', $stocking_places, isset($stocking_place_id) ? $stocking_place_id : (isset($item['stocking_place_id']) ? $item['stocking_place_id'] : set_value('stocking_place_id')), [
                         'class' => 'form-control'
                     ]);
                 ?>
@@ -254,12 +254,12 @@ $config = config('\Stock\Config\StockConfig');
             <!-- Supplier -->
             <div class ="col-md-4">
                 <div class="form-group">
-                    <?= form_label(lang('MY_application.field_supplier'), 'supplier_id').form_dropdown('supplier_id', $suppliers, isset($supplier_id) ? $supplier_id : (isset($item['supplier_id']) ? $item['supplier_id'] : []), [
+                    <?= form_label(lang('MY_application.field_supplier'), 'supplier_id').form_dropdown('supplier_id', $suppliers, isset($supplier_id) ? $supplier_id : (isset($item['supplier_id']) ? $item['supplier_id'] : set_value('supplier_id')), [
                         'class' => 'form-control'
                     ]); ?>
                 </div>
                 <div class="form-group">
-                    <?= form_label(lang('MY_application.field_supplier_ref'), 'supplier_ref').form_input('supplier_ref', isset($supplier_ref) ? $supplier_ref : (isset($item['supplier_ref']) ? $item['supplier_ref'] : ''), [
+                    <?= form_label(lang('MY_application.field_supplier_ref'), 'supplier_ref').form_input('supplier_ref', isset($supplier_ref) ? $supplier_ref : (isset($item['supplier_ref']) ? $item['supplier_ref'] : set_value('supplier_ref')), [
                         'class' => 'form-control'
                     ]) ?>
                 </div>
@@ -268,13 +268,13 @@ $config = config('\Stock\Config\StockConfig');
             <!-- Buying price and buying date -->
             <div class="col-md-4">
                 <div class="form-group">
-                    <?= form_label(lang('MY_application.field_buying_price'), 'buying_price').form_input('buying_price', isset($buying_price) ? $buying_price : (isset($item['buying_price']) ? $item['buying_price'] : ''), [
+                    <?= form_label(lang('MY_application.field_buying_price'), 'buying_price').form_input('buying_price', isset($buying_price) ? $buying_price : (isset($item['buying_price']) ? $item['buying_price'] : set_value('buying_price')), [
                         'class' => 'form-control',
                         'step' => '0.01'
                     ], 'number') ?>
                 </div>
                 <div class="form-group">
-                    <?= form_label(lang('MY_application.field_buying_date'), 'buying_date').form_input('buying_date', isset($buying_date) ? $buying_date : (isset($item['buying_date']) ? $item['buying_date'] : ''), [
+                    <?= form_label(lang('MY_application.field_buying_date'), 'buying_date').form_input('buying_date', isset($buying_date) ? $buying_date : (isset($item['buying_date']) ? $item['buying_date'] : set_value('buying_date')), [
                         'class' => 'form-control',
                         'id' => 'buying_date',
                         'onblur' => 'change_warranty()'
@@ -285,7 +285,7 @@ $config = config('\Stock\Config\StockConfig');
             <!-- Warranty -->
             <div class="col-md-4">
                 <div class="form-group">
-                    <?= form_label(lang('MY_application.field_warranty_duration').' ('.lang('MY_application.text_months').')', 'warranty_duration').form_input('warranty_duration', isset($warranty_duration) ? $warranty_duration : (isset($item['warranty_duration']) ? $item['warranty_duration'] : ''), [
+                    <?= form_label(lang('MY_application.field_warranty_duration').' ('.lang('MY_application.text_months').')', 'warranty_duration').form_input('warranty_duration', isset($warranty_duration) ? $warranty_duration : (isset($item['warranty_duration']) ? $item['warranty_duration'] : set_value('warranty_duration')), [
                         'class' => 'form-control',
                         'id' => 'warranty_duration',
                         'onblur' => 'change_warranty()'
