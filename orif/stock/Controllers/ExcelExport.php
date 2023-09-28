@@ -64,9 +64,9 @@ class ExcelExport extends \App\Controllers\BaseController
                 if ($group_by == config('\Stock\config\StockConfig')->group_by_item_common) {
                     // Group by item_common
                     $builder = $this->db->table('item_common');
-                    $totalPriceQuery = $this->db->table('item')
-                        ->select('item_common_id, COUNT(item_id) as item_count, SUM(buying_price) as total_price')
-                        ->groupBy('item_common_id')
+                    $countItemsQuery = $this->db->table('item')
+                        ->select('item_common_id, supplier_id, COUNT(item_id) as item_count')
+                        ->groupBy('item_common_id, supplier_id')
                         ->getCompiledSelect();
 
                     $lastCreatedDateQuery = $this->db->table('item')
@@ -74,8 +74,8 @@ class ExcelExport extends \App\Controllers\BaseController
                         ->groupBy('item_common_id')
                         ->getCompiledSelect();
 
-                    $builder->select('item_common.*, item_group.name AS "item_group_name", items.item_count, items.total_price, last_item.*')
-                        ->join('(' . $totalPriceQuery . ') items', 'item_common.item_common_id = items.item_common_id', 'inner')
+                    $builder->select('item_common.*, item_group.name AS "item_group_name", items.item_count, items.supplier_id, last_item.*')
+                        ->join('(' . $countItemsQuery . ') items', 'item_common.item_common_id = items.item_common_id', 'inner')
                         ->join('(' . $lastCreatedDateQuery . ') last_item', 'item_common.item_common_id = last_item.item_common_id', 'inner')
                         ->join('item_group', 'item_group.item_group_id = item_common.item_group_id', 'inner');
 
@@ -133,7 +133,6 @@ class ExcelExport extends \App\Controllers\BaseController
 
                         $item_entity = $this->entity_model->where('name', $item['entity_name'])->first();
                         $item['entity_address'] = !is_null($item_entity) ? "{$item_entity['address']} {$item_entity['zip']}, {$item_entity['locality']}" : '';
-                        $item['total_price'] = $item['total_price'] != 0 ? round($item['total_price'], 2) : '0';
                         $unitPrices = explode(',', $item['unit_price']);
                         $item['unit_price'] = $unitPrices ? 0 : $item['unit_price'];
 
@@ -147,6 +146,7 @@ class ExcelExport extends \App\Controllers\BaseController
                                 }
                             }
                         }
+                        $item['total_price'] = floatval($item['unit_price']) * intval($item['item_count']);
                     }
                     
                     $tag_ids = $this->item_tag_link_model->where('item_common_id', $item['item_common_id'])->findColumn('item_tag_id');
@@ -169,7 +169,7 @@ class ExcelExport extends \App\Controllers\BaseController
                         ];
                         $supplier = array_filter($supplier);
                     }
-    
+
                     $item['supplier'] = $supplier == null ? '' : implode("\n", $supplier);
                     $items[$idx] = $item;
                 }
