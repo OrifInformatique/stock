@@ -20,6 +20,11 @@ li.nav-item {
 	margin: 0 10px;
 }
 
+/* Form disabled background */
+.disabled-bg {
+    background-color: #ECECEC;
+}
+
 /* Items list style */
 #list_item .item {
     padding: .75rem;
