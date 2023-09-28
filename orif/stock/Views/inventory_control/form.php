@@ -2,7 +2,7 @@
 	<h3>
 	<?php
 		echo lang('MY_application.field_inventory_control').' : ';
-		echo $item['name'].' ('.$item['inventory_number'].')';
+		echo $item_common['name'].' ('.$item['inventory_number'].')';
 	?>
 	</h3>
 

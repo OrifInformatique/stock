@@ -581,6 +581,7 @@ class Item extends BaseController {
             $this->user_model = new User_model();
 
             $data['item'] = $this->item_model->find($id);
+            $data['item_common'] = $this->item_common_model->find($data['item']['item_common_id']);
             $data['item']['inventory_number'] = $this->item_model->getInventoryNumber($data['item']);
             $data['controller'] = $this->user_model->find($_SESSION['user_id']);
 
@@ -603,13 +604,13 @@ class Item extends BaseController {
                 $inventory_control['remarks'] = $data['remarks'];
 
                 $this->inventory_control_model->insert($inventory_control);
-                return redirect()->to("/item/view/".$id);
+                return redirect()->to("/item_common/view/".$data['item_common']['item_common_id']);
             } else {
                 $this->display_view('Stock\Views\inventory_control\form', $data);
             }
         } else {
             // No item specified or access is not allowed, display items list
-            return redirect()->to('/item');
+            return redirect()->to(base_url());
         }
     }
 
