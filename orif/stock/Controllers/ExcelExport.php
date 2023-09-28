@@ -65,8 +65,8 @@ class ExcelExport extends \App\Controllers\BaseController
                     // Group by item_common
                     $builder = $this->db->table('item_common');
                     $countItemsQuery = $this->db->table('item')
-                        ->select('item_common_id, supplier_id, COUNT(item_id) as item_count')
-                        ->groupBy('item_common_id, supplier_id')
+                        ->select('item_common_id, MAX(supplier_id) AS supplier_id, COUNT(item_id) as item_count')
+                        ->groupBy('item_common_id')
                         ->getCompiledSelect();
 
                     $lastCreatedDateQuery = $this->db->table('item')
