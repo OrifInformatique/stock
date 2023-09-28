@@ -1,6 +1,6 @@
 <?php
 /**
- * View delete_user
+ * View delete_loan
  *
  * @author      Orif (ViDi,AeDa)
  * @link        https://github.com/OrifInformatique

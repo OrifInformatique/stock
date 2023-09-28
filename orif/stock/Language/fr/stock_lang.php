@@ -109,7 +109,7 @@ return[
 'hard_delete_item_common_explanation'   => 'Toutes ses données ainsi que tous les exemplaires de cet objet seront définitivement effacés.',
 'item_common_no_item'                   => 'Aucun exemplaire de cet objet n\'est répertorié.',
 
-'loan_delete_explanation'               => 'La suppression du prêt de cet exemplaire d\'objet est définitive. L\'objet sera peut-être à nouveau disponible pour être prêté après la suppression de ce prêt.',
+'loan_delete_explanation'               => 'La suppression du prêt est définitive.',
 
 'item_delete_explanation'               => 'La suppression d\'un exemplaire d\'objet est définitive et toutes les informations de contrôles d\'inventaire et de prêts seront supprimées.<br>Si vous souhaitez le désactiver sans le supprimer, vous pouvez modifier son état à "plus disponible".',
 'really_want_to_delete_item'            => 'Voulez-vous vraiment supprimer cet exemplaire d\'objet ?',
