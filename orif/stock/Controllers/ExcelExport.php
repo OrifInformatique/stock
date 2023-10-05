@@ -69,8 +69,9 @@ class ExcelExport extends \App\Controllers\BaseController
                         ->groupBy('item_common_id')
                         ->getCompiledSelect();
 
+                    // TODO: Replace created_date with buying_price
                     $lastCreatedDateQuery = $this->db->table('item')
-                        ->select('item_common_id, group_concat(buying_price) as unit_price, MAX(created_date) as last_created_date')
+                        ->select('item_common_id, group_concat(supplier_id) as suppliers, group_concat(buying_price) as unit_price, MAX(created_date) as last_created_date')
                         ->groupBy('item_common_id')
                         ->getCompiledSelect();
 
@@ -148,19 +149,33 @@ class ExcelExport extends \App\Controllers\BaseController
                         }
                         $item['total_price'] = floatval($item['unit_price']) * intval($item['item_count']);
                     }
-                    
+
                     $tag_ids = $this->item_tag_link_model->where('item_common_id', $item['item_common_id'])->findColumn('item_tag_id');
                     is_array($tag_ids) ? $item['tags'] = $this->item_tag_model->whereIn('item_tag_id', $tag_ids)->findColumn('name') : $item['tags'] = [];
                     $item['tags'] = (is_array($item['tags']) ? implode(';', $item['tags']) : '');
                     isset($item['item_group_id']) ? $item['group_name'] = $this->item_group_model->withDeleted()->find($item['item_group_id'])['name'] : $item['group_name'] = '';
                     
+                    // TODO Ignore supplier_id == 1 to not get "Inconnu" supplier name
                     $supplier = null;
-                    !isset($item['supplier_id']) ?: $supplier = $this->supplier_model->find($item['supplier_id']);
-                    if ($supplier != null) {
-                        $supplier = $supplier['name'];
+                    $last_supplier_id = null;
+                    if (isset($item['suppliers'])) {
+                        $suppliers = explode(',', $item['suppliers']);
+                        if (is_array($suppliers)) {
+                            $suppliers = array_reverse($suppliers);
+                            foreach ($suppliers as $supplier_id) {
+                                if ($supplier_id > 0) {
+                                    $last_supplier_id = $supplier_id;
+                                    break;
+                                }
+                            }
+                        }
                     }
 
-                    $item['supplier'] = $supplier == null ? '' : $supplier;
+                    if (!is_null($last_supplier_id)) {
+                        $supplier = $this->supplier_model->find($last_supplier_id);
+                    }
+
+                    $item['supplier'] = $supplier == null ? '' : $supplier['name'];
                     $items[$idx] = $item;
                 }
     
