@@ -182,7 +182,6 @@ class ExcelExport extends \App\Controllers\BaseController
                     $item['tags'] = (is_array($item['tags']) ? implode(';', $item['tags']) : '');
                     isset($item['item_group_id']) ? $item['group_name'] = $this->item_group_model->withDeleted()->find($item['item_group_id'])['name'] : $item['group_name'] = '';
                     
-                    // TODO Ignore supplier_id == 1 to not get "Inconnu" supplier name
                     $supplier = null;
                     $last_supplier_id = null;
                     $supplier_to_ignore = $this->supplier_model->where('name', config('\Stock\config\StockConfig')->supplier_to_ignore)->first();
