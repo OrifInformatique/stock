@@ -52,4 +52,5 @@ class StockConfig extends BaseConfig
 
     public $group_by_item_common        =   0;
     public $group_by_item               =   1;
+    public $supplier_to_ignore          =   'Inconnu';
 }

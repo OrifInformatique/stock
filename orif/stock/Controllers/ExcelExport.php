@@ -158,12 +158,13 @@ class ExcelExport extends \App\Controllers\BaseController
                     // TODO Ignore supplier_id == 1 to not get "Inconnu" supplier name
                     $supplier = null;
                     $last_supplier_id = null;
+                    $supplier_to_ignore = $this->supplier_model->where('name', config('\Stock\config\StockConfig')->supplier_to_ignore)->first();
                     if (isset($item['suppliers'])) {
                         $suppliers = explode(',', $item['suppliers']);
                         if (is_array($suppliers)) {
                             $suppliers = array_reverse($suppliers);
                             foreach ($suppliers as $supplier_id) {
-                                if ($supplier_id > 0) {
+                                if ($supplier_id > 0 && $supplier_id != $supplier_to_ignore['supplier_id']) {
                                     $last_supplier_id = $supplier_id;
                                     break;
                                 }
