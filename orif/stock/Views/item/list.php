@@ -191,29 +191,28 @@ async function load_items(page, filters) {
 
 
     // URL for ajax call to PHP controller                      Stock\Controllers\
-    url = "<?= base_url("/item/load_list_json")?>"+ "/" + page+filters;
+    url = "https://testjs.sectioninformatique.net/items/"+page+filters;
     
     await $.ajax({
         url: url,
         type: "get",
         success: function (response) {
-            var result = JSON.parse(response);
-            page = result.number_page;
+            page = url.split('/')[4].split('?')[0];
             filters=getFilters();
             history.pushState(null, "", "<?= base_url("item/index")?>"+ "/" +page+filters);
             eItems = $("#e .multiselect-container .active input");
             
             // Empty list before filling it
-            if (result.items.length > 0){
+            if (response.items.length > 0) {
                 $("#table_item").toggle(true);
-                $.each(result.items, function (i, item) {
+                $.each(response.items, function (i, item) {
                     $("#list_item").append(display_item(item));
                 });
             } else {
                 $("#no_item_message").toggle(true);
             }
 
-            if (result.late_loans_count > 0) {
+            if (response.late_loans_count > 0) {
                 $("#late_loans").toggle(true);
                 $("#late_loans").text(result.late_loans_count);
             } else {
@@ -223,20 +222,20 @@ async function load_items(page, filters) {
             if (eItems.length > 0) {
                 $("#btn_late_loans").attr("href", '<?= base_url('item/list_loans') ?>' + '/1?e=' + eItems[0].value);
                 
-                if (result.user_entities) {
+                if (response.user_entities) {
                     $("#btn_add").attr("href", '<?= base_url('item/create') ?>' + '/' + eItems[0].value);
-                    $("#btn_add").toggle(result.user_entities.includes($("#e .multiselect-container .active input")[0].value));
+                    $("#btn_add").toggle(response.user_entities.includes($("#e .multiselect-container .active input")[0].value));
                 } else {
                     $("#btn_add").toggle(false);
                 }
             }
 
-            $('#g').html(result.div_item_groups);
-            $('#s').html(result.div_stocking_places);
+            $('#g').html(response.div_item_groups);
+            $('#s').html(response.div_stocking_places);
 
             initializeMultiSelect();
 
-            $("#pagination_top, #pagination_bottom").html(result.pagination);
+            $("#pagination_top, #pagination_bottom").html(response.pagination);
 
             // Change cursor
             $("*").css("cursor", "");
@@ -309,17 +308,20 @@ function getFilters() {
 
 function display_item(item){
     // Item's parameters
-    let href = '<?= base_url("/item_common/view/"); ?>'+item["item_common_id"];
-    let src_image = '<?= base_url(); ?>'+item["image_path"]+'<?= '?t=' . time() ?>';
+    let href = '<?= base_url("/item_common/view/"); ?>'+item["item_common"]['item_common_id'];
+    let src_image = '<?= base_url('/images/no_image.png'); ?>';
+    if (item.item_common.image !== null) {
+        src_image = '<?= base_url('/uploads/images'); ?>'+'/'+item["item_common"]["image"]+'<?= '?t=' . time() ?>';
+    }
     let alt_image = '<?php htmlspecialchars(lang("MY_application.field_image")); ?>';
-    let item_condition = item["condition"]["bootstrap_label"];
-    let loan_bootstrap_label = item["current_loan"]["bootstrap_label"];
-    let item_localisation = item["current_loan"]["loan_id"]!=null ?'<div class="small">'+item["current_loan"]["item_localisation"]+'</div>':"";
-    let item_planned_return = item["current_loan"]["loan_id"]!=null ?'<div class="small">'+'<?= lang("MY_application.field_loan_planned_return"); ?> : '+item["current_loan"]["planned_return_date"]+'</div>':"";
-    let item_name = item["name"];
-    let item_description = item["description"];
+    let item_condition = '<div class="text-white ' + itemConditionBootstrap(item["item_condition"]).htmlClass + '">' + itemConditionBootstrap(item["item_condition"]).value + '</div>';
+    let loan_bootstrap_label = '<div class="text-white ' + loanStatusBoostrap(item["current_loan"]).htmlClass + '">' + loanStatusBoostrap(item["current_loan"]).value + '</div>';
+    let item_localisation = item["current_loan"]!=null ?'<div class="small">'+item["current_loan"]["item_localisation"]+'</div>':"";
+    let item_planned_return = item["current_loan"]!=null ?'<div class="small">'+'<?= lang("MY_application.field_loan_planned_return"); ?> : '+new Date(item["current_loan"]["planned_return_date"]).toLocaleDateString("fr-CH")+'</div>':"";
+    let item_name = item["item_common"]["name"];
+    let item_description = item["item_common"]["description"];
     let stocking_place = "<span>"+item["stocking_place"]["name"]+"</span>";
-    let inventory_number = item["inventory_number"];
+    let inventory_number = item.inventory_prefix + '.' + item.item_id.toString().padStart(4, '0');
     let serial_number = item["serial_number"];
     let delete_item = '<?php if(isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] == true && $_SESSION["user_access"] >= config('\User\Config\UserConfig')->access_lvl_admin) { echo "<td><a href=\"".base_url("/item/delete/"); ?>/'+item["item_id"]+'" class=\"close\" title=\"Supprimer l\'objet\">×</a></td> <?php } ?>';
 
@@ -358,5 +360,61 @@ function initializeMultiSelect() {
         buttonClass: 'btn btn-outline-primary',
         numberDisplayed: 5
     });
+}
+
+function itemConditionBootstrap(itemCondition) {
+    let value = itemCondition.name;
+    let htmlClass = 'badge ';
+
+    switch(itemCondition.item_condition_id) {
+      case 10:
+        htmlClass = htmlClass + 'bg-success';
+        break;
+      
+      case 30:
+        htmlClass = htmlClass + 'bg-warning';
+        break;
+
+      case 40:
+        htmlClass = htmlClass + 'bg-danger';
+        break;
+
+      default:
+        break;
+    }
+
+    return {value, htmlClass};
+}
+
+function loanStatusBoostrap(currentLoan) {
+    let htmlClass = 'badge ';
+    let value = '';
+
+    if (currentLoan !== null) {
+      let end;
+
+      if (currentLoan.planned_return_date !== null) {
+        end = new Date(currentLoan.planned_return_date);
+      } else {
+        end = new Date(currentLoan.date);
+        end.setMonth(end.getMonth() + 3);
+      }
+
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+
+      if (end < now) {
+        htmlClass += 'bg-danger';
+        value = 'Prêt en retard';
+      } else {
+        htmlClass += 'bg-warning';
+        value = 'En prêt';
+      }
+    } else {
+      htmlClass += 'bg-success';
+      value = 'Pas de prêt en cours';
+    }
+
+    return {value, htmlClass};
 }
 </script>
