@@ -396,12 +396,8 @@ class Item extends BaseController {
                 return redirect()->to(base_url("picture/select_picture"));
             }
             // Load entities
-            if (isset($_SESSION['user_access']) && isset($_SESSION['user_id']) && $_SESSION['user_access'] < config('\User\Config\UserConfig')->access_lvl_admin) {
-                $entity_ids = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->findColumn('fk_entity_id');
-                $data['entities_list'] = $this->entity_model->find($entity_ids);
-            } else {
-                $data['entities_list'] = $this->entity_model->findAll();
-            }
+            $entity_ids = $this->user_entity_model->where('fk_user_id', $_SESSION['user_id'])->findColumn('fk_entity_id');
+            $data['entities_list'] = $this->entity_model->find($entity_ids);
             
             $data['entities'] = $this->dropdown($data['entities_list'], 'entity_id');
 
@@ -506,9 +502,13 @@ class Item extends BaseController {
             // Load the tags
             $data['item_tags_list'] = $this->item_tag_model->findAll();
             $data['item_tags'] = $this->dropdown($data['item_tags_list'], 'item_tag_id');
+            $data['item_tag_ids'] = $this->item_tag_link_model->where('item_common_id', $item_common['item_common_id'])->findColumn('item_tag_id');
 
             // Load entity id
             $data['selected_entity_id'] = $entity_id;
+
+            // Load inventory ID
+            $data['inventory_id'] = $this->item_model->getInventoryID($item);
 
             $data['item_common'] = $item_common;
             $data['item'] = $item;
@@ -581,6 +581,7 @@ class Item extends BaseController {
             $this->user_model = new User_model();
 
             $data['item'] = $this->item_model->find($id);
+            $data['item_common'] = $this->item_common_model->find($data['item']['item_common_id']);
             $data['item']['inventory_number'] = $this->item_model->getInventoryNumber($data['item']);
             $data['controller'] = $this->user_model->find($_SESSION['user_id']);
 
@@ -603,13 +604,13 @@ class Item extends BaseController {
                 $inventory_control['remarks'] = $data['remarks'];
 
                 $this->inventory_control_model->insert($inventory_control);
-                return redirect()->to("/item/view/".$id);
+                return redirect()->to("/item_common/view/".$data['item_common']['item_common_id']);
             } else {
                 $this->display_view('Stock\Views\inventory_control\form', $data);
             }
         } else {
             // No item specified or access is not allowed, display items list
-            return redirect()->to('/item');
+            return redirect()->to(base_url());
         }
     }
 
@@ -632,7 +633,7 @@ class Item extends BaseController {
             // Get item object with related inventory controls
             $output['item'] = $this->item_model->find($id);
             $output['item_common'] = $this->item_common_model->find($output['item']['item_common_id']);
-            $output['inventory_controls'] = $this->inventory_control_model->where('item_id='.$id)->findAll();
+            $output['inventory_controls'] = $this->inventory_control_model->where('item_id='.$id)->orderBy('date', 'desc')->findAll();
             $output['item']['inventory_number'] = $this->item_model->getInventoryNumber($output['item']);
             array_walk($output['inventory_controls'], function(&$control) {
                 $control['controller'] = $this->inventory_control_model->getUser($control['controller_id']);
@@ -831,7 +832,7 @@ class Item extends BaseController {
             $item = $this->item_model->find($id);
             $item_common = $this->item_common_model->find($item['item_common_id']);
             $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
-            $loans = $this->loan_model->where('item_id', $item['item_id'])->findAll();
+            $loans = $this->loan_model->where('item_id', $item['item_id'])->orderBy('date', 'desc')->findAll();
             array_walk($loans, function(&$loan) {
                 $loan['loan_by_user'] = $this->loan_model->get_loaner($loan);
                 $loan['date'] = databaseToShortDate($loan['date']);
@@ -875,10 +876,13 @@ class Item extends BaseController {
             $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_admin) {
 
             if (empty($command)) {
-                $data['db'] = 'loan';
-                $data['id'] = $id;
+                $data['loan'] = $this->loan_model->find($id);
+                $item = $this->item_model->find($data['loan']['item_id']);
+                $data['inventory_number'] = $this->item_model->getInventoryNumber($item);
+                $data['item_common'] = $this->item_common_model->find($item['item_common_id']);
+                $data['title'] = lang('stock_lang.title_delete_loan');
 
-                $this->display_view('Stock\Views\item\confirm_delete', $data);
+                $this->display_view('Stock\Views\loan\confirm_delete', $data);
             } else {
                 // get the data from the loan with this id (to fill the form or to get the concerned item)
                 $data = $this->loan_model->find($id);
@@ -1134,6 +1138,9 @@ class Item extends BaseController {
             $this->loan_model->update($id, $data);
         }
 
-        return redirect()->to(base_url());
+        // Go back to the item_common corresponding to the updated loan
+        $loan = $this->loan_model->find($id);
+        $item = $this->item_model->where('item_id', $loan['item_id'])->first();
+        return redirect()->to(base_url('item_common/view/'.$item['item_common_id']));
     }
 }

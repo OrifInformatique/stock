@@ -200,15 +200,4 @@ class CustomRules
         $item_common = (new Item_common_model())->where('name', [$name])->first();
         return is_null($item_common) || $item_common['item_common_id'] == $id;
     }
-
-    /**
-     * Checks if string is made of alpha numeric and accented characters and spaces
-     *
-     * @param string $str string to check
-     * @return boolean = TRUE if the matches with the received string
-     */
-    public function alpha_numeric_accent_space($str)
-    {
-        return (bool) preg_match('/^[A-zÀ-ÿ0-9 ]+$/i', $str);
-    }
 }

@@ -90,7 +90,7 @@ class Admin extends BaseController
     public function view_tags($with_deleted = false)
     {
         if ($with_deleted) {
-            $data['items'] = $this->item_tag_model->withDeleted()->findAll();
+            $data['items'] = $this->item_tag_model->withDeleted()->orderBy('name', 'asc')->findAll();
 
             // Add the "active" info for each tag
             foreach ($data['items'] as &$tag) {
@@ -102,7 +102,7 @@ class Admin extends BaseController
                 'active'      => lang('stock_lang.field_active'),
             ];
         } else {
-            $data['items'] = $this->item_tag_model->findAll();
+            $data['items'] = $this->item_tag_model->orderBy('name', 'asc')->findAll();
 
             $data['columns'] = [
                 'name' => lang('stock_lang.field_name'),
@@ -251,7 +251,7 @@ class Admin extends BaseController
         }
 
         if ($with_deleted) {
-            $data['items'] = $this->stocking_place_model->withDeleted()->where('fk_entity_id', $entity_id)->findAll();
+            $data['items'] = $this->stocking_place_model->withDeleted()->where('fk_entity_id', $entity_id)->orderBy('name', 'asc')->findAll();
 
             // Add the "active" info for each stocking place
             foreach ($data['items'] as &$stocking_place) {
@@ -266,7 +266,7 @@ class Admin extends BaseController
                 'active' => lang('stock_lang.field_active'),
             ];
         } else {
-            $data['items'] = $this->stocking_place_model->where('fk_entity_id', $entity_id)->findAll();
+            $data['items'] = $this->stocking_place_model->where('fk_entity_id', $entity_id)->orderBy('name', 'asc')->findAll();
             foreach ($data['items'] as &$stocking_place) {
                 if ($stocking_place['fk_entity_id'] != null)
                     $stocking_place['fk_entity_id'] = $this->entity_model->withDeleted()->find($stocking_place['fk_entity_id'])['name'];
@@ -462,10 +462,10 @@ class Admin extends BaseController
         ];
 
         if ($with_deleted) {
-            $suppliers = $this->supplier_model->withDeleted()->findAll();
+            $suppliers = $this->supplier_model->withDeleted()->orderBy('name', 'asc')->findAll();
             $data['columns']['active'] = lang('stock_lang.field_active');
         } else {
-            $suppliers = $this->supplier_model->findAll();
+            $suppliers = $this->supplier_model->orderBy('name', 'asc')->findAll();
         }
 
         // Order columns and construct contents for common module generic items_list view
@@ -651,7 +651,7 @@ class Admin extends BaseController
         }
 
         if ($with_deleted) {
-            $data['items'] = $this->item_group_model->withDeleted()->where('fk_entity_id', $entity_id)->findAll();
+            $data['items'] = $this->item_group_model->withDeleted()->where('fk_entity_id', $entity_id)->orderBy('name', 'asc')->findAll();
 
             // Add the "active" info for each item group
             foreach ($data['items'] as &$item_group) {
@@ -665,7 +665,7 @@ class Admin extends BaseController
                 'active' => lang('stock_lang.field_active'),
             ];
         } else {
-            $data['items'] = $this->item_group_model->where('fk_entity_id', $entity_id)->findAll();
+            $data['items'] = $this->item_group_model->where('fk_entity_id', $entity_id)->orderBy('name', 'asc')->findAll();
             foreach ($data['items'] as $itemidx => $item) {
                 if (isset($item['fk_entity_id']))
                     $item['fk_entity_id'] = $this->entity_model->withDeleted(true)->find($item['fk_entity_id'])['name'];
@@ -847,7 +847,7 @@ class Admin extends BaseController
     {
         $data['columns'] = ['name' => lang('stock_lang.name'), 'address' => lang('stock_lang.address'), 'zip' => lang('stock_lang.zip_code'), 'locality' => lang('stock_lang.locality'), 'shortname' => lang('stock_lang.tagname')];
         $data['items'] = [];
-        foreach ($this->entity_model->withDeleted($with_deleted)->findAll() as $entity) {
+        foreach ($this->entity_model->withDeleted($with_deleted)->orderBy('name', 'asc')->findAll() as $entity) {
             $data['items'][] = ['id' => $entity['entity_id'], 'name' => $entity['name'], 'address' => $entity['address'], 'zip' => $entity['zip'], 'locality' => $entity['locality'], 'shortname' => $entity['shortname'], 'enabled' => $entity['archive'] == null ? lang('common_lang.yes') : lang('common_lang.no')];
         }
         if ($with_deleted == true) {
@@ -934,9 +934,9 @@ class Admin extends BaseController
 
         if (!empty($fk_user_ids)) {
             if ($with_deleted) {
-                $users = $this->user_model->withDeleted()->find($fk_user_ids);
+                $users = $this->user_model->withDeleted()->orderBy('username', 'asc')->find($fk_user_ids);
             } else {
-                $users = $this->user_model->find($fk_user_ids);
+                $users = $this->user_model->orderBy('username', 'asc')->find($fk_user_ids);
             }
         } else {
             $users = [];

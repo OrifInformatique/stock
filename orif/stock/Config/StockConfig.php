@@ -17,6 +17,9 @@ class StockConfig extends BaseConfig
     public $username_max_length         =   45;
     public $password_min_length         =   6;
     public $password_max_length         =   72;
+    
+    public $access_lvl_manager          =   2;
+    public $access_lvl_admin            =   4;
 
     /* Validation rules */
     public $group_short_max_length      =   2;
@@ -29,7 +32,9 @@ class StockConfig extends BaseConfig
     /* Constants */
     public $inventory_prefix            =   'ORP';
     public $inventory_number_chars      =   4;
+
     public $functional_item_condition   =   10;
+    public $soft_deleted_item_condition =   40;
     public $items_default_group         =   2;
     public $item_no_image               =   'no_image.png';
     public $item_no_image_path          =   'images/';
@@ -37,19 +42,17 @@ class StockConfig extends BaseConfig
     public $image_extension             =   '.png';
     public $image_picture_suffix        =   '_picture';
     public $image_tmp_suffix            =   '_tmp';
+    public $image_upload_width          =   360;
+    public $image_upload_height         =   360;
+    public $name_min_length             =   3;
+    public $name_max_length             =   100;
     public $images_upload_path          =   'uploads/images/';
     public $files_upload_path           =   'uploads/files/';
     public $items_per_page              =   48;
     public $database_date_format        =   'Y-m-d';
     public $database_datetime_format    =   'Y-m-d H:i:s';
-    public $image_upload_width          =   360;
-    public $image_upload_height         =   360;
-    public $name_min_length             = 3;
-    public $name_max_length             = 100;
-
-    public $access_lvl_manager          =   2;
-    public $access_lvl_admin            =   4;
 
     public $group_by_item_common        =   0;
     public $group_by_item               =   1;
+    public $supplier_to_ignore          =   'Inconnu';
 }

@@ -12,7 +12,7 @@
         <div class="row">
             <div class="col-12">
                 <div>
-                    <h1><?= lang('My_application.header_item_name').' "'.esc($inventory_number) . '"'; ?></h1>
+                    <h3><?= esc($inventory_number).' - '.esc($item_common['name']); ?></h3>
                     <h4><?= lang('user_lang.what_to_do'); ?></h4>
                     <div class = "alert alert-warning" ><?= lang('stock_lang.item_delete_explanation'); ?></div>
                 </div>
