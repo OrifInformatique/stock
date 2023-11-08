@@ -20,7 +20,7 @@
         } else {
             echo lang('common_lang.page_prefix').' - '.$title;
         }
-    ?></title>
+    ?></title> 
 
     <!-- Icon -->
     <link rel="icon" type="image/png" href="<?= base_url("images/favicon.png"); ?>" />
