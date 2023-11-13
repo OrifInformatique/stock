@@ -111,6 +111,7 @@ class ItemCommon extends BaseController {
             $item_common['item_group'] = $this->item_common_model->getItemGroup($item_common);
             $item_common['entity'] = $this->entity_model->where('entity_id', $item_common['item_group']['fk_entity_id'])->first();
             
+            $output['title'] = $item_common['name'];
             $output['item_common'] = $item_common;
             $output['entity_id'] = $item_common['entity']['entity_id'];
 
