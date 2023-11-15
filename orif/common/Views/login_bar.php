@@ -38,7 +38,7 @@
 
         <?php } else { ?>
           <!-- Not logged in, display a "login" button -->
-          <a href="<?php echo base_url("user/auth/login"); ?>" ><?php echo lang('common_lang.btn_login'); ?></a>
+          <a href="<?php echo base_url("user/auth/login?after_login_redirect=" . current_url()); ?>"><?php echo lang('common_lang.btn_login'); ?></a>
         <?php } ?>
       </div>
     </div>
