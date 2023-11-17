@@ -8,7 +8,7 @@
         <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && isset($can_modify) && $can_modify && $_SESSION['user_access'] >= config('User\Config\UserConfig')->access_lvl_registered): ?>
             <div class="col-12">
                 <a href="<?= base_url("item/create/{$entity_id}/{$item_common['item_common_id']}"); ?>" class="btn btn-outline-success btn-sm mb-2" role="button">
-                    <?= lang('My_application.btn_add_subitem'); ?>
+                    <?= lang('MY_application.btn_add_subitem'); ?>
                 </a>
                 <a href="<?= base_url('item_common/modify/' . $item_common['item_common_id']); ?>" class="btn btn-outline-warning btn-sm mb-2" role="button">
                     <?= lang('MY_application.btn_modify'); ?>
