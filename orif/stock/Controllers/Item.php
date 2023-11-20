@@ -514,6 +514,7 @@ class Item extends BaseController {
             $data['item_common'] = $item_common;
             $data['item'] = $item;
             $data['item_id'] = $item_id;
+            $data['title'] = $item_common['name'];
 
             $this->display_view('Stock\Views\item\form', $data);
         } else {
@@ -585,6 +586,7 @@ class Item extends BaseController {
             $data['item_common'] = $this->item_common_model->find($data['item']['item_common_id']);
             $data['item']['inventory_number'] = $this->item_model->getInventoryNumber($data['item']);
             $data['controller'] = $this->user_model->find($_SESSION['user_id']);
+            $data['title'] = $data['item_common']['name'];
 
             if (isset($_POST['date']) && $_POST['date'] != '') {
                 $data['date'] = $_POST['date'];
@@ -636,6 +638,7 @@ class Item extends BaseController {
             $output['item_common'] = $this->item_common_model->find($output['item']['item_common_id']);
             $output['inventory_controls'] = $this->inventory_control_model->where('item_id='.$id)->orderBy('date', 'desc')->findAll();
             $output['item']['inventory_number'] = $this->item_model->getInventoryNumber($output['item']);
+            $output['title'] = $output['item_common']['name'];
             array_walk($output['inventory_controls'], function(&$control) {
                 $control['controller'] = $this->inventory_control_model->getUser($control['controller_id']);
             });
@@ -666,6 +669,7 @@ class Item extends BaseController {
             // Get item object and related loans
             $item = $this->item_model->find($id);
 
+            $data['title'] = $this->item_common_model->find($item['item_common_id'])['name'];
             $data['item'] = $item;
             $data['item_id'] = $id;
             $data['new_loan'] = true;
@@ -848,6 +852,7 @@ class Item extends BaseController {
                 }
             });
 
+            $output['title'] = $item_common['name'];
             $output['item'] = $item;
             $output['item_common'] = $item_common;
             $output['loans'] = $loans;
