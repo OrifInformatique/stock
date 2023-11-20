@@ -287,6 +287,7 @@ class ItemCommon extends BaseController {
             $output['item_tags'] = $this->dropdown($item_tags, 'item_tag_id');
             $output['item_tag_ids'] = $item_tag_ids;
             $output['config'] = config('\Stock\Config\StockConfig');
+            $output['title'] = $item_common['name'];
 
             if (isset($_SESSION['POST'])) {
                 foreach ($_SESSION['POST'] as $key => $value) {

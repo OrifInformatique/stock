@@ -419,6 +419,7 @@ class Item extends BaseController {
             $data['selected_entity_id'] = $entity_id;
 
             $data['item_id'] = $this->item_model->getFutureId();
+            $data['title'] = $item_common['name'];
 
             if (!isset($data['errors'])) {
                 $data['errors'] = $validation->getErrors();
@@ -440,7 +441,7 @@ class Item extends BaseController {
     }
     
     /**
-     * Modifz a new item
+     * Modify a new item
      *
      * @return void
      */
