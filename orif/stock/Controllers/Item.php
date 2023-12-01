@@ -155,6 +155,9 @@ class Item extends BaseController {
             $_SESSION['items_list_url'] .= '?'.$_SERVER['QUERY_STRING'];
         }
 
+        // Save URL containing search filters
+        $output['filters_url'] = urlencode($_SESSION['items_list_url']);
+
         // Get user's search filters and add default values
         $filters = $_GET;
         if (!isset($filters['c'])) {
