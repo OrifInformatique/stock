@@ -1107,14 +1107,14 @@ class Item extends BaseController {
             $item_common = $this->item_common_model->find($item['item_common_id']);
             $item['inventory_item_nb'] = $this->item_model->getInventoryNumber($item);
             $loaner = $this->user_model->withDeleted()->find($loan['loan_by_user_id']);
-    
+
             $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
             $data['title'] = lang('MY_application.page_return_loan');
             $data['loan'] = $loan;
             $data['item'] = $item;
             $data['item_common'] = $item_common;
             $data['loaner'] = $loaner;
-    
+
             return $this->display_view('Stock\Views\loan\return', $data);
         } else {
             return redirect()->to($_SESSION['_ci_previous_url']);
@@ -1128,19 +1128,53 @@ class Item extends BaseController {
      */
     public function save_loan_return_date($id) {
         // Check if this is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
+        if (isset($_SESSION['logged_in']) &&
+            $_SESSION['logged_in'] == true &&
+            $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
 
+            $loan = $this->loan_model->find($id);
+
+            if (!is_null($loan)) {
+                $item = $this->item_model->find($loan['item_id']);
+                $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
+            }
+
+            // Data to be sent to the view
             $data = [
-                'real_return_date' => $this->request->getVar('real_return_date'),
+                'title'             => lang('MY_application.page_return_loan'),
+                'loan'              => $loan,
+                'loaner'            => $this->user_model->withDeleted()->find($loan['loan_by_user_id']),
+                'item'              => $item,
+                'item_common'       => $this->item_common_model->find($item['item_common_id']),
+                'real_return_date'  => $this->request->getVar('real_return_date'),
             ];
 
-            //save updated loan data
-            $this->loan_model->update($id, $data);
-        }
+            // Setting validation rules
+            if (!empty($_POST)) {
+                $validation = \Config\Services::validation();
 
-        // Go back to the item_common corresponding to the updated loan
-        $loan = $this->loan_model->find($id);
-        $item = $this->item_model->where('item_id', $loan['item_id'])->first();
-        return redirect()->to(base_url('item_common/view/'.$item['item_common_id']));
+                $validation->setRule('real_return_date', lang('MY_application.header_loan_real_return'), 'required',
+                    ['required' => lang('MY_application.msg_err_invalid_return_date')]);
+
+                // Check if date is valid
+                if ($validation->run($_POST)) {
+                    // Save updated loan data
+                    $this->loan_model->update($id, $data['real_return_date']);
+
+                    // Go back to the item_common corresponding to the updated loan
+                    $loan = $this->loan_model->find($id);
+                    $item = $this->item_model->where('item_id', $loan['item_id'])->first();
+                    return redirect()->to('\item_common\view'.$item['item_common_id']);
+                } else {
+                    $data['errors'] = $validation->getErrors();
+
+                    if (isset($_POST['real_return_date'])) $data['real_return_date'] = $_POST['real_return_date'];
+                }
+                $this->display_view('Stock\Views\loan\return', $data);
+            }
+        } else {
+            // Access not allowed, redirect to items list
+            return redirect()->to('/item');
+        }
     }
 }

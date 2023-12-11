@@ -219,6 +219,7 @@ return[
 'msg_err_no_planned_return_date' => 'La date de retour prévue doit être fournie',
 'msg_err_no_loan_email'          => 'L\'adresse e-mail de l\'emprunteur doit être fournie',
 'msg_err_invalid_loan_to'        => 'Le nom d\'utilisateur de l\'emprunteur n\'est pas valide',
+'msg_err_invalid_return_date'    => 'La date de retour n\'est pas valide',
 'msg_no_loan'                    => 'Aucun prêt à afficher',
 'msg_err_not_photo'              => 'Le fichier fournit n\'est pas une image',
 'msg_no_inventory_controls'      => 'Aucun contrôle d\'inventaire',
