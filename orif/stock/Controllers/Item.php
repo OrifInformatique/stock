@@ -650,7 +650,7 @@ class Item extends BaseController {
     /**
      * Create loan for one given item
      *
-     * @param integer $id
+     * @param integer $id : The ID of the related item common
      * @return void
      */
     public function create_loan($id = NULL) {
@@ -662,20 +662,30 @@ class Item extends BaseController {
             $this->user_entity_model->check_user_item_entity($_SESSION['user_id'], $id) &&
             $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
 
-            // Get item object and related loans
+            // Get item object and related item common
             $item = $this->item_model->find($id);
+            $item_common = $this->item_common_model->find($item['item_common_id']);
+            $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
 
-            $data['item'] = $item;
-            $data['item_id'] = $id;
-            $data['new_loan'] = true;
             $users = (new User_model())->findAll();
-            $data['users'] = array_map(function($user) {
-                return [
-                    'id' => $user['id'],
-                    'username' => $user['username'],
-                    'email' => $user['email'],
-                ];
-            }, $users);
+
+            // Preparing data for the view
+            $data = [
+                'action'        => 'create',
+                'action_url'    => base_url('item/create_loan/'.$id),
+                'title'         => lang('MY_application.page_create_loan'),
+                'item'          => $item,
+                'item_id'       => $id,
+                'item_common'   => $item_common,
+                'new_loan'      => true,
+                'users' => array_map(function($user) {
+                    return [
+                        'id' => $user['id'],
+                        'username' => $user['username'],
+                        'email' => $user['email'],
+                    ];
+                }, $users),
+            ];
 
             // Test input
             if (!empty($_POST)) {
@@ -732,7 +742,7 @@ class Item extends BaseController {
     /**
      * Modify some loan
      *
-     * @param integer $id
+     * @param integer $id : The ID related to the loan
      * @return void
      */
     public function modify_loan($id = NULL) {
@@ -743,25 +753,38 @@ class Item extends BaseController {
             $this->user_entity_model->check_user_loan_entity($_SESSION['user_id'], $id) &&
             $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
 
-            // get the data from the loan with this id (to fill the form or to get the concerned item)
+            // Get item object and related loans
             $loan = $this->loan_model->find($id);
-
-            $data['date'] = $loan['date'];
-            $data['planned_return_date'] = $loan['planned_return_date'];
-            $data['real_return_date'] = $loan['real_return_date'];
-            $data['item_localisation'] = $loan['item_localisation'];
-            $data['item_id'] = $loan['item_id'];
-            $data['loan_to_user_id'] = $loan['loan_to_user_id'];
-            $data['borrower_email'] = $loan['borrower_email'];
-            $data['new_loan'] = false;
+            $item = $this->item_model->find($loan['item_id']);
+            $item_common = $this->item_common_model->find($item['item_common_id']);
+            $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
+            
             $users = (new User_model())->findAll();
-            $data['users'] = array_map(function($user) {
-                return [
-                    'id' => $user['id'],
-                    'username' => $user['username'],
-                    'email' => $user['email'],
-                ];
-            }, $users);
+
+            $data = [
+                'action'                => 'modify',
+                'action_url'            => base_url('item/modify_loan/'.$id),
+                'title'                 => lang('MY_application.page_modify_loan'),
+                'date'                  => $loan['date'],
+                'planned_return_date'   => $loan['planned_return_date'],
+                'real_return_date'      => $loan['real_return_date'],
+                'item_localisation'     => $loan['item_localisation'],
+                'item_id'               => $loan['item_id'],
+                'item'                  => $item,
+                'item_common'           => $item_common,
+                'loan_to_user_id'       => $loan['loan_to_user_id'],
+                'borrower_email'        => $loan['borrower_email'],
+                'loan'                  => $loan,
+                'loaner'                => $this->user_model->withDeleted()->find($loan['loan_by_user_id']),
+                'new_loan'              => false,
+                'users' => array_map(function($user) {
+                    return [
+                        'id' => $user['id'],
+                        'username' => $user['username'],
+                        'email' => $user['email'],
+                    ];
+                }, $users),
+            ];
 
             if (!empty($_POST)) {
                 // test input
@@ -1106,16 +1129,19 @@ class Item extends BaseController {
             $item = $this->item_model->find($loan['item_id']);
             $item_common = $this->item_common_model->find($item['item_common_id']);
             $item['inventory_item_nb'] = $this->item_model->getInventoryNumber($item);
-            $loaner = $this->user_model->withDeleted()->find($loan['loan_by_user_id']);
-
             $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
-            $data['title'] = lang('MY_application.page_return_loan');
-            $data['loan'] = $loan;
-            $data['item'] = $item;
-            $data['item_common'] = $item_common;
-            $data['loaner'] = $loaner;
 
-            return $this->display_view('Stock\Views\loan\return', $data);
+            $data = [
+                'action' => 'return',
+                'action_url' => base_url('item/return_loan/'.$id),
+                'title' => lang('MY_application.page_return_loan'),
+                'loan' => $loan,
+                'item' => $item,
+                'item_common' => $item_common,
+                'loaner' => $this->user_model->withDeleted()->find($loan['loan_by_user_id']),
+            ];
+
+            return $this->display_view('Stock\Views\loan\form', $data);
         } else {
             return redirect()->to($_SESSION['_ci_previous_url']);
         }
