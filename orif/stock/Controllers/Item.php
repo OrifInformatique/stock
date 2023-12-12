@@ -1127,27 +1127,27 @@ class Item extends BaseController {
      * @param $id : The id of the concerned loan
      */
     public function save_loan_return_date($id) {
+        $loan = $this->loan_model->find($id);
+
+        if (!is_null($loan)) {
+            $item = $this->item_model->find($loan['item_id']);
+            $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
+        }
+
+        // Data to be sent to the view
+        $data = [
+            'title'             => lang('MY_application.page_return_loan'),
+            'loan'              => $loan,
+            'loaner'            => $this->user_model->withDeleted()->find($loan['loan_by_user_id']),
+            'item'              => $item,
+            'item_common'       => $this->item_common_model->find($item['item_common_id']),
+            'real_return_date'  => $this->request->getVar('real_return_date'),
+        ];
+
         // Check if this is allowed
         if (isset($_SESSION['logged_in']) &&
             $_SESSION['logged_in'] == true &&
             $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
-
-            $loan = $this->loan_model->find($id);
-
-            if (!is_null($loan)) {
-                $item = $this->item_model->find($loan['item_id']);
-                $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
-            }
-
-            // Data to be sent to the view
-            $data = [
-                'title'             => lang('MY_application.page_return_loan'),
-                'loan'              => $loan,
-                'loaner'            => $this->user_model->withDeleted()->find($loan['loan_by_user_id']),
-                'item'              => $item,
-                'item_common'       => $this->item_common_model->find($item['item_common_id']),
-                'real_return_date'  => $this->request->getVar('real_return_date'),
-            ];
 
             // Setting validation rules
             if (!empty($_POST)) {
@@ -1158,23 +1158,26 @@ class Item extends BaseController {
 
                 // Check if date is valid
                 if ($validation->run($_POST)) {
+                    $loanArray = [
+                        'real_return_date' => $data['real_return_date'],
+                    ];
                     // Save updated loan data
-                    $this->loan_model->update($id, $data['real_return_date']);
+                    $this->loan_model->update($id, $loanArray);
 
                     // Go back to the item_common corresponding to the updated loan
                     $loan = $this->loan_model->find($id);
                     $item = $this->item_model->where('item_id', $loan['item_id'])->first();
-                    return redirect()->to('\item_common\view'.$item['item_common_id']);
+                    return redirect()->to('/item_common/view/'.$item['item_common_id']);
                 } else {
                     $data['errors'] = $validation->getErrors();
 
                     if (isset($_POST['real_return_date'])) $data['real_return_date'] = $_POST['real_return_date'];
                 }
-                $this->display_view('Stock\Views\loan\return', $data);
             }
         } else {
-            // Access not allowed, redirect to items list
-            return redirect()->to('/item');
+            // Access not allowed
+            $data['errors'] = [lang('MY_application.msg_err_access_denied')];
         }
+        $this->display_view('Stock\Views\loan\return', $data);
     }
 }
