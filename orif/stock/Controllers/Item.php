@@ -682,7 +682,7 @@ class Item extends BaseController {
                 $validation = \Config\Services::validation();
                 $user_ids = implode(',', array_map(function($user) { return $user['id']; }, $users)) . ','; // Allows empty ids
 
-                $validation->setRule("date", "Date du prêt", 'required', array('required' => "La date du prêt doit être fournie"));
+                $validation->setRule("date", lang('MY_application.field_loan_date'), 'required', array('required' => lang('MY_application.msg_err_no_loan_date')));
                 $validation->setRule("planned_return_date", lang('MY_application.field_loan_planned_return'), 'required', [
                     'required' => lang('MY_application.msg_err_no_planned_return_date'),
                 ]);
@@ -1149,12 +1149,16 @@ class Item extends BaseController {
             $_SESSION['logged_in'] == true &&
             $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
 
-            // Setting validation rules
+            // Form validation
             if (!empty($_POST)) {
+                // Setting rules
                 $validation = \Config\Services::validation();
 
-                $validation->setRule('real_return_date', lang('MY_application.header_loan_real_return'), 'required',
-                    ['required' => lang('MY_application.msg_err_invalid_return_date')]);
+                $validation->setRule('real_return_date', lang('MY_application.header_loan_real_return'),
+                    'required|greater_than_equal_to['.$loan['date'].']', [
+                        'required' => lang('MY_application.msg_err_invalid_return_date'),
+                        'greater_than_equal_to' => lang('MY_application.msg_err_invalid_return_date')
+                    ]);
 
                 // Check if date is valid
                 if ($validation->run($_POST)) {
@@ -1165,8 +1169,8 @@ class Item extends BaseController {
                     $this->loan_model->update($id, $loanArray);
 
                     // Go back to the item_common corresponding to the updated loan
-                    $loan = $this->loan_model->find($id);
                     $item = $this->item_model->where('item_id', $loan['item_id'])->first();
+                    
                     return redirect()->to('/item_common/view/'.$item['item_common_id']);
                 } else {
                     $data['errors'] = $validation->getErrors();

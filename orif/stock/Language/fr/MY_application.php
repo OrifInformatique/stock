@@ -216,6 +216,7 @@ return[
 'msg_err_stocking_short_unique'  => 'Un nom court d\'emplacement doit être unique',
 'msg_err_username_used'          => 'Ce nom est déjà utilisé',
 'msg_err_photo_upload'           => 'Aucune photo n\'a été ajoutée',
+'msg_err_no_loan_date'           => 'La date du prêt doit être fournie',
 'msg_err_no_planned_return_date' => 'La date de retour prévue doit être fournie',
 'msg_err_no_loan_email'          => 'L\'adresse e-mail de l\'emprunteur doit être fournie',
 'msg_err_invalid_loan_to'        => 'Le nom d\'utilisateur de l\'emprunteur n\'est pas valide',
