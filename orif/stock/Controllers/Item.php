@@ -650,26 +650,25 @@ class Item extends BaseController {
     /**
      * Create loan for one given item
      *
-     * @param integer $id : The ID of the related item common
+     * @param integer $id : The ID of the related item
      * @return void
      */
-    public function create_loan($id = NULL) {
-        // Check if this is allowed
-        if (!empty($id) &&
+    public function create_loan($id) {
+        // Get item object
+        $item = $this->item_model->find($id);
+        // Check if access is granted
+        if (!is_null($item) &&
             isset($_SESSION['logged_in']) &&
             $_SESSION['logged_in'] == true &&
-            isset($_SESSION['user_id']) && 
+            isset($_SESSION['user_id']) &&
             $this->user_entity_model->check_user_item_entity($_SESSION['user_id'], $id) &&
             $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
 
-            // Get item object and related item common
-            $item = $this->item_model->find($id);
+            // Preparing data for the view
             $item_common = $this->item_common_model->find($item['item_common_id']);
             $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
-
             $users = (new User_model())->findAll();
 
-            // Preparing data for the view
             $data = [
                 'action'        => 'create',
                 'action_url'    => base_url('item/create_loan/'.$id),
@@ -733,7 +732,6 @@ class Item extends BaseController {
             }
             $this->display_view('Stock\Views\loan\form', $data);
         } else {
-
             // No item specified or access is not allowed, redirect to items list
             return redirect()->to('/item');
         }
@@ -745,16 +743,18 @@ class Item extends BaseController {
      * @param integer $id : The ID related to the loan
      * @return void
      */
-    public function modify_loan($id = NULL) {
-        // Check if this is allowed
-        if (isset($_SESSION['logged_in']) &&
+    public function modify_loan($id) {
+        // Get loan object
+        $loan = $this->loan_model->find($id);
+        // Check if access is granted
+        if (!is_null($loan) &&
+            isset($_SESSION['logged_in']) &&
             $_SESSION['logged_in'] == true &&
             isset($_SESSION['user_id']) &&
             $this->user_entity_model->check_user_loan_entity($_SESSION['user_id'], $id) &&
             $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
 
-            // Get item object and related loans
-            $loan = $this->loan_model->find($id);
+            // Preparing data for the view
             $item = $this->item_model->find($loan['item_id']);
             $item_common = $this->item_common_model->find($item['item_common_id']);
             $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
@@ -1120,68 +1120,44 @@ class Item extends BaseController {
     /**
      * Display a form to register the return of a loan
      * 
-     * @param $id : The id of the concerned loan
+     * @param $id : The ID of the related loan
      */
     public function return_loan($id) {
+        // Get loan object
         $loan = $this->loan_model->find($id);
 
-        if (!is_null($loan)) {
+        // Check if access is granted
+        if (!is_null($loan) &&
+            is_null($loan['real_return_date']) &&
+            isset($_SESSION['logged_in']) &&
+            $_SESSION['logged_in'] == true &&
+            isset($_SESSION['user_id']) &&
+            $this->user_entity_model->check_user_item_entity($_SESSION['user_id'], $id) &&
+            $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
+
+            // Preparing data for the view
             $item = $this->item_model->find($loan['item_id']);
-            $item_common = $this->item_common_model->find($item['item_common_id']);
-            $item['inventory_item_nb'] = $this->item_model->getInventoryNumber($item);
             $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
 
             $data = [
-                'action' => 'return',
-                'action_url' => base_url('item/return_loan/'.$id),
-                'title' => lang('MY_application.page_return_loan'),
-                'loan' => $loan,
-                'item' => $item,
-                'item_common' => $item_common,
-                'loaner' => $this->user_model->withDeleted()->find($loan['loan_by_user_id']),
+                'action'        => 'return',
+                'action_url'    => base_url('item/return_loan/'.$id),
+                'title'         => lang('MY_application.page_return_loan'),
+                'loan'          => $loan,
+                'loaner'        => $this->user_model->withDeleted()->find($loan['loan_by_user_id']),
+                'item'          => $item,
+                'item_common'   => $this->item_common_model->find($item['item_common_id']),
             ];
-
-            return $this->display_view('Stock\Views\loan\form', $data);
-        } else {
-            return redirect()->to($_SESSION['_ci_previous_url']);
-        }
-    }
-
-    /**
-     * Save new return date
-     * 
-     * @param $id : The id of the concerned loan
-     */
-    public function save_loan_return_date($id) {
-        $loan = $this->loan_model->find($id);
-
-        if (!is_null($loan)) {
-            $item = $this->item_model->find($loan['item_id']);
-            $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
-        }
-
-        // Data to be sent to the view
-        $data = [
-            'title'             => lang('MY_application.page_return_loan'),
-            'loan'              => $loan,
-            'loaner'            => $this->user_model->withDeleted()->find($loan['loan_by_user_id']),
-            'item'              => $item,
-            'item_common'       => $this->item_common_model->find($item['item_common_id']),
-            'real_return_date'  => $this->request->getVar('real_return_date'),
-        ];
-
-        // Check if this is allowed
-        if (isset($_SESSION['logged_in']) &&
-            $_SESSION['logged_in'] == true &&
-            $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
 
             // Form validation
             if (!empty($_POST)) {
+                $data['real_return_date'] = $this->request->getVar('real_return_date');
+
                 // Setting rules
                 $validation = \Config\Services::validation();
 
                 $validation->setRule('real_return_date', lang('MY_application.header_loan_real_return'),
-                    'required|greater_than_equal_to['.$loan['date'].']', [
+                    'required', [ // |greater_than_equal_to['.$loan['date'].'] NOT FUNCTIONAL
                         'required' => lang('MY_application.msg_err_invalid_return_date'),
                         'greater_than_equal_to' => lang('MY_application.msg_err_invalid_return_date')
                     ]);
@@ -1194,20 +1170,19 @@ class Item extends BaseController {
                     // Save updated loan data
                     $this->loan_model->update($id, $loanArray);
 
-                    // Go back to the item_common corresponding to the updated loan
-                    $item = $this->item_model->where('item_id', $loan['item_id'])->first();
-                    
+                    // Redirect to corresponding item common page
                     return redirect()->to('/item_common/view/'.$item['item_common_id']);
                 } else {
                     $data['errors'] = $validation->getErrors();
 
-                    if (isset($_POST['real_return_date'])) $data['real_return_date'] = $_POST['real_return_date'];
+                    if (isset($_POST['real_return_date'])) {
+                        $data['real_return_date'] = $_POST['real_return_date'];
+                    }
                 }
             }
-        } else {
-            // Access not allowed
-            $data['errors'] = [lang('MY_application.msg_err_access_denied')];
+            return $this->display_view('Stock\Views\loan\form', $data);
         }
-        $this->display_view('Stock\Views\loan\return', $data);
+        // Access denied, redirect to previous URL
+        return redirect()->to($_SESSION['_ci_previous_url']);
     }
 }
