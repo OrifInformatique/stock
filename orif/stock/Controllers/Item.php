@@ -667,16 +667,18 @@ class Item extends BaseController {
             // Preparing data for the view
             $item_common = $this->item_common_model->find($item['item_common_id']);
             $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
-            $users = (new User_model())->findAll();
+            $users = $this->user_model->findAll();
+            $today = date('Y-m-d');
 
             $data = [
-                'action'        => 'create',
-                'action_url'    => base_url('item/create_loan/'.$id),
-                'title'         => lang('MY_application.page_create_loan'),
-                'item'          => $item,
-                'item_id'       => $id,
-                'item_common'   => $item_common,
-                'new_loan'      => true,
+                'action'                => 'create',
+                'action_url'            => base_url('item/create_loan/'.$id),
+                'title'                 => lang('MY_application.page_create_loan'),
+                'item'                  => $item,
+                'item_common'           => $item_common,
+                'loaner'                => $this->user_model->find($_SESSION['user_id']),
+                'date'                  => $today,
+                'planned_return_date'   => date('Y-m-d', strtotime($today.'+3 months')),
                 'users' => array_map(function($user) {
                     return [
                         'id' => $user['id'],
@@ -713,9 +715,8 @@ class Item extends BaseController {
                         $loanArray["loan_to_user_id"] = NULL;
                     }
 
-                    $loanArray["item_id"] = $id;
-
-                    $loanArray["loan_by_user_id"] = $_SESSION['user_id'];
+                    $loanArray['item_id'] = $id;
+                    $loanArray['loan_by_user_id'] = $_SESSION['user_id'];
 
                     $this->loan_model->insert($loanArray);
 
@@ -758,25 +759,20 @@ class Item extends BaseController {
             $item = $this->item_model->find($loan['item_id']);
             $item_common = $this->item_common_model->find($item['item_common_id']);
             $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
-            
-            $users = (new User_model())->findAll();
+            $users = $this->user_model->findAll();
 
             $data = [
                 'action'                => 'modify',
                 'action_url'            => base_url('item/modify_loan/'.$id),
                 'title'                 => lang('MY_application.page_modify_loan'),
+                'loan'                  => $loan,
+                'item'                  => $item,
+                'item_common'           => $item_common,
+                'loaner'                => $this->user_model->withDeleted()->find($loan['loan_by_user_id']),
+                'borrower'              => $loan['loan_to_user_id'] ? $this->user_model->withDeleted()->find($loan['loan_to_user_id']) : null,
                 'date'                  => $loan['date'],
                 'planned_return_date'   => $loan['planned_return_date'],
                 'real_return_date'      => $loan['real_return_date'],
-                'item_localisation'     => $loan['item_localisation'],
-                'item_id'               => $loan['item_id'],
-                'item'                  => $item,
-                'item_common'           => $item_common,
-                'loan_to_user_id'       => $loan['loan_to_user_id'],
-                'borrower_email'        => $loan['borrower_email'],
-                'loan'                  => $loan,
-                'loaner'                => $this->user_model->withDeleted()->find($loan['loan_by_user_id']),
-                'new_loan'              => false,
                 'users' => array_map(function($user) {
                     return [
                         'id' => $user['id'],
@@ -805,7 +801,6 @@ class Item extends BaseController {
 
                 if ($validation->run($_POST) === TRUE) {
                     //Declarations
-
                     $loanArray = $_POST;
 
                     if ($loanArray["real_return_date"] == 0 || $loanArray["real_return_date"] == "0000-00-00" || $loanArray["real_return_date"] == "") {
@@ -818,7 +813,7 @@ class Item extends BaseController {
                     // Execute the changes in the item table
                     $this->loan_model->update($id, $loanArray);
 
-                    return redirect()->to("/item/loans/".$data["item_id"]);
+                    return redirect()->to("/item/loans/".$item["item_id"]);
                 } else {
                     $data['errors'] = $validation->getErrors();
 
@@ -1138,15 +1133,27 @@ class Item extends BaseController {
             // Preparing data for the view
             $item = $this->item_model->find($loan['item_id']);
             $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
+            $users = $this->user_model->findAll();
 
             $data = [
-                'action'        => 'return',
-                'action_url'    => base_url('item/return_loan/'.$id),
-                'title'         => lang('MY_application.page_return_loan'),
-                'loan'          => $loan,
-                'loaner'        => $this->user_model->withDeleted()->find($loan['loan_by_user_id']),
-                'item'          => $item,
-                'item_common'   => $this->item_common_model->find($item['item_common_id']),
+                'action'                => 'return',
+                'action_url'            => base_url('item/return_loan/'.$id),
+                'title'                 => lang('MY_application.page_return_loan'),
+                'loan'                  => $loan,
+                'loaner'                => $this->user_model->withDeleted()->find($loan['loan_by_user_id']),
+                'borrower'              => $loan['loan_to_user_id'] ? $this->user_model->withDeleted()->find($loan['loan_to_user_id']) : null,
+                'item'                  => $item,
+                'item_common'           => $this->item_common_model->find($item['item_common_id']),
+                'date'                  => $loan['date'],
+                'planned_return_date'   => $loan['planned_return_date'],
+                'real_return_date'      => date('Y-m-d'),
+                'users' => array_map(function($user) {
+                    return [
+                        'id' => $user['id'],
+                        'username' => $user['username'],
+                        'email' => $user['email'],
+                    ];
+                }, $users),
             ];
 
             // Form validation
