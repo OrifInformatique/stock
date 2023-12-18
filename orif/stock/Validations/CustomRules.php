@@ -200,4 +200,16 @@ class CustomRules
         $item_common = (new Item_common_model())->where('name', [$name])->first();
         return is_null($item_common) || $item_common['item_common_id'] == $id;
     }
+
+    /**
+     * Checks that a date is later than, or identical to another one
+     *
+     * @param string $date1 = The date to compare
+     * @param string $date2 = The date to be compared to
+     * @return boolean = TRUE if the date is later than or equal to the other, FALSE otherwise
+     */
+    public function later_than_equal_to($date1, $date2): bool
+    {
+        return $date1 >= $date2;
+    }
 }
