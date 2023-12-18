@@ -1,4 +1,4 @@
-<form class="container" method="post" action="<?= $action_url ?>" enctype="multipart/form-data">
+<form id="loan_form" class="container" method="post" action="<?= $action_url ?>" enctype="multipart/form-data">
     <!-- ERROR MESSAGES -->
     <div class="row">
     <?php
@@ -45,17 +45,17 @@
         <select class="form-control" name="loan_to_user_id">
             <option value=""></option>
             <?php foreach ($users as $user) { ?>
-                <option value="<?= $user['id']; ?>" <?php if(isset($borrower) && $user['id'] == $borrower['id']) echo 'selected'; ?>><?= $user['username']; ?></option>
+                <option value="<?= $user['id']; ?>" <?php if(isset($loan_to_user_id) && $user['id'] == $loan_to_user_id) echo 'selected'; ?>><?= $user['username']; ?></option>
             <?php } ?>
         </select><br />
     <?php endif; ?>
     <!-- BORROWER EMAIL -->
     <label for="borrower_email"><?php if ($action != 'return') echo '* '; echo lang('MY_application.field_borrower_email'); ?> :&nbsp;</label>
-    <input class="form-control" name="borrower_email" value="<?php if (isset($loan['borrower_email'])) echo $loan['borrower_email']; ?>"
-        <?php if ($action == 'return') echo "disabled"?>/><br />
+    <input class="form-control" name="borrower_email" value="<?php if (isset($borrower_email)) echo $borrower_email; ?>"
+        <?php if ($action == 'return' || (isset($loan_to_user_id) && !empty($loan_to_user_id))) echo "disabled"?>/><br />
     <!-- ITEM LOCALISATION -->
     <label for="item_localisation"><?= lang('MY_application.header_loan_localisation'); ?> :&nbsp;</label>
-    <input class="form-control" name="item_localisation" value="<?php if (isset($loan['item_localisation'])) echo $loan['item_localisation']; ?>"
+    <input class="form-control" name="item_localisation" value="<?php if (isset($item_localisation)) echo $item_localisation; ?>"
         <?php if ($action == 'return') echo "disabled"?>/><br />
     <!-- LOAN DATE -->
     <label for="date"><?php if ($action != 'return') echo '* '; echo lang('MY_application.header_loan_date'); ?> :&nbsp;</label>
@@ -69,7 +69,7 @@
     <label for="real_return_date"><?php if ($action == 'return') echo '* '; echo lang('MY_application.header_loan_real_return'); ?> :&nbsp;</label>
     <input class="form-control" name="real_return_date" type="date" value="<?php if(isset($real_return_date)) echo $real_return_date; ?>" /><br />
     <!-- SUBMIT BUTTON -->
-    <button type="submit" class="btn btn-success"><?= lang('MY_application.btn_save'); ?></button>
+    <button type="submit" class="btn btn-success" <?php if ($action != 'return') echo 'onclick="enable_email()"'; ?>><?= lang('MY_application.btn_save'); ?></button>
     <a class="btn btn-default" href="<?php if ($action == 'modify') {echo base_url("item/loans/" . $item['item_id']);} else {echo base_url("item_common/view/" . $item['item_common_id']);} ?>">
         <?= lang('MY_application.btn_cancel'); ?></a>
 </form>
@@ -85,6 +85,21 @@
         let user = users.find(u => u.id == user_id);
         let email = user ? user.email : '';
         $('input[name="borrower_email"]').val(email);
+
+        // If a user is selected, the email field is disabled
+        if ($('select[name="loan_to_user_id"]').val()  == "") {
+            $('input[name="borrower_email"]').prop("disabled", false);
+        } else {
+            $('input[name="borrower_email"]').prop("disabled", true);
+        }
+    }
+
+    /**
+     * Enables email right before submitting the form
+     */
+    function enable_email () {
+        $('input[name="borrower_email"]').prop("disabled", false);
+        $('#loan_form').submit();
     }
 
     $(document).on('change', 'select', set_borrower_email);

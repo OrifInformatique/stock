@@ -665,7 +665,6 @@ class Item extends BaseController {
             $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
 
             // Preparing data for the view
-            $item_common = $this->item_common_model->find($item['item_common_id']);
             $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
             $users = $this->user_model->findAll();
             $today = date('Y-m-d');
@@ -675,7 +674,7 @@ class Item extends BaseController {
                 'action_url'            => base_url('item/create_loan/'.$id),
                 'title'                 => lang('MY_application.page_create_loan'),
                 'item'                  => $item,
-                'item_common'           => $item_common,
+                'item_common'           => $this->item_common_model->find($item['item_common_id']),
                 'loaner'                => $this->user_model->find($_SESSION['user_id']),
                 'date'                  => $today,
                 'planned_return_date'   => date('Y-m-d', strtotime($today.'+3 months')),
@@ -760,7 +759,6 @@ class Item extends BaseController {
 
             // Preparing data for the view
             $item = $this->item_model->find($loan['item_id']);
-            $item_common = $this->item_common_model->find($item['item_common_id']);
             $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
             $users = $this->user_model->findAll();
 
@@ -768,11 +766,12 @@ class Item extends BaseController {
                 'action'                => 'modify',
                 'action_url'            => base_url('item/modify_loan/'.$id),
                 'title'                 => lang('MY_application.page_modify_loan'),
-                'loan'                  => $loan,
                 'item'                  => $item,
-                'item_common'           => $item_common,
+                'item_common'           => $this->item_common_model->find($item['item_common_id']),
                 'loaner'                => $this->user_model->withDeleted()->find($loan['loan_by_user_id']),
-                'borrower'              => $loan['loan_to_user_id'] ? $this->user_model->withDeleted()->find($loan['loan_to_user_id']) : null,
+                'loan_to_user_id'       => $loan['loan_to_user_id'],
+                'borrower_email'        => $loan['borrower_email'],
+                'item_localisation'     => $loan['item_localisation'],
                 'date'                  => $loan['date'],
                 'planned_return_date'   => $loan['planned_return_date'],
                 'real_return_date'      => $loan['real_return_date'],
@@ -1145,11 +1144,13 @@ class Item extends BaseController {
                 'action'                => 'return',
                 'action_url'            => base_url('item/return_loan/'.$id),
                 'title'                 => lang('MY_application.page_return_loan'),
-                'loan'                  => $loan,
-                'loaner'                => $this->user_model->withDeleted()->find($loan['loan_by_user_id']),
-                'borrower'              => $loan['loan_to_user_id'] ? $this->user_model->withDeleted()->find($loan['loan_to_user_id']) : null,
                 'item'                  => $item,
                 'item_common'           => $this->item_common_model->find($item['item_common_id']),
+                'loaner'                => $this->user_model->withDeleted()->find($loan['loan_by_user_id']),
+                'borrower'              => $this->user_model->withDeleted()->find($loan['loan_to_user_id']),
+                'loan_to_user_id'       => $loan['loan_to_user_id'],
+                'borrower_email'        => $loan['borrower_email'],
+                'item_localisation'     => $loan['item_localisation'],
                 'date'                  => $loan['date'],
                 'planned_return_date'   => $loan['planned_return_date'],
                 'real_return_date'      => date('Y-m-d'),
