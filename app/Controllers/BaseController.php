@@ -139,7 +139,7 @@ abstract class BaseController extends Controller
         
         // If not defined in $data, set after login redirect URL to base URL
         if (!isset($data['after_login_redirect'])) {
-            $data['after_login_redirect'] = base_url();
+            $data['after_login_redirect'] = current_url();
         }
 
         // Display common headers
