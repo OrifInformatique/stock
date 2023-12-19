@@ -40,7 +40,7 @@
     <!-- BORROWER -->
     <label for="loan_to_user_id"><?= lang('MY_application.header_loan_to_user'); ?> :&nbsp;</label>
     <?php if ($action == 'return'): ?>
-        <input class="form-control" name="loan_to_user_id" value="<?php if (isset($borrower)) echo $borrower['username']; ?>" disabled><br />
+        <input class="form-control" name="loan_to_user_id" value="<?php if (isset($borrower['username'])) echo $borrower['username']; ?>" disabled><br />
     <?php else: ?>
         <select class="form-control" name="loan_to_user_id">
             <option value=""></option>
@@ -67,9 +67,10 @@
         <?php if ($action == 'return') echo "disabled"?>/><br />
     <!-- REAL RETURN DATE -->
     <label for="real_return_date"><?php if ($action == 'return') echo '* '; echo lang('MY_application.header_loan_real_return'); ?> :&nbsp;</label>
-    <input class="form-control" name="real_return_date" type="date" value="<?php if(isset($real_return_date)) echo $real_return_date; ?>" /><br />
+    <input class="form-control" name="real_return_date" type="date" value="<?php if(isset($real_return_date)) echo $real_return_date; ?>"
+        <?php if ($action == 'modify' && !isset($real_return_date)) echo 'disabled' ?>  /><br />
     <!-- SUBMIT BUTTON -->
-    <button type="submit" class="btn btn-success" <?php if ($action != 'return') echo 'onclick="enable_email()"'; ?>><?= lang('MY_application.btn_save'); ?></button>
+    <button type="submit" class="btn btn-success" <?php if ($action != 'return') echo 'onclick="enable_inputs()"'; ?>><?= lang('MY_application.btn_save'); ?></button>
     <a class="btn btn-default" href="<?php if ($action == 'modify') {echo base_url("item/loans/" . $item['item_id']);} else {echo base_url("item_common/view/" . $item['item_common_id']);} ?>">
         <?= lang('MY_application.btn_cancel'); ?></a>
 </form>
@@ -95,10 +96,11 @@
     }
 
     /**
-     * Enables email right before submitting the form
+     * Enables inputs right before submitting the form
      */
-    function enable_email () {
+    function enable_inputs () {
         $('input[name="borrower_email"]').prop("disabled", false);
+        $('input[name="real_return_date"]').prop("disabled", false);
         $('#loan_form').submit();
     }
 

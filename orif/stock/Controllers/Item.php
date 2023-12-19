@@ -656,13 +656,15 @@ class Item extends BaseController {
     public function create_loan($id) {
         // Get item object
         $item = $this->item_model->find($id);
+        $item['current_loan'] = $this->item_model->getCurrentLoan($item);
         // Check if access is granted
         if (!is_null($item) &&
             isset($_SESSION['logged_in']) &&
             $_SESSION['logged_in'] == true &&
             isset($_SESSION['user_id']) &&
             $this->user_entity_model->check_user_item_entity($_SESSION['user_id'], $id) &&
-            $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
+            $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered &&
+            !array_key_exists('real_return_date', $item['current_loan'])) {
 
             // Preparing data for the view
             $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
@@ -701,9 +703,9 @@ class Item extends BaseController {
                     'later_than_equal_to' => lang('MY_application.msg_err_invalid_planned_date'),
                 ]);
                 $validation->setRule('real_return_date', lang('MY_application.header_loan_real_return'), "later_than_equal_to[{$_POST['date']}]|not_in_future", [
-                        'later_than_equal_to' => lang('MY_application.msg_err_invalid_return_date'),
-                        'not_in_future' => lang('MY_application.msg_err_invalid_return_date'),
-                    ]);
+                    'later_than_equal_to' => lang('MY_application.msg_err_invalid_return_date'),
+                    'not_in_future' => lang('MY_application.msg_err_invalid_return_date'),
+                ]);
                 $validation->setRule("borrower_email", lang('MY_application.field_borrower_email'), 'required|valid_email', [
                     'required' => lang('MY_application.msg_err_no_loan_email'),
                     'valid_email' => lang('MY_application.msg_err_invalid_loan_email'),
@@ -803,9 +805,17 @@ class Item extends BaseController {
                     'later_than_equal_to' => lang('MY_application.msg_err_invalid_planned_date'),
                 ]);
                 $validation->setRule('real_return_date', lang('MY_application.header_loan_real_return'), "later_than_equal_to[{$_POST['date']}]|not_in_future", [
+                    'later_than_equal_to' => lang('MY_application.msg_err_invalid_return_date'),
+                    'not_in_future' => lang('MY_application.msg_err_invalid_return_date'),
+                ]);
+                // To prevent simultaneous loans, the return date must be provided if it already existed
+                if (isset($loan['real_return_date'])) {
+                    $validation->setRule('real_return_date', lang('MY_application.header_loan_real_return'), "required|later_than_equal_to[{$_POST['date']}]|not_in_future", [
+                        'required' => lang('MY_application.msg_err_no_return_date'),
                         'later_than_equal_to' => lang('MY_application.msg_err_invalid_return_date'),
                         'not_in_future' => lang('MY_application.msg_err_invalid_return_date'),
                     ]);
+                }
                 $validation->setRule("borrower_email", lang('MY_application.field_borrower_email'), 'required|valid_email', [
                     'required' => lang('MY_application.msg_err_no_loan_email'),
                     'valid_email' => lang('MY_application.msg_err_invalid_loan_email'),
@@ -865,6 +875,7 @@ class Item extends BaseController {
             $item = $this->item_model->find($id);
             $item_common = $this->item_common_model->find($item['item_common_id']);
             $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
+            $item['current_loan'] = $this->item_model->getCurrentLoan($item);
             $loans = $this->loan_model->where('item_id', $item['item_id'])->orderBy('date', 'desc')->findAll();
             array_walk($loans, function(&$loan) {
                 $loan['loan_by_user'] = $this->loan_model->get_loaner($loan);
@@ -1181,10 +1192,10 @@ class Item extends BaseController {
                 $validation = \Config\Services::validation();
 
                 $validation->setRule('real_return_date', lang('MY_application.header_loan_real_return'), "required|later_than_equal_to[{$loan['date']}]|not_in_future", [
-                        'required' => lang('MY_application.msg_err_no_return_date'),
-                        'later_than_equal_to' => lang('MY_application.msg_err_invalid_return_date'),
-                        'not_in_future' => lang('MY_application.msg_err_invalid_return_date'),
-                    ]);
+                    'required' => lang('MY_application.msg_err_no_return_date'),
+                    'later_than_equal_to' => lang('MY_application.msg_err_invalid_return_date'),
+                    'not_in_future' => lang('MY_application.msg_err_invalid_return_date'),
+                ]);
 
                 // Check if date is valid
                 if ($validation->run($_POST)) {
