@@ -105,6 +105,12 @@ function load_items(page, filters){
             filters=getFilters();
             history.pushState(null, "", "<?= base_url("item/list_loans/")?>"+page+filters);
 
+            // Change redirection link after login
+            if ($("#login_button").length) { // Check if login button exists
+                after_login_redirect = $("#login_button").attr("href").replace(/(after_login_redirect=)(.*)/, "$1" + result.filters_url);
+                $("#login_button").attr("href", after_login_redirect);
+            }
+
             // Empty list before filling it
             if (result.items !== null && result.items.length > 0){
                 $("#table_item").toggle(true);

@@ -106,6 +106,9 @@ class ItemCommon extends BaseController {
         $item_common = $this->item_common_model->where('item_common_id', $id)->first();
 
         if (!is_null($item_common)) {
+            // Store current URL to redirect if user logs in
+            $output['after_login_redirect'] = current_url();
+ 
             $item_common['tags'] = $this->item_common_model->getTags($item_common);
             $item_common['image'] = $this->item_common_model->getImagePath($item_common);
             $item_common['item_group'] = $this->item_common_model->getItemGroup($item_common);
