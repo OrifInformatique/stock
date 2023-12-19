@@ -155,6 +155,9 @@ class Item extends BaseController {
             $_SESSION['items_list_url'] .= '?'.$_SERVER['QUERY_STRING'];
         }
 
+        // Save URL containing search filters
+        $output['filters_url'] = urlencode($_SESSION['items_list_url']);
+
         // Get user's search filters and add default values
         $filters = $_GET;
         if (!isset($filters['c'])) {
@@ -908,7 +911,7 @@ class Item extends BaseController {
     }
 
     /**
-     * Loads the list of loands
+     * Loads the list of loans
      *
      * @param integer $page
      * @return array
@@ -917,10 +920,13 @@ class Item extends BaseController {
         helper('MY_date');
 
         // Store URL to make possible to come back later (from item detail for example)
-        $_SESSION['items_list_url'] = base_url('item/index/'.$page);
+        $_SESSION['items_list_url'] = base_url('item/list_loans/'.$page);
         if (isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING'])) {
             $_SESSION['items_list_url'] .= '?'.$_SERVER['QUERY_STRING'];
         }
+
+        // Save URL containing search filters
+        $filters_url = urlencode($_SESSION['items_list_url']);
 
         // Add page title
         $title = lang('My_application.page_item_list');
@@ -1004,6 +1010,7 @@ class Item extends BaseController {
                 'pagination' => $pagination,
                 'number_page' => $number_page,
                 'late_loans_count' => $late_loans_count,
+                'filters_url' => $filters_url,
             ];
         } else {
             return [
@@ -1012,6 +1019,7 @@ class Item extends BaseController {
                 'pagination' => null,
                 'number_page' => 0,
                 'late_loans_count' => 0,
+                'filters_url' => $filters_url,
             ];
         }
     }
