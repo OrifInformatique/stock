@@ -692,13 +692,18 @@ class Item extends BaseController {
                 $validation = \Config\Services::validation();
                 $user_ids = implode(',', array_map(function($user) { return $user['id']; }, $users)) . ','; // Allows empty ids
 
-                $validation->setRule("date", lang('MY_application.field_loan_date'), 'required', [
+                $validation->setRule("date", lang('MY_application.field_loan_date'), 'required|not_in_future', [
                     'required' => lang('MY_application.msg_err_no_loan_date'),
+                    'not_in_future' => lang('MY_application.msg_err_invalid_loan_date'),
                 ]);
                 $validation->setRule("planned_return_date", lang('MY_application.field_loan_planned_return'), "required|later_than_equal_to[{$_POST['date']}]", [
                     'required' => lang('MY_application.msg_err_no_planned_return_date'),
                     'later_than_equal_to' => lang('MY_application.msg_err_invalid_planned_date'),
                 ]);
+                $validation->setRule('real_return_date', lang('MY_application.header_loan_real_return'), "later_than_equal_to[{$_POST['date']}]|not_in_future", [
+                        'later_than_equal_to' => lang('MY_application.msg_err_invalid_return_date'),
+                        'not_in_future' => lang('MY_application.msg_err_invalid_return_date'),
+                    ]);
                 $validation->setRule("borrower_email", lang('MY_application.field_borrower_email'), 'required|valid_email', [
                     'required' => lang('MY_application.msg_err_no_loan_email'),
                     'valid_email' => lang('MY_application.msg_err_invalid_loan_email'),
@@ -789,13 +794,18 @@ class Item extends BaseController {
                 $validation = \Config\Services::validation();
                 $user_ids = implode(',', array_map(function($user) { return $user['id']; }, $users)) . ','; // Allows empty ids
 
-                $validation->setRule("date", lang('MY_application.field_loan_date'), 'required', [
+                $validation->setRule("date", lang('MY_application.field_loan_date'), 'required|not_in_future', [
                     'required' => lang('MY_application.msg_err_no_loan_date'),
+                    'not_in_future' => lang('MY_application.msg_err_invalid_loan_date'),
                 ]);
                 $validation->setRule("planned_return_date", lang('MY_application.field_loan_planned_return'), "required|later_than_equal_to[{$_POST['date']}]", [
                     'required' => lang('MY_application.msg_err_no_planned_return_date'),
                     'later_than_equal_to' => lang('MY_application.msg_err_invalid_planned_date'),
                 ]);
+                $validation->setRule('real_return_date', lang('MY_application.header_loan_real_return'), "later_than_equal_to[{$_POST['date']}]|not_in_future", [
+                        'later_than_equal_to' => lang('MY_application.msg_err_invalid_return_date'),
+                        'not_in_future' => lang('MY_application.msg_err_invalid_return_date'),
+                    ]);
                 $validation->setRule("borrower_email", lang('MY_application.field_borrower_email'), 'required|valid_email', [
                     'required' => lang('MY_application.msg_err_no_loan_email'),
                     'valid_email' => lang('MY_application.msg_err_invalid_loan_email'),
@@ -1170,9 +1180,10 @@ class Item extends BaseController {
                 // Setting rules
                 $validation = \Config\Services::validation();
 
-                $validation->setRule('real_return_date', lang('MY_application.header_loan_real_return'), "required|later_than_equal_to[{$loan['date']}]", [
+                $validation->setRule('real_return_date', lang('MY_application.header_loan_real_return'), "required|later_than_equal_to[{$loan['date']}]|not_in_future", [
                         'required' => lang('MY_application.msg_err_no_return_date'),
                         'later_than_equal_to' => lang('MY_application.msg_err_invalid_return_date'),
+                        'not_in_future' => lang('MY_application.msg_err_invalid_return_date'),
                     ]);
 
                 // Check if date is valid

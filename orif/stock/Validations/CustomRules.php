@@ -210,6 +210,17 @@ class CustomRules
      */
     public function later_than_equal_to($date1, $date2): bool
     {
-        return $date1 >= $date2;
+        return $date1 ? $date1 >= $date2 : true; // Empty dates pass the validation
+    }
+
+    /**
+     * Checks that a date is not in the future
+     *
+     * @param string $date = The date to check
+     * @return boolean = TRUE if the date is not in the future, FALSE otherwise
+     */
+    public function not_in_future ($date): bool
+    {
+        return $date ? $date <= date('Y-m-d') : true; // Empty dates pass the validation
     }
 }
