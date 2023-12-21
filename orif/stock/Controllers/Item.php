@@ -347,7 +347,7 @@ class Item extends BaseController {
                 foreach ($_POST as $key => $value) {
                     if (substr($key, -4, null) == "tags") {
                         // Stock links to be created when the item will exist
-                        $linkArray[] = $value;
+                        array_push($linkArray, ...$value);
                     } else {
                         if (substr($key, 0, 11) == 'item_common' && is_null($item_common_id)) {
                             $itemCommonArray[substr($key, 12, null)] = $value;
