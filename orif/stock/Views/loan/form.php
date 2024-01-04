@@ -36,7 +36,7 @@
     <!-- FROM INPUTS -->
     <!-- LOANER -->
     <label for="loan_by_user_id"><?= lang('MY_application.header_loan_by_user'); ?> :&nbsp;</label>
-    <input class="form-control" name="loan_by_user_id" value="<?php if (isset($loaner['username'])) echo $loaner['username']; ?>" disabled><br />
+    <p id="loan_by_user_id"><?php if (isset($loaner['username'])) echo $loaner['username']; ?></p>
     <!-- BORROWER -->
     <label for="loan_to_user_id"><?= lang('MY_application.header_loan_to_user'); ?> :&nbsp;</label>
     <?php if ($action == 'return'): ?>
@@ -52,7 +52,7 @@
     <!-- BORROWER EMAIL -->
     <label for="borrower_email"><?php if ($action != 'return') echo '* '; echo lang('MY_application.field_borrower_email'); ?> :&nbsp;</label>
     <input class="form-control" name="borrower_email" value="<?php if (isset($borrower_email)) echo $borrower_email; ?>"
-        <?php if ($action == 'return' || (isset($loan_to_user_id) && !empty($loan_to_user_id))) echo "disabled"?>/><br />
+        <?php if ($action == 'return' || (isset($loan_to_user_id) && !empty($loan_to_user_id))) echo "disabled"; ?>/><br />
     <!-- ITEM LOCALISATION -->
     <label for="item_localisation"><?= lang('MY_application.header_loan_localisation'); ?> :&nbsp;</label>
     <input class="form-control" name="item_localisation" value="<?php if (isset($item_localisation)) echo $item_localisation; ?>"
