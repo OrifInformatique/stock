@@ -114,7 +114,7 @@ $config = config('\Stock\Config\StockConfig');
                         <?= form_label(lang('MY_application.field_group'), 'item_common_group_id'); ?>
                     </div>
                     <div class="col-8">
-                        <?= form_dropdown('item_common_item_group_id', $item_groups, isset($item_common_item_group) ? $item_common_item_group : (isset($item_common['item_group_id']) ? $item_common['item_group_id'] : set_value('item_common_item_group_id')), [
+                        <?= form_dropdown('item_common_item_group_id', $item_groups, isset($item_common_item_group_id) ? $item_common_item_group_id : (isset($item_common['item_group_id']) ? $item_common['item_group_id'] : set_value('item_common_item_group_id')), [
                                 'class' => 'form-control',
                                 'id' => 'item_common_group_id'
                             ]);
@@ -212,7 +212,7 @@ $config = config('\Stock\Config\StockConfig');
                         <?= form_label(lang('MY_application.field_remarks'), 'remarks') ?>
                     </div>
                     <div class="col-md-8">
-                        <?= form_textarea('remarks', isset($supplier_ref) ? $supplier_ref : (isset($item['remarks']) ? $item['remarks'] : set_value('remarks')), [
+                        <?= form_textarea('remarks', isset($remarks) ? $remarks : (isset($item['remarks']) ? $item['remarks'] : set_value('remarks')), [
                             'class' => 'form-control',
                             'rows' => '2'
                         ]) ?>
