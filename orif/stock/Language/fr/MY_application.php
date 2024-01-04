@@ -226,7 +226,7 @@ return[
 'msg_err_invalid_loan_date'      => 'La date du prêt n\'est pas valide',
 'msg_err_invalid_planned_date'   => 'La date de retour prévue n\'est pas valide',
 'msg_err_invalid_return_date'    => 'La date de retour n\'est pas valide',
-'msg_err_invalid_loan_email'     => 'L\'adresse e-mail de l\'emprunteur n\'est pas vailde',
+'msg_err_invalid_loan_email'     => 'L\'adresse e-mail de l\'emprunteur n\'est pas valide',
 'msg_no_loan'                    => 'Aucun prêt à afficher',
 'msg_err_not_photo'              => 'Le fichier fournit n\'est pas une image',
 'msg_no_inventory_controls'      => 'Aucun contrôle d\'inventaire',
