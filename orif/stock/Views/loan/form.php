@@ -68,7 +68,7 @@
     <!-- REAL RETURN DATE -->
     <label for="real_return_date"><?php if ($action == 'return') echo '* '; echo lang('MY_application.header_loan_real_return'); ?> :&nbsp;</label>
     <input class="form-control" name="real_return_date" type="date" value="<?php if(isset($real_return_date)) echo $real_return_date; ?>"
-        <?php if ($action == 'modify' && !isset($real_return_date)) echo 'disabled' ?>  /><br />
+        <?php if ($action == 'create' || $action == 'modify' && !isset($real_return_date)) echo 'disabled' ?> /><br />
     <!-- SUBMIT BUTTON -->
     <button type="submit" class="btn btn-success" <?php if ($action != 'return') echo 'onclick="enable_inputs()"'; ?>><?= lang('MY_application.btn_save'); ?></button>
     <a class="btn btn-default" href="<?php if ($action == 'modify') {echo base_url("item/loans/" . $item['item_id']);} else {echo base_url("item_common/view/" . $item['item_common_id']);} ?>">
