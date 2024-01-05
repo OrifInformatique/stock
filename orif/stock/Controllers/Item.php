@@ -502,6 +502,12 @@ class Item extends BaseController {
             // Load item groups
             $data['item_groups_list'] = $this->item_group_model->where('fk_entity_id', $entity_id)->findAll();
             $data['item_groups'] = $this->dropdown($data['item_groups_list'], 'item_group_id');
+            $item_groups_full_list = $this->item_group_model->findAll();
+            $data['item_groups_full_list'] = array();
+            foreach($item_groups_full_list as $group) {
+                $data['item_groups_full_list'][$group['item_group_id']] = $group['short_name'];
+            }
+            $data['item_groups_full_list'] = json_encode($data['item_groups_full_list']);
 
             $data['conditions'] = $this->dropdown($this->item_condition_model->findAll(), 'item_condition_id');
 
