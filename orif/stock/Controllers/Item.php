@@ -155,6 +155,9 @@ class Item extends BaseController {
             $_SESSION['items_list_url'] .= '?'.$_SERVER['QUERY_STRING'];
         }
 
+        // Save URL containing search filters
+        $output['filters_url'] = urlencode($_SESSION['items_list_url']);
+
         // Get user's search filters and add default values
         $filters = $_GET;
         if (!isset($filters['c'])) {
@@ -419,6 +422,7 @@ class Item extends BaseController {
             $data['selected_entity_id'] = $entity_id;
 
             $data['item_id'] = $this->item_model->getFutureId();
+            $data['title'] = $item_common['name'];
 
             if (!isset($data['errors'])) {
                 $data['errors'] = $validation->getErrors();
@@ -440,7 +444,7 @@ class Item extends BaseController {
     }
     
     /**
-     * Modifz a new item
+     * Modify a new item
      *
      * @return void
      */
@@ -513,6 +517,7 @@ class Item extends BaseController {
             $data['item_common'] = $item_common;
             $data['item'] = $item;
             $data['item_id'] = $item_id;
+            $data['title'] = $item_common['name'];
 
             $this->display_view('Stock\Views\item\form', $data);
         } else {
@@ -584,6 +589,7 @@ class Item extends BaseController {
             $data['item_common'] = $this->item_common_model->find($data['item']['item_common_id']);
             $data['item']['inventory_number'] = $this->item_model->getInventoryNumber($data['item']);
             $data['controller'] = $this->user_model->find($_SESSION['user_id']);
+            $data['title'] = $data['item_common']['name'];
 
             if (isset($_POST['date']) && $_POST['date'] != '') {
                 $data['date'] = $_POST['date'];
@@ -635,6 +641,7 @@ class Item extends BaseController {
             $output['item_common'] = $this->item_common_model->find($output['item']['item_common_id']);
             $output['inventory_controls'] = $this->inventory_control_model->where('item_id='.$id)->orderBy('date', 'desc')->findAll();
             $output['item']['inventory_number'] = $this->item_model->getInventoryNumber($output['item']);
+            $output['title'] = $output['item_common']['name'];
             array_walk($output['inventory_controls'], function(&$control) {
                 $control['controller'] = $this->inventory_control_model->getUser($control['controller_id']);
             });
@@ -674,7 +681,7 @@ class Item extends BaseController {
             $data = [
                 'action'                => 'create',
                 'action_url'            => base_url('item/create_loan/'.$id),
-                'title'                 => lang('MY_application.page_create_loan'),
+                'title'                 => lang('MY_application.page_create_loan').$this->item_common_model->find($item['item_common_id'])['name'],
                 'item'                  => $item,
                 'item_common'           => $this->item_common_model->find($item['item_common_id']),
                 'loaner'                => $this->user_model->find($_SESSION['user_id']),
@@ -891,6 +898,7 @@ class Item extends BaseController {
                 }
             });
 
+            $output['title'] = $item_common['name'];
             $output['item'] = $item;
             $output['item_common'] = $item_common;
             $output['loans'] = $loans;
@@ -952,7 +960,7 @@ class Item extends BaseController {
     }
 
     /**
-     * Loads the list of loands
+     * Loads the list of loans
      *
      * @param integer $page
      * @return array
@@ -961,10 +969,13 @@ class Item extends BaseController {
         helper('MY_date');
 
         // Store URL to make possible to come back later (from item detail for example)
-        $_SESSION['items_list_url'] = base_url('item/index/'.$page);
+        $_SESSION['items_list_url'] = base_url('item/list_loans/'.$page);
         if (isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING'])) {
             $_SESSION['items_list_url'] .= '?'.$_SERVER['QUERY_STRING'];
         }
+
+        // Save URL containing search filters
+        $filters_url = urlencode($_SESSION['items_list_url']);
 
         // Add page title
         $title = lang('My_application.page_item_list');
@@ -1048,6 +1059,7 @@ class Item extends BaseController {
                 'pagination' => $pagination,
                 'number_page' => $number_page,
                 'late_loans_count' => $late_loans_count,
+                'filters_url' => $filters_url,
             ];
         } else {
             return [
@@ -1056,6 +1068,7 @@ class Item extends BaseController {
                 'pagination' => null,
                 'number_page' => 0,
                 'late_loans_count' => 0,
+                'filters_url' => $filters_url,
             ];
         }
     }
