@@ -681,7 +681,7 @@ class Item extends BaseController {
             $data = [
                 'action'                => 'create',
                 'action_url'            => base_url('item/create_loan/'.$id),
-                'title'                 => lang('MY_application.page_create_loan').$this->item_common_model->find($item['item_common_id'])['name'],
+                'title'                 => lang('MY_application.page_create_loan')." - ".$this->item_common_model->find($item['item_common_id'])['name'],
                 'item'                  => $item,
                 'item_common'           => $this->item_common_model->find($item['item_common_id']),
                 'loaner'                => $this->user_model->find($_SESSION['user_id']),

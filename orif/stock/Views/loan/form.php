@@ -14,15 +14,9 @@
     <!-- HEADERS -->
     <div class="form_title row">
         <!-- ACTION -->
-        <div class="col-md-4">
+        <div class="col-md-8">
             <h3 class="title">
                 <?= $title; ?>
-            </h3>
-        </div>
-        <!-- ITEM COMMON NAME -->
-        <div class="col-md-4">
-            <h3 class="item_name">
-                <?= $item_common['name']; ?>
             </h3>
         </div>
 
