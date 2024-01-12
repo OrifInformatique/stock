@@ -5,7 +5,7 @@ $config = config('\Stock\Config\StockConfig');
 <div class="container">
     <?= form_open("", [
             'enctype' => 'multipart/form-data'
-        ]); 
+        ]);
     ?>
         <!-- Error messages -->
         <?php if (isset($upload_errors) && !empty($upload_errors)): ?>
@@ -84,14 +84,14 @@ $config = config('\Stock\Config\StockConfig');
                     <div class="col-8">
                         <?= form_input('item_common_name', isset($item_common_name) ? $item_common_name : (isset($item_common['name']) ? $item_common['name'] : set_value('item_common_name')), [
                                 'placeholder' => lang('stock_lang.field_item_common_name'),
-                                'class' => 'form-control', 
+                                'class' => 'form-control',
                                 'id' => 'item_common_name'
-                            ]); 
+                            ]);
                         ?>
                         <span class="text-danger"><?= isset($errors['name']) ? $errors['name']: ''; ?></span>
                     </div>
                 </div>
-                    
+
                 <!-- Description -->
                 <div class="row mb-2">
                     <div class="col-4">
@@ -100,9 +100,9 @@ $config = config('\Stock\Config\StockConfig');
                     <div class="col-8">
                         <?= form_input('item_common_description', isset($item_common_description) ? $item_common_description : (isset($item_common['description']) ? $item_common['description'] : set_value('item_common_description')), [
                                 'placeholder' => lang('stock_lang.field_item_common_description'),
-                                'class' => 'form-control', 
+                                'class' => 'form-control',
                                 'id' => 'item_common_description'
-                            ]); 
+                            ]);
                         ?>
                         <span class="text-danger"><?= isset($errors['description']) ? $errors['description']: ''; ?></span>
                     </div>
@@ -328,9 +328,9 @@ $config = config('\Stock\Config\StockConfig');
         // Reload the page entirely if entity has been changed
         $('#e ul.multiselect-container input[type=radio]').change(() => {
             let url = location.href;
-            let eItems = $("#e .multiselect-container .active input");
-            if (eItems.length > 0) {
-                url = url.replace(/\/\d+/, `/${eItems[0].value}`);
+            let selectedEntities = $("#e .multiselect-container .active input");
+            if (selectedEntities.length > 0) {
+                url = url.replace(/\/\d+/, `/${selectedEntities[0].value}`);
                 location.href = url;
             }
         });
@@ -338,14 +338,11 @@ $config = config('\Stock\Config\StockConfig');
         // Refresh the image to prevent display of an old cach image.
         // Changing the src attribute forces browser to update.
         d = new Date();
-        $("#picture").attr("src", "<?= base_url($config->images_upload_path.$imagePath); ?>?"+d.getTime()); 
+        $("#picture").attr("src", "<?= base_url($config->images_upload_path.$imagePath); ?>?"+d.getTime());
     });
 
     function get(objectName) {
         switch (objectName) {
-            case "item_groups":
-                return <?php $array = ""; foreach($item_groups_list as $item_group) $array .= "'".$item_group['short_name']."',"; echo "[$array]"; ?>;
-
             case "item_tags":
                 return <?php $array = ""; foreach($item_tags_list as $item_tag) $array .= "'".$item_tag['short_name']."',"; echo "[$array]"; ?>;
 
@@ -395,27 +392,39 @@ $config = config('\Stock\Config\StockConfig');
     }
 
     function createInventoryNo() {
+        // Get the selected entity's short name
         let entities = JSON.parse('<?= json_encode($entities_list); ?>');
-        let eItems = $("#e .multiselect-container .active input");
-        var objectGroupField = $('#item_common_group_id').val();
+        let selectedEntities = $("#e .multiselect-container .active input");
+        var entityShortName = '';
+        $(entities).each((entity) => {
+            if (entities[entity].entity_id == selectedEntities[0].value) entityShortName = entities[entity].shortname;
+        });
 
-        var objectGroups = get("item_groups");
+        // Get the selected group's short name
+        let itemGroups = JSON.parse('<?= json_encode($item_groups_list); ?>');
+        let selectedItemGroup = $('#item_common_group_id').val();
+        var itemGroupShortName = '';
+        $(itemGroups).each((itemGroup) => {
+            if (itemGroups[itemGroup].item_group_id == selectedItemGroup) itemGroupShortName = itemGroups[itemGroup].short_name;
+        });
 
+        // Get the first selected tag's short name
         var tagShortName = getFirstTagShortName();
+
+        // Get the last two digits of the buying year ("00" if the buying date is not defined)
         var buyingDateField = document.getElementById('buying_date');
         var date = new Date(buyingDateField.value).getFullYear();
-        var inventoryNumberField = document.getElementById('inventory_prefix');
-        var inventoryNumber = "";
-        var inventoryIdField = document.getElementById('inventory_id');
-        var entityTag = '';
-        $(entities).each((entity) => {
-            if (entities[entity].entity_id == eItems[0].value) entityTag = entities[entity].shortname;
-        });
         date = date.toString().slice(2,4);
         if(date == "N"){
             date = "00";
         }
-        inventoryNumber = entityTag + "." + objectGroups[objectGroupField-1] + tagShortName + date;
+
+        // Generate and display the inventory prefix and inventory id
+        var inventoryNumberField = document.getElementById('inventory_prefix');
+        var inventoryNumber = "";
+        var inventoryIdField = document.getElementById('inventory_id');
+        
+        inventoryNumber = entityShortName + "." + itemGroupShortName + tagShortName + date;
         inventoryNumberField.value = inventoryNumber;
 
         // If inventory_id field is empty, complete it
