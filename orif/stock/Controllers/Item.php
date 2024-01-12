@@ -289,6 +289,7 @@ class Item extends BaseController {
                     return redirect()->to(base_url());
                 } else {
                     $data['item_common'] = $item_common;
+                    $data['title'] = $item_common['name'];
                 }
             }
 
@@ -422,10 +423,6 @@ class Item extends BaseController {
             $data['selected_entity_id'] = $entity_id;
 
             $data['item_id'] = $this->item_model->getFutureId();
-
-            if (!is_null($item_common_id)) {
-                $data['title'] = $item_common['name'];
-            }
 
             if (!isset($data['errors'])) {
                 $data['errors'] = $validation->getErrors();
