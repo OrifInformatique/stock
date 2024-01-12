@@ -328,9 +328,9 @@ $config = config('\Stock\Config\StockConfig');
         // Reload the page entirely if entity has been changed
         $('#e ul.multiselect-container input[type=radio]').change(() => {
             let url = location.href;
-            let eItems = $("#e .multiselect-container .active input");
-            if (eItems.length > 0) {
-                url = url.replace(/\/\d+/, `/${eItems[0].value}`);
+            let selectedEntities = $("#e .multiselect-container .active input");
+            if (selectedEntities.length > 0) {
+                url = url.replace(/\/\d+/, `/${selectedEntities[0].value}`);
                 location.href = url;
             }
         });
@@ -392,26 +392,39 @@ $config = config('\Stock\Config\StockConfig');
     }
 
     function createInventoryNo() {
+        // Get the selected entity's short name
         let entities = JSON.parse('<?= json_encode($entities_list); ?>');
-        let eItems = $("#e .multiselect-container .active input");
-        let objectGroups = JSON.parse(JSON.stringify(<?= $item_groups_full_list ?>));
-        var objectGroupField = $('#item_common_group_id').val();
+        let selectedEntities = $("#e .multiselect-container .active input");
+        var entityShortName = '';
+        $(entities).each((entity) => {
+            if (entities[entity].entity_id == selectedEntities[0].value) entityShortName = entities[entity].shortname;
+        });
 
+        // Get the selected group's short name
+        let itemGroups = JSON.parse('<?= json_encode($item_groups_list); ?>');
+        let selectedItemGroup = $('#item_common_group_id').val();
+        var itemGroupShortName = '';
+        $(itemGroups).each((itemGroup) => {
+            if (itemGroups[itemGroup].item_group_id == selectedItemGroup) itemGroupShortName = itemGroups[itemGroup].short_name;
+        });
+
+        // Get the first selected tag's short name
         var tagShortName = getFirstTagShortName();
+
+        // Get the last two digits of the buying year ("00" if the buying date is not defined)
         var buyingDateField = document.getElementById('buying_date');
         var date = new Date(buyingDateField.value).getFullYear();
-        var inventoryNumberField = document.getElementById('inventory_prefix');
-        var inventoryNumber = "";
-        var inventoryIdField = document.getElementById('inventory_id');
-        var entityTag = '';
-        $(entities).each((entity) => {
-            if (entities[entity].entity_id == eItems[0].value) entityTag = entities[entity].shortname;
-        });
         date = date.toString().slice(2,4);
         if(date == "N"){
             date = "00";
         }
-        inventoryNumber = entityTag + "." + objectGroups[objectGroupField] + tagShortName + date;
+
+        // Generate and display the inventory prefix and inventory id
+        var inventoryNumberField = document.getElementById('inventory_prefix');
+        var inventoryNumber = "";
+        var inventoryIdField = document.getElementById('inventory_id');
+        
+        inventoryNumber = entityShortName + "." + itemGroupShortName + tagShortName + date;
         inventoryNumberField.value = inventoryNumber;
 
         // If inventory_id field is empty, complete it
