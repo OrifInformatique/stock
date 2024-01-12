@@ -16,7 +16,7 @@
         <!-- ACTION -->
         <div class="col-md-8">
             <h3 class="title">
-                <?= $title; ?>
+                <?= $form_title; ?>
             </h3>
         </div>
 
