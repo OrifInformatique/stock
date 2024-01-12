@@ -422,7 +422,7 @@ class Item extends BaseController {
             $data['selected_entity_id'] = $entity_id;
 
             $data['item_id'] = $this->item_model->getFutureId();
-            
+
             if (!is_null($item_common_id)) {
                 $data['title'] = $item_common['name'];
             }
@@ -678,15 +678,17 @@ class Item extends BaseController {
 
             // Preparing data for the view
             $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
+            $item_common = $this->item_common_model->find($item['item_common_id']);
             $users = $this->user_model->findAll();
             $today = date('Y-m-d');
 
             $data = [
                 'action'                => 'create',
                 'action_url'            => base_url('item/create_loan/'.$id),
-                'title'                 => lang('MY_application.page_create_loan')." - ".$this->item_common_model->find($item['item_common_id'])['name'],
+                'title'                 => lang('MY_application.page_create_loan')." - ".$item_common['name'],
+                'form_title'            => lang('MY_application.page_create_loan')." - ".$item_common['name'],
                 'item'                  => $item,
-                'item_common'           => $this->item_common_model->find($item['item_common_id']),
+                'item_common'           => $item_common,
                 'loaner'                => $this->user_model->find($_SESSION['user_id']),
                 'date'                  => $today,
                 'planned_return_date'   => date('Y-m-d', strtotime($today.'+3 months')),
@@ -776,13 +778,15 @@ class Item extends BaseController {
 
             // Preparing data for the view
             $item = $this->item_model->find($loan['item_id']);
+            $item_common = $this->item_common_model->find($item['item_common_id']);
             $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
             $users = $this->user_model->findAll();
 
             $data = [
                 'action'                => 'modify',
                 'action_url'            => base_url('item/modify_loan/'.$id),
-                'title'                 => lang('MY_application.page_modify_loan'),
+                'title'                 => lang('MY_application.page_modify_loan'). " - " .$item_common['name'],
+                'form_title'            => lang('MY_application.page_modify_loan'). " - " .$item_common['name'],
                 'item'                  => $item,
                 'item_common'           => $this->item_common_model->find($item['item_common_id']),
                 'loaner'                => $this->user_model->withDeleted()->find($loan['loan_by_user_id']),
@@ -1174,13 +1178,15 @@ class Item extends BaseController {
 
             // Preparing data for the view
             $item = $this->item_model->find($loan['item_id']);
+            $item_common = $this->item_common_model->find($item['item_common_id']);
             $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
             $users = $this->user_model->findAll();
 
             $data = [
                 'action'                => 'return',
                 'action_url'            => base_url('item/return_loan/'.$id),
-                'title'                 => lang('MY_application.page_return_loan'),
+                'title'                 => lang('MY_application.page_return_loan'). " - " .$item_common['name'],
+                'form_title'            => lang('MY_application.page_return_loan'). " - " .$item_common['name'],
                 'item'                  => $item,
                 'item_common'           => $this->item_common_model->find($item['item_common_id']),
                 'loaner'                => $this->user_model->withDeleted()->find($loan['loan_by_user_id']),
