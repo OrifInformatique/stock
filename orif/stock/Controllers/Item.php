@@ -1170,7 +1170,7 @@ class Item extends BaseController {
             isset($_SESSION['logged_in']) &&
             $_SESSION['logged_in'] == true &&
             isset($_SESSION['user_id']) &&
-            $this->user_entity_model->check_user_item_entity($_SESSION['user_id'], $id) &&
+            $this->user_entity_model->check_user_loan_entity($_SESSION['user_id'], $id) &&
             $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
 
             // Preparing data for the view
