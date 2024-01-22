@@ -43,7 +43,7 @@ class Picture extends BaseController {
                 break;
         }
 
-        $this->display_view('Stock\Views\item\select_photo', $data);
+        return $this->display_view('Stock\Views\item\select_photo', $data);
     }
 
     /**

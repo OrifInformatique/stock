@@ -33,7 +33,7 @@
 <div id="buttons" class="container">
     <div class="row">
         <div class="col text-right">
-            <a href="<?=$_SESSION['_ci_previous_url']?>" class="btn btn-secondary" ><?=lang('common_lang.btn_back');?></a>
+            <a href="<?=session('_ci_previous_url')?>" class="btn btn-secondary" ><?=lang('common_lang.btn_back');?></a>
         </div>
     </div>
 </div>

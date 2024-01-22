@@ -22,7 +22,7 @@
 
                 </div>
                 <div class="text-right">
-                    <a href="<?= base_url('stock/admin/view_tags'); ?>" class="btn btn-default">
+                    <a href="<?= base_url('stock/admin/view_tags'); ?>" class="btn btn-secondary">
                         <?= lang('common_lang.btn_cancel'); ?>
                     </a>
 

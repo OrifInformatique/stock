@@ -30,5 +30,5 @@
 	<button type="submit" name="submit" class="btn btn-success">
 		<?php echo lang('MY_application.btn_save'); ?>
 	</button>
-	<a class="btn btn-default" href="<?php echo base_url("item_common/view/".$item['item_common_id']); ?>"><?php echo lang('MY_application.btn_cancel'); ?></a>
+	<a class="btn btn-secondary" href="<?php echo base_url("item_common/view/".$item['item_common_id']); ?>"><?php echo lang('MY_application.btn_cancel'); ?></a>
 </form>

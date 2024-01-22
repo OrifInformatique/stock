@@ -36,7 +36,7 @@
     <input class="form-control" name="item_localisation" value="<?php if(isset($item_localisation)) {echo $item_localisation;} else {echo set_value('item_localisation');} ?>" /><br />
 
     <button type="submit" class="btn btn-success"><?= lang('MY_application.btn_save'); ?></button>
-    <a class="btn btn-default" href="<?= base_url("item/loans/" . $item_id); ?>"><?= lang('MY_application.btn_cancel'); ?></a>
+    <a class="btn btn-secondary" href="<?= base_url("item/loans/" . $item_id); ?>"><?= lang('MY_application.btn_cancel'); ?></a>
 </form>
 <script>
     const users = <?= json_encode($users); ?>;
