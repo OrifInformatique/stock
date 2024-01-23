@@ -61,4 +61,4 @@ jobs:
         CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
         GRAPH_USER_SCOPES: ${{ secrets.GRAPH_USER_SCOPES }}
         REDIRECT_URI: ${{ secrets.REDIRECT_URI }}
-      run: vendor/bin/phpunit --process-isolation
+      run: vendor/bin/phpunit
