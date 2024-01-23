@@ -36,7 +36,6 @@ class AdminMenuTest extends CIUnitTestCase
     # previous data and change some session data.
     public function test_panel_config_with_administrator_session() 
     {
-        d('this test must be rewrite when the stock unit tests are created');
         
         $_SESSION['logged_in'] = true;
         $_SESSION['user_access'] = Config('\User\Config\UserConfig')
@@ -48,5 +47,11 @@ class AdminMenuTest extends CIUnitTestCase
         # $response = $result->response();
         # $body = $response->getBody();
         # $result->assertSee(lang('user_lang.title_user_list'), 'h1');
+        
+
+        $warning = 'This function must be rewritten when the stock unit '
+            . 'tests are created.';
+        d($warning);
+        return;
     }
 }
