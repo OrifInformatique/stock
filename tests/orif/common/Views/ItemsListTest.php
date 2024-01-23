@@ -148,7 +148,6 @@ class ItemsListTest extends CIUnitTestCase
         $result = $this->controller(Test::class)
                        ->execute('display_view', '\Common\items_list', $data);
         $response = $result->response()->getBody();
-        d($response);
         $result->assertSee(lang('common_lang.btn_show_disabled'), 'label');
     }
 
