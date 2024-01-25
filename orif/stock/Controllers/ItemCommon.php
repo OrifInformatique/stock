@@ -400,7 +400,7 @@ class ItemCommon extends BaseController {
     */
     public function rename_images() {
         if (!isset($_SESSION['user_access']) || $_SESSION['user_access'] < config('\User\Config\UserConfig')->access_lvl_registered) {
-            return redirect()->to(base_url())->with('error', 'no rights');
+            return redirect()->to(base_url());
         }
 
         $items = $this->item_common_model->findAll();
