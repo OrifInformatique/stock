@@ -389,4 +389,55 @@ class ItemCommon extends BaseController {
             return redirect()->to(base_url());
         }
     }
+
+    /**
+    * Rename images and update the item_common
+    * in case of wrong naming convention or 
+    * unexisting image
+    *
+    * @return void
+    * @Date used on the 25.01.2024
+    */
+    public function rename_images() {
+        if (!isset($_SESSION['user_access']) || $_SESSION['user_access'] < config('\User\Config\UserConfig')->access_lvl_registered) {
+            return redirect()->to(base_url())->with('error', 'no rights');
+        }
+
+        $items = $this->item_common_model->findAll();
+        $unchangedImages = [];
+
+        foreach ($items as $i => $item) {
+            $pathToImageFolder = 'uploads' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR;
+            $pathToFile = $pathToImageFolder . $item['image'];
+
+            if (file_exists($pathToFile) && !is_null($item['image'])) {
+                $newFilename = sprintf('%04d_picture.png', $item['item_common_id']);
+
+                $key = array_search($newFilename, array_column($items, 'image'));
+
+                if ($key) {
+                    array_push($unchangedImages, $items[$i]);
+                    continue;
+                }
+
+                $newPathToFile = $pathToImageFolder . $newFilename;
+
+                rename($pathToFile, $newPathToFile);
+
+                $this->item_common_model->update($item['item_common_id'], ['image' => $newFilename]);
+            } else {
+                $this->item_common_model->update($item['item_common_id'], ['image' => NULL]);
+            }
+        }
+
+        $itemsWithImage = $this->item_common_model->where('image != \'no_image.png\' OR image != NULL')->findAll();
+
+        if (count($unchangedImages) != count($itemsWithImage)) {
+            $this->rename_images();
+        }
+
+        clearstatcache();
+
+        return redirect()->to(base_url());
+    }
 }
