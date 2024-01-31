@@ -93,7 +93,7 @@ else
   <!-- FORM BUTTONS -->
   <div class="row">
     <div class="col text-right pt-3 pl-0 pr-0">
-      <a class="btn btn-default" href="<?= base_url('stock/admin/view_suppliers'); ?>"><?= lang('common_lang.btn_cancel'); ?></a>
+      <a class="btn btn-secondary" href="<?= base_url('stock/admin/view_suppliers'); ?>"><?= lang('common_lang.btn_cancel'); ?></a>
       <?= form_submit('save', lang('common_lang.btn_save'), ['class' => 'btn btn-primary']); ?>
     </div>
   </div>

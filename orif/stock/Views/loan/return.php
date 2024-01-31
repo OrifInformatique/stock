@@ -53,5 +53,5 @@
     <input class="form-control" name="real_return_date" type="date" value="<?php if(isset($real_return_date)) {echo $real_return_date;} else {echo date('Y-m-d');} ?>" /><br />
 
     <button type="submit" class="btn btn-success"><?= lang('MY_application.btn_save'); ?></button>
-    <a class="btn btn-default" href="<?= base_url("item_common/view/" . $item['item_common_id']); ?>"><?= lang('MY_application.btn_cancel'); ?></a>
+    <a class="btn btn-secondary" href="<?= base_url("item_common/view/" . $item['item_common_id']); ?>"><?= lang('MY_application.btn_cancel'); ?></a>
 </form>

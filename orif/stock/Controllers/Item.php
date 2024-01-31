@@ -432,7 +432,7 @@ class Item extends BaseController {
                 unset($_SESSION['POST']);
             }
 
-            $this->display_view('Stock\Views\item\form', $data);
+            return $this->display_view('Stock\Views\item\form', $data);
         } else {
             // Access is not allowed
             return redirect()->to(base_url());
@@ -514,7 +514,7 @@ class Item extends BaseController {
             $data['item'] = $item;
             $data['item_id'] = $item_id;
 
-            $this->display_view('Stock\Views\item\form', $data);
+            return $this->display_view('Stock\Views\item\form', $data);
         } else {
             // Access is not allowed
             return redirect()->to(base_url());
@@ -546,7 +546,7 @@ class Item extends BaseController {
                         'inventory_number' => $this->item_model->getInventoryNumber($item),
                         'title' => lang('stock_lang.title_delete_item')
                     );
-                    $this->display_view('Stock\Views\item\confirm_delete', $output);
+                    return $this->display_view('Stock\Views\item\confirm_delete', $output);
                     break;
                 case 1: // Delete item_common and related items
                     $this->inventory_control_model->where('item_id', $item['item_id'])->delete();
@@ -606,7 +606,7 @@ class Item extends BaseController {
                 $this->inventory_control_model->insert($inventory_control);
                 return redirect()->to("/item_common/view/".$data['item_common']['item_common_id']);
             } else {
-                $this->display_view('Stock\Views\inventory_control\form', $data);
+                return $this->display_view('Stock\Views\inventory_control\form', $data);
             }
         } else {
             // No item specified or access is not allowed, display items list
@@ -639,7 +639,7 @@ class Item extends BaseController {
                 $control['controller'] = $this->inventory_control_model->getUser($control['controller_id']);
             });
 
-            $this->display_view('Stock\Views\inventory_control\list', $output);
+            return $this->display_view('Stock\Views\inventory_control\list', $output);
         } else {
 
             // No item specified or access not allowed, display items list
@@ -721,7 +721,7 @@ class Item extends BaseController {
                     }
                 }
             }
-            $this->display_view('Stock\Views\loan\form', $data);
+            return $this->display_view('Stock\Views\loan\form', $data);
         } else {
 
             // No item specified or access is not allowed, redirect to items list
@@ -806,7 +806,7 @@ class Item extends BaseController {
                     }
                 }
             }
-            $this->display_view('Stock\Views\loan\form', $data);
+            return $this->display_view('Stock\Views\loan\form', $data);
         } else {
             // Access is not allowed
             return redirect()->to("/item");
@@ -851,7 +851,7 @@ class Item extends BaseController {
             $output['item_common'] = $item_common;
             $output['loans'] = $loans;
 
-            $this->display_view('Stock\Views\loan\list', $output);
+            return $this->display_view('Stock\Views\loan\list', $output);
         } else {
 
             // No item specified or access not allowed, display items list
@@ -882,7 +882,7 @@ class Item extends BaseController {
                 $data['item_common'] = $this->item_common_model->find($item['item_common_id']);
                 $data['title'] = lang('stock_lang.title_delete_loan');
 
-                $this->display_view('Stock\Views\loan\confirm_delete', $data);
+                return $this->display_view('Stock\Views\loan\confirm_delete', $data);
             } else {
                 // get the data from the loan with this id (to fill the form or to get the concerned item)
                 $data = $this->loan_model->find($id);
@@ -904,7 +904,7 @@ class Item extends BaseController {
      */
     public function list_loans() {
         $output['entities'] = $this->entity_model->dropdown('name');
-        $this->display_view('Stock\Views\item\loans_list', $output);
+        return $this->display_view('Stock\Views\item\loans_list', $output);
     }
 
     /**
