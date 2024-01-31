@@ -54,7 +54,9 @@ class Migrate extends BaseController
 
             if ($this->validate($validationRules))
             {
-                if ($_POST['password'] == 'uzdSb8U8ZUD5h24')
+                $validData = $this->validator->getValidated();
+
+                if ($validData['password'] == 'uzdSb8U8ZUD5h24')
                 {
                     try
                     {

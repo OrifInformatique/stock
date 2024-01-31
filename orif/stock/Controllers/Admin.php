@@ -143,7 +143,9 @@ class Admin extends BaseController
             ];
 
             if ($this->validate($validationRules)) {
-                $this->item_tag_model->update($id, $_POST);
+                $validData = $this->validator->getValidated();
+
+                $this->item_tag_model->update($id, $validData);
 
                 return redirect()->to('/stock/admin/view_tags');
             }
@@ -176,7 +178,9 @@ class Admin extends BaseController
             ];
 
             if ($this->validate($validationRules)) {
-                $this->item_tag_model->insert($_POST);
+                $validData = $this->validator->getValidated();
+
+                $this->item_tag_model->insert($validData);
 
                 return redirect()->to("/stock/admin/view_tags/");
             }
@@ -330,7 +334,9 @@ class Admin extends BaseController
             ];
 
             if ($this->validate($validationRules, $validationErrors)) {
-                $this->stocking_place_model->update($id, $_POST);
+                $validData = $this->validator->getValidated();
+
+                $this->stocking_place_model->update($id, $validData);
 
                 return redirect()->to('/stock/admin/view_stocking_places');
             }
@@ -377,7 +383,9 @@ class Admin extends BaseController
             ];
 
             if ($this->validate($validationRules, $validationErrors)) {
-                $this->stocking_place_model->insert($_POST);
+                $validData = $this->validator->getValidated();
+
+                $this->stocking_place_model->insert($validData);
 
                 return redirect()->to("/stock/admin/view_stocking_places");
             }
@@ -528,7 +536,9 @@ class Admin extends BaseController
             }
 
             if ($this->validate($validationRules)) {
-                $this->supplier_model->update($id, $_POST);
+                $validData = $this->validator->getValidated();
+
+                $this->supplier_model->update($id, $validData);
 
                 return redirect()->to('/stock/admin/view_suppliers');
             }
@@ -571,7 +581,9 @@ class Admin extends BaseController
             }
 
             if ($this->validate($validationRules)) {
-                $this->supplier_model->insert($_POST);
+                $validData = $this->validator->getValidated();
+
+                $this->supplier_model->insert($validData);
 
                 return redirect()->to("/stock/admin/view_suppliers");
             }
@@ -729,7 +741,9 @@ class Admin extends BaseController
             ];
 
             if ($this->validate($validationRules, $validationErrors)) {
-                $this->item_group_model->update($id, $_POST);
+                $validData = $this->validator->getValidated();
+
+                $this->item_group_model->update($id, $validData);
 
                 return redirect()->to('/stock/admin/view_item_groups');
             }
