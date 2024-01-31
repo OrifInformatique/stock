@@ -218,7 +218,6 @@ class Auth extends BaseController {
      */
     public function azure_login(): string|Response
     {
-<<<<<<< HEAD
         $client_id = getenv('CLIENT_ID');
         $client_secret = getenv('CLIENT_SECRET');
         $ad_tenant = getenv('TENANT_ID');
@@ -359,9 +358,6 @@ class Auth extends BaseController {
     public function login(): string|Response
     {
         // If user is not already logged
-=======
-        // If user not yet logged in
->>>>>>> Release-4.4
         if(!(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true)) {
 
             // Store the redirection URL in a session variable
