@@ -106,11 +106,15 @@ class ItemCommon extends BaseController {
         $item_common = $this->item_common_model->where('item_common_id', $id)->first();
 
         if (!is_null($item_common)) {
+            // Store current URL to redirect if user logs in
+            $output['after_login_redirect'] = current_url();
+ 
             $item_common['tags'] = $this->item_common_model->getTags($item_common);
             $item_common['image'] = $this->item_common_model->getImagePath($item_common);
             $item_common['item_group'] = $this->item_common_model->getItemGroup($item_common);
             $item_common['entity'] = $this->entity_model->where('entity_id', $item_common['item_group']['fk_entity_id'])->first();
             
+            $output['title'] = $item_common['name'];
             $output['item_common'] = $item_common;
             $output['entity_id'] = $item_common['entity']['entity_id'];
 
@@ -286,6 +290,7 @@ class ItemCommon extends BaseController {
             $output['item_tags'] = $this->dropdown($item_tags, 'item_tag_id');
             $output['item_tag_ids'] = $item_tag_ids;
             $output['config'] = config('\Stock\Config\StockConfig');
+            $output['title'] = $item_common['name'];
 
             if (isset($_SESSION['POST'])) {
                 foreach ($_SESSION['POST'] as $key => $value) {
@@ -383,5 +388,56 @@ class ItemCommon extends BaseController {
             // Access not allowed
             return redirect()->to(base_url());
         }
+    }
+
+    /**
+    * Rename images and update the item_common
+    * in case of wrong naming convention or 
+    * unexisting image
+    *
+    * @return void
+    * @Date used on the 25.01.2024
+    */
+    public function rename_images() {
+        if (!isset($_SESSION['user_access']) || $_SESSION['user_access'] < config('\User\Config\UserConfig')->access_lvl_registered) {
+            return redirect()->to(base_url());
+        }
+
+        $items = $this->item_common_model->findAll();
+        $unchangedImages = [];
+
+        foreach ($items as $i => $item) {
+            $pathToImageFolder = 'uploads' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR;
+            $pathToFile = $pathToImageFolder . $item['image'];
+
+            if (file_exists($pathToFile) && !is_null($item['image'])) {
+                $newFilename = sprintf('%04d_picture.png', $item['item_common_id']);
+
+                $key = array_search($newFilename, array_column($items, 'image'));
+
+                if ($key) {
+                    array_push($unchangedImages, $items[$i]);
+                    continue;
+                }
+
+                $newPathToFile = $pathToImageFolder . $newFilename;
+
+                rename($pathToFile, $newPathToFile);
+
+                $this->item_common_model->update($item['item_common_id'], ['image' => $newFilename]);
+            } else {
+                $this->item_common_model->update($item['item_common_id'], ['image' => NULL]);
+            }
+        }
+
+        $itemsWithImage = $this->item_common_model->where('image != \'no_image.png\' OR image != NULL')->findAll();
+
+        if (count($unchangedImages) != count($itemsWithImage)) {
+            $this->rename_images();
+        }
+
+        clearstatcache();
+
+        return redirect()->to(base_url());
     }
 }

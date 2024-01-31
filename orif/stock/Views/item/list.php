@@ -192,7 +192,7 @@ async function load_items(page, filters) {
 
     // URL for ajax call to PHP controller                      Stock\Controllers\
     url = "<?= base_url("/item/load_list_json")?>"+ "/" + page+filters;
-    
+
     await $.ajax({
         url: url,
         type: "get",
@@ -202,7 +202,13 @@ async function load_items(page, filters) {
             filters=getFilters();
             history.pushState(null, "", "<?= base_url("item/index")?>"+ "/" +page+filters);
             eItems = $("#e .multiselect-container .active input");
-            
+
+            // Change redirection link after login
+            if ($("#login_button").length) { // Check if login button exists
+                after_login_redirect = $("#login_button").attr("href").replace(/(after_login_redirect=)(.*)/, "$1" + result.filters_url);
+                $("#login_button").attr("href", after_login_redirect);
+            }
+
             // Empty list before filling it
             if (result.items.length > 0){
                 $("#table_item").toggle(true);

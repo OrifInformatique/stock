@@ -155,6 +155,9 @@ class Item extends BaseController {
             $_SESSION['items_list_url'] .= '?'.$_SERVER['QUERY_STRING'];
         }
 
+        // Save URL containing search filters
+        $output['filters_url'] = urlencode($_SESSION['items_list_url']);
+
         // Get user's search filters and add default values
         $filters = $_GET;
         if (!isset($filters['c'])) {
@@ -286,6 +289,7 @@ class Item extends BaseController {
                     return redirect()->to(base_url());
                 } else {
                     $data['item_common'] = $item_common;
+                    $data['title'] = $item_common['name'];
                 }
             }
 
@@ -440,7 +444,7 @@ class Item extends BaseController {
     }
     
     /**
-     * Modifz a new item
+     * Modify a new item
      *
      * @return void
      */
@@ -513,6 +517,7 @@ class Item extends BaseController {
             $data['item_common'] = $item_common;
             $data['item'] = $item;
             $data['item_id'] = $item_id;
+            $data['title'] = $item_common['name'];
 
             return $this->display_view('Stock\Views\item\form', $data);
         } else {
@@ -584,6 +589,7 @@ class Item extends BaseController {
             $data['item_common'] = $this->item_common_model->find($data['item']['item_common_id']);
             $data['item']['inventory_number'] = $this->item_model->getInventoryNumber($data['item']);
             $data['controller'] = $this->user_model->find($_SESSION['user_id']);
+            $data['title'] = $data['item_common']['name'];
 
             if (isset($_POST['date']) && $_POST['date'] != '') {
                 $data['date'] = $_POST['date'];
@@ -635,6 +641,7 @@ class Item extends BaseController {
             $output['item_common'] = $this->item_common_model->find($output['item']['item_common_id']);
             $output['inventory_controls'] = $this->inventory_control_model->where('item_id='.$id)->orderBy('date', 'desc')->findAll();
             $output['item']['inventory_number'] = $this->item_model->getInventoryNumber($output['item']);
+            $output['title'] = $output['item_common']['name'];
             array_walk($output['inventory_controls'], function(&$control) {
                 $control['controller'] = $this->inventory_control_model->getUser($control['controller_id']);
             });
@@ -650,45 +657,67 @@ class Item extends BaseController {
     /**
      * Create loan for one given item
      *
-     * @param integer $id
+     * @param integer $id : The ID of the related item
      * @return void
      */
-    public function create_loan($id = NULL) {
-        // Check if this is allowed
-        if (!empty($id) &&
+    public function create_loan($id) {
+        // Get item object
+        $item = $this->item_model->find($id);
+        $item['current_loan'] = $this->item_model->getCurrentLoan($item);
+        // Check if access is granted
+        if (!is_null($item) &&
             isset($_SESSION['logged_in']) &&
             $_SESSION['logged_in'] == true &&
-            isset($_SESSION['user_id']) && 
+            isset($_SESSION['user_id']) &&
             $this->user_entity_model->check_user_item_entity($_SESSION['user_id'], $id) &&
-            $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
+            $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered &&
+            !array_key_exists('real_return_date', $item['current_loan'])) {
 
-            // Get item object and related loans
-            $item = $this->item_model->find($id);
+            // Preparing data for the view
+            $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
+            $item_common = $this->item_common_model->find($item['item_common_id']);
+            $users = $this->user_model->findAll();
+            $today = date('Y-m-d');
 
-            $data['item'] = $item;
-            $data['item_id'] = $id;
-            $data['new_loan'] = true;
-            $users = (new User_model())->findAll();
-            $data['users'] = array_map(function($user) {
-                return [
-                    'id' => $user['id'],
-                    'username' => $user['username'],
-                    'email' => $user['email'],
-                ];
-            }, $users);
+            $data = [
+                'action'                => 'create',
+                'action_url'            => base_url('item/create_loan/'.$id),
+                'title'                 => lang('MY_application.page_create_loan')." - ".$item_common['name'],
+                'form_title'            => lang('MY_application.page_create_loan')." - ".$item_common['name'],
+                'item'                  => $item,
+                'item_common'           => $item_common,
+                'loaner'                => $this->user_model->find($_SESSION['user_id']),
+                'date'                  => $today,
+                'planned_return_date'   => date('Y-m-d', strtotime($today.'+3 months')),
+                'users' => array_map(function($user) {
+                    return [
+                        'id' => $user['id'],
+                        'username' => $user['username'],
+                        'email' => $user['email'],
+                    ];
+                }, $users),
+            ];
 
             // Test input
             if (!empty($_POST)) {
                 $validation = \Config\Services::validation();
                 $user_ids = implode(',', array_map(function($user) { return $user['id']; }, $users)) . ','; // Allows empty ids
 
-                $validation->setRule("date", "Date du prêt", 'required', array('required' => "La date du prêt doit être fournie"));
-                $validation->setRule("planned_return_date", lang('MY_application.field_loan_planned_return'), 'required', [
+                $validation->setRule("date", lang('MY_application.field_loan_date'), 'required|not_in_future', [
+                    'required' => lang('MY_application.msg_err_no_loan_date'),
+                    'not_in_future' => lang('MY_application.msg_err_invalid_loan_date'),
+                ]);
+                $validation->setRule("planned_return_date", lang('MY_application.field_loan_planned_return'), "required|later_than_equal_to[{$_POST['date']}]", [
                     'required' => lang('MY_application.msg_err_no_planned_return_date'),
+                    'later_than_equal_to' => lang('MY_application.msg_err_invalid_planned_date'),
+                ]);
+                $validation->setRule('real_return_date', lang('MY_application.header_loan_real_return'), "later_than_equal_to[{$_POST['date']}]|not_in_future", [
+                    'later_than_equal_to' => lang('MY_application.msg_err_invalid_return_date'),
+                    'not_in_future' => lang('MY_application.msg_err_invalid_return_date'),
                 ]);
                 $validation->setRule("borrower_email", lang('MY_application.field_borrower_email'), 'required|valid_email', [
                     'required' => lang('MY_application.msg_err_no_loan_email'),
-                    'valid_email' => lang('MY_application.msg_err_email'),
+                    'valid_email' => lang('MY_application.msg_err_invalid_loan_email'),
                 ]);
                 $validation->setRule("loan_to_user_id", lang('MY_application.field_loan_to_user'), "if_exist|in_list[{$user_ids}]", [
                     'in_list' => lang('MY_application.msg_err_invalid_loan_to'),
@@ -704,9 +733,8 @@ class Item extends BaseController {
                         $loanArray["loan_to_user_id"] = NULL;
                     }
 
-                    $loanArray["item_id"] = $id;
-
-                    $loanArray["loan_by_user_id"] = $_SESSION['user_id'];
+                    $loanArray['item_id'] = $id;
+                    $loanArray['loan_by_user_id'] = $_SESSION['user_id'];
 
                     $this->loan_model->insert($loanArray);
 
@@ -723,7 +751,6 @@ class Item extends BaseController {
             }
             return $this->display_view('Stock\Views\loan\form', $data);
         } else {
-
             // No item specified or access is not allowed, redirect to items list
             return redirect()->to('/item');
         }
@@ -732,49 +759,77 @@ class Item extends BaseController {
     /**
      * Modify some loan
      *
-     * @param integer $id
+     * @param integer $id : The ID related to the loan
      * @return void
      */
-    public function modify_loan($id = NULL) {
-        // Check if this is allowed
-        if (isset($_SESSION['logged_in']) &&
+    public function modify_loan($id) {
+        // Get loan object
+        $loan = $this->loan_model->find($id);
+        // Check if access is granted
+        if (!is_null($loan) &&
+            isset($_SESSION['logged_in']) &&
             $_SESSION['logged_in'] == true &&
             isset($_SESSION['user_id']) &&
             $this->user_entity_model->check_user_loan_entity($_SESSION['user_id'], $id) &&
             $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
 
-            // get the data from the loan with this id (to fill the form or to get the concerned item)
-            $loan = $this->loan_model->find($id);
+            // Preparing data for the view
+            $item = $this->item_model->find($loan['item_id']);
+            $item_common = $this->item_common_model->find($item['item_common_id']);
+            $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
+            $users = $this->user_model->findAll();
 
-            $data['date'] = $loan['date'];
-            $data['planned_return_date'] = $loan['planned_return_date'];
-            $data['real_return_date'] = $loan['real_return_date'];
-            $data['item_localisation'] = $loan['item_localisation'];
-            $data['item_id'] = $loan['item_id'];
-            $data['loan_to_user_id'] = $loan['loan_to_user_id'];
-            $data['borrower_email'] = $loan['borrower_email'];
-            $data['new_loan'] = false;
-            $users = (new User_model())->findAll();
-            $data['users'] = array_map(function($user) {
-                return [
-                    'id' => $user['id'],
-                    'username' => $user['username'],
-                    'email' => $user['email'],
-                ];
-            }, $users);
+            $data = [
+                'action'                => 'modify',
+                'action_url'            => base_url('item/modify_loan/'.$id),
+                'title'                 => lang('MY_application.page_modify_loan'). " - " .$item_common['name'],
+                'form_title'            => lang('MY_application.page_modify_loan'). " - " .$item_common['name'],
+                'item'                  => $item,
+                'item_common'           => $this->item_common_model->find($item['item_common_id']),
+                'loaner'                => $this->user_model->withDeleted()->find($loan['loan_by_user_id']),
+                'loan_to_user_id'       => $loan['loan_to_user_id'],
+                'borrower_email'        => $loan['borrower_email'],
+                'item_localisation'     => $loan['item_localisation'],
+                'date'                  => $loan['date'],
+                'planned_return_date'   => $loan['planned_return_date'],
+                'real_return_date'      => $loan['real_return_date'],
+                'users' => array_map(function($user) {
+                    return [
+                        'id' => $user['id'],
+                        'username' => $user['username'],
+                        'email' => $user['email'],
+                    ];
+                }, $users),
+            ];
 
             if (!empty($_POST)) {
                 // test input
                 $validation = \Config\Services::validation();
                 $user_ids = implode(',', array_map(function($user) { return $user['id']; }, $users)) . ','; // Allows empty ids
 
-                $validation->setRule("date", "Date du prêt", 'required', array('required' => "La date du prêt doit être fournie"));
-                $validation->setRule("planned_return_date", lang('MY_application.field_loan_planned_return'), 'required', [
-                    'required' => lang('MY_application.msg_err_no_planned_return_date'),
+                $validation->setRule("date", lang('MY_application.field_loan_date'), 'required|not_in_future', [
+                    'required' => lang('MY_application.msg_err_no_loan_date'),
+                    'not_in_future' => lang('MY_application.msg_err_invalid_loan_date'),
                 ]);
+                $validation->setRule("planned_return_date", lang('MY_application.field_loan_planned_return'), "required|later_than_equal_to[{$_POST['date']}]", [
+                    'required' => lang('MY_application.msg_err_no_planned_return_date'),
+                    'later_than_equal_to' => lang('MY_application.msg_err_invalid_planned_date'),
+                ]);
+                $validation->setRule('real_return_date', lang('MY_application.header_loan_real_return'), "later_than_equal_to[{$_POST['date']}]|not_in_future", [
+                    'later_than_equal_to' => lang('MY_application.msg_err_invalid_return_date'),
+                    'not_in_future' => lang('MY_application.msg_err_invalid_return_date'),
+                ]);
+                // To prevent simultaneous loans, the return date must be provided if it already existed
+                if (isset($loan['real_return_date'])) {
+                    $validation->setRule('real_return_date', lang('MY_application.header_loan_real_return'), "required|later_than_equal_to[{$_POST['date']}]|not_in_future", [
+                        'required' => lang('MY_application.msg_err_no_return_date'),
+                        'later_than_equal_to' => lang('MY_application.msg_err_invalid_return_date'),
+                        'not_in_future' => lang('MY_application.msg_err_invalid_return_date'),
+                    ]);
+                }
                 $validation->setRule("borrower_email", lang('MY_application.field_borrower_email'), 'required|valid_email', [
                     'required' => lang('MY_application.msg_err_no_loan_email'),
-                    'valid_email' => lang('MY_application.msg_err_email'),
+                    'valid_email' => lang('MY_application.msg_err_invalid_loan_email'),
                 ]);
                 $validation->setRule("loan_to_user_id", lang('MY_application.field_loan_to_user'), "if_exist|in_list[{$user_ids}]", [
                     'in_list' => lang('MY_application.msg_err_invalid_loan_to'),
@@ -782,7 +837,6 @@ class Item extends BaseController {
 
                 if ($validation->run($_POST) === TRUE) {
                     //Declarations
-
                     $loanArray = $_POST;
 
                     if ($loanArray["real_return_date"] == 0 || $loanArray["real_return_date"] == "0000-00-00" || $loanArray["real_return_date"] == "") {
@@ -795,7 +849,7 @@ class Item extends BaseController {
                     // Execute the changes in the item table
                     $this->loan_model->update($id, $loanArray);
 
-                    return redirect()->to("/item/loans/".$data["item_id"]);
+                    return redirect()->to("/item/loans/".$item["item_id"]);
                 } else {
                     $data['errors'] = $validation->getErrors();
 
@@ -832,6 +886,7 @@ class Item extends BaseController {
             $item = $this->item_model->find($id);
             $item_common = $this->item_common_model->find($item['item_common_id']);
             $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
+            $item['current_loan'] = $this->item_model->getCurrentLoan($item);
             $loans = $this->loan_model->where('item_id', $item['item_id'])->orderBy('date', 'desc')->findAll();
             array_walk($loans, function(&$loan) {
                 $loan['loan_by_user'] = $this->loan_model->get_loaner($loan);
@@ -847,6 +902,7 @@ class Item extends BaseController {
                 }
             });
 
+            $output['title'] = $item_common['name'];
             $output['item'] = $item;
             $output['item_common'] = $item_common;
             $output['loans'] = $loans;
@@ -908,7 +964,7 @@ class Item extends BaseController {
     }
 
     /**
-     * Loads the list of loands
+     * Loads the list of loans
      *
      * @param integer $page
      * @return array
@@ -917,10 +973,13 @@ class Item extends BaseController {
         helper('MY_date');
 
         // Store URL to make possible to come back later (from item detail for example)
-        $_SESSION['items_list_url'] = base_url('item/index/'.$page);
+        $_SESSION['items_list_url'] = base_url('item/list_loans/'.$page);
         if (isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING'])) {
             $_SESSION['items_list_url'] .= '?'.$_SERVER['QUERY_STRING'];
         }
+
+        // Save URL containing search filters
+        $filters_url = urlencode($_SESSION['items_list_url']);
 
         // Add page title
         $title = lang('My_application.page_item_list');
@@ -1004,6 +1063,7 @@ class Item extends BaseController {
                 'pagination' => $pagination,
                 'number_page' => $number_page,
                 'late_loans_count' => $late_loans_count,
+                'filters_url' => $filters_url,
             ];
         } else {
             return [
@@ -1012,6 +1072,7 @@ class Item extends BaseController {
                 'pagination' => null,
                 'number_page' => 0,
                 'late_loans_count' => 0,
+                'filters_url' => $filters_url,
             ];
         }
     }
@@ -1097,50 +1158,85 @@ class Item extends BaseController {
     /**
      * Display a form to register the return of a loan
      * 
-     * @param $id : The id of the concerned loan
+     * @param $id : The ID of the related loan
      */
     public function return_loan($id) {
+        // Get loan object
         $loan = $this->loan_model->find($id);
 
-        if (!is_null($loan)) {
+        // Check if access is granted
+        if (!is_null($loan) &&
+            is_null($loan['real_return_date']) &&
+            isset($_SESSION['logged_in']) &&
+            $_SESSION['logged_in'] == true &&
+            isset($_SESSION['user_id']) &&
+            $this->user_entity_model->check_user_loan_entity($_SESSION['user_id'], $id) &&
+            $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
+
+            // Preparing data for the view
             $item = $this->item_model->find($loan['item_id']);
             $item_common = $this->item_common_model->find($item['item_common_id']);
-            $item['inventory_item_nb'] = $this->item_model->getInventoryNumber($item);
-            $loaner = $this->user_model->withDeleted()->find($loan['loan_by_user_id']);
-    
             $item['inventory_number'] = $this->item_model->getInventoryNumber($item);
-            $data['title'] = lang('MY_application.page_return_loan');
-            $data['loan'] = $loan;
-            $data['item'] = $item;
-            $data['item_common'] = $item_common;
-            $data['loaner'] = $loaner;
-    
-            return $this->display_view('Stock\Views\loan\return', $data);
-        } else {
-            return redirect()->to($_SESSION['_ci_previous_url']);
-        }
-    }
-
-    /**
-     * Save new return date
-     * 
-     * @param $id : The id of the concerned loan
-     */
-    public function save_loan_return_date($id) {
-        // Check if this is allowed
-        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) {
+            $users = $this->user_model->findAll();
 
             $data = [
-                'real_return_date' => $this->request->getVar('real_return_date'),
+                'action'                => 'return',
+                'action_url'            => base_url('item/return_loan/'.$id),
+                'title'                 => lang('MY_application.page_return_loan'). " - " .$item_common['name'],
+                'form_title'            => lang('MY_application.page_return_loan'). " - " .$item_common['name'],
+                'item'                  => $item,
+                'item_common'           => $this->item_common_model->find($item['item_common_id']),
+                'loaner'                => $this->user_model->withDeleted()->find($loan['loan_by_user_id']),
+                'borrower'              => $this->user_model->withDeleted()->find($loan['loan_to_user_id']),
+                'loan_to_user_id'       => $loan['loan_to_user_id'],
+                'borrower_email'        => $loan['borrower_email'],
+                'item_localisation'     => $loan['item_localisation'],
+                'date'                  => $loan['date'],
+                'planned_return_date'   => $loan['planned_return_date'],
+                'real_return_date'      => date('Y-m-d'),
+                'users' => array_map(function($user) {
+                    return [
+                        'id' => $user['id'],
+                        'username' => $user['username'],
+                        'email' => $user['email'],
+                    ];
+                }, $users),
             ];
 
-            //save updated loan data
-            $this->loan_model->update($id, $data);
-        }
+            // Form validation
+            if (!empty($_POST)) {
+                $data['real_return_date'] = $this->request->getVar('real_return_date');
 
-        // Go back to the item_common corresponding to the updated loan
-        $loan = $this->loan_model->find($id);
-        $item = $this->item_model->where('item_id', $loan['item_id'])->first();
-        return redirect()->to(base_url('item_common/view/'.$item['item_common_id']));
+                // Setting rules
+                $validation = \Config\Services::validation();
+
+                $validation->setRule('real_return_date', lang('MY_application.header_loan_real_return'), "required|later_than_equal_to[{$loan['date']}]|not_in_future", [
+                    'required' => lang('MY_application.msg_err_no_return_date'),
+                    'later_than_equal_to' => lang('MY_application.msg_err_invalid_return_date'),
+                    'not_in_future' => lang('MY_application.msg_err_invalid_return_date'),
+                ]);
+
+                // Check if date is valid
+                if ($validation->run($_POST)) {
+                    $loanArray = [
+                        'real_return_date' => $data['real_return_date'],
+                    ];
+                    // Save updated loan data
+                    $this->loan_model->update($id, $loanArray);
+
+                    // Redirect to corresponding item common page
+                    return redirect()->to('/item_common/view/'.$item['item_common_id']);
+                } else {
+                    $data['errors'] = $validation->getErrors();
+
+                    if (isset($_POST['real_return_date'])) {
+                        $data['real_return_date'] = $_POST['real_return_date'];
+                    }
+                }
+            }
+            return $this->display_view('Stock\Views\loan\form', $data);
+        }
+        // Access denied, redirect to previous URL
+        return redirect()->to($_SESSION['_ci_previous_url']);
     }
 }
