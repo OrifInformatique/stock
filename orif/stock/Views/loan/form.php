@@ -99,8 +99,4 @@
     }
 
     $(document).on('change', 'select', set_borrower_email);
-<<<<<<< HEAD
 </script>
-=======
-</script>
->>>>>>> Release-4.4
