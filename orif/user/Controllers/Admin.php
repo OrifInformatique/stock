@@ -66,7 +66,7 @@ class Admin extends BaseController
             'user_types' => $usertypes,
             'with_deleted' => $with_deleted
         );
-        $this->display_view('\User\admin\list_user', $output);
+        return $this->display_view('\User\admin\list_user', $output);
     }
 
     /**
@@ -128,7 +128,7 @@ class Admin extends BaseController
             'errors'        => $this->user_model->errors()==null?[]:$this->user_model->errors()
         );
 
-        $this->display_view('\User\admin\form_user', $output);
+        return $this->display_view('\User\admin\form_user', $output);
     }
 
     /**
@@ -154,7 +154,7 @@ class Admin extends BaseController
                     'user' => $user,
                     'title' => lang('user_lang.title_user_delete')
                 );
-                $this->display_view('\User\admin\delete_user', $output);
+                return $this->display_view('\User\admin\delete_user', $output);
                 break;
             case 1: // Deactivate (soft delete) user
                 if ($_SESSION['user_id'] != $user['id']) {
@@ -218,6 +218,6 @@ class Admin extends BaseController
             'title' => lang('user_lang.title_user_password_reset'),
             'errors' => $this->user_model->errors()==null?[]:$this->user_model->errors()
         );
-        $this->display_view('\User\admin\password_change_user', $output);
+        return $this->display_view('\User\admin\password_change_user', $output);
     }
 }

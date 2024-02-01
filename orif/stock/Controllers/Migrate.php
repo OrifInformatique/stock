@@ -40,7 +40,7 @@ class Migrate extends BaseController
     public function index()
     {
         // Display migration form
-        $this->display_view('\Stock\Views\migration\migration_form');
+        return $this->display_view('\Stock\Views\migration\migration_form');
     }
 
     public function toLatest()

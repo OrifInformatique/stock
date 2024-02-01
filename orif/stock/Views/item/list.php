@@ -98,7 +98,7 @@
                     <?= form_label("&nbsp;") ?>
                 </div>
                 <div class="text-right">
-                    <a href="<?= base_url("item/index/") . "/"?>" class="btn btn-default"><?php echo htmlspecialchars(lang('MY_application.btn_remove_filters')); ?></a>
+                    <a href="<?= base_url("item/index/") . "/"?>" class="btn btn-secondary"><?php echo htmlspecialchars(lang('MY_application.btn_remove_filters')); ?></a>
                     <a href="<?= base_url("item/list_loans/") . "/"?>" id="btn_late_loans" class="btn btn-primary">
                         <?php echo htmlspecialchars(lang('MY_application.btn_to_loans')); ?>
                             <span id="late_loans" class="badge badge-danger"></span>

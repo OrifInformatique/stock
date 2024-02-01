@@ -2,7 +2,7 @@
 /**
  * 403 Access denied error view
  *
- * @author      Orif (ViDi,HeMa)
+ * @author      Orif (ViDi,MoDa)
  * @link        https://github.com/OrifInformatique
  * @copyright   Copyright (c), Orif (https://www.orif.ch)
  */
@@ -31,7 +31,7 @@ http_response_code(403);
 <div id="buttons" class="container">
     <div class="row">
         <div class="col text-right">
-            <a href="<?=$_SESSION['_ci_previous_url']?>" class="btn btn-secondary" ><?=lang('common_lang.btn_back');?></a>
+            <a href="<?=session('_ci_previous_url')?>" class="btn btn-secondary" ><?=lang('common_lang.btn_back');?></a>
         </div>
     </div>
 </div>
