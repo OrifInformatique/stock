@@ -207,21 +207,19 @@ class Item_model extends MyModel
 
     /**
      * Searching item(s) in the database depending on filters
+     * 
      * @param array $filters The array of filters
      * @return array array of corresponding items and items count
      */
-    public function getFiltered($filters, $page) {
+    public function getFiltered($filters, $page): array {
         // Initialize a global query for filtering
-        $queryBuilder = $this->db->table('entity')
-            ->join('item_group', 'item_group.fk_entity_id = entity.entity_id', 'inner')
-            ->join('stocking_place', 'stocking_place.fk_entity_id = entity.entity_id', 'inner')
-            ->join('item_common', 'item_common.item_group_id = item_group.item_group_id', 'inner')
+        $queryBuilder = $this->join('item_common', 'item.item_common_id = item_common.item_common_id', 'inner')
             ->join('item_tag_link', 'item_tag_link.item_common_id = item_common.item_common_id', 'inner')
-            ->join('item', 'item.stocking_place_id = stocking_place.stocking_place_id AND item.item_common_id = item_common.item_common_id', 'inner');
+            ->join('item_group', 'item_common.item_group_id = item_group.item_group_id', 'inner');
 
         // Entity filter
         if (isset($filters['e']) && $filters['e'] != 0) {
-            $queryBuilder->where('entity_id', $filters['e']);
+            $queryBuilder->where('item_group.fk_entity_id', $filters['e']);
         }
 
         // Text search filter
@@ -293,14 +291,41 @@ class Item_model extends MyModel
             $orderByField = 'item_common.name';
         }
 
-        // Order by filter
+        // Order by filter  
         if (isset($filters['ad'])) {
             $orderBy = $filters['ad'] === '0' ? 'ASC' : 'DESC';
         } else {
             $orderBy = 'ASC';
         }
 
+        $queryBuilder->select('item.item_id,
+        item_common.item_common_id,
+        item_common.name,
+        item_common.description,
+        item_common.image,
+        item_common.linked_file,
+        GROUP_CONCAT(item_tag_link.item_tag_id),
+        item.inventory_prefix,
+        item.serial_number,
+        item.buying_price,
+        item.buying_date,
+        item.warranty_duration,
+        item.remarks,
+        item.supplier_id,
+        item.supplier_ref,
+        item.created_by_user_id,
+        item.created_date,
+        item.modified_by_user_id,
+        item.modified_date,
+        item.checked_by_user_id,
+        item.checked_date,
+        item.stocking_place_id,
+        item.item_condition_id,
+        item_group.item_group_id,
+        item_group.fk_entity_id');
+
         $queryBuilder->orderBy($orderByField, $orderBy);
+        $queryBuilder->groupBy('item.item_id');
 
         // Count and get paginated items
         $itemsPerPage = config('\Stock\Config\StockConfig')->items_per_page;
