@@ -214,7 +214,7 @@ class Item_model extends MyModel
     public function getFiltered($filters, $page): array {
         // Initialize a global query for filtering
         $queryBuilder = $this->join('item_common', 'item.item_common_id = item_common.item_common_id', 'inner')
-            ->join('item_tag_link', 'item_tag_link.item_common_id = item_common.item_common_id', 'inner')
+            ->join('item_tag_link', 'item_tag_link.item_common_id = item_common.item_common_id', 'left')
             ->join('item_group', 'item_common.item_group_id = item_group.item_group_id', 'inner');
 
         // Entity filter
@@ -224,30 +224,7 @@ class Item_model extends MyModel
 
         // Text search filter
         if (isset($filters['ts']) && $filters['ts'] != '') {
-            $textSearch = esc($filters['ts']);
-            $parts = explode('.', $textSearch);
-            $lastPart = end($parts);
-            $inventoryNumber = '';
-            $whereCondition = "(item_common.description LIKE '%{$textSearch}%' OR item_common.name LIKE '%{$textSearch}%' OR item.serial_number LIKE '%{$textSearch}%')";
-
-            if (is_numeric($lastPart)) {
-                for ($i = 0; $i < count($parts) - 1; $i++) {
-                    if ($i > 0) {
-                        $inventoryNumber .= '.';
-                    }
-                    $inventoryNumber .= $parts[$i];
-                }
-
-                if ($inventoryNumber !== '') {
-                    $whereCondition .= " OR item.item_id = {$lastPart} AND item.inventory_prefix LIKE '%{$inventoryNumber}%'";
-                } else {
-                    $whereCondition .= " OR item.item_id = {$lastPart}";
-                }
-            } else {
-                $whereCondition .= " OR item.inventory_prefix LIKE '%{$textSearch}%'";
-            }
-
-            // Bind the parameters to the query
+            $whereCondition = $this->getTextSearchFilter(esc($filters['ts']));
             $queryBuilder->where($whereCondition);
         }
 
@@ -271,58 +248,22 @@ class Item_model extends MyModel
             $queryBuilder->whereIn('item_tag_link.item_tag_id', $filters['t']);
         }
 
-        // Order by field filter
-        if (isset($filters['o'])) {
-            switch ($filters['o']) {
-                case '1':
-                    $orderByField = 'item.stocking_place_id';
-                    break;
-                case '2':
-                    $orderByField = 'item.buying_date';
-                    break;
-                case '3':
-                    $orderByField = 'item.inventory_prefix';
-                    break;
-                default:
-                    $orderByField = 'item_common.name';
-                    break;
-            }
-        } else {
-            $orderByField = 'item_common.name';
-        }
+        // Select fields manually to prevent ambiguous data
+        $queryBuilder->select('
+            item.item_id,
+            item_common.item_common_id,
+            item_common.name,
+            item_common.description,
+            item_common.image,
+            GROUP_CONCAT(item_tag_link.item_tag_id),
+            item.inventory_prefix,
+            item.serial_number,
+            item.stocking_place_id,
+            item.item_condition_id,
+        ');
 
-        // Order by filter  
-        if (isset($filters['ad'])) {
-            $orderBy = $filters['ad'] === '0' ? 'ASC' : 'DESC';
-        } else {
-            $orderBy = 'ASC';
-        }
-
-        $queryBuilder->select('item.item_id,
-        item_common.item_common_id,
-        item_common.name,
-        item_common.description,
-        item_common.image,
-        item_common.linked_file,
-        GROUP_CONCAT(item_tag_link.item_tag_id),
-        item.inventory_prefix,
-        item.serial_number,
-        item.buying_price,
-        item.buying_date,
-        item.warranty_duration,
-        item.remarks,
-        item.supplier_id,
-        item.supplier_ref,
-        item.created_by_user_id,
-        item.created_date,
-        item.modified_by_user_id,
-        item.modified_date,
-        item.checked_by_user_id,
-        item.checked_date,
-        item.stocking_place_id,
-        item.item_condition_id,
-        item_group.item_group_id,
-        item_group.fk_entity_id');
+        $orderByField = isset($filters['o']) ? $this->getOrderByField($filters['o']) : config('\Stock\Config\StockConfig')->default_order_by_field;
+        $orderBy = isset($filters['ad']) && $filters['ad'] === '0' ? 'ASC' : 'DESC';
 
         $queryBuilder->orderBy($orderByField, $orderBy);
         $queryBuilder->groupBy('item.item_id');
@@ -342,10 +283,62 @@ class Item_model extends MyModel
             $item['image_path'] = $this->item_common_model->getImagePath($item);
         }
 
+        unset($item);
+
         return array(
             'items' => $items,
             'items_count' => $totalItemsCount
         );
+    }
+
+    /**
+     * Get text search condition from the provided string
+     *
+     * @param string $textSearch
+     * @return string
+     */
+    private function getTextSearchFilter(string $textSearch): string {
+        $parts = explode('.', $textSearch);
+        $lastPart = end($parts);
+        $whereConditions = [
+            "item_common.description LIKE '%{$textSearch}%'",
+            "item_common.name LIKE '%{$textSearch}%'",
+            "item.serial_number LIKE '%{$textSearch}%'",
+        ];
+
+        if (is_numeric($lastPart)) {
+            $inventoryNumber = implode('.', array_slice($parts, 0, -1));
+
+            if ($inventoryNumber !== '') {
+                $whereConditions[] = "item.item_id = {$lastPart} AND item.inventory_prefix LIKE '%{$inventoryNumber}%'";
+            } else {
+                $whereConditions[] = "item.item_id = {$lastPart}";
+            }
+        } else {
+            $whereConditions[] = "item.inventory_prefix LIKE '%{$textSearch}%'";
+        }
+
+        // Combine conditions with OR
+        return '(' . implode(' OR ', $whereConditions) . ')';
+    }
+
+    /**
+     * Get order by field from the provided filter value
+     *
+     * @param string $filter
+     * @return string
+     */
+    private function getOrderByField(string $filter): string {
+        switch ($filter) {
+            case '1':
+                return 'item.stocking_place_id';
+            case '2':
+                return 'item.buying_date';
+            case '3':
+                return 'item.inventory_prefix';
+            default:
+                return config('\Stock\Config\StockConfig')->default_order_by_field;
+        }
     }
 
 
