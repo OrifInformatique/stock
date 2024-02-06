@@ -263,7 +263,7 @@ class Item_model extends MyModel
         ');
 
         $orderByField = isset($filters['o']) ? $this->getOrderByField($filters['o']) : config('\Stock\Config\StockConfig')->default_order_by_field;
-        $orderBy = isset($filters['ad']) && $filters['ad'] === '0' ? 'ASC' : 'DESC';
+        $orderBy = !isset($filters['ad']) ? 'ASC' : ($filters['ad'] === '0' ? 'ASC': 'DESC');
 
         $queryBuilder->orderBy($orderByField, $orderBy);
         $queryBuilder->groupBy('item.item_id');
