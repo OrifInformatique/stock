@@ -74,7 +74,7 @@ class Item_model extends MyModel
      */
     public function getFutureId()
     {
-        $this->db->query("SET information_schema_stats_expiry = 0");
+        $this->db->query("ANALYZE TABLE item");
         $query = $this->db->query("SHOW TABLE STATUS LIKE 'item'");
         $row = $query->getRow();
         $nextId = $row->Auto_increment;

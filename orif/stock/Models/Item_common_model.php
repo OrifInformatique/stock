@@ -70,7 +70,7 @@ class Item_common_model extends MyModel
 
     public function getFutureId()
     {
-        $this->db->query("SET information_schema_stats_expiry = 0");
+        $this->db->query("ANALYZE TABLE item_common");
         $query = $this->db->query("SHOW TABLE STATUS LIKE 'item_common'");
         $row = $query->getRow();
         $nextId = $row->Auto_increment;
