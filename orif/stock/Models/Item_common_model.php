@@ -59,12 +59,22 @@ class Item_common_model extends MyModel
     {
         $this->item_group_model = new Item_group_model();
         $this->item_tag_link_model = new Item_tag_link_model();
+        $this->db = \Config\Database::connect();
     }
 
     public function getItemGroup($item_common)
     {
         $itemGroup = $this->item_group_model->asArray()->where(["item_group_id" => $item_common['item_group_id']])->first();
         return $itemGroup;
+    }
+
+    public function getFutureId()
+    {
+        $this->db->query("SET information_schema_stats_expiry = 0");
+        $query = $this->db->query("SHOW TABLE STATUS LIKE 'item_common'");
+        $row = $query->getRow();
+        $nextId = $row->Auto_increment;
+        return $nextId;
     }
 
     public function getTags($item_common)

@@ -279,6 +279,7 @@ class Item extends BaseController {
             $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) 
         {
             if (!is_null($item_common_id)) {
+                $imageId = $item_common_id;
                 $item_common = $this->item_common_model->find($item_common_id);
 
                 if (is_null($item_common)) {
@@ -287,11 +288,13 @@ class Item extends BaseController {
                 } else {
                     $data['item_common'] = $item_common;
                 }
+            } else {
+                // Get new item common id for picture prefix
+                $imageId = $this->item_common_model->getFutureId();
             }
 
-            // Get new item id and set picture_prefix
-            $item_id = $this->item_model->getFutureId();
-            $_SESSION['picture_prefix'] = str_pad($item_id, $this->config->inventory_number_chars, "0", STR_PAD_LEFT);
+            // Set picture_prefix
+            $_SESSION['picture_prefix'] = str_pad($imageId, $this->config->inventory_number_chars, "0", STR_PAD_LEFT);
 
             // Define image path variables
             $temp_image_name = $_SESSION["picture_prefix"].$this->config->image_picture_suffix.$this->config->image_tmp_suffix.$this->config->image_extension;
@@ -455,7 +458,7 @@ class Item extends BaseController {
             $item = $this->item_model->find($item_id);
             $item_common = $this->item_common_model->find($item['item_common_id']);
 
-            $_SESSION['picture_prefix'] = str_pad($item_id, $this->config->inventory_number_chars, "0", STR_PAD_LEFT);
+            $_SESSION['picture_prefix'] = str_pad($item_common['item_common_id'], $this->config->inventory_number_chars, "0", STR_PAD_LEFT);
 
             $validation = $this->set_validation_rules();
 
