@@ -1030,7 +1030,7 @@ class Admin extends BaseController
                     'cb_not_null_user' => lang('user_lang.msg_err_user_not_exist')
                 ],
                 'user_name' => [
-                    'cb_unique_user' => lang('user_lang.msg_err_user_not_unique')
+                    'cb_unique_user' => lang('user_lang.msg_err_username_not_unique')
                 ],
                 'user_usertype' => [
                     'cb_not_null_user_type' => lang('user_lang.msg_err_user_type_not_exist')

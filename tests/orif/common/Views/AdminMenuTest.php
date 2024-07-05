@@ -16,6 +16,7 @@ class AdminMenuTest extends CIUnitTestCase
     protected $migrateOnce = false;
     protected $refresh     = true;
     protected $namespace   = 'User';
+
     protected function setUp(): void
     {
         parent::setUp();
