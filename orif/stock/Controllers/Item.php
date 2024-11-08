@@ -1244,10 +1244,12 @@ class Item extends BaseController {
 
     public function ApiTest() {
         $data = [
-            'id' => 1,
-            'price' => 550.0,
-            'name' => 'Ordinateur portable',
-            'supplier' => 'Digitec'
+            [
+                'id' => 1,
+                'price' => 550.0,
+                'name' => 'Ordinateur portable',
+                'supplier' => 'Digitec'
+            ]
         ];
 
         return $this->respond($data, 200);
