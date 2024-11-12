@@ -36,7 +36,6 @@ use Stock\Models\User_entity_model;
 use Stock\Models\Item_common_model;
 use User\Models\User_model;
 use CodeIgniter\Database\BaseConnection;
-use CodeIgniter\API\ResponseTrait;
 
 class Item extends BaseController {
 
@@ -57,7 +56,6 @@ class Item extends BaseController {
     protected Item_common_model $item_common_model;
     protected $config;
     protected BaseConnection $db;
-    use ResponseTrait;
 
     /**
      * Constructor
@@ -1240,18 +1238,5 @@ class Item extends BaseController {
         }
         // Access denied, redirect to previous URL
         return redirect()->to($_SESSION['_ci_previous_url']);
-    }
-
-    public function ApiTest() {
-        $data = [
-            [
-                'id' => 1,
-                'price' => 550.0,
-                'name' => 'Ordinateur portable',
-                'supplier' => 'Digitec'
-            ]
-        ];
-
-        return $this->respond($data, 200);
     }
 }
