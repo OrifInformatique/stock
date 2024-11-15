@@ -5,9 +5,9 @@ namespace Stock\Controllers;
 /**
  * A controller for items API endpoints
  *
- * @author      Orif (ViDi)
+ * @author      Orif (PeDi)
  * @link        https://github.com/OrifInformatique
- * @copyright   Copyright (c) 2016, Orif <http://www.orif.ch>
+ * @copyright   Copyright (c) 2024, Orif <http://www.orif.ch>
  */
 
 use CodeIgniter\HTTP\RequestInterface;
@@ -50,14 +50,20 @@ class API extends BaseController
         $this->db = \Config\Database::connect();
     }
 
-    public function show_item($id = 0)
+    /**
+     * Endpoint containing item information
+     * 
+     * @param integer $id : The ID of the item
+     * @return void
+     */
+    public function show($id = 0)
     {
+        $data = ['item' => null];
+
         // Get database entity
         $item = $this->item_model->find($id);
 
         // Get data for endpoint
-        $data = ['item' => null];
-
         if ($item) {
             $inventory_nb = $this->item_model->getInventoryNumber($item);
 
@@ -107,6 +113,10 @@ class API extends BaseController
                 ];
             }
 
+            $warranty_status_i = $this->item_model->getWarrantyStatus($item);
+            $warranty_status = lang(
+                'MY_application.text_warranty_status')[$warranty_status_i];
+
             $supplier = $this->item_model->getSupplier($item);
             $supplier = $supplier ? $supplier['name'] : null;
 
@@ -124,6 +134,7 @@ class API extends BaseController
                     'buying_price'      => $item['buying_price'],
                     'buying_date'       => $item['buying_date'],
                     'warranty_duration' => $item['warranty_duration'],
+                    'warranty_status'   => $warranty_status,
                     'remarks'           => $item['remarks'],
                     'supplier'          => $supplier,
                     'supplier_ref'      => $item['supplier_ref'],
@@ -137,14 +148,22 @@ class API extends BaseController
         return $this->respond($data, 200);
     }
 
+    /**
+     * Endpoint containing item common information
+     * 
+     * @param integer $id : The ID of the item
+     * @return void
+     */
     public function show_item_common($id = 0)
     {
-        // Get database entity
-        $item_common = $this->item_common_model->find($id);
-
-        // Get data for endpoint
         $data = ['item_common' => null];
 
+        // Get database entities
+        $item = $this->item_model->find($id);
+        if ($item) $item_common = $this->item_common_model
+            ->find($item['item_common_id']);
+
+        // Get data for endpoint
         if ($item_common) {
             $item_group = $this->item_common_model->getItemGroup($item_common);
             $group = $item_group ? $item_group['name'] : null;
@@ -171,7 +190,7 @@ class API extends BaseController
             // Data to send
             $data = [
                 'item_common' => [
-                    'id'            => $id,
+                    'id'            => $item_common['item_common_id'],
                     'name'          => $item_common['name'],
                     'image_path'    => $image_path,
                     'description'   => $item_common['description'],
@@ -184,5 +203,15 @@ class API extends BaseController
 
         // API Response
         return $this->respond($data, 200);
+    }
+
+    /**
+     * Endpoint containing loan and control history information of an item
+     * 
+     * @param integer $id : The ID of the item
+     * @return void
+     */
+    public function show_history($id) {
+
     }
 }
