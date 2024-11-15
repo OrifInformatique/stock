@@ -19,6 +19,7 @@ use Stock\Models\Item_model;
 use Stock\Models\Loan_model;
 use Stock\Models\Item_condition_model;
 use Stock\Models\Item_common_model;
+use Stock\Models\Entity_model;
 use \DateInterval;
 use \DateTime;
 
@@ -42,6 +43,7 @@ class API extends BaseController
         $this->loan_model = new Loan_model();
         $this->item_condition_model = new Item_condition_model();
         $this->item_common_model = new Item_common_model();
+        $this->entity_model = new Entity_model();
         $this->config = config('\Stock\Config\StockConfig');
 
         // Initialize db for query builder
@@ -57,21 +59,24 @@ class API extends BaseController
         $data = ['item' => null];
 
         if ($item) {
-            $inventory_nb = $this->item_model->geTInventoryNumber($item);
+            $inventory_nb = $this->item_model->getInventoryNumber($item);
+
             $condition = $this->item_condition_model
-                ->find($item['item_condition_id'])['name'];
-    
-            $loan = $this->loan_model->where('item_id', $id)
+                ->find($item['item_condition_id']);
+            $condition = $condition ? $condition['name'] : null;
+
+            $loan = $this->loan_model
+                ->where('item_id', $id)
                 ->where('real_return_date', null, false)
                 ->first();
-    
+
             $current_loan = [
                 'state' => lang('MY_application.lbl_loan_status_not_loaned'),
                 'borrower_email'        => null,
                 'item_localisation'     => null,
                 'planned_return_date'   => null,
             ];
-    
+
             // Check if there is a current loan
             if (!is_null($loan)) {
                 $current_loan = [
@@ -80,26 +85,34 @@ class API extends BaseController
                     'item_localisation'     => $loan['item_localisation'],
                     'planned_return_date'   => $loan['planned_return_date'],
                 ];
-    
+
                 // Check if current loan is late
                 $end = new DateTime($loan['planned_return_date']);
                 $now = new DateTime();
-                
+
                 if ($end < $now) {
                     $current_loan['state'] =
                         lang('MY_application.lbl_loan_status_late');
                 }
             }
-    
-            $supplier = $this->item_model->getSupplier($item)['name'];
-            $stocking_place = $this->item_model->getStockingPlace($item)['name'];
+
             $control = $this->item_model->getLastInventoryControl($item);
-            $last_control = [
-                'date'          => $control['date'],
-                'controller'    => $control['controller']['username'],
-                'remarks'       => $control['remarks'],
-            ];
-    
+            $last_control = null;
+
+            if ($control) {
+                $last_control = [
+                    'date'          => $control['date'],
+                    'controller'    => $control['controller']['username'],
+                    'remarks'       => $control['remarks'],
+                ];
+            }
+
+            $supplier = $this->item_model->getSupplier($item);
+            $supplier = $supplier ? $supplier['name'] : null;
+
+            $stocking_place = $this->item_model->getStockingPlace($item);
+            $stocking_place = $stocking_place ? $stocking_place['name'] : null;
+
             // Data to send
             $data = [
                 'item' => [
@@ -126,14 +139,50 @@ class API extends BaseController
 
     public function show_item_common($id = 0)
     {
-        $item_common = $item_common_model->find($id);
+        // Get database entity
+        $item_common = $this->item_common_model->find($id);
 
-        $data = [
-            'item_common' => [
-                'id'=> $id,
-            ]
-        ];
+        // Get data for endpoint
+        $data = ['item_common' => null];
 
+        if ($item_common) {
+            $item_group = $this->item_common_model->getItemGroup($item_common);
+            $group = $item_group ? $item_group['name'] : null;
+
+            $image_path = base_url() . $this->item_common_model
+                ->getImagePath($item_common);
+
+            $entity = $this->entity_model
+                ->where('entity_id', $item_group['fk_entity_id'])
+                ->first();
+            $entity = $entity ? $entity['name'] : null;
+
+            $tags = $this->item_common_model->getTags($item_common);
+
+            if (!empty($tags)) {
+                foreach ($tags as &$tag) {
+                    $tag = $tag[0]['name'];
+                }
+                unset($tag);
+            } else {
+                $tags = null;
+            }
+
+            // Data to send
+            $data = [
+                'item_common' => [
+                    'id'            => $id,
+                    'name'          => $item_common['name'],
+                    'image_path'    => $image_path,
+                    'description'   => $item_common['description'],
+                    'group'         => $group,
+                    'entity'        => $entity,
+                    'tags'          => $tags,
+                ]
+            ];
+        }
+
+        // API Response
         return $this->respond($data, 200);
     }
 }
