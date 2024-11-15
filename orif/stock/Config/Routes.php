@@ -14,7 +14,9 @@ $routes->add('stock/export_excel/(:any)','\Stock\Controllers\ExcelExport::$1');
 $routes->add('stock/item/has_items/(:any)/(:any)','\Stock\Controllers\Item::has_items/$1/$2');
 $routes->add('item/(:any)', '\Stock\Controllers\Item::$1');
 $routes->add('item_common/(:any)', '\Stock\Controllers\ItemCommon::$1');
-$routes->add('items/(:num)', '\Stock\Controllers\API\Item_API::show/$1');
 $routes->add('picture/(:any)', '\Stock\Controllers\Picture::$1');
+
+$routes->get('api/items/(:num)', '\Stock\Controllers\API::show_item/$1');
+$routes->get('api/items_common/(:num)', '\Stock\Controllers\API::show_item_common/$1');
 
 ?>

@@ -11,7 +11,7 @@ class Cors implements FilterInterface
     public function before(RequestInterface $request, $arguments = null)
     {
         if ($request->getMethod() === 'options') {
-            header('Access-Control-Allow-Origin: http://localhost:4000');
+            header('Access-Control-Allow-Origin: *');
 
             exit;
         }
@@ -20,6 +20,6 @@ class Cors implements FilterInterface
     public function after(RequestInterface $request,
         ResponseInterface $response, $arguments = null)
     {
-        $response->setHeader('Access-Control-Allow-Origin', 'http://localhost:4000');
+        $response->setHeader('Access-Control-Allow-Origin', '*');
     }
 }
