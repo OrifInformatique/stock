@@ -20,6 +20,7 @@ use Stock\Models\Loan_model;
 use Stock\Models\Item_condition_model;
 use Stock\Models\Item_common_model;
 use Stock\Models\Entity_model;
+use Stock\Models\Inventory_control_model;
 use \DateInterval;
 use \DateTime;
 
@@ -44,6 +45,7 @@ class API extends BaseController
         $this->item_condition_model = new Item_condition_model();
         $this->item_common_model = new Item_common_model();
         $this->entity_model = new Entity_model();
+        $this->inventory_control_model = new Inventory_control_model();
         $this->config = config('\Stock\Config\StockConfig');
 
         // Initialize db for query builder
@@ -54,7 +56,7 @@ class API extends BaseController
      * Endpoint containing item information
      * 
      * @param integer $id : The ID of the item
-     * @return void
+     * @return CodeIgniter\HTTP\Response
      */
     public function show($id = 0)
     {
@@ -152,7 +154,7 @@ class API extends BaseController
      * Endpoint containing item common information
      * 
      * @param integer $id : The ID of the item
-     * @return void
+     * @return CodeIgniter\HTTP\Response
      */
     public function show_item_common($id = 0)
     {
@@ -209,9 +211,71 @@ class API extends BaseController
      * Endpoint containing loan and control history information of an item
      * 
      * @param integer $id : The ID of the item
-     * @return void
+     * @return CodeIgniter\HTTP\Response
      */
-    public function show_history($id) {
+    public function show_history($id = 0)
+    {
+        $data = [
+            'loans_history'     => null,
+            'controls_history'  => null,
+        ];
 
+        // Get database entity
+        $item = $this->item_model->find($id);
+        if ($item) {
+            $loans = $this->loan_model
+                ->where('item_id', $id)
+                ->findAll();
+            $controls = $this->inventory_control_model
+                ->where('item_id', $id)
+                ->findAll();
+        }
+
+        // Get loans data for endpoint
+        if (!empty($loans)) {
+            $data['loans_history'] = array();
+
+            foreach ($loans as $loan) {
+                // Preparing data
+                $loaner = $this->loan_model->get_loaner($loan);
+                $loaner = $loaner ? $loaner['username'] : null;
+
+                $borrower_info = [
+                    'username'  => null,
+                    'email'     => $loan['borrower_email'],
+                ];
+
+                if ($loan['loan_to_user_id']) {
+                    $borrower = $this->loan_model->get_borrower($loan);
+                    $borrower_info['username'] = $borrower
+                        ? $borrower['username'] : null;
+                }
+
+                // Data to send
+                $loan_data = [
+                    'date'                  => $loan['date'],
+                    'planned_return_date'   => $loan['planned_return_date'],
+                    'real_return_date'      => $loan['real_return_date'],
+                    'item_location'         => $loan['item_localisation'],
+                    'lent_by'               => $loaner,
+                    'borrower'              => $borrower_info,
+                ];
+
+                array_push($data['loans_history'], $loan_data);
+            }
+        }
+
+        // Get controls data for endpoint
+        if (!empty($controls)) {
+            
+
+            // Data to send
+            $data['controls_history'] = [
+
+            ];
+        }
+
+        // API Response
+        return $this->respond($data, 200);
     }
 }

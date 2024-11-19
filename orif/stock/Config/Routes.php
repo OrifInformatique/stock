@@ -18,5 +18,6 @@ $routes->add('picture/(:any)', '\Stock\Controllers\Picture::$1');
 
 $routes->get('api/items/(:num)', '\Stock\Controllers\API::show/$1');
 $routes->get('api/items/(:num)/item_common', '\Stock\Controllers\API::show_item_common/$1');
+$routes->get('api/items/(:num)/history', '\Stock\Controllers\API::show_history/$1');
 
 ?>
