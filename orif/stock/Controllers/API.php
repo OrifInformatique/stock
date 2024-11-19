@@ -34,9 +34,7 @@ class API extends BaseController
     public function initController(RequestInterface $request,
         ResponseInterface $response, LoggerInterface $logger)
     {
-        // Set Access level before calling parent constructor
-        // Accessibility reserved to admin users
-        $this->access_level = "*";
+        // Call parent constructor
         parent::initController($request, $response, $logger);
 
         // Load required models 
@@ -46,10 +44,6 @@ class API extends BaseController
         $this->item_common_model = new Item_common_model();
         $this->entity_model = new Entity_model();
         $this->inventory_control_model = new Inventory_control_model();
-        $this->config = config('\Stock\Config\StockConfig');
-
-        // Initialize db for query builder
-        $this->db = \Config\Database::connect();
     }
 
     /**
@@ -267,12 +261,23 @@ class API extends BaseController
 
         // Get controls data for endpoint
         if (!empty($controls)) {
-            
+            $data['controls_history'] = array();
 
-            // Data to send
-            $data['controls_history'] = [
+            foreach ($controls as $control) {
+                // Preparing data
+                $controller = $this->inventory_control_model
+                    ->getUser($control['controller_id']);
+                $controller = $controller ? $controller['username'] : null;
 
-            ];
+                // Data to send
+                $control_data = [
+                    'date'          => $control['date'],
+                    'controller'    => $controller,
+                    'remarks'       => $control['remarks'],
+                ];
+
+                array_push($data['controls_history'], $control_data);
+            }
         }
 
         // API Response
