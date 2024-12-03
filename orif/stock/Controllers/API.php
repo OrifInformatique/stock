@@ -76,21 +76,21 @@ class API extends BaseController
                 ->first();
 
             $current_loan = [
-                'loan_id'           => null,
+                'loan_id'               => null,
                 'status' => lang('MY_application.lbl_loan_status_not_loaned'),
-                'borrower_email'    => null,
-                'item_location'     => null,
-                'planned_return'    => null,
+                'borrower_email'        => null,
+                'item_localisation'     => null,
+                'planned_return_date'   => null,
             ];
 
             // Check if there is a current loan
             if (!is_null($loan)) {
                 $current_loan = [
-                    'loan_id'           => $loan['loan_id'],
+                    'loan_id'               => $loan['loan_id'],
                     'status' => lang('MY_application.lbl_loan_status_loaned'),
-                    'borrower_email'    => $loan['borrower_email'],
-                    'item_location'     => $loan['item_localisation'],
-                    'planned_return'    => $loan['planned_return_date'],
+                    'borrower_email'        => $loan['borrower_email'],
+                    'item_localisation'     => $loan['item_localisation'],
+                    'planned_return_date'   => $loan['planned_return_date'],
                 ];
 
                 // Check if current loan is late
@@ -104,13 +104,13 @@ class API extends BaseController
             }
 
             $supplier = $this->item_model->getSupplier($item);
-            $supplier = $supplier ? array(
+            $supplier_info = $supplier ? array(
                 'supplier_id'   => $supplier['supplier_id'],
                 'name'          => $supplier['name'],
             ) : null;
 
             $stocking_place = $this->item_model->getStockingPlace($item);
-            $stocking_place = $stocking_place ? array(
+            $stocking_place_info = $stocking_place ? array(
                 'stocking_place_id' => $stocking_place['stocking_place_id'],
                 'name'              => $stocking_place['name'],
             ) : null;
@@ -125,11 +125,11 @@ class API extends BaseController
                 $last_control = [
                     'inventory_control_id'  => $control['inventory_control_id'],
                     'date'                  => $control['date'],
+                    'remarks'               => $control['remarks'],
                     'controller' => [
-                        'controller_id' => $controller['id'],
-                        'username'      => $controller['username'],
+                        'id'        => $controller['id'],
+                        'username'  => $controller['username'],
                     ],
-                    'remarks' => $control['remarks'],
                 ];
             }
 
@@ -137,8 +137,8 @@ class API extends BaseController
             $item['warranty_status'] = $warranty_status;
             $item['condition'] = $condition;
             $item['current_loan'] = $current_loan;
-            $item['supplier'] = $supplier;
-            $item['stocking_place'] = $stocking_place;
+            $item['supplier'] = $supplier_info;
+            $item['stocking_place'] = $stocking_place_info;
             $item['last_control'] = $last_control;
 
             // Data to send
@@ -167,16 +167,16 @@ class API extends BaseController
             $image_path = base_url() . $this->item_common_model
                 ->getImagePath($item_common);
 
-            $item_group = $this->item_common_model->getItemGroup($item_common);
-            $group = $item_group ? array(
-                'item_group_id' => $item_group['item_group_id'],
-                'name'          => $item_group['name'],
+            $group = $this->item_common_model->getItemGroup($item_common);
+            $group_info = $group ? array(
+                'item_group_id' => $group['item_group_id'],
+                'name'          => $group['name'],
             ) : null;
 
             $entity = $this->entity_model
-                ->where('entity_id', $item_group['fk_entity_id'])
+                ->where('entity_id', $group['fk_entity_id'])
                 ->first();
-            $entity = $entity ? array(
+            $entity_info = $entity ? array(
                 'entity_id' => $entity['entity_id'],
                 'name'      => $entity['name'],
             ) : null;
@@ -196,8 +196,8 @@ class API extends BaseController
             }
 
             $item_common['image_path'] = $image_path;
-            $item_common['group'] = $group;
-            $item_common['entity'] = $entity;
+            $item_common['group'] = $group_info;
+            $item_common['entity'] = $entity_info;
             $item_common['tags'] = $tags;
 
             // Data to send
@@ -217,8 +217,11 @@ class API extends BaseController
     public function show_item_history($id = 0)
     {
         $data = [
-            'loans_history'     => null,
-            'controls_history'  => null,
+            'history' => [
+                'item_id'   => $id,
+                'loans'     => null,
+                'controls'  => null,
+            ]
         ];
 
         // Get database entity
@@ -234,58 +237,51 @@ class API extends BaseController
 
         // Get loans data for endpoint
         if (!empty($loans)) {
-            $data['loans_history'] = array();
+            $data['history']['loans'] = array();
 
             foreach ($loans as $loan) {
                 // Preparing data
                 $loaner = $this->loan_model->get_loaner($loan);
-                $loaner = $loaner ? $loaner['username'] : null;
+                $loaner_info = $loaner ? array(
+                    'id'        => $loaner['id'],
+                    'username'  => $loaner['username'],
+                ) : null;
 
-                $borrower_info = [
-                    'username'  => null,
-                    'email'     => $loan['borrower_email'],
-                ];
+                $borrower_info = null;
 
                 if ($loan['loan_to_user_id']) {
                     $borrower = $this->loan_model->get_borrower($loan);
-                    $borrower_info['username'] = $borrower
-                        ? $borrower['username'] : null;
+                    $borrower_info = $borrower ? array(
+                        'id'        => $borrower['id'],
+                        'username'  => $borrower['username'],
+                    ) : null;
                 }
 
-                // Data to send
-                $loan_data = [
-                    'id'                => $loan['loan_id'],
-                    'date'              => $loan['date'],
-                    'planned_return'    => $loan['planned_return_date'],
-                    'real_return'       => $loan['real_return_date'],
-                    'item_location'     => $loan['item_localisation'],
-                    'lent_by'           => $loaner,
-                    'borrower'          => $borrower_info,
-                ];
+                $loan['loaner'] = $loaner_info;
+                $loan['borrower'] = $borrower_info;
 
-                array_push($data['loans_history'], $loan_data);
+                // Data to send
+                array_push($data['history']['loans'], $loan);
             }
         }
 
         // Get controls data for endpoint
         if (!empty($controls)) {
-            $data['controls_history'] = array();
+            $data['history']['controls'] = array();
 
             foreach ($controls as $control) {
                 // Preparing data
                 $controller = $this->inventory_control_model
                     ->getUser($control['controller_id']);
-                $controller = $controller ? $controller['username'] : null;
+                $controller_info = $controller ? array(
+                    'id'            => $controller['id'],
+                    'username'      => $controller['username'],
+                ) : null;
+
+                $control['controller'] = $controller_info;
 
                 // Data to send
-                $control_data = [
-                    'id'            => $control['inventory_control_id'],
-                    'date'          => $control['date'],
-                    'controller'    => $controller,
-                    'remarks'       => $control['remarks'],
-                ];
-
-                array_push($data['controls_history'], $control_data);
+                array_push($data['history']['controls'], $control);
             }
         }
 
