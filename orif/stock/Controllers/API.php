@@ -164,40 +164,44 @@ class API extends BaseController
 
         // Get data for endpoint
         if ($item_common) {
-            $item_group = $this->item_common_model->getItemGroup($item_common);
-            $group = $item_group ? $item_group['name'] : null;
-
             $image_path = base_url() . $this->item_common_model
                 ->getImagePath($item_common);
+
+            $item_group = $this->item_common_model->getItemGroup($item_common);
+            $group = $item_group ? array(
+                'item_group_id' => $item_group['item_group_id'],
+                'name'          => $item_group['name'],
+            ) : null;
 
             $entity = $this->entity_model
                 ->where('entity_id', $item_group['fk_entity_id'])
                 ->first();
-            $entity = $entity ? $entity['name'] : null;
+            $entity = $entity ? array(
+                'entity_id' => $entity['entity_id'],
+                'name'      => $entity['name'],
+            ) : null;
 
             $tags = $this->item_common_model->getTags($item_common);
 
             if (!empty($tags)) {
                 foreach ($tags as &$tag) {
-                    $tag = $tag[0]['name'];
+                    $tag = array(
+                        'item_tag_id'   => $tag[0]['item_tag_id'],
+                        'name'          => $tag[0]['name'],
+                    );
                 }
                 unset($tag);
             } else {
                 $tags = null;
             }
 
+            $item_common['image_path'] = $image_path;
+            $item_common['group'] = $group;
+            $item_common['entity'] = $entity;
+            $item_common['tags'] = $tags;
+
             // Data to send
-            $data = [
-                'item_common' => [
-                    'id'            => $item_common['item_common_id'],
-                    'name'          => $item_common['name'],
-                    'image_path'    => $image_path,
-                    'description'   => $item_common['description'],
-                    'group'         => $group,
-                    'entity'        => $entity,
-                    'tags'          => $tags,
-                ]
-            ];
+            $data['item_common'] = $item_common;
         }
 
         // API Response
