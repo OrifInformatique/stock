@@ -52,7 +52,7 @@ class API extends BaseController
      * @param integer $id : The ID of the item
      * @return CodeIgniter\HTTP\Response
      */
-    public function show($id = 0)
+    public function show_item($id = 0)
     {
         $data = ['item' => null];
 
@@ -63,9 +63,12 @@ class API extends BaseController
         if ($item) {
             $inventory_nb = $this->item_model->getInventoryNumber($item);
 
+            $warranty_status_i = $this->item_model->getWarrantyStatus($item);
+            $warranty_status = lang(
+                'MY_application.text_warranty_status')[$warranty_status_i];
+
             $condition = $this->item_condition_model
                 ->find($item['item_condition_id']);
-            $condition = $condition ? $condition['name'] : null;
 
             $loan = $this->loan_model
                 ->where('item_id', $id)
@@ -73,19 +76,21 @@ class API extends BaseController
                 ->first();
 
             $current_loan = [
-                'state' => lang('MY_application.lbl_loan_status_not_loaned'),
-                'borrower_email'        => null,
-                'item_localisation'     => null,
-                'planned_return_date'   => null,
+                'loan_id'           => null,
+                'status' => lang('MY_application.lbl_loan_status_not_loaned'),
+                'borrower_email'    => null,
+                'item_location'     => null,
+                'planned_return'    => null,
             ];
 
             // Check if there is a current loan
             if (!is_null($loan)) {
                 $current_loan = [
-                    'state' => lang('MY_application.lbl_loan_status_loaned'),
-                    'borrower_email'        => $loan['borrower_email'],
-                    'item_localisation'     => $loan['item_localisation'],
-                    'planned_return_date'   => $loan['planned_return_date'],
+                    'loan_id'           => $loan['loan_id'],
+                    'status' => lang('MY_application.lbl_loan_status_loaned'),
+                    'borrower_email'    => $loan['borrower_email'],
+                    'item_location'     => $loan['item_localisation'],
+                    'planned_return'    => $loan['planned_return_date'],
                 ];
 
                 // Check if current loan is late
@@ -93,51 +98,51 @@ class API extends BaseController
                 $now = new DateTime();
 
                 if ($end < $now) {
-                    $current_loan['state'] =
+                    $current_loan['status'] =
                         lang('MY_application.lbl_loan_status_late');
                 }
             }
+
+            $supplier = $this->item_model->getSupplier($item);
+            $supplier = $supplier ? array(
+                'supplier_id'   => $supplier['supplier_id'],
+                'name'          => $supplier['name'],
+            ) : null;
+
+            $stocking_place = $this->item_model->getStockingPlace($item);
+            $stocking_place = $stocking_place ? array(
+                'stocking_place_id' => $stocking_place['stocking_place_id'],
+                'name'              => $stocking_place['name'],
+            ) : null;
 
             $control = $this->item_model->getLastInventoryControl($item);
             $last_control = null;
 
             if ($control) {
+                $controller = $this->inventory_control_model
+                    ->getUser($control['controller_id']);
+
                 $last_control = [
-                    'date'          => $control['date'],
-                    'controller'    => $control['controller']['username'],
-                    'remarks'       => $control['remarks'],
+                    'inventory_control_id'  => $control['inventory_control_id'],
+                    'date'                  => $control['date'],
+                    'controller' => [
+                        'controller_id' => $controller['id'],
+                        'username'      => $controller['username'],
+                    ],
+                    'remarks' => $control['remarks'],
                 ];
             }
 
-            $warranty_status_i = $this->item_model->getWarrantyStatus($item);
-            $warranty_status = lang(
-                'MY_application.text_warranty_status')[$warranty_status_i];
-
-            $supplier = $this->item_model->getSupplier($item);
-            $supplier = $supplier ? $supplier['name'] : null;
-
-            $stocking_place = $this->item_model->getStockingPlace($item);
-            $stocking_place = $stocking_place ? $stocking_place['name'] : null;
+            $item['inventory_nb'] = $inventory_nb;
+            $item['warranty_status'] = $warranty_status;
+            $item['condition'] = $condition;
+            $item['current_loan'] = $current_loan;
+            $item['supplier'] = $supplier;
+            $item['stocking_place'] = $stocking_place;
+            $item['last_control'] = $last_control;
 
             // Data to send
-            $data = [
-                'item' => [
-                    'id'                => $id,
-                    'inventory_nb'      => $inventory_nb,
-                    'serial_nb'         => $item['serial_number'],
-                    'condition'         => $condition,
-                    'current_loan'      => $current_loan,
-                    'buying_price'      => $item['buying_price'],
-                    'buying_date'       => $item['buying_date'],
-                    'warranty_duration' => $item['warranty_duration'],
-                    'warranty_status'   => $warranty_status,
-                    'remarks'           => $item['remarks'],
-                    'supplier'          => $supplier,
-                    'supplier_ref'      => $item['supplier_ref'],
-                    'stocking_place'    => $stocking_place,
-                    'last_control'      => $last_control,
-                ]
-            ];
+            $data['item'] = $item;
         }
 
         // API Response
@@ -145,7 +150,7 @@ class API extends BaseController
     }
 
     /**
-     * Endpoint containing item common information
+     * Endpoint containing item common information for a given item
      * 
      * @param integer $id : The ID of the item
      * @return CodeIgniter\HTTP\Response
@@ -154,10 +159,8 @@ class API extends BaseController
     {
         $data = ['item_common' => null];
 
-        // Get database entities
-        $item = $this->item_model->find($id);
-        if ($item) $item_common = $this->item_common_model
-            ->find($item['item_common_id']);
+        // Get database entity
+        $item_common = $this->item_common_model->find($id);
 
         // Get data for endpoint
         if ($item_common) {
@@ -202,12 +205,12 @@ class API extends BaseController
     }
 
     /**
-     * Endpoint containing loan and control history information of an item
+     * Endpoint containing loan and control history information for a given item
      * 
      * @param integer $id : The ID of the item
      * @return CodeIgniter\HTTP\Response
      */
-    public function show_history($id = 0)
+    public function show_item_history($id = 0)
     {
         $data = [
             'loans_history'     => null,
@@ -247,12 +250,13 @@ class API extends BaseController
 
                 // Data to send
                 $loan_data = [
-                    'date'                  => $loan['date'],
-                    'planned_return_date'   => $loan['planned_return_date'],
-                    'real_return_date'      => $loan['real_return_date'],
-                    'item_location'         => $loan['item_localisation'],
-                    'lent_by'               => $loaner,
-                    'borrower'              => $borrower_info,
+                    'id'                => $loan['loan_id'],
+                    'date'              => $loan['date'],
+                    'planned_return'    => $loan['planned_return_date'],
+                    'real_return'       => $loan['real_return_date'],
+                    'item_location'     => $loan['item_localisation'],
+                    'lent_by'           => $loaner,
+                    'borrower'          => $borrower_info,
                 ];
 
                 array_push($data['loans_history'], $loan_data);
@@ -271,6 +275,7 @@ class API extends BaseController
 
                 // Data to send
                 $control_data = [
+                    'id'            => $control['inventory_control_id'],
                     'date'          => $control['date'],
                     'controller'    => $controller,
                     'remarks'       => $control['remarks'],
