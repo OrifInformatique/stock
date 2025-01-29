@@ -159,8 +159,11 @@ class API extends BaseController
     {
         $data = ['item_common' => null];
 
-        // Get database entity
-        $item_common = $this->item_common_model->find($id);
+        // Get database entities
+        $item = $this->item_model->find($id);
+        $item_common = null;
+        if ($item) $item_common = $this->item_common_model
+            ->find($item['item_common_id']);
 
         // Get data for endpoint
         if ($item_common) {
