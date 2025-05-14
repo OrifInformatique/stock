@@ -42,6 +42,7 @@ class Filters extends BaseConfig
             // 'csrf',
             // 'invalidchars',
             'stockbf',
+            'cors'
         ],
         'after' => [
             'toolbar',
@@ -70,10 +71,5 @@ class Filters extends BaseConfig
      * Example:
      * 'isLoggedIn' => ['before' => ['account/*', 'profiles/*']]
      */
-    public array $filters = [
-        'cors' => [
-            'before'    => ['API/*'],
-            'after'     => ['API/*'],
-        ]
-    ];
+    public array $filters = [];
 }

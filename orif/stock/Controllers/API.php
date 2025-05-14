@@ -221,7 +221,7 @@ class API extends BaseController
     {
         $data = [
             'history' => [
-                'item_id'   => $id,
+                'item_id'   => null,
                 'loans'     => null,
                 'controls'  => null,
             ]
@@ -230,6 +230,8 @@ class API extends BaseController
         // Get database entity
         $item = $this->item_model->find($id);
         if ($item) {
+            $data['history']['item_id'] = $id;
+
             $loans = $this->loan_model
                 ->where('item_id', $id)
                 ->findAll();
