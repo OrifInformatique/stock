@@ -127,7 +127,7 @@ $validation=\Config\Services::validation();
         <!-- FORM BUTTONS -->
         <div class="row">
             <div class="col text-right">
-                <a class="btn btn-default" href="<?= base_url('user/admin/list_user'); ?>"><?= lang('common_lang.btn_cancel'); ?></a>
+                <a class="btn btn-secondary" href="<?= base_url('user/admin/list_user'); ?>"><?= lang('common_lang.btn_cancel'); ?></a>
                 <?= form_submit('save', lang('common_lang.btn_save'), ['class' => 'btn btn-primary']); ?>
             </div>
         </div>

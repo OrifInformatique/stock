@@ -40,7 +40,7 @@ class Migrate extends BaseController
     public function index()
     {
         // Display migration form
-        $this->display_view('\Stock\Views\migration\migration_form');
+        return $this->display_view('\Stock\Views\migration\migration_form');
     }
 
     public function toLatest()
@@ -54,7 +54,9 @@ class Migrate extends BaseController
 
             if ($this->validate($validationRules))
             {
-                if ($_POST['password'] == 'uzdSb8U8ZUD5h24')
+                $validData = $this->validator->getValidated();
+
+                if ($validData['password'] == 'uzdSb8U8ZUD5h24')
                 {
                     try
                     {

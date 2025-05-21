@@ -17,7 +17,7 @@
                     <div class = "alert alert-warning" ><?= lang('stock_lang.item_delete_explanation'); ?></div>
                 </div>
                 <div class="text-right">
-                    <a href="<?= base_url("item_common/view/{$item_common['item_common_id']}"); ?>" class="btn btn-default">
+                    <a href="<?= base_url("item_common/view/{$item_common['item_common_id']}"); ?>" class="btn btn-secondary">
                         <?= lang('common_lang.btn_cancel'); ?>
                     </a>
                     <button class="btn btn-danger"  data-toggle="modal" data-target="#confirmDeleteItemCommon">
@@ -34,7 +34,7 @@
                                 <div class="alert alert-danger text-center"><?= lang('stock_lang.hard_delete_item_explanation'); ?></div>
                             </div>
                             <div class="modal-footer justify-content-right">
-                                <button type="button" class="btn btn-default" data-dismiss="modal"><?= lang('common_lang.btn_cancel'); ?></button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><?= lang('common_lang.btn_cancel'); ?></button>
                                 <a href="<?= base_url(uri_string().'/1'); ?>" class="btn btn-danger">
                                     <?= lang('stock_lang.btn_delete_item'); ?>
                                 </a>

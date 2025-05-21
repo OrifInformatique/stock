@@ -64,13 +64,13 @@
             <?php
             if (!empty($item['linked_file'])) {
                 echo '<a href="'.base_url('uploads/files/'.$item['linked_file']).'" '.
-                        'class="btn btn-default"  role="button" >'
+                        'class="btn btn-secondary"  role="button" >'
                         .lang('MY_application.btn_linked_doc').
                      '</a>';
             }
             else {
                 echo '<a href="#" '.
-                     'class="btn btn-default disabled"  role="button" >'
+                     'class="btn btn-secondary disabled"  role="button" >'
                          .lang('MY_application.btn_linked_doc').
                      '</a>';
             }
@@ -131,7 +131,7 @@
 
                     // Button to display loans history -->
                     echo '<a href="'.base_url('/item/loans/'.$item['item_id']).'" '.
-                        'class="btn btn-default"  role="button" >'.
+                        'class="btn btn-secondary"  role="button" >'.
                         lang('MY_application.btn_loans_history').
                     '   </a>';
                     }
@@ -177,7 +177,7 @@
 
                     // Button for controls history 
                     echo '<a href="'.base_url('/item/inventory_controls/'.$item['item_id']).
-                        '" class="btn btn-default"  role="button" >'.
+                        '" class="btn btn-secondary"  role="button" >'.
                         lang('MY_application.btn_inventory_control_history').'</a>';
                 }?>
             </div></div>

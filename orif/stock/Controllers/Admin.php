@@ -143,7 +143,9 @@ class Admin extends BaseController
             ];
 
             if ($this->validate($validationRules)) {
-                $this->item_tag_model->update($id, $_POST);
+                $validData = $this->validator->getValidated();
+
+                $this->item_tag_model->update($id, $validData);
 
                 return redirect()->to('/stock/admin/view_tags');
             }
@@ -159,7 +161,7 @@ class Admin extends BaseController
             return redirect()->to('/stock/admin/view_tags');
         }
 
-        $this->display_view('Stock\admin\tags\form', $output);
+        return $this->display_view('Stock\admin\tags\form', $output);
     }
 
     /**
@@ -176,13 +178,15 @@ class Admin extends BaseController
             ];
 
             if ($this->validate($validationRules)) {
-                $this->item_tag_model->insert($_POST);
+                $validData = $this->validator->getValidated();
+
+                $this->item_tag_model->insert($validData);
 
                 return redirect()->to("/stock/admin/view_tags/");
             }
         }
 
-        $this->display_view('Stock\admin\tags\form');
+        return $this->display_view('Stock\admin\tags\form');
     }
 
     /**
@@ -200,7 +204,8 @@ class Admin extends BaseController
                 $output = array(
                     'tag' => $this->item_tag_model->withDeleted()->find($id)
                 );
-                $this->display_view('\Stock\admin\tags\delete', $output);
+                return $this->display_view('\Stock\admin\tags\delete',
+                    $output);
                 break;
 
             case 1: // Soft Delete item_tag
@@ -329,7 +334,9 @@ class Admin extends BaseController
             ];
 
             if ($this->validate($validationRules, $validationErrors)) {
-                $this->stocking_place_model->update($id, $_POST);
+                $validData = $this->validator->getValidated();
+
+                $this->stocking_place_model->update($id, $validData);
 
                 return redirect()->to('/stock/admin/view_stocking_places');
             }
@@ -347,7 +354,7 @@ class Admin extends BaseController
 
         $output['entities'] = $this->entity_model->withDeleted()->findAll();
 
-        $this->display_view('Stock\admin\stocking_places\form', $output);
+        return $this->display_view('Stock\admin\stocking_places\form', $output);
     }
 
     /**
@@ -376,7 +383,9 @@ class Admin extends BaseController
             ];
 
             if ($this->validate($validationRules, $validationErrors)) {
-                $this->stocking_place_model->insert($_POST);
+                $validData = $this->validator->getValidated();
+
+                $this->stocking_place_model->insert($validData);
 
                 return redirect()->to("/stock/admin/view_stocking_places");
             }
@@ -384,7 +393,7 @@ class Admin extends BaseController
 
         $output['entities'] = $this->entity_model->withDeleted()->findAll();
 
-        $this->display_view('Stock\admin\stocking_places\form', $output);
+        return $this->display_view('Stock\admin\stocking_places\form', $output);
     }
 
     /**
@@ -401,7 +410,7 @@ class Admin extends BaseController
                 $output = array(
                     'stocking_place' => $this->stocking_place_model->withDeleted()->find($id)
                 );
-                $this->display_view('\Stock\admin\stocking_places\delete', $output);
+                return $this->display_view('\Stock\admin\stocking_places\delete', $output);
                 break;
 
             case 1: // Soft delete stocking_place
@@ -527,7 +536,9 @@ class Admin extends BaseController
             }
 
             if ($this->validate($validationRules)) {
-                $this->supplier_model->update($id, $_POST);
+                $validData = $this->validator->getValidated();
+
+                $this->supplier_model->update($id, $validData);
 
                 return redirect()->to('/stock/admin/view_suppliers');
             }
@@ -543,7 +554,7 @@ class Admin extends BaseController
             return redirect()->to('/stock/admin/view_suppliers');
         }
 
-        $this->display_view('Stock\admin\suppliers\form', $output);
+        return $this->display_view('Stock\admin\suppliers\form', $output);
     }
 
     /**
@@ -570,13 +581,15 @@ class Admin extends BaseController
             }
 
             if ($this->validate($validationRules)) {
-                $this->supplier_model->insert($_POST);
+                $validData = $this->validator->getValidated();
+
+                $this->supplier_model->insert($validData);
 
                 return redirect()->to("/stock/admin/view_suppliers");
             }
         }
 
-        $this->display_view('Stock\admin\suppliers\form');
+        return $this->display_view('Stock\admin\suppliers\form');
     }
 
     /**
@@ -593,7 +606,7 @@ class Admin extends BaseController
                 $output = array(
                     'supplier' => $this->supplier_model->withDeleted()->find($id)
                 );
-                $this->display_view('\Stock\admin\suppliers\delete', $output);
+                return $this->display_view('\Stock\admin\suppliers\delete', $output);
                 break;
 
             case 1: // Soft delete supplier
@@ -728,7 +741,9 @@ class Admin extends BaseController
             ];
 
             if ($this->validate($validationRules, $validationErrors)) {
-                $this->item_group_model->update($id, $_POST);
+                $validData = $this->validator->getValidated();
+
+                $this->item_group_model->update($id, $validData);
 
                 return redirect()->to('/stock/admin/view_item_groups');
             }
@@ -746,7 +761,7 @@ class Admin extends BaseController
 
         $output['entities'] = $this->entity_model->findAll();
 
-        $this->display_view('Stock\admin\item_groups\form', $output);
+        return $this->display_view('Stock\admin\item_groups\form', $output);
     }
 
     /**
@@ -786,7 +801,7 @@ class Admin extends BaseController
         $output['entities'] = $this->entity_model->findAll();
         $output['errors'] = $validation->getErrors();
 
-        $this->display_view('Stock\admin\item_groups\form', $output);
+        return $this->display_view('Stock\admin\item_groups\form', $output);
     }
 
     /**
@@ -803,7 +818,7 @@ class Admin extends BaseController
                 $output = array(
                     'item_group' => $this->item_group_model->withDeleted()->find($id)
                 );
-                $this->display_view('\Stock\admin\item_groups\delete', $output);
+                return $this->display_view('\Stock\admin\item_groups\delete', $output);
                 break;
 
             case 1: // Soft delete item_group
@@ -974,7 +989,7 @@ class Admin extends BaseController
         $output['entities'] = $this->dropdown($this->entity_model->findAll(), 'entity_id');
         $output['default_entity'] = $entity_id;
 
-        $this->display_view(['\Stock\Views\admin\common\entity_selector', '\Common\Views\items_list'], $output);
+        return $this->display_view(['\Stock\Views\admin\common\entity_selector', '\Common\Views\items_list'], $output);
     }
 
     public function save_user($user_id = 0)
@@ -1015,7 +1030,7 @@ class Admin extends BaseController
                     'cb_not_null_user' => lang('user_lang.msg_err_user_not_exist')
                 ],
                 'user_name' => [
-                    'cb_unique_user' => lang('user_lang.msg_err_user_not_unique')
+                    'cb_unique_user' => lang('user_lang.msg_err_username_not_unique')
                 ],
                 'user_usertype' => [
                     'cb_not_null_user_type' => lang('user_lang.msg_err_user_type_not_exist')
@@ -1164,7 +1179,7 @@ class Admin extends BaseController
                     'user' => $user,
                     'title' => lang('user_lang.title_user_delete')
                 );
-                $this->display_view('\User\admin\delete_user', $output);
+                return $this->display_view('\User\admin\delete_user', $output);
                 break;
             case 1: // Deactivate (soft delete) user
                 if ($_SESSION['user_id'] != $user['id']) {

@@ -76,7 +76,10 @@
     <?php } ?>
 
     <!-- BUTTON TO CREATE NEW LOAN -->
-    <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $registered_access) { ?>
-        <a href="<?= base_url('item/create_loan/'.$item['item_id']); ?>" class="btn btn-primary"><?= lang('MY_application.btn_new') ?></a>
+    <?php if(isset($_SESSION['logged_in']) &&
+        $_SESSION['logged_in'] == true &&
+        $registered_access &&
+        !array_key_exists('real_return_date', $item['current_loan'])) { ?>
+            <a href="<?= base_url('item/create_loan/'.$item['item_id']); ?>" class="btn btn-primary"><?= lang('MY_application.btn_new') ?></a>
     <?php } ?>
 </div>
