@@ -168,17 +168,11 @@ class ItemCommon extends BaseController {
             $this->user_entity_model->check_user_item_common_entity($_SESSION['user_id'], $id) &&
             $_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_registered) 
         {
-            $imageId = $id;
             $upload_failed = false;
             $item_common = $this->item_common_model->find($id);
 
-            // If image allready exist, get its id
-            if (isset($item_common['image']) && $item_common['image'] !== '') {
-                $imageId = explode('_', $item_common['image'])[0];
-            }
-
             // Define image path variables
-            $_SESSION['picture_prefix'] = str_pad($imageId, $this->config->inventory_number_chars, "0", STR_PAD_LEFT);
+            $_SESSION['picture_prefix'] = str_pad($id, $this->config->inventory_number_chars, "0", STR_PAD_LEFT);
             $temp_image_name = $_SESSION["picture_prefix"].$this->config->image_picture_suffix.$this->config->image_tmp_suffix.$this->config->image_extension;
             $new_image_name = $_SESSION["picture_prefix"].$this->config->image_picture_suffix.$this->config->image_extension;
 
@@ -227,7 +221,7 @@ class ItemCommon extends BaseController {
                 if (file_exists($this->config->images_upload_path.$temp_image_name)) {
                     if (file_exists($this->config->images_upload_path.$new_image_name)) {
                         // If new image name already exists, delete it
-                        unlink(ROOTPATH.'public/' . $this->config->images_upload_path . $item_common['image']);
+                        unlink(ROOTPATH.'public/' . $this->config->images_upload_path . $new_image_name);
                     }
                     rename($this->config->images_upload_path.$temp_image_name, $this->config->images_upload_path.$new_image_name);
                 }
