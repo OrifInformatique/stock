@@ -8,6 +8,9 @@ use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use CodeIgniter\HTTP\Response;
+
+use Common\Exceptions\AccessDeniedException;
 
 /**
  * Class BaseController
@@ -58,7 +61,8 @@ abstract class BaseController extends Controller
     /**
      * Constructor.
      */
-    public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
+    public function initController(RequestInterface $request,
+        ResponseInterface $response, LoggerInterface $logger)
     {
         // Do Not Edit This Line
         parent::initController($request, $response, $logger);
@@ -69,10 +73,7 @@ abstract class BaseController extends Controller
         
         // Check permission on construct
         if (!$this->check_permission()) {
-            $this->display_view('\User\errors\403error');
-            exit();
-            //throw new \Exception("some message here",403);
-            //show_error(lang('msg_err_access_denied_message'), 403, lang('msg_err_access_denied_header'));
+            throw AccessDeniedException::forPageAccessDenied();
         }
     }
 
@@ -85,7 +86,8 @@ abstract class BaseController extends Controller
     * @return bool : true if user level is equal or higher than required level,
     *                false else
     */
-    protected function check_permission($required_level = NULL)
+    protected function check_permission(
+        ?int $required_level = NULL): bool|Response
     {
         if (!isset($_SESSION['logged_in'])) {
             // Tests can accidentally delete $_SESSION,
@@ -106,7 +108,7 @@ abstract class BaseController extends Controller
             // check if user is logged in, if not access is not allowed
             if ($_SESSION['logged_in'] != true) {
                 // The usual redirect()->to() doesn't work here. Keep this kind of redirect.
-                return $this->response->redirect(base_url('user/auth/login'));
+                return false;
             }
             // check if page is accessible for all logged in users
             elseif ($required_level == "@") {
@@ -130,8 +132,12 @@ abstract class BaseController extends Controller
      * @param  $view_parts : single view or array of view parts to display
      *         $data : data array to send to the view
      */
-    public function display_view($view_parts, $data = NULL)
+    public function display_view(string|array $view_parts,
+        ?array $data = NULL): string
     {
+        // The view to be constructed and displayed
+        $viewToDisplay = '';
+        
         // If not defined in $data, set page title to empty string
         if (!isset($data['title'])) {
             $data['title'] = '';
@@ -142,32 +148,35 @@ abstract class BaseController extends Controller
             $data['after_login_redirect'] = current_url();
         }
 
-        // Display common headers
-        echo view('Common\header', $data);
+        // Add common headers to the view
+        $viewToDisplay .=  view('Common\header', $data);
 
-        // Display login bar
-        echo view('Common\login_bar');
+        // Add login bar to the view
+        $viewToDisplay .= view('Common\login_bar');
 
-        // Display admin menu if appropriate
+        // Add admin menu to the view if the current url is an admin url
         foreach (config('Common\Config\AdminPanelConfig')->tabs as $tab){
             if (strstr(current_url(),$tab['pageLink'])) {
-                echo view('\Common\adminMenu');
+                $viewToDisplay .= view('\Common\adminMenu');
             }
         }
 
         if (is_array($view_parts)) {
-            // Display multiple view parts
+            // Add multiple parts to the view
             foreach ($view_parts as $view_part) {
-                echo view($view_part, $data);
+                $viewToDisplay .= view($view_part, $data);
             }
         }
         elseif (is_string($view_parts)) {
-            // Display unique view part
-            echo view($view_parts, $data);
+            // Add unique part to the view
+            $viewToDisplay .= view($view_parts, $data);
         }
 
-        // Display common footer
-        echo view('Common\footer');
+        // Add common footers to the view
+        $viewToDisplay .= view('Common\footer');
+        
+        // Return the complete view to display
+        return $viewToDisplay;
     }
 
     /**

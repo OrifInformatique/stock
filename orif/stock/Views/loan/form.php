@@ -65,7 +65,7 @@
         <?php if ($action == 'create' || $action == 'modify' && !isset($real_return_date)) echo 'disabled' ?> /><br />
     <!-- SUBMIT BUTTON -->
     <button type="submit" class="btn btn-success" <?php if ($action != 'return') echo 'onclick="enable_inputs()"'; ?>><?= lang('MY_application.btn_save'); ?></button>
-    <a class="btn btn-default" href="<?php if ($action == 'modify') {echo base_url("item/loans/" . $item['item_id']);} else {echo base_url("item_common/view/" . $item['item_common_id']);} ?>">
+    <a class="btn btn-secondary" href="<?php if ($action == 'modify') {echo base_url("item/loans/" . $item['item_id']);} else {echo base_url("item_common/view/" . $item['item_common_id']);} ?>">
         <?= lang('MY_application.btn_cancel'); ?></a>
 </form>
 <script>

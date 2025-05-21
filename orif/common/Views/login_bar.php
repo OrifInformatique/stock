@@ -27,14 +27,15 @@
           <!-- ADMIN ACCESS ONLY -->
           <?php if ($_SESSION['user_access'] >= config('\User\Config\UserConfig')->access_lvl_admin) { ?>
               <!-- Link to the first administration tab defined in Common\Config\AdminPanelConfig -->
-              <a href="<?php echo base_url(config('\Common\Config\AdminPanelConfig')->tabs[0]['pageLink']); ?>" ><?php echo lang('common_lang.btn_admin'); ?></a><br />
+              <a href="<?php echo base_url(config('\Common\Config\AdminPanelConfig')->tabs[0]['pageLink']); ?>" ><?php echo lang('common_lang.btn_admin'); ?></a>
           <?php } ?>
           <!-- END OF ADMIN ACCESS -->
-
           <!-- Logged in, display a "change password" button -->
-          <a href="<?php echo base_url("user/auth/change_password"); ?>" ><?php echo lang('common_lang.btn_change_my_password'); ?></a>
+          <?php if (!isset($_SESSION['azure_identification'])) { ?>
+            <a href="<?php echo base_url("user/auth/change_password"); ?>" ><?php echo lang('common_lang.btn_change_my_password'); ?></a>
+          <?php } ?>
           <!-- and a "logout" button -->
-          <a href="<?php echo base_url("user/auth/logout"); ?>" ><?php echo lang('common_lang.btn_logout'); ?></a><br />
+          <a href="<?php echo base_url("user/auth/logout"); ?>" ><?php echo lang('common_lang.btn_logout'); ?></a>
 
         <?php } else { ?>
           <!-- Not logged in, display a "login" button -->

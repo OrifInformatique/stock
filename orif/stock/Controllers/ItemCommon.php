@@ -143,14 +143,14 @@ class ItemCommon extends BaseController {
 
                 $output['items'] = $items;
 
-                $this->display_view('Stock\Views\item_common\details', $output);
+                return $this->display_view('Stock\Views\item_common\details', $output);
             } else {
                 // No items so we display the page with a concise message
-                $this->display_view('Stock\Views\item_common\details', $output);
+                return $this->display_view('Stock\Views\item_common\details', $output);
             }
         } else {
             // $id is not valid, display an error message
-            $this->display_view('Stock\Views\errors\application\inexistent_item');
+            return $this->display_view('Stock\Views\errors\application\inexistent_item');
         }
     }
 
@@ -307,7 +307,7 @@ class ItemCommon extends BaseController {
             }
             unset($_SESSION['POST']);
 
-            $this->display_view('Stock\Views\item_common\form', $output);
+            return $this->display_view('Stock\Views\item_common\form', $output);
         } else {
             // Access not allowed
             return redirect()->to(base_url());
@@ -337,7 +337,7 @@ class ItemCommon extends BaseController {
                         'item_common' => $item_common,
                         'title' => lang('stock_lang.title_delete_item_common')
                     );
-                    $this->display_view('Stock\Views\item_common\delete', $output);
+                    return $this->display_view('Stock\Views\item_common\delete', $output);
                     break;
                 case 1: // Delete item_common and related items
                     $items = $this->item_model->where('item_common_id', $id)->findAll();
