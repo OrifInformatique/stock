@@ -9,6 +9,7 @@ use CodeIgniter\Filters\Honeypot;
 use CodeIgniter\Filters\InvalidChars;
 use CodeIgniter\Filters\SecureHeaders;
 use Stock\Filters\FilterusrrequestBf;
+use Stock\Filters\Cors;
 
 class Filters extends BaseConfig
 {
@@ -25,7 +26,8 @@ class Filters extends BaseConfig
         'honeypot'      => Honeypot::class,
         'invalidchars'  => InvalidChars::class,
         'secureheaders' => SecureHeaders::class,
-        'stockbf'  => FilterusrrequestBf::class,
+        'stockbf'       => FilterusrrequestBf::class,
+        'cors'          => Cors::class,
     ];
 
     /**
@@ -39,7 +41,8 @@ class Filters extends BaseConfig
             // 'honeypot',
             // 'csrf',
             // 'invalidchars',
-            'stockbf'
+            'stockbf',
+            'cors'
         ],
         'after' => [
             'toolbar',
