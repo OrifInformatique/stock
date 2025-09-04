@@ -48,42 +48,42 @@ Vagrantfile
 #-------------------------
 # Temporary Files
 #-------------------------
-writable/cache/*
+ci-application/writable/cache/*
 !writable/cache/index.html
 
-writable/logs/*
+ci-application/writable/logs/*
 !writable/logs/index.html
 
-writable/session/*
+ci-application/writable/session/*
 !writable/session/index.html
 
-writable/uploads/*
+ci-application/writable/uploads/*
 !writable/uploads/index.html
 
-writable/debugbar/*
+ci-application/writable/debugbar/*
 
-php_errors.log
+ci-application/php_errors.log
 
 #-------------------------
 # User Guide Temp Files
 #-------------------------
-user_guide_src/build/*
-user_guide_src/cilexer/build/*
-user_guide_src/cilexer/dist/*
-user_guide_src/cilexer/pycilexer.egg-info/*
+ci-application/user_guide_src/build/*
+ci-application/user_guide_src/cilexer/build/*
+ci-application/user_guide_src/cilexer/dist/*
+ci-application/user_guide_src/cilexer/pycilexer.egg-info/*
 
 #-------------------------
 # Test Files
 #-------------------------
-tests/coverage*
+ci-application/tests/coverage*
 
 # Don't save phpunit under version control.
-phpunit
+ci-application/phpunit
 
 #-------------------------
 # Composer
 #-------------------------
-vendor/
+ci-application/vendor/
 
 #-------------------------
 # IDE / Development Files
@@ -121,10 +121,10 @@ nb-configuration.xml
 # Visual Studio Code
 .vscode/
 
-/results/
-/phpunit*.xml
-/.phpunit.*.cache
+ci-application//results/
+ci-application//phpunit*.xml
+ci-application//.phpunit.*.cache
 
 # User uploaded files (the folders have to stay in GIT)
-public/uploads/images/*
-public/uploads/files/*
+ci-application/public/uploads/images/*
+ci-application/public/uploads/files/*

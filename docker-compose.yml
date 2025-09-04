@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  apache:
+    build: 
+      context: ./docker/apache
+    ports:
+      - "80:80"
+    volumes:
+      - ./ci-application:/var/www/html
+    depends_on:
+      - mariadb
+
+  mariadb:
+    build: 
+      context: ./docker/mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+volumes:
+  mariadb_data:
