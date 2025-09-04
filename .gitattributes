@@ -8,4 +8,4 @@
 
 /.github/ export-ignore
 /documentation/ export-ignore
-/ci_application/tests/ export-ignore
+/ci-application/tests/ export-ignore
