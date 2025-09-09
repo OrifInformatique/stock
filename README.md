@@ -4,19 +4,20 @@ Web application to manage items inventory, loans and more.
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+These instructions will get you a docker environment up and running on your local machine for development and testing purposes.
 
 ### Prerequisites
 
-This project is developed on a AMP server with PHP 8.1 and MariaDB 10.4.
+This project is developed on a Docker environment with PHP 8.1 and MariaDB 11.4.
 It is based on the CodeIgniter 4.x framework.
+To run it with Docker you need to install [Docker Desktop](https://www.docker.com/products/docker-desktop/) at first.
 
 ### Installing
 
-1. Download [our latest release](https://github.com/OrifInformatique/stock/releases)
-2. Unzip your download in your project's directory (in your local PHP server)
-3. Run "composer install" to download required packages (you have to install composer at first, you can [get it here](https://getcomposer.org/download/))
-4. Create a copy of the "env_dist" file and rename it to .env, then adapt it to your server's parameters
+1. [Clone the project](https://github.com/OrifInformatique/stock)
+2. Create a copy of the project root's "env_dist" file and rename it to .env, then adapt it if you want
+3. From a terminal, go into the "ci-application" directory and run `composer install` to download required php packages (you have to install composer at first, you can [get it here](https://getcomposer.org/download/))
+4. In the "ci-application" directory, create a copy of the "env_dist" file and rename it to .env, then adapt it to your Docker's parameters
 ```
 FOR EXAMPLE
 
@@ -30,43 +31,23 @@ app.baseURL = 'http://localhost/stock/public/'
 
 [...]
 
-database.default.hostname = localhost
-database.default.database = stock
-database.default.username = root
-database.default.password = 
+database.default.hostname = mariadb
+database.default.database = stock_db
+database.default.username = stock_user
+database.default.password = stock_password
 database.default.DBDriver = MySQLi
 
 [...]
 
 ```
-5. Generate a local database running CodeIgniter's spark migrate commands
-
+5. From a terminal, go into the root directory and run `docker-compose up --build`
+6. Access a terminal in the Docker apache container with `docker-compose exec apache bash`
+7. From this terminal, generate the database in mariadb Docker's container running CodeIgniter's spark migrate commands
 ```bash
 php spark migrate -n Stock
 php spark migrate -n User
 ```
-
-## Upgrade Version 1.6 to Version 4.0
-
-This upgrade makes lot of changes as the application is adapted to new CodeIgniter 4.x. Please follow carefully these steps and try it in a test environment before.
-
-1. BE SURE TO HAVE A COMPLETE BACKUP OF YOUR APPLICATION (DATABASE AND FILES)
-2. With FTP connexion, remove all files and folder from the hosting server, except for the "uploads" folder
-3. With FTP connexion, upload all the content of Version 4.0 release to the hosting server
-4. Move the "uploads" folder from root to "public" folder
-5. Rename the .env_dist file to .env and adapt its content to your hosting environment
-6. Delete the orif/stock/Database/Migrations/restore_CI3_version folder
-7. Browse to APPLICATION_URL/stock/migrate/toCI4
-8. Enter the password that you can find in orif/stock/Controllers/Migrate.php (line 49) and validate
-9. Delete the file orif/stock/Controllers/Migrate.php
-10. Delete the folder orif/stock/Views/migration
-11. Browse to the application and connect with an administrator account
-12. Browse to APPLICATION_URL/clean_images/index
-13. Click on "Yes" to execute the script which will clean up the items images
-14. Delete the file orif/stock/Controllers/Clean_images.php
-15. Delete the folder orif/stock/Views/admin/clean_images
-16. Delete the folder orif/stock/Commands
-17. VERIFY THAT ALL THE APPLICATION WORKS WELL
+8. Access your application (http://localhost:80/public)
 
 ## Built With
 

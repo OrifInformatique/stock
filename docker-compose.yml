@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   apache:
     build: 
@@ -10,6 +8,8 @@ services:
       - ./ci-application:/var/www/html
     depends_on:
       - mariadb
+    networks:
+      - app-network
 
   mariadb:
     build: 
@@ -22,7 +22,13 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - mariadb_data:/var/lib/mysql
+      - db_data:/var/lib/mysql
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
-  mariadb_data:
+  db_data:
