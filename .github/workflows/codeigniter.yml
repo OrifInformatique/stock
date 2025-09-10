@@ -28,7 +28,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Validate composer.json and composer.lock
+    - name: Validate ci-application/composer.json and ci-application/composer.lock
       run: composer validate --strict
 
     - name: Cache Composer packages
