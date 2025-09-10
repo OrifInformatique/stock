@@ -35,6 +35,7 @@ class AdminMenuTest extends CIUnitTestCase
     # list_user of module stock creates side effects in other tests.
     # To check: list_user of module stock makes the view function saves
     # previous data and change some session data.
+    /*
     public function test_panel_config_with_administrator_session() 
     {
         
@@ -55,4 +56,5 @@ class AdminMenuTest extends CIUnitTestCase
         d($warning);
         return;
     }
+    */
 }
