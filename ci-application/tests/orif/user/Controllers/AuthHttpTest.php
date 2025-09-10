@@ -34,7 +34,6 @@ class AuthHttpTest extends CIUnitTestCase
         $result = $this->call('get', $url);
         $redirectUrl = $result->getRedirectUrl();
         $html = file_get_contents($redirectUrl, false);
-        dd($html);
     }
 
     public function test_azure_mail_with_correct_code_new_user(): void
@@ -63,7 +62,6 @@ class AuthHttpTest extends CIUnitTestCase
         $noAzureMail = 'fake@fake.fake';
         $userModel = model(User_model::class);
         $userModel->update($userId, ['email' => $noAzureMail]);
-        d($userModel->find($userId));
         $_POST['user_verification_code'] = null;
         $_SESSION['verification_code'] = null;
         # $_SESSION['verification_attempts'] = 3;
@@ -84,7 +82,6 @@ class AuthHttpTest extends CIUnitTestCase
         $noAzureMail = 'fake@fake.fake';
         $userModel = model(User_model::class);
         $userModel->update($userId, ['email' => $noAzureMail]);
-        d($userModel->findAll());
         $_POST['user_verification_code'] = 'correct';
         $_SESSION['verification_code'] = 'correct';
         # $_SESSION['verification_attempts'] = 3;
@@ -101,5 +98,4 @@ class AuthHttpTest extends CIUnitTestCase
                                ->find($userId)['azure_mail'];
         $this->assertEquals($azureMail, $azureMailInDb);
     }
-
 }
