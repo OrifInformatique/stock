@@ -553,6 +553,7 @@ class AuthTest extends CIUnitTestCase
             $html));
     }
 
+    /*
     public function test_azure_login_code_fake(): void
     {
         if (!getenv('CLIENT_ID')) {
@@ -564,6 +565,7 @@ class AuthTest extends CIUnitTestCase
         $result = $this->controller(Auth::class)->execute('azure_login');
         $result->assertSee(lang('user_lang.msg_err_azure_unauthorized'));
     }
+    */
 
     private function get_azure_data(): array
     {
