@@ -8,7 +8,7 @@ These instructions will get you a docker environment up and running on your loca
 
 ### Prerequisites
 
-This project is developed on a Docker environment with PHP 8.1 and MariaDB 11.4.
+This project is developed on a Docker environment with PHP 8.1 and MariaDB 10.11.
 It is based on the CodeIgniter 4.x framework.
 To run it with Docker you need to install [Docker Desktop](https://www.docker.com/products/docker-desktop/) at first.
 
@@ -47,7 +47,8 @@ database.default.DBDriver = MySQLi
 php spark migrate -n Stock
 php spark migrate -n User
 ```
-8. Access your application (http://localhost:80/public)
+8. Access your application (http://localhost/public)
+9. Access phpMyAdmin (http://localhost:8080/)
 
 ## Built With
 
