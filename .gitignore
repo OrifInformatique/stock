@@ -49,16 +49,16 @@ Vagrantfile
 # Temporary Files
 #-------------------------
 ci-application/writable/cache/*
-!writable/cache/index.html
+!ci-application/writable/cache/index.html
 
 ci-application/writable/logs/*
-!writable/logs/index.html
+!ci-application/writable/logs/index.html
 
 ci-application/writable/session/*
-!writable/session/index.html
+!ci-application/writable/session/index.html
 
 ci-application/writable/uploads/*
-!writable/uploads/index.html
+!ci-application/writable/uploads/index.html
 
 ci-application/writable/debugbar/*
 

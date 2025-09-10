@@ -31,12 +31,6 @@ jobs:
     - name: Validate composer.json and composer.lock
       run: cd ci-application && composer validate --strict
 
-    - name: Fix permissions for writable directory
-      run: |
-        cd ci-application
-        chmod -R 777 writable
-        chmod -R 777 writable/cache
-    
     - name: Cache Composer packages
       id: composer-cache
       uses: actions/cache@v3
