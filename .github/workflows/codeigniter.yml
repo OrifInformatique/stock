@@ -28,8 +28,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Validate ci-application/composer.json and ci-application/composer.lock
-      run: composer validate --strict
+    - name: Validate composer.json and composer.lock
+      run: cd ci-application && composer validate --strict
 
     - name: Cache Composer packages
       id: composer-cache
