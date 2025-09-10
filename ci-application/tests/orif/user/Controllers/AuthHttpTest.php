@@ -38,6 +38,8 @@ class AuthHttpTest extends CIUnitTestCase
 
     public function test_azure_mail_with_correct_code_new_user(): void
     {
+        ob_start(); // Start output buffering
+
         $firstName = 'Firstname';
         $lastName = 'Lastname';
         $userName = "$firstName.$lastName";
@@ -54,10 +56,14 @@ class AuthHttpTest extends CIUnitTestCase
         $name = $userModel->select('username')->where('username=', $userName)
                                               ->findAll()[0]['username'];
         $this->assertEquals($userName, $name);
+
+        ob_end_clean(); // Clear the output buffer
     }
 
     public function test_azure_mail_existed_user_variable_created(): void
     {
+        ob_start(); // Start output buffering
+
         $userId = 2;
         $noAzureMail = 'fake@fake.fake';
         $userModel = model(User_model::class);
@@ -74,10 +80,14 @@ class AuthHttpTest extends CIUnitTestCase
         $result = $this->withSession()->post($url);
         # d($result->response()->getBody());
         $result->assertSee(lang('user_lang.user_validation_code'));
+
+        ob_end_clean(); // Clear the output buffer
     }
 
     public function test_azure_mail_with_correct_code_existing_user(): void
     {
+        ob_start(); // Start output buffering
+
         $userId = 2;
         $noAzureMail = 'fake@fake.fake';
         $userModel = model(User_model::class);
@@ -97,5 +107,7 @@ class AuthHttpTest extends CIUnitTestCase
         $azureMailInDb = $userModel->select('azure_mail')
                                ->find($userId)['azure_mail'];
         $this->assertEquals($azureMail, $azureMailInDb);
+
+        ob_end_clean(); // Clear the output buffer
     }
 }
