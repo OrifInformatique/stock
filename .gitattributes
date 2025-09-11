@@ -3,5 +3,9 @@
 /.gitattributes export-ignore
 /conventions.md export-ignore
 /phpunit.xml.dist export-ignore
+/docker-compose.yml export-ignore
+/docker/ export-ignore
+
+/.github/ export-ignore
 /documentation/ export-ignore
-/tests/ export-ignore
+/ci-application/tests/ export-ignore
