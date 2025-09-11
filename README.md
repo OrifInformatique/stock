@@ -15,7 +15,7 @@ To run it with Docker you need to install [Docker Desktop](https://www.docker.co
 ### Installing
 
 1. [Clone the project](https://github.com/OrifInformatique/stock)
-2. Create a copy of the project root's "env_dist" file and rename it to .env, then adapt it if you want
+2. Create a copy of the project root's "env_dist" file and rename it to .env, uncomment informations and adapt them if needed
 3. From a terminal, go into the "ci-application" directory and run `composer install` to download required php packages (you have to install composer at first, you can [get it here](https://getcomposer.org/download/))
 4. In the "ci-application" directory, create a copy of the "env_dist" file and rename it to .env, then adapt it to your Docker's parameters
 ```
@@ -27,7 +27,7 @@ CI_ENVIRONMENT = development
 
 [...]
 
-app.baseURL = 'http://localhost/stock/public/'
+app.baseURL = 'http://localhost/public/'
 
 [...]
 
@@ -49,6 +49,10 @@ php spark migrate -n User
 ```
 8. Access your application (http://localhost/public)
 9. Access phpMyAdmin (http://localhost:8080/)
+
+## Run tests
+1. Access a terminal in the Docker apache container with `docker-compose exec apache bash`
+2. Run `vendor/bin/phpunit`
 
 ## Built With
 

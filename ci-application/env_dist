@@ -20,7 +20,7 @@
 # APP
 #--------------------------------------------------------------------
 
-# app.baseURL = ''
+# app.baseURL = 'http://localhost/public/'
 # If you have trouble with `.`, you could also use `_`.
 # app_baseURL = ''
 # app.forceGlobalSecureRequests = false
@@ -30,18 +30,18 @@
 # DATABASE
 #--------------------------------------------------------------------
 
-# database.default.hostname = localhost
-# database.default.database = ci4
-# database.default.username = root
-# database.default.password = root
+# database.default.hostname = mariadb
+# database.default.database = stock_db
+# database.default.username = stock_user
+# database.default.password = stock_password
 # database.default.DBDriver = MySQLi
 # database.default.DBPrefix =
 # database.default.port = 3306
 
-# database.tests.hostname = localhost
-# database.tests.database = ci4_test
-# database.tests.username = root
-# database.tests.password = root
+# database.tests.hostname = mariadb
+# database.tests.database = stock_test_db
+# database.tests.username = stock_test_user
+# database.tests.password = stock_test_password
 # database.tests.DBDriver = MySQLi
 # database.tests.DBPrefix =
 # database.tests.port = 3306
