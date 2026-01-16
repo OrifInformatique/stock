@@ -1209,4 +1209,18 @@ class Item extends BaseController {
         // Access denied, redirect to previous URL
         return redirect()->to($_SESSION['_ci_previous_url']);
     }
+
+    /**
+     * Redirect to the item_common view corresponding to the item
+     * 
+     * @param $id : The ID of the item
+     */
+    public function show_item($id) {
+        $item = $this->item_model->find($id);
+        if (!is_null($item)) {
+            return redirect()->to('/item_common/view/'.$item['item_common_id']);
+        } else {
+            return redirect()->to(base_url());
+        }
+    }
 }

@@ -91,15 +91,15 @@ class ItemCommon extends BaseController {
     }
 
     /**
-     * Display details of one single item
+     * Display details of an item common and its related items
      *
-     * @param $id : the item to display
+     * @param $id : the item common to display
      * @return void
      */
     public function view($id = NULL) {
 
         if (is_null($id)) {
-            // No item selected, display items list
+            // No item common selected, display items list
             return redirect()->to(base_url());
         }
 
