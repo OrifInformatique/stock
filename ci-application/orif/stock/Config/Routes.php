@@ -12,6 +12,7 @@ $routes->add('stock/admin/(:any)','\Stock\Controllers\Admin::$1');
 $routes->add('stock/export_excel','\Stock\Controllers\ExcelExport::index');
 $routes->add('stock/export_excel/(:any)','\Stock\Controllers\ExcelExport::$1');
 $routes->add('stock/item/has_items/(:any)/(:any)','\Stock\Controllers\Item::has_items/$1/$2');
+$routes->add('item/(:num)','\Stock\Controllers\Item::show_item/$1');
 $routes->add('item/(:any)', '\Stock\Controllers\Item::$1');
 $routes->add('item_common/(:any)', '\Stock\Controllers\ItemCommon::$1');
 $routes->add('picture/(:any)', '\Stock\Controllers\Picture::$1');
