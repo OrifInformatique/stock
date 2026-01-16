@@ -141,3 +141,24 @@
 #--------------------------------------------------------------------
 
 # curlrequest.shareOptions = false
+
+#-------------------------------------------------------------------
+# Azure AD
+#-------------------------------------------------------------------
+
+# CLIENT_ID = 
+# TENANT_ID = 
+# CLIENT_SECRET = 
+# GRAPH_USER_SCOPES = 'User.Read'
+# REDIRECT_URI = https://stock.sectioninformatique.ch/user/auth/azure_login
+
+#-------------------------------------------------------------------
+# SMTP
+#-------------------------------------------------------------------
+
+# PROTOCOL = smtp
+# SMTP_HOST = smtp-mail.outlook.com
+# SMTP_ID = verif@sectioninformatique.ch
+# SMTP_PASSWORD = 
+# SMTP_PORT = 587
+# SMTP_CRYPTO = tls

@@ -167,7 +167,7 @@ class Auth extends BaseController {
         $email->initialize($emailConfig);
 
         // Sending code to user's  mail
-        $email->setFrom('smtp@sectioninformatique.ch', 'packbase'); 
+        $email->setFrom(getenv('SMTP_ID'), lang('common_lang.app_title')); 
         $email->setTo($form_email);
         $email->setSubject('Code de vérification');
         $email->setMessage('Voici votre code de vérification: '.$verification_code);
